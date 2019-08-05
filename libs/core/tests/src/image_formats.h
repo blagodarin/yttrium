@@ -26,7 +26,7 @@ inline Yt::Image make_gray8_test_image()
 	auto data = &buffer[0];
 	for (unsigned y = 0; y < size; ++y)
 		for (unsigned x = 0; x < size; ++x)
-			*data++ = static_cast<std::uint8_t>(y < size / 2 ? x * size + y / 2 : (size - 1 - x) * size + (size - 1 - y) / 2);
+			*data++ = static_cast<uint8_t>(y < size / 2 ? x * size + y / 2 : (size - 1 - x) * size + (size - 1 - y) / 2);
 	return { { size, size, Yt::PixelFormat::Gray8 }, buffer.data() };
 }
 

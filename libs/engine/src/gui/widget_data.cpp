@@ -26,18 +26,16 @@
 
 namespace
 {
-	using namespace Yt;
-
-	SizeF make_text_size(const Font& font, std::string_view text, float max_width, float max_height)
+	Yt::SizeF make_text_size(const Yt::Font& font, std::string_view text, float max_width, float max_height)
 	{
 		if (text.empty())
 			return { 0, max_height };
-		const SizeF unscaled_text_size{ font.text_size(text) };
+		const Yt::SizeF unscaled_text_size{ font.text_size(text) };
 		const auto font_size = std::min(max_height, unscaled_text_size._height * max_width / unscaled_text_size._width);
 		return { unscaled_text_size._width * font_size / unscaled_text_size._height, font_size };
 	}
 
-	Vector2 make_top_left(const RectF& rect, const SizeF& size, float margin, unsigned alignment)
+	Yt::Vector2 make_top_left(const Yt::RectF& rect, const Yt::SizeF& size, float margin, unsigned alignment)
 	{
 		const auto x_left = [&] { return rect.left() + margin; };
 		const auto x_center = [&] { return (rect.left() + rect.right() - size._width) / 2; };
@@ -54,15 +52,15 @@ namespace
 #else
 			[[fallthrough]];
 #endif
-		case TopLeftAlignment: return { x_left(), y_top() };
-		case TopAlignment: return { x_center(), y_top() };
-		case TopRightAlignment: return { x_right(), y_top() };
-		case LeftAlignment: return { x_left(), y_center() };
-		case CenterAlignment: return { x_center(), y_center() };
-		case RightAlignment: return { x_right(), y_center() };
-		case BottomLeftAlignment: return { x_left(), y_bottom() };
-		case BottomAlignment: return { x_center(), y_bottom() };
-		case BottomRightAlignment: return { x_right(), y_bottom() };
+		case Yt::TopLeftAlignment: return { x_left(), y_top() };
+		case Yt::TopAlignment: return { x_center(), y_top() };
+		case Yt::TopRightAlignment: return { x_right(), y_top() };
+		case Yt::LeftAlignment: return { x_left(), y_center() };
+		case Yt::CenterAlignment: return { x_center(), y_center() };
+		case Yt::RightAlignment: return { x_right(), y_center() };
+		case Yt::BottomLeftAlignment: return { x_left(), y_bottom() };
+		case Yt::BottomAlignment: return { x_center(), y_bottom() };
+		case Yt::BottomRightAlignment: return { x_right(), y_bottom() };
 		}
 	}
 }

@@ -213,18 +213,16 @@ namespace
 #	undef dct_interleave16
 #	undef dct_pass
 #else
-		using Yt::fixed_point;
-
 #	define IDCT_1D(s0, s1, s2, s3, s4, s5, s6, s7) \
 		int p2 = s2; \
 		int p3 = s6; \
-		int p1 = (p2 + p3) * fixed_point<int, 12>(0.5411961f); \
-		int t2 = p1 + p3 * fixed_point<int, 12>(-1.847759065f); \
-		int t3 = p1 + p2 * fixed_point<int, 12>(0.765366865f); \
+		int p1 = (p2 + p3) * Yt::fixed_point<int, 12>(0.5411961f); \
+		int t2 = p1 + p3 * Yt::fixed_point<int, 12>(-1.847759065f); \
+		int t3 = p1 + p2 * Yt::fixed_point<int, 12>(0.765366865f); \
 		p2 = s0; \
 		p3 = s4; \
-		int t0 = (p2 + p3) * fixed_point<int, 12>(1.f); \
-		int t1 = (p2 - p3) * fixed_point<int, 12>(1.f); \
+		int t0 = (p2 + p3) * Yt::fixed_point<int, 12>(1.f); \
+		int t1 = (p2 - p3) * Yt::fixed_point<int, 12>(1.f); \
 		int x0 = t0 + t3; \
 		int x3 = t0 - t3; \
 		int x1 = t1 + t2; \
@@ -237,15 +235,15 @@ namespace
 		int p4 = t1 + t3; \
 		p1 = t0 + t3; \
 		p2 = t1 + t2; \
-		const int p5 = (p3 + p4) * fixed_point<int, 12>(1.175875602f); \
-		t0 = t0 * fixed_point<int, 12>(0.298631336f); \
-		t1 = t1 * fixed_point<int, 12>(2.053119869f); \
-		t2 = t2 * fixed_point<int, 12>(3.072711026f); \
-		t3 = t3 * fixed_point<int, 12>(1.501321110f); \
-		p1 = p5 + p1 * fixed_point<int, 12>(-0.899976223f); \
-		p2 = p5 + p2 * fixed_point<int, 12>(-2.562915447f); \
-		p3 = p3 * fixed_point<int, 12>(-1.961570560f); \
-		p4 = p4 * fixed_point<int, 12>(-0.390180644f); \
+		const int p5 = (p3 + p4) * Yt::fixed_point<int, 12>(1.175875602f); \
+		t0 = t0 * Yt::fixed_point<int, 12>(0.298631336f); \
+		t1 = t1 * Yt::fixed_point<int, 12>(2.053119869f); \
+		t2 = t2 * Yt::fixed_point<int, 12>(3.072711026f); \
+		t3 = t3 * Yt::fixed_point<int, 12>(1.501321110f); \
+		p1 = p5 + p1 * Yt::fixed_point<int, 12>(-0.899976223f); \
+		p2 = p5 + p2 * Yt::fixed_point<int, 12>(-2.562915447f); \
+		p3 = p3 * Yt::fixed_point<int, 12>(-1.961570560f); \
+		p4 = p4 * Yt::fixed_point<int, 12>(-0.390180644f); \
 		t3 += p1 + p4; \
 		t2 += p2 + p3; \
 		t1 += p2 + p4; \
@@ -364,7 +362,7 @@ namespace
 
 		size_t parse_headers(const uint8_t* data, size_t size) noexcept
 		{
-			const auto skip_segment = [&data, &size]() noexcept -> size_t
+			const auto skip_segment = [&data, &size]() noexcept->size_t
 			{
 				if (size < 2)
 					return 0;

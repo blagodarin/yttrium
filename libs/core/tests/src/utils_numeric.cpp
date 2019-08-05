@@ -53,7 +53,7 @@ TEST_CASE("utils.is_power_of_2")
 {
 	using Yt::is_power_of_2;
 
-	static const std::array<int, std::numeric_limits<std::int8_t>::max() + 1> table{
+	static const std::array<int, std::numeric_limits<int8_t>::max() + 1> table{
 		// clang-format off
 		0, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0,
 		1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -66,9 +66,9 @@ TEST_CASE("utils.is_power_of_2")
 		// clang-format on
 	};
 
-	for (std::int8_t i = std::numeric_limits<std::int8_t>::min(); i < 0; ++i)
+	for (int8_t i = std::numeric_limits<int8_t>::min(); i < 0; ++i)
 		CHECK(!is_power_of_2(i));
-	for (std::uint8_t i = 0; i <= std::numeric_limits<std::int8_t>::max(); ++i)
+	for (uint8_t i = 0; i <= std::numeric_limits<int8_t>::max(); ++i)
 		CHECK(int{ is_power_of_2(i) } == table[i]);
 }
 
@@ -83,7 +83,7 @@ TEST_CASE("utils.next_power_of_2")
 {
 	using Yt::next_power_of_2;
 
-	static const std::array<std::uint8_t, std::numeric_limits<std::int8_t>::max() + 1> table{
+	static const std::array<uint8_t, std::numeric_limits<int8_t>::max() + 1> table{
 		// clang-format off
 		0, 1, 2, 4, 4, 8, 8, 8, 8, 16, 16, 16, 16, 16, 16, 16,
 		16, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32,
@@ -96,10 +96,10 @@ TEST_CASE("utils.next_power_of_2")
 		// clang-format on
 	};
 
-	for (std::size_t i = 1; i <= static_cast<std::size_t>(std::numeric_limits<std::int8_t>::max()); ++i)
+	for (std::size_t i = 1; i <= static_cast<size_t>(std::numeric_limits<int8_t>::max()); ++i)
 		CHECK(next_power_of_2(i) == table[i]);
 
-	const auto max_power_of_2 = static_cast<std::uintmax_t>(std::numeric_limits<std::intmax_t>::max()) + 1;
+	const auto max_power_of_2 = static_cast<uintmax_t>(std::numeric_limits<intmax_t>::max()) + 1;
 	CHECK(next_power_of_2(max_power_of_2 - 1) == max_power_of_2);
 	CHECK(next_power_of_2(max_power_of_2) == max_power_of_2);
 	CHECK(next_power_of_2(max_power_of_2 + 1) != max_power_of_2);
@@ -109,7 +109,7 @@ TEST_CASE("utils.power_of_2_alignment")
 {
 	using Yt::power_of_2_alignment;
 
-	static const std::array<std::uint8_t, std::numeric_limits<std::int8_t>::max() + 1> table{
+	static const std::array<uint8_t, std::numeric_limits<int8_t>::max() + 1> table{
 		// clang-format off
 		0, 1, 2, 1, 4, 1, 2, 1, 8, 1, 2, 1, 4, 1, 2, 1,
 		16, 1, 2, 1, 4, 1, 2, 1, 8, 1, 2, 1, 4, 1, 2, 1,
@@ -122,10 +122,10 @@ TEST_CASE("utils.power_of_2_alignment")
 		// clang-format on
 	};
 
-	for (int i = 0; i <= std::numeric_limits<std::int8_t>::max(); ++i)
+	for (int i = 0; i <= std::numeric_limits<int8_t>::max(); ++i)
 	{
-		CHECK(power_of_2_alignment(i) == table[static_cast<std::size_t>(i)]);
-		CHECK(power_of_2_alignment(-i) == table[static_cast<std::size_t>(i)]);
+		CHECK(power_of_2_alignment(i) == table[static_cast<size_t>(i)]);
+		CHECK(power_of_2_alignment(-i) == table[static_cast<size_t>(i)]);
 	}
 }
 
@@ -133,14 +133,14 @@ TEST_CASE("utils.same_sign")
 {
 	using Yt::same_sign;
 
-	CHECK(same_sign<std::intmax_t>(0, 0));
-	CHECK(same_sign<std::intmax_t>(-1, -1));
-	CHECK(!same_sign<std::intmax_t>(0, -1));
-	CHECK(!same_sign<std::intmax_t>(-1, 0));
-	CHECK(same_sign(std::numeric_limits<std::intmax_t>::max(), std::numeric_limits<std::intmax_t>::max()));
-	CHECK(same_sign(std::numeric_limits<std::intmax_t>::min(), std::numeric_limits<std::intmax_t>::min()));
-	CHECK(!same_sign(std::numeric_limits<std::intmax_t>::max(), std::numeric_limits<std::intmax_t>::min()));
-	CHECK(!same_sign(std::numeric_limits<std::intmax_t>::min(), std::numeric_limits<std::intmax_t>::max()));
+	CHECK(same_sign<intmax_t>(0, 0));
+	CHECK(same_sign<intmax_t>(-1, -1));
+	CHECK(!same_sign<intmax_t>(0, -1));
+	CHECK(!same_sign<intmax_t>(-1, 0));
+	CHECK(same_sign(std::numeric_limits<intmax_t>::max(), std::numeric_limits<intmax_t>::max()));
+	CHECK(same_sign(std::numeric_limits<intmax_t>::min(), std::numeric_limits<intmax_t>::min()));
+	CHECK(!same_sign(std::numeric_limits<intmax_t>::max(), std::numeric_limits<intmax_t>::min()));
+	CHECK(!same_sign(std::numeric_limits<intmax_t>::min(), std::numeric_limits<intmax_t>::max()));
 }
 
 TEST_CASE("utils.swap_bytes")
