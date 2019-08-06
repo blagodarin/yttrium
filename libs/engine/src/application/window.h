@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../renderer/builtin/builtin.h"
+#include "../renderer/builtin.h"
 #include "../renderer/pass.h"
 #include "../renderer/renderer.h"
 #include "application.h"

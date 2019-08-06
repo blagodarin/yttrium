@@ -172,8 +172,12 @@ y_sources(yengine "src/gui/widgets"
 
 y_sources(yengine "src/renderer"
 	src/renderer/backend.h
+	src/renderer/builtin.cpp
+	src/renderer/builtin.h
 	src/renderer/debug_renderer.cpp
 	src/renderer/debug_renderer.h
+	src/renderer/debug_texture.cpp
+	src/renderer/debug_texture.h
 	src/renderer/material.cpp
 	src/renderer/material.h
 	src/renderer/mesh_data.cpp
@@ -185,13 +189,6 @@ y_sources(yengine "src/renderer"
 	src/renderer/renderer.h
 	src/renderer/texture.cpp
 	src/renderer/texture.h
-	)
-
-y_sources(yengine "src/renderer/builtin"
-	src/renderer/builtin/builtin.h
-	src/renderer/builtin/builtin.cpp
-	src/renderer/builtin/debug_texture.cpp
-	src/renderer/builtin/debug_texture.h
 	)
 
 y_sources(yengine "src/renderer/formats"

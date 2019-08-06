@@ -17,8 +17,8 @@
 
 #include "debug_renderer.h"
 
-#include "builtin/builtin.h"
-#include "builtin/debug_texture.h"
+#include "builtin.h"
+#include "debug_texture.h"
 #include "pass.h"
 
 #include <algorithm>
