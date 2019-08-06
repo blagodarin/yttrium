@@ -83,26 +83,26 @@ endif()
 
 if(UNIX)
 	if(Y_RENDERER_OPENGL)
-		y_sources(yengine "src/application/_x11"
-			src/application/_x11/application.cpp
-			src/application/_x11/application.h
-			src/application/_x11/glx.cpp
-			src/application/_x11/glx.h
-			src/application/_x11/window.cpp
-			src/application/_x11/window.h
+		y_sources(yengine "src/application/x11"
+			src/application/x11/application.cpp
+			src/application/x11/application.h
+			src/application/x11/glx.cpp
+			src/application/x11/glx.h
+			src/application/x11/window.cpp
+			src/application/x11/window.h
 			)
 		target_include_directories(yengine SYSTEM PRIVATE ${X11_INCLUDE_DIR})
 		target_link_libraries(yengine PRIVATE ${X11_X11_LIB})
 		if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 			# Xlib macros (DefaultScreen, RootWindow) produce old-style-cast warnings.
-			set_property(SOURCE src/application/_x11/application.cpp src/application/_x11/window.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-old-style-cast)
+			set_property(SOURCE src/application/x11/application.cpp src/application/x11/window.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-old-style-cast)
 		endif()
 	else()
-		y_sources(yengine "src/application/_xcb"
-			src/application/_xcb/application.cpp
-			src/application/_xcb/application.h
-			src/application/_xcb/window.cpp
-			src/application/_xcb/window.h
+		y_sources(yengine "src/application/xcb"
+			src/application/xcb/application.cpp
+			src/application/xcb/application.h
+			src/application/xcb/window.cpp
+			src/application/xcb/window.h
 			)
 		target_link_libraries(yengine PRIVATE xcb xcb-image xcb-xkb xkbcommon xkbcommon-x11)
 		if(Y_RENDERER_VULKAN)
@@ -110,20 +110,20 @@ if(UNIX)
 		endif()
 		if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 			# https://bugs.freedesktop.org/show_bug.cgi?id=74080
-			set_property(SOURCE src/application/_xcb/window.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-keyword-macro)
+			set_property(SOURCE src/application/xcb/window.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-keyword-macro)
 		endif()
 	endif()
 elseif(WIN32)
-	y_sources(yengine "src/application/_windows"
-		src/application/_windows/application.cpp
-		src/application/_windows/application.h
-		src/application/_windows/window.cpp
-		src/application/_windows/window.h
+	y_sources(yengine "src/application/windows"
+		src/application/windows/application.cpp
+		src/application/windows/application.h
+		src/application/windows/window.cpp
+		src/application/windows/window.h
 		)
 	if(Y_RENDERER_OPENGL)
-		y_sources(yengine "src/application/_windows"
-			src/application/_windows/wgl.cpp
-			src/application/_windows/wgl.h
+		y_sources(yengine "src/application/windows"
+			src/application/windows/wgl.cpp
+			src/application/windows/wgl.h
 			)
 	endif()
 endif()
