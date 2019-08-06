@@ -200,28 +200,28 @@ y_sources(yengine "src/renderer"
 	)
 
 if(Y_RENDERER_OPENGL)
-	y_sources(yengine "src/renderer/_opengl"
-		src/renderer/_opengl/api.h
-		src/renderer/_opengl/gl.cpp
-		src/renderer/_opengl/gl.h
-		src/renderer/_opengl/mesh.h
-		src/renderer/_opengl/program.cpp
-		src/renderer/_opengl/program.h
-		src/renderer/_opengl/renderer.cpp
-		src/renderer/_opengl/renderer.h
-		src/renderer/_opengl/texture.cpp
-		src/renderer/_opengl/texture.h
-		src/renderer/_opengl/version.h
-		src/renderer/_opengl/wrappers.cpp
-		src/renderer/_opengl/wrappers.h
+	y_sources(yengine "src/renderer/opengl"
+		src/renderer/opengl/api.h
+		src/renderer/opengl/gl.cpp
+		src/renderer/opengl/gl.h
+		src/renderer/opengl/mesh.h
+		src/renderer/opengl/program.cpp
+		src/renderer/opengl/program.h
+		src/renderer/opengl/renderer.cpp
+		src/renderer/opengl/renderer.h
+		src/renderer/opengl/texture.cpp
+		src/renderer/opengl/texture.h
+		src/renderer/opengl/version.h
+		src/renderer/opengl/wrappers.cpp
+		src/renderer/opengl/wrappers.h
 		)
 	add_yrc_sources(yengine
-		src/renderer/_opengl/2d_fs.glsl
-		src/renderer/_opengl/2d_vs.glsl
+		src/renderer/opengl/2d_fs.glsl
+		src/renderer/opengl/2d_vs.glsl
 		)
-	source_group("src\\renderer\\_opengl" FILES
-		src/renderer/_opengl/2d_fs.glsl
-		src/renderer/_opengl/2d_vs.glsl
+	source_group("src\\renderer\\opengl" FILES
+		src/renderer/opengl/2d_fs.glsl
+		src/renderer/opengl/2d_vs.glsl
 		)
 	target_link_libraries(yengine PRIVATE OpenGL::GL)
 	if(WIN32)
@@ -237,40 +237,40 @@ if(Y_RENDERER_OPENGL)
 		target_include_directories(yengine SYSTEM PRIVATE ${GLEXT_INCLUDE_DIR} ${WGLEXT_INCLUDE_DIR})
 	endif()
 	if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-		set_property(SOURCE src/renderer/_opengl/gl.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-useless-cast)
+		set_property(SOURCE src/renderer/opengl/gl.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-useless-cast)
 	endif()
 elseif(Y_RENDERER_VULKAN)
-	y_sources(yengine "src/renderer/_vulkan"
-		src/renderer/_vulkan/buffer.cpp
-		src/renderer/_vulkan/buffer.h
-		src/renderer/_vulkan/context.cpp
-		src/renderer/_vulkan/context.h
-		src/renderer/_vulkan/depth_buffer.cpp
-		src/renderer/_vulkan/depth_buffer.h
-		src/renderer/_vulkan/handles.cpp
-		src/renderer/_vulkan/handles.h
-		src/renderer/_vulkan/helpers.cpp
-		src/renderer/_vulkan/helpers.h
-		src/renderer/_vulkan/mesh.cpp
-		src/renderer/_vulkan/mesh.h
-		src/renderer/_vulkan/program.cpp
-		src/renderer/_vulkan/program.h
-		src/renderer/_vulkan/renderer.cpp
-		src/renderer/_vulkan/renderer.h
-		src/renderer/_vulkan/swapchain.cpp
-		src/renderer/_vulkan/swapchain.h
-		src/renderer/_vulkan/texture.cpp
-		src/renderer/_vulkan/texture.h
-		src/renderer/_vulkan/wrappers.cpp
-		src/renderer/_vulkan/wrappers.h
+	y_sources(yengine "src/renderer/vulkan"
+		src/renderer/vulkan/buffer.cpp
+		src/renderer/vulkan/buffer.h
+		src/renderer/vulkan/context.cpp
+		src/renderer/vulkan/context.h
+		src/renderer/vulkan/depth_buffer.cpp
+		src/renderer/vulkan/depth_buffer.h
+		src/renderer/vulkan/handles.cpp
+		src/renderer/vulkan/handles.h
+		src/renderer/vulkan/helpers.cpp
+		src/renderer/vulkan/helpers.h
+		src/renderer/vulkan/mesh.cpp
+		src/renderer/vulkan/mesh.h
+		src/renderer/vulkan/program.cpp
+		src/renderer/vulkan/program.h
+		src/renderer/vulkan/renderer.cpp
+		src/renderer/vulkan/renderer.h
+		src/renderer/vulkan/swapchain.cpp
+		src/renderer/vulkan/swapchain.h
+		src/renderer/vulkan/texture.cpp
+		src/renderer/vulkan/texture.h
+		src/renderer/vulkan/wrappers.cpp
+		src/renderer/vulkan/wrappers.h
 		)
 	add_yglslc_sources(yengine
-		FRAGMENT src/renderer/_vulkan/2d_fs.glsl
-		VERTEX src/renderer/_vulkan/2d_vs.glsl
+		FRAGMENT src/renderer/vulkan/2d_fs.glsl
+		VERTEX src/renderer/vulkan/2d_vs.glsl
 		)
-	source_group("src\\renderer\\_vulkan" FILES
-		src/renderer/_vulkan/2d_fs.glsl
-		src/renderer/_vulkan/2d_vs.glsl
+	source_group("src\\renderer\\vulkan" FILES
+		src/renderer/vulkan/2d_fs.glsl
+		src/renderer/vulkan/2d_vs.glsl
 		)
 	target_link_libraries(yengine PRIVATE Vulkan::Vulkan)
 	if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
@@ -278,9 +278,9 @@ elseif(Y_RENDERER_VULKAN)
 		target_compile_options(yengine PRIVATE -Wno-zero-as-null-pointer-constant)
 	endif()
 else()
-	y_sources(yengine "src/renderer/_null"
-		src/renderer/_null/renderer.cpp
-		src/renderer/_null/renderer.h
+	y_sources(yengine "src/renderer/null"
+		src/renderer/null/renderer.cpp
+		src/renderer/null/renderer.h
 		)
 endif()
 

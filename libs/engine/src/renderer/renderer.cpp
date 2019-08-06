@@ -26,11 +26,11 @@
 #include "../model/mesh_data.h"
 
 #if Y_RENDERER_OPENGL
-#	include "_opengl/renderer.h"
+#	include "opengl/renderer.h"
 #elif Y_RENDERER_VULKAN
-#	include "_vulkan/renderer.h"
+#	include "vulkan/renderer.h"
 #else
-#	include "_null/renderer.h"
+#	include "null/renderer.h"
 #endif
 
 #include <cassert>
