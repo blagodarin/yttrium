@@ -170,6 +170,16 @@ y_sources(yengine "src/gui/widgets"
 	src/gui/widgets/label.h
 	)
 
+y_sources(yengine "src/model"
+	src/model/mesh_data.cpp
+	src/model/mesh_data.h
+	)
+
+y_sources(yengine "src/model/formats"
+	src/model/formats/obj.cpp
+	src/model/formats/obj.h
+	)
+
 y_sources(yengine "src/renderer"
 	src/renderer/backend.h
 	src/renderer/builtin.cpp
@@ -180,8 +190,6 @@ y_sources(yengine "src/renderer"
 	src/renderer/debug_texture.h
 	src/renderer/material.cpp
 	src/renderer/material.h
-	src/renderer/mesh_data.cpp
-	src/renderer/mesh_data.h
 	src/renderer/modifiers.cpp
 	src/renderer/pass.cpp
 	src/renderer/pass.h
@@ -189,11 +197,6 @@ y_sources(yengine "src/renderer"
 	src/renderer/renderer.h
 	src/renderer/texture.cpp
 	src/renderer/texture.h
-	)
-
-y_sources(yengine "src/renderer/formats"
-	src/renderer/formats/obj.cpp
-	src/renderer/formats/obj.h
 	)
 
 if(Y_RENDERER_OPENGL)

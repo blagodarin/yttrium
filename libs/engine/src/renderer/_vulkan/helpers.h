@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../mesh_data.h"
+#include "../../model/mesh_data.h"
 
 #include <vulkan/vulkan.h>
 
