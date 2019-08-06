@@ -26,7 +26,7 @@
 
 #include <cassert>
 
-namespace Yttrium
+namespace Yt
 {
 	struct ScriptCommand
 	{

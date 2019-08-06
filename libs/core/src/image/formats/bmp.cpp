@@ -23,7 +23,7 @@
 
 #include <limits>
 
-namespace Yttrium
+namespace Yt
 {
 	bool read_bmp_header(Reader& reader, ImageInfo& info)
 	{

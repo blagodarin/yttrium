@@ -86,7 +86,7 @@ namespace
 	}
 }
 
-namespace Yttrium
+namespace Yt
 {
 	void IonToken::check_end() const
 	{

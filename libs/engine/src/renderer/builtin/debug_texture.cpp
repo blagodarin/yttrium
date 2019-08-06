@@ -17,7 +17,7 @@
 
 #include "debug_texture.h"
 
-namespace Yttrium::DebugTexture
+namespace Yt::DebugTexture
 {
 	constexpr int32_t _ = 0;
 	constexpr int32_t W = -1;

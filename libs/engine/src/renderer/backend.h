@@ -22,7 +22,7 @@
 #include <yttrium/renderer/manager.h>
 #include <yttrium/renderer/texture.h>
 
-namespace Yttrium
+namespace Yt
 {
 	class Buffer;
 	enum class ImageOrientation;

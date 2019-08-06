@@ -19,7 +19,7 @@
 
 #include <catch2/catch.hpp>
 
-using Yttrium::Buffer;
+using Yt::Buffer;
 
 const auto granularity = Buffer::memory_granularity();
 

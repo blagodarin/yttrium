@@ -46,7 +46,7 @@ namespace
 	}
 }
 
-namespace Yttrium
+namespace Yt
 {
 	WglContext::RenderingContext::RenderingContext(HDC hdc, HGLRC hglrc)
 		: _hglrc(hglrc)

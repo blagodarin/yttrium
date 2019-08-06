@@ -25,7 +25,7 @@
 
 #include <windows.h>
 
-namespace Yttrium
+namespace Yt
 {
 	class Size;
 

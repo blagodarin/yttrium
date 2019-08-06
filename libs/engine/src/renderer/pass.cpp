@@ -34,7 +34,7 @@
 namespace
 {
 	// Makes Y point forward and Z point up.
-	const Yttrium::Matrix4 _3d_directions{
+	const Yt::Matrix4 _3d_directions{
 		1, 0, 0, 0,
 		0, 0, 1, 0,
 		0, -1, 0, 0,
@@ -42,7 +42,7 @@ namespace
 	};
 }
 
-namespace Yttrium
+namespace Yt
 {
 	struct RenderPassImpl::Batch2D
 	{

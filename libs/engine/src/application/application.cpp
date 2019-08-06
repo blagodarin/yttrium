@@ -22,7 +22,7 @@
 
 #include <stdexcept>
 
-namespace Yttrium
+namespace Yt
 {
 	void ApplicationPrivate::add_window(Application& application, WindowPrivate& window)
 	{

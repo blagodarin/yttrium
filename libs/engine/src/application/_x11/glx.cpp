@@ -52,7 +52,7 @@ namespace
 	}
 }
 
-namespace Yttrium
+namespace Yt
 {
 	GlxContext::GlxContext(::Display* display, int screen)
 		: _display{ display }

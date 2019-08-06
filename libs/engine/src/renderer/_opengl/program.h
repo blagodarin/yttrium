@@ -21,7 +21,7 @@
 
 #include "wrappers.h"
 
-namespace Yttrium
+namespace Yt
 {
 	class GlProgram final : public RenderProgram
 	{

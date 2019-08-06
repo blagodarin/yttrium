@@ -21,7 +21,7 @@
 #include <yttrium/math/size.h>
 #include <yttrium/math/vector.h>
 
-namespace Yttrium
+namespace Yt
 {
 	class Matrix4
 	{

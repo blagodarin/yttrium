@@ -21,7 +21,7 @@
 
 #include <clocale>
 
-namespace Yttrium
+namespace Yt
 {
 	NativeApplication::NativeApplication()
 	{

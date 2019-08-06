@@ -22,7 +22,7 @@
 #include <string_view>
 #include <vector>
 
-namespace Yttrium
+namespace Yt
 {
 	class Line3;
 	class MarginsF;

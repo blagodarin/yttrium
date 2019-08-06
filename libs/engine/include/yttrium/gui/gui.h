@@ -24,7 +24,7 @@
 #include <memory>
 #include <string>
 
-namespace Yttrium
+namespace Yt
 {
 	class AudioManager;
 	enum class Key;

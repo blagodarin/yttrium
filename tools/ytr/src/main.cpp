@@ -25,11 +25,9 @@
 
 #include <iostream>
 
-using namespace Yttrium;
-
 int ymain(int argc, char** argv)
 {
-	Logger logger;
+	Yt::Logger logger;
 
 	if (argc < 3)
 	{
@@ -39,14 +37,14 @@ int ymain(int argc, char** argv)
 
 	const auto translation_path = std::filesystem::u8path(argv[1]);
 
-	auto translation_source = Source::from(translation_path);
+	auto translation_source = Yt::Source::from(translation_path);
 	if (!translation_source)
 	{
 		std::cerr << "ERROR: Unable to open " << translation_path << " for reading\n";
 		return 1;
 	}
 
-	const auto translation = Translation::load(*translation_source);
+	const auto translation = Yt::Translation::load(*translation_source);
 	if (!translation)
 	{
 		std::cerr << "ERROR: Failed to read " << translation_path << '\n';
@@ -59,7 +57,7 @@ int ymain(int argc, char** argv)
 	{
 		const auto source_path = std::filesystem::u8path(argv[i]);
 
-		const auto source = Source::from(source_path);
+		const auto source = Yt::Source::from(source_path);
 		if (!source)
 		{
 			std::cerr << "ERROR: Unable to open " << source_path << " for reading\n";
@@ -68,12 +66,12 @@ int ymain(int argc, char** argv)
 
 		try
 		{
-			IonReader ion{ *source };
-			for (auto token = ion.read(); token.type() != IonToken::Type::End; token = ion.read())
+			Yt::IonReader ion{ *source };
+			for (auto token = ion.read(); token.type() != Yt::IonToken::Type::End; token = ion.read())
 				if (token.translatable())
 					translation->add(token.text());
 		}
-		catch (const IonError& e)
+		catch (const Yt::IonError& e)
 		{
 			std::cerr << "ERROR: Failed to read " << source_path << ": " << e.what() << '\n';
 			return 1;
@@ -82,7 +80,7 @@ int ymain(int argc, char** argv)
 
 	translation->remove_obsolete();
 
-	Writer output{ translation_path };
+	Yt::Writer output{ translation_path };
 	if (!output)
 	{
 		std::cerr << "ERROR: Unable to open " << translation_path << " for writing\n";

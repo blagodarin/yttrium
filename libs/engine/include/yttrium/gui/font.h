@@ -23,7 +23,7 @@
 #include <string_view>
 #include <vector>
 
-namespace Yttrium
+namespace Yt
 {
 	class RenderManager;
 	class Size;

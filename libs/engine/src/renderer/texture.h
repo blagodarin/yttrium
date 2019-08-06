@@ -22,7 +22,7 @@
 #include <yttrium/image.h>
 #include <yttrium/math/size.h>
 
-namespace Yttrium
+namespace Yt
 {
 	class RectF;
 	class RenderBackend;

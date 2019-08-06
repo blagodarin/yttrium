@@ -19,7 +19,7 @@
 
 #include <yttrium/renderer/program.h>
 
-namespace Yttrium
+namespace Yt
 {
 	class VulkanRenderer;
 

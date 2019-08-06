@@ -17,7 +17,7 @@
 
 #include "helpers.h"
 
-namespace Yttrium
+namespace Yt
 {
 	VulkanVertexFormat::VulkanVertexFormat(const std::vector<VA>& vas)
 	{

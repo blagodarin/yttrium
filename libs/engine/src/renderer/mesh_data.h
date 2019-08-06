@@ -21,7 +21,7 @@
 
 #include <vector>
 
-namespace Yttrium
+namespace Yt
 {
 	/// Vertex attribute type.
 	enum class VA

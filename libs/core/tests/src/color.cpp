@@ -21,7 +21,8 @@
 
 TEST_CASE("color.bgra32")
 {
-	using Yttrium::Bgra32;
+	using Yt::Bgra32;
+
 	{
 		Bgra32 color{ 1, 2, 3 };
 		CHECK(color._b == 1u);

@@ -22,7 +22,7 @@
 #include <cassert>
 #include <stdexcept>
 
-namespace Yttrium
+namespace Yt
 {
 	void VK_HBuffer::bind_memory(VkDeviceMemory memory) const
 	{

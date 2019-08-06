@@ -22,9 +22,9 @@
 
 TEST_CASE("script.context.find")
 {
-	Yttrium::ScriptContext parent;
-	Yttrium::ScriptContext child{ &parent };
-	Yttrium::ScriptContext grandchild{ &child };
+	Yt::ScriptContext parent;
+	Yt::ScriptContext child{ &parent };
+	Yt::ScriptContext grandchild{ &child };
 
 	CHECK(&parent == &parent.root());
 	CHECK(&parent == &child.root());
@@ -60,12 +60,12 @@ TEST_CASE("script.context.find")
 
 TEST_CASE("script.context.int")
 {
-	Yttrium::ScriptContext context;
+	Yt::ScriptContext context;
 	CHECK(context.get_int("int", 7) == 7);
 
 	context.set("int", 42);
 	REQUIRE(context.find("int"));
-	CHECK(context.find("int")->type() == Yttrium::ScriptValue::Type::Literal);
+	CHECK(context.find("int")->type() == Yt::ScriptValue::Type::Literal);
 	CHECK(context.find("int")->string() == "42");
 	CHECK(context.find("int")->to_int() == 42);
 	CHECK(context.get_int("int", 7) == 42);
@@ -77,11 +77,11 @@ TEST_CASE("script.context.int")
 
 TEST_CASE("script.context.string")
 {
-	Yttrium::ScriptContext context;
+	Yt::ScriptContext context;
 
 	context.set("string", "value");
 	REQUIRE(context.find("string"));
-	CHECK(context.find("string")->type() == Yttrium::ScriptValue::Type::String);
+	CHECK(context.find("string")->type() == Yt::ScriptValue::Type::String);
 	CHECK(context.find("string")->string() == "value");
 	CHECK(context.find("string")->to_int() == 0);
 
@@ -93,7 +93,7 @@ TEST_CASE("script.context.substitute")
 {
 	std::string text;
 
-	Yttrium::ScriptContext context;
+	Yt::ScriptContext context;
 	context.substitute(text, "Hi, I'm {name}! What's up?");
 	CHECK(text == "Hi, I'm ! What's up?");
 

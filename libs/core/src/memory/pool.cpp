@@ -22,7 +22,7 @@
 // TODO: Get rid of magical chunk item count in places where pools are used.
 // Perhaps setting the pool chunk size to memory page size will do.
 
-namespace Yttrium
+namespace Yt
 {
 	class PoolChunk
 	{

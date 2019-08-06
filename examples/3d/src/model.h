@@ -20,7 +20,7 @@
 #include <memory>
 #include <string_view>
 
-namespace Yttrium
+namespace Yt
 {
 	class Material;
 	class Mesh;
@@ -28,17 +28,15 @@ namespace Yttrium
 	class ResourceLoader;
 }
 
-using namespace Yttrium;
-
 class Model
 {
 public:
-	Model(ResourceLoader&, std::string_view mesh, std::string_view material);
+	Model(Yt::ResourceLoader&, std::string_view mesh, std::string_view material);
 	~Model();
 
-	void draw(RenderPass&);
+	void draw(Yt::RenderPass&);
 
 private:
-	const std::shared_ptr<const Mesh> _mesh;
-	const std::shared_ptr<const Material> _material;
+	const std::shared_ptr<const Yt::Mesh> _mesh;
+	const std::shared_ptr<const Yt::Material> _material;
 };

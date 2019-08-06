@@ -19,7 +19,7 @@
 
 #include <vulkan/vulkan.h>
 
-namespace Yttrium
+namespace Yt
 {
 	class VulkanContext;
 

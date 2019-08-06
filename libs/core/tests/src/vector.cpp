@@ -22,7 +22,7 @@
 
 TEST_CASE("vector2")
 {
-	using Yttrium::Vector2;
+	using Yt::Vector2;
 
 	CHECK(Vector2(1, 2) + Vector2(3, 4) == Vector2(4, 6));
 	CHECK(Vector2(1, 2) + 3 == Vector2(4, 5));
@@ -45,7 +45,7 @@ TEST_CASE("vector2")
 
 TEST_CASE("vector3.arithmetics")
 {
-	using Yttrium::Vector3;
+	using Yt::Vector3;
 
 	CHECK(Vector3(1, 2, 3) + Vector3(4, 5, 6) == Vector3(5, 7, 9));
 	CHECK(Vector3(1, 2, 3) + 4 == Vector3(5, 6, 7));
@@ -68,13 +68,13 @@ TEST_CASE("vector3.arithmetics")
 
 TEST_CASE("vector3.length")
 {
-	CHECK(Yttrium::length({ 1, 4, 8 }) == 9.f);
-	CHECK(Yttrium::length(Yttrium::normalize({ 1, 4, 8 })) == 1.f);
+	CHECK(Yt::length({ 1, 4, 8 }) == 9.f);
+	CHECK(Yt::length(Yt::normalize({ 1, 4, 8 })) == 1.f);
 }
 
 TEST_CASE("vector4")
 {
-	using Yttrium::Vector4;
+	using Yt::Vector4;
 
 	CHECK(Vector4(1, 2, 3, 4) + Vector4(5, 6, 7, 8) == Vector4(6, 8, 10, 12));
 	CHECK(Vector4(1, 2, 3, 4) + 5 == Vector4(6, 7, 8, 9));

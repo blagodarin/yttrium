@@ -27,12 +27,12 @@
 namespace
 {
 	// All IDCT code is based on or taken from the 'stb_image' public domain library (https://github.com/nothings/stb).
-	void idct(std::uint8_t* dst, std::size_t dst_stride, const std::int16_t* src) noexcept
+	void idct(uint8_t* dst, size_t dst_stride, const int16_t* src) noexcept
 	{
 #if Y_ARCH_X86
 		constexpr auto fixed = [](float x) constexpr noexcept
 		{
-			return Yttrium::fixed_point<std::int16_t, 12>(x);
+			return Yt::fixed_point<int16_t, 12>(x);
 		};
 
 		// This is constructed to match our regular (generic) integer IDCT exactly.
@@ -213,18 +213,16 @@ namespace
 #	undef dct_interleave16
 #	undef dct_pass
 #else
-		using Yttrium::fixed_point;
-
 #	define IDCT_1D(s0, s1, s2, s3, s4, s5, s6, s7) \
 		int p2 = s2; \
 		int p3 = s6; \
-		int p1 = (p2 + p3) * fixed_point<int, 12>(0.5411961f); \
-		int t2 = p1 + p3 * fixed_point<int, 12>(-1.847759065f); \
-		int t3 = p1 + p2 * fixed_point<int, 12>(0.765366865f); \
+		int p1 = (p2 + p3) * Yt::fixed_point<int, 12>(0.5411961f); \
+		int t2 = p1 + p3 * Yt::fixed_point<int, 12>(-1.847759065f); \
+		int t3 = p1 + p2 * Yt::fixed_point<int, 12>(0.765366865f); \
 		p2 = s0; \
 		p3 = s4; \
-		int t0 = (p2 + p3) * fixed_point<int, 12>(1.f); \
-		int t1 = (p2 - p3) * fixed_point<int, 12>(1.f); \
+		int t0 = (p2 + p3) * Yt::fixed_point<int, 12>(1.f); \
+		int t1 = (p2 - p3) * Yt::fixed_point<int, 12>(1.f); \
 		int x0 = t0 + t3; \
 		int x3 = t0 - t3; \
 		int x1 = t1 + t2; \
@@ -237,15 +235,15 @@ namespace
 		int p4 = t1 + t3; \
 		p1 = t0 + t3; \
 		p2 = t1 + t2; \
-		const int p5 = (p3 + p4) * fixed_point<int, 12>(1.175875602f); \
-		t0 = t0 * fixed_point<int, 12>(0.298631336f); \
-		t1 = t1 * fixed_point<int, 12>(2.053119869f); \
-		t2 = t2 * fixed_point<int, 12>(3.072711026f); \
-		t3 = t3 * fixed_point<int, 12>(1.501321110f); \
-		p1 = p5 + p1 * fixed_point<int, 12>(-0.899976223f); \
-		p2 = p5 + p2 * fixed_point<int, 12>(-2.562915447f); \
-		p3 = p3 * fixed_point<int, 12>(-1.961570560f); \
-		p4 = p4 * fixed_point<int, 12>(-0.390180644f); \
+		const int p5 = (p3 + p4) * Yt::fixed_point<int, 12>(1.175875602f); \
+		t0 = t0 * Yt::fixed_point<int, 12>(0.298631336f); \
+		t1 = t1 * Yt::fixed_point<int, 12>(2.053119869f); \
+		t2 = t2 * Yt::fixed_point<int, 12>(3.072711026f); \
+		t3 = t3 * Yt::fixed_point<int, 12>(1.501321110f); \
+		p1 = p5 + p1 * Yt::fixed_point<int, 12>(-0.899976223f); \
+		p2 = p5 + p2 * Yt::fixed_point<int, 12>(-2.562915447f); \
+		p3 = p3 * Yt::fixed_point<int, 12>(-1.961570560f); \
+		p4 = p4 * Yt::fixed_point<int, 12>(-0.390180644f); \
 		t3 += p1 + p4; \
 		t2 += p2 + p3; \
 		t1 += p2 + p4; \
@@ -287,22 +285,21 @@ namespace
 			x2 += 65536 + (128 << 17);
 			x3 += 65536 + (128 << 17);
 
-			using Yttrium::clamp_to_uint8;
-			dst[0] = clamp_to_uint8((x0 + t3) >> 17);
-			dst[1] = clamp_to_uint8((x1 + t2) >> 17);
-			dst[2] = clamp_to_uint8((x2 + t1) >> 17);
-			dst[3] = clamp_to_uint8((x3 + t0) >> 17);
-			dst[4] = clamp_to_uint8((x3 - t0) >> 17);
-			dst[5] = clamp_to_uint8((x2 - t1) >> 17);
-			dst[6] = clamp_to_uint8((x1 - t2) >> 17);
-			dst[7] = clamp_to_uint8((x0 - t3) >> 17);
+			dst[0] = Yt::clamp_to_uint8((x0 + t3) >> 17);
+			dst[1] = Yt::clamp_to_uint8((x1 + t2) >> 17);
+			dst[2] = Yt::clamp_to_uint8((x2 + t1) >> 17);
+			dst[3] = Yt::clamp_to_uint8((x3 + t0) >> 17);
+			dst[4] = Yt::clamp_to_uint8((x3 - t0) >> 17);
+			dst[5] = Yt::clamp_to_uint8((x2 - t1) >> 17);
+			dst[6] = Yt::clamp_to_uint8((x1 - t2) >> 17);
+			dst[7] = Yt::clamp_to_uint8((x0 - t3) >> 17);
 		}
 
 #	undef IDCT_1D
 #endif
 	}
 
-	enum : std::uint8_t
+	enum : uint8_t
 	{
 		TEM = 0x01,       // Temporary.
 		SOF0 = 0xc0,      // Start-of-Frame (baseline DCT).
@@ -330,42 +327,42 @@ namespace
 	{
 		static constexpr int FastLookupBits = 10;
 
-		const std::uint8_t* _values = nullptr;
-		std::uint8_t _sizes[257]; // Bit sizes for a Huffman value at the corresponding positions.
-		std::uint32_t _max_codes[18];
+		const uint8_t* _values = nullptr;
+		uint8_t _sizes[257]; // Bit sizes for a Huffman value at the corresponding positions.
+		uint32_t _max_codes[18];
 		int _delta[17];
-		std::uint8_t _fast_lookup[1 << FastLookupBits];
+		uint8_t _fast_lookup[1 << FastLookupBits];
 	};
 
 	struct JpegComponent
 	{
-		std::size_t _horizontal = 0;
-		std::size_t _vertical = 0;
-		const std::uint8_t* _quantization_table = nullptr;
+		size_t _horizontal = 0;
+		size_t _vertical = 0;
+		const uint8_t* _quantization_table = nullptr;
 		const JpegHuffmanTable* _dc_table = nullptr;
 		const JpegHuffmanTable* _ac_table = nullptr;
-		const std::int16_t* _ac_lookup = nullptr;
+		const int16_t* _ac_lookup = nullptr;
 	};
 
 	struct JpegData
 	{
 	public:
-		std::size_t _width = 0;
-		std::size_t _height = 0;
-		const std::uint8_t* _quantization_tables[2];
+		size_t _width = 0;
+		size_t _height = 0;
+		const uint8_t* _quantization_tables[2];
 		JpegHuffmanTable _huffman_tables[2][2];
-		std::int16_t _ac_lookup[2][1 << JpegHuffmanTable::FastLookupBits];
+		int16_t _ac_lookup[2][1 << JpegHuffmanTable::FastLookupBits];
 		JpegComponent _components[3];
-		std::size_t _restart_interval = 0;
-		std::size_t _mcu_x_count = 0;
-		std::size_t _mcu_y_count = 0;
-		std::size_t _ycbcr_size = 0;
-		std::size_t _ycbcr_offset[3];
-		std::size_t _ycbcr_stride[3];
+		size_t _restart_interval = 0;
+		size_t _mcu_x_count = 0;
+		size_t _mcu_y_count = 0;
+		size_t _ycbcr_size = 0;
+		size_t _ycbcr_offset[3];
+		size_t _ycbcr_stride[3];
 
-		std::size_t parse_headers(const std::uint8_t* data, std::size_t size) noexcept
+		size_t parse_headers(const uint8_t* data, size_t size) noexcept
 		{
-			const auto skip_segment = [&data, &size]() noexcept->std::size_t
+			const auto skip_segment = [&data, &size]() noexcept->size_t
 			{
 				if (size < 2)
 					return 0;
@@ -387,7 +384,7 @@ namespace
 				const auto marker = data[1];
 				data += 2;
 				size -= 2;
-				std::size_t segment_size = 0;
+				size_t segment_size = 0;
 				switch (marker)
 				{
 				case SOF0: segment_size = decode_sof0(data, size); break;
@@ -407,19 +404,19 @@ namespace
 				if (marker == SOS)
 				{
 					process_headers();
-					return static_cast<std::size_t>(data - base);
+					return static_cast<size_t>(data - base);
 				}
 			}
 			return 0;
 		}
 
 	private:
-		static constexpr std::uint16_t u16(const std::uint8_t* data) noexcept
+		static constexpr uint16_t u16(const uint8_t* data) noexcept
 		{
-			return static_cast<std::uint16_t>(unsigned{ data[0] } << 8 | unsigned{ data[1] });
+			return static_cast<uint16_t>(unsigned{ data[0] } << 8 | unsigned{ data[1] });
 		}
 
-		std::size_t decode_dht(const std::uint8_t* data, std::size_t size) noexcept
+		size_t decode_dht(const uint8_t* data, size_t size) noexcept
 		{
 			if (size < 2)
 				return 0;
@@ -439,15 +436,15 @@ namespace
 			huffman._values = sizes + 16;
 
 			int value_count = 0;
-			for (std::size_t i = 0; i < 16; ++i)
-				for (std::uint8_t j = 0; j < sizes[i]; ++j)
-					huffman._sizes[value_count++] = static_cast<std::uint8_t>(i + 1);
+			for (size_t i = 0; i < 16; ++i)
+				for (uint8_t j = 0; j < sizes[i]; ++j)
+					huffman._sizes[value_count++] = static_cast<uint8_t>(i + 1);
 
 			if (segment_size != 19 + value_count)
 				return 0;
 
 			{
-				std::uint16_t codes[256];
+				uint16_t codes[256];
 
 				int index = 0;
 				for (int code = 0, i = 1; i <= 16; ++i)
@@ -456,14 +453,14 @@ namespace
 					if (huffman._sizes[index] == i)
 					{
 						while (huffman._sizes[index] == i)
-							codes[index++] = static_cast<std::uint16_t>(code++);
+							codes[index++] = static_cast<uint16_t>(code++);
 						if (code - 1 >= 1 << i)
 							return 0;
 					}
-					huffman._max_codes[i] = static_cast<std::uint32_t>(code) << (32 - i); // Pre-shift max code to avoid shifting bit value in JpegHuffmanTable::read.
+					huffman._max_codes[i] = static_cast<uint32_t>(code) << (32 - i); // Pre-shift max code to avoid shifting bit value in JpegHuffmanTable::read.
 					code <<= 1;
 				}
-				huffman._max_codes[17] = std::numeric_limits<std::uint32_t>::max();
+				huffman._max_codes[17] = std::numeric_limits<uint32_t>::max();
 
 				std::memset(huffman._fast_lookup, 0xff, sizeof huffman._fast_lookup);
 				for (int i = 0; i < index; ++i)
@@ -473,7 +470,7 @@ namespace
 						const auto offset = codes[i] << (JpegHuffmanTable::FastLookupBits - code_bits);
 						const auto count = 1 << (JpegHuffmanTable::FastLookupBits - code_bits);
 						for (int j = 0; j < count; ++j)
-							huffman._fast_lookup[offset + j] = static_cast<std::uint8_t>(i);
+							huffman._fast_lookup[offset + j] = static_cast<uint8_t>(i);
 					}
 				}
 			}
@@ -495,7 +492,7 @@ namespace
 							if (value < (1 << (value_size - 1)))
 								value += static_cast<int>((~0u << value_size) + 1);
 							if (value >= -128 && value <= 127)
-								ac_lookup[i] = static_cast<std::int16_t>(value * 256 + (code & 0xf0) + code_size + value_size);
+								ac_lookup[i] = static_cast<int16_t>(value * 256 + (code & 0xf0) + code_size + value_size);
 						}
 					}
 				}
@@ -504,7 +501,7 @@ namespace
 			return segment_size;
 		}
 
-		std::size_t decode_dqt(const std::uint8_t* data, std::size_t size) noexcept
+		size_t decode_dqt(const uint8_t* data, size_t size) noexcept
 		{
 			if (size < 67)
 				return 0;
@@ -518,7 +515,7 @@ namespace
 			return segment_size;
 		}
 
-		std::size_t decode_dri(const std::uint8_t* data, std::size_t size) noexcept
+		size_t decode_dri(const uint8_t* data, size_t size) noexcept
 		{
 			if (size < 4)
 				return 0;
@@ -529,7 +526,7 @@ namespace
 			return segment_size;
 		}
 
-		std::size_t decode_sof0(const std::uint8_t* data, std::size_t size) noexcept
+		size_t decode_sof0(const uint8_t* data, size_t size) noexcept
 		{
 			if (size < 2)
 				return 0;
@@ -539,14 +536,14 @@ namespace
 			const auto color_bits = data[2];
 			_width = u16(data + 3);
 			_height = u16(data + 5);
-			const auto components = std::size_t{ data[7] };
+			const auto components = size_t{ data[7] };
 			if (color_bits != 8 || !_width || !_height || components != 3 || segment_size != 8 + 3 * components)
 				return 0;
-			for (std::size_t i = 0; i < components; ++i)
+			for (size_t i = 0; i < components; ++i)
 			{
 				const auto id = data[8 + 3 * i];
-				const auto h = std::size_t{ data[8 + 3 * i + 1] } >> 4;
-				const auto v = std::size_t{ data[8 + 3 * i + 1] } & 0xf;
+				const auto h = size_t{ data[8 + 3 * i + 1] } >> 4;
+				const auto v = size_t{ data[8 + 3 * i + 1] } & 0xf;
 				const auto qt = data[8 + 3 * i + 2];
 				if (id != i + 1 || h != (i > 0 ? 1u : 2u) || v != h || qt > 1)
 					return 0;
@@ -557,17 +554,17 @@ namespace
 			return segment_size;
 		}
 
-		std::size_t decode_sos(const std::uint8_t* data, std::size_t size)
+		size_t decode_sos(const uint8_t* data, size_t size)
 		{
 			if (size < 3)
 				return 0;
 			const auto segment_size = u16(data);
 			if (segment_size > size)
 				return 0;
-			const auto components = std::size_t{ data[2] };
+			const auto components = size_t{ data[2] };
 			if (components != 3 || segment_size != 6 + 2 * components)
 				return 0;
-			for (std::size_t i = 0; i < components; ++i)
+			for (size_t i = 0; i < components; ++i)
 			{
 				const auto id = data[3 + 2 * i];
 				const auto dc = data[3 + 2 * i + 1] >> 4;
@@ -587,7 +584,7 @@ namespace
 		{
 			auto max_h = _components[0]._horizontal;
 			auto max_v = _components[0]._vertical;
-			for (std::size_t i = 1; i < 3; ++i)
+			for (size_t i = 1; i < 3; ++i)
 			{
 				if (const auto h = _components[i]._horizontal; h > max_h)
 					max_h = h;
@@ -599,7 +596,7 @@ namespace
 			_mcu_x_count = (_width + mcu_width - 1) / mcu_width;
 			_mcu_y_count = (_height + mcu_height - 1) / mcu_height;
 			_ycbcr_size = 0;
-			for (std::size_t i = 0; i < 3; ++i)
+			for (size_t i = 0; i < 3; ++i)
 			{
 				_ycbcr_offset[i] = _ycbcr_size;
 				_ycbcr_stride[i] = _mcu_x_count * _components[i]._horizontal * 8;
@@ -611,31 +608,31 @@ namespace
 	class JpegBitstream
 	{
 	public:
-		constexpr explicit JpegBitstream(const std::uint8_t* data) noexcept
+		constexpr explicit JpegBitstream(const uint8_t* data) noexcept
 			: _data{ data } {}
 
-		bool read_scan(const JpegData& data, Yttrium::Buffer& ycbcr_buffer) noexcept
+		bool read_scan(const JpegData& data, Yt::Buffer& ycbcr_buffer) noexcept
 		{
 			int last_dc[3]{ 0, 0, 0 };
-			auto restart_counter = data._restart_interval ? data._restart_interval : std::numeric_limits<std::size_t>::max();
+			auto restart_counter = data._restart_interval ? data._restart_interval : std::numeric_limits<size_t>::max();
 			int restart_index = 0;
-			for (std::size_t mcu_y = 0; mcu_y < data._mcu_y_count; ++mcu_y)
+			for (size_t mcu_y = 0; mcu_y < data._mcu_y_count; ++mcu_y)
 			{
-				for (std::size_t mcu_x = 0; mcu_x < data._mcu_x_count; ++mcu_x)
+				for (size_t mcu_x = 0; mcu_x < data._mcu_x_count; ++mcu_x)
 				{
-					for (std::size_t c = 0; c < 3; ++c)
+					for (size_t c = 0; c < 3; ++c)
 					{
 						const auto& component = data._components[c];
-						for (std::size_t v = 0; v < component._vertical; ++v)
+						for (size_t v = 0; v < component._vertical; ++v)
 						{
-							for (std::size_t h = 0; h < component._horizontal; ++h)
+							for (size_t h = 0; h < component._horizontal; ++h)
 							{
-								alignas(16) std::int16_t block[64]{};
+								alignas(16) int16_t block[64]{};
 								if (!read_block(component, last_dc[c], &block[0]))
 									return false;
 								const auto x = (mcu_x * component._horizontal + h) * 8;
 								const auto y = (mcu_y * component._vertical + v) * 8;
-								std::uint8_t* output = ycbcr_buffer.begin() + data._ycbcr_offset[c] + y * data._ycbcr_stride[c] + x;
+								uint8_t* output = ycbcr_buffer.begin() + data._ycbcr_offset[c] + y * data._ycbcr_stride[c] + x;
 								::idct(output, data._ycbcr_stride[c], &block[0]);
 							}
 						}
@@ -653,14 +650,14 @@ namespace
 		}
 
 	private:
-		bool read_block(const JpegComponent& component, int& last_dc, std::int16_t* block) noexcept
+		bool read_block(const JpegComponent& component, int& last_dc, int16_t* block) noexcept
 		{
 			if (_free_bits > 16)
 				read_bits(16);
 			const auto [dc_code, dc_delta] = read_value(*component._dc_table);
 			if (dc_code < 0)
 				return false;
-			block[0] = static_cast<std::int16_t>((last_dc += dc_delta) * component._quantization_table[0]);
+			block[0] = static_cast<int16_t>((last_dc += dc_delta) * component._quantization_table[0]);
 			int i = 0;
 			do
 			{
@@ -670,7 +667,7 @@ namespace
 				{
 					skip_bits(fast_ac & 0xf);
 					i += ((fast_ac >> 4) & 0xf) + 1;
-					block[_dezigzag_table[i]] = static_cast<std::int16_t>((fast_ac >> 8) * component._quantization_table[i]);
+					block[_dezigzag_table[i]] = static_cast<int16_t>((fast_ac >> 8) * component._quantization_table[i]);
 				}
 				else
 				{
@@ -682,7 +679,7 @@ namespace
 					if (!s && r != 15)
 						return false;
 					i += r + 1;
-					block[_dezigzag_table[i]] = static_cast<std::int16_t>(ac_value * component._quantization_table[i]);
+					block[_dezigzag_table[i]] = static_cast<int16_t>(ac_value * component._quantization_table[i]);
 				}
 			} while (i < 63);
 			return true;
@@ -703,7 +700,7 @@ namespace
 		std::pair<int, int> read_value(const JpegHuffmanTable& huffman) noexcept
 		{
 			assert(_free_bits <= 16);
-			std::uint8_t code;
+			uint8_t code;
 			if (const auto index = huffman._fast_lookup[_buffer >> (32 - JpegHuffmanTable::FastLookupBits)]; index < 255)
 			{
 				code = huffman._values[index];
@@ -717,7 +714,7 @@ namespace
 						break;
 				if (size > 16)
 					return { -1, 0 };
-				code = huffman._values[static_cast<std::int32_t>(_buffer >> (32 - size)) + huffman._delta[size]];
+				code = huffman._values[static_cast<int32_t>(_buffer >> (32 - size)) + huffman._delta[size]];
 				skip_bits(size);
 			}
 			const auto value_size = code & 0xf;
@@ -738,14 +735,14 @@ namespace
 			assert(_free_bits > max_free_bits);
 			do
 			{
-				auto next = _marker ? std::uint32_t{ 0 } : *_data++;
+				auto next = _marker ? uint32_t{ 0 } : *_data++;
 				if (next == 0xff)
 				{
 					do
 					{
 						next = *_data++;
 					} while (next == 0xff);
-					_marker = static_cast<std::uint8_t>(next);
+					_marker = static_cast<uint8_t>(next);
 					next ^= 0xff; // Negates lower bits. Produces 0xff for 0x00, stops on marker otherwise.
 				}
 				_free_bits -= 8;
@@ -761,12 +758,12 @@ namespace
 		}
 
 	private:
-		const std::uint8_t* _data = nullptr;
+		const uint8_t* _data = nullptr;
 		int _free_bits = 32;
-		std::uint32_t _buffer = 0;
-		std::uint8_t _marker = 0;
+		uint32_t _buffer = 0;
+		uint8_t _marker = 0;
 
-		static constexpr std::uint8_t _dezigzag_table[64 + 15]{
+		static constexpr uint8_t _dezigzag_table[64 + 15]{
 			0, 1, 8, 16, 9, 2, 3, 10,
 			17, 24, 32, 25, 18, 11, 4, 5,
 			12, 19, 26, 33, 40, 48, 41, 34,
@@ -781,11 +778,11 @@ namespace
 	};
 }
 
-namespace Yttrium
+namespace Yt
 {
-	bool read_jpeg(const void* data, std::size_t size, ImageInfo& info, Buffer& buffer, Upsampling upsampling)
+	bool read_jpeg(const void* data, size_t size, ImageInfo& info, Buffer& buffer, Upsampling upsampling)
 	{
-		const auto bytes = static_cast<const std::uint8_t*>(data);
+		const auto bytes = static_cast<const uint8_t*>(data);
 		assert(size >= 2 && bytes[size - 2] == 0xff && bytes[size - 1] == EOI);
 		JpegData jpeg;
 		const auto scan_offset = jpeg.parse_headers(bytes, size);

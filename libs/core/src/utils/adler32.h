@@ -20,7 +20,7 @@
 #include <cstddef>
 #include <cstdint>
 
-namespace Yttrium
+namespace Yt
 {
 	class Adler32
 	{

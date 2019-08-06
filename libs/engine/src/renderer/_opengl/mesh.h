@@ -20,7 +20,7 @@
 #include <yttrium/renderer/mesh.h>
 #include "wrappers.h"
 
-namespace Yttrium
+namespace Yt
 {
 	class OpenGLMesh final : public Mesh
 	{

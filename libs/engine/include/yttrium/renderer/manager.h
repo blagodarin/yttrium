@@ -22,7 +22,7 @@
 #include <memory>
 #include <string>
 
-namespace Yttrium
+namespace Yt
 {
 	class Image;
 	class Mesh;

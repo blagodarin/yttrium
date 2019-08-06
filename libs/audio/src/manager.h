@@ -26,7 +26,7 @@
 #include <thread>
 #include <variant>
 
-namespace Yttrium
+namespace Yt
 {
 	class AudioBackend;
 

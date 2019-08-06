@@ -21,7 +21,7 @@
 
 #include <xcb/xcb.h>
 
-namespace Yttrium
+namespace Yt
 {
 	class NativeApplication
 	{

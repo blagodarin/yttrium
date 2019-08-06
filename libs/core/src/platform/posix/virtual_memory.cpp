@@ -24,7 +24,7 @@
 #include <sys/mman.h> // mmap, munmap
 #include <unistd.h>   // sysconf
 
-namespace Yttrium
+namespace Yt
 {
 	void* vm_allocate(size_t size) noexcept
 	{

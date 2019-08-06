@@ -94,17 +94,15 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 	add_compile_options(-Werror -Weverything
 		-Wno-c++98-compat
 		-Wno-c++98-compat-pedantic
-		-Wno-covered-switch-default
+		-Wno-covered-switch-default # default label in switch which covers all enumeration values
 		-Wno-exit-time-destructors
 		-Wno-float-equal
 		-Wno-global-constructors
-		-Wno-gnu-statement-expression
-		-Wno-header-hygiene # TODO: Remove "using namespace" from examples.
 		-Wno-nested-anon-types
 		-Wno-padded
 		-Wno-return-std-move-in-c++11
-		-Wno-switch-enum
-		-Wno-weak-vtables
+		-Wno-switch-enum # enumeration value '___' not explicitly handled in switch
+		-Wno-weak-vtables # '___' has no out-of-line virtual method definitions; its vtable will be emitted in every translation unit
 		)
 
 	link_libraries(stdc++fs) # Required for GCC 8 standard library which is used by Clang.

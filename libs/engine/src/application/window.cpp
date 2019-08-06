@@ -24,7 +24,7 @@
 
 // TODO: Windowed mode.
 
-namespace Yttrium
+namespace Yt
 {
 	WindowPrivate::WindowPrivate(Application& application)
 		: _application{ application, *this }

@@ -20,7 +20,7 @@
 #include "context.h"
 #include "handles.h"
 
-namespace Yttrium
+namespace Yt
 {
 	VulkanDepthBuffer::VulkanDepthBuffer(const VulkanContext& context, uint32_t width, uint32_t height, VkFormat format)
 		: _context{ context }

@@ -19,7 +19,7 @@
 
 #include <yttrium/math/vector.h>
 
-namespace Yttrium
+namespace Yt
 {
 	class Plane
 	{

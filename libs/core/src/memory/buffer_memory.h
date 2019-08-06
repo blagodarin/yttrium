@@ -19,7 +19,7 @@
 
 #include <mutex>
 
-namespace Yttrium
+namespace Yt
 {
 	class BufferMemory
 	{

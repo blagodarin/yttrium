@@ -17,7 +17,7 @@
 
 #include "widget.h"
 
-namespace Yttrium
+namespace Yt
 {
 	void Widget::draw(RenderPass& pass, const RectF& rect, WidgetData::Style style) const
 	{

@@ -22,7 +22,7 @@
 #include "depth_buffer.h"
 #include "wrappers.h"
 
-namespace Yttrium
+namespace Yt
 {
 	class VulkanContext;
 

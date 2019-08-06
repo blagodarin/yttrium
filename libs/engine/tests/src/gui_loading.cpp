@@ -28,16 +28,12 @@
 
 #include <catch2/catch.hpp>
 
-using Yttrium::Gui;
-using Yttrium::GuiDataError;
-using Yttrium::IonError;
-using Yttrium::ResourceError;
-using Yttrium::ResourceLoader;
-using Yttrium::ScriptContext;
-using Yttrium::Storage;
-
 TEST_CASE("gui.load")
 {
+	using Yt::GuiDataError;
+	using Yt::IonError;
+	using Yt::ResourceError;
+
 	std::unordered_map<std::string, std::string> _sources;
 
 	const auto add = [&_sources](std::string_view name, std::string_view data) {
@@ -45,13 +41,13 @@ TEST_CASE("gui.load")
 	};
 
 	const auto source = [&_sources](std::string_view data) {
-		Storage storage{ Storage::UseFileSystem::Never };
+		Yt::Storage storage{ Yt::Storage::UseFileSystem::Never };
 		storage.attach_buffer("main.ion", ::make_buffer(data));
 		for (const auto& [extra_name, extra_data] : _sources)
 			storage.attach_buffer(extra_name, ::make_buffer(extra_data));
-		ResourceLoader resource_loader{ storage };
-		ScriptContext script_context;
-		Gui{ "main.ion", resource_loader, script_context };
+		Yt::ResourceLoader resource_loader{ storage };
+		Yt::ScriptContext script_context;
+		Yt::Gui{ "main.ion", resource_loader, script_context };
 	};
 
 	const auto fragment = [&source](const std::string& data) {

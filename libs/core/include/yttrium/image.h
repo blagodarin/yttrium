@@ -21,7 +21,7 @@
 
 #include <optional>
 
-namespace Yttrium
+namespace Yt
 {
 	class Source;
 	class Writer;

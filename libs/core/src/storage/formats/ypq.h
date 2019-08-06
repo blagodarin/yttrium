@@ -23,7 +23,7 @@
 
 #include <vector>
 
-namespace Yttrium
+namespace Yt
 {
 	class YpqReader final : public PackageReader
 	{

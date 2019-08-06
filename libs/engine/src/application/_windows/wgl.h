@@ -22,7 +22,7 @@
 #include <GL/gl.h>
 #include <GL/wglext.h>
 
-namespace Yttrium
+namespace Yt
 {
 	class WglContext
 	{

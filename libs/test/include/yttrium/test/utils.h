@@ -19,10 +19,10 @@
 
 #include <string_view>
 
-namespace Yttrium
+namespace Yt
 {
 	class Buffer;
 }
 
-Yttrium::Buffer make_buffer(std::string_view);
-Yttrium::Buffer make_random_buffer(size_t);
+Yt::Buffer make_buffer(std::string_view);
+Yt::Buffer make_random_buffer(size_t);

@@ -20,7 +20,7 @@
 #include <atomic>
 #include <functional>
 
-namespace Yttrium
+namespace Yt
 {
 	class Application;
 	struct UpdateEvent;

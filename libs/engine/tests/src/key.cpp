@@ -21,8 +21,8 @@
 
 TEST_CASE("key_event")
 {
-	using Yttrium::Key;
-	using Yttrium::KeyEvent;
+	using Yt::Key;
+	using Yt::KeyEvent;
 
 	CHECK(KeyEvent(Key::A, false, false)._key == Key::A);
 	CHECK(KeyEvent(Key::B, false, false)._key == Key::B);
@@ -34,8 +34,8 @@ TEST_CASE("key_event")
 
 TEST_CASE("key_lookup")
 {
-	using Yttrium::Key;
-	using Yttrium::lookup_key;
+	using Yt::Key;
+	using Yt::lookup_key;
 
 	CHECK(lookup_key({}) == Key::Null);
 	CHECK(lookup_key("no_such_key") == Key::Null);

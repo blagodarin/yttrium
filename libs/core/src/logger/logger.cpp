@@ -28,13 +28,13 @@
 
 namespace
 {
-	static_assert(Yttrium::Logger::MaxMessageSize == Yttrium::RingLog::MaxStringSize);
+	static_assert(Yt::Logger::MaxMessageSize == Yt::RingLog::MaxStringSize);
 
 	std::atomic<bool> _global_logger_created{ false };
-	std::atomic<Yttrium::LoggerPrivate*> _global_logger_private{ nullptr };
+	std::atomic<Yt::LoggerPrivate*> _global_logger_private{ nullptr };
 }
 
-namespace Yttrium
+namespace Yt
 {
 	class LoggerPrivate
 	{

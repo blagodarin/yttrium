@@ -19,7 +19,7 @@
 
 #include <yttrium/exceptions.h>
 
-namespace Yttrium
+namespace Yt
 {
 	class BadPackage : public DataError
 	{

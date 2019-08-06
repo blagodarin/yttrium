@@ -27,7 +27,7 @@
 #include <cstring>
 #include <limits>
 
-namespace Yttrium
+namespace Yt
 {
 	BufferWriter::BufferWriter(Buffer& buffer) noexcept
 		: _buffer{ buffer }

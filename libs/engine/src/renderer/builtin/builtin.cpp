@@ -28,7 +28,7 @@ namespace
 	const int32_t _white_texture_data = -1;
 }
 
-namespace Yttrium
+namespace Yt
 {
 	RenderBuiltin::RenderBuiltin(RenderBackend& backend)
 		: _white_texture{ backend.create_texture_2d({ { 1, 1, PixelFormat::Bgra32 }, &_white_texture_data }, RenderManager::TextureFlag::NoMipmaps) }

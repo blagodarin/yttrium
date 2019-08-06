@@ -26,13 +26,13 @@
 
 namespace
 {
-	constexpr auto PngSignature = Yttrium::make_cc('\x89', 'P', 'N', 'G', '\r', '\n', '\x1a', '\n');
+	constexpr auto PngSignature = Yt::make_cc('\x89', 'P', 'N', 'G', '\r', '\n', '\x1a', '\n');
 
 	enum class PngChunkType : uint32_t
 	{
-		IDAT = Yttrium::make_cc('I', 'D', 'A', 'T'),
-		IEND = Yttrium::make_cc('I', 'E', 'N', 'D'),
-		IHDR = Yttrium::make_cc('I', 'H', 'D', 'R'),
+		IDAT = Yt::make_cc('I', 'D', 'A', 'T'),
+		IEND = Yt::make_cc('I', 'E', 'N', 'D'),
+		IHDR = Yt::make_cc('I', 'H', 'D', 'R'),
 	};
 
 	enum class PngColorType : uint8_t
@@ -113,13 +113,13 @@ namespace
 
 #pragma pack(pop)
 
-	Yttrium::Buffer make_zlib_buffer(const void* data, size_t size)
+	Yt::Buffer make_zlib_buffer(const void* data, size_t size)
 	{
 		constexpr size_t max_block_bytes = 65535;
-		Yttrium::Buffer buffer;
+		Yt::Buffer buffer;
 		buffer.reserve(size + 2 + (size + max_block_bytes - 1) / max_block_bytes * 5 + 4);
-		Yttrium::Writer writer{ buffer };
-		writer.write(Yttrium::swap_bytes(uint16_t{ 0x7801 })); // Deflate algorithm, 32 KiB window, no compression.
+		Yt::Writer writer{ buffer };
+		writer.write(Yt::swap_bytes(uint16_t{ 0x7801 })); // Deflate algorithm, 32 KiB window, no compression.
 		for (size_t offset = 0; offset < size;)
 		{
 			const auto remaining_bytes = size - offset;
@@ -130,12 +130,12 @@ namespace
 			writer.write(static_cast<const std::byte*>(data) + offset, block_bytes);
 			offset += block_bytes;
 		}
-		writer.write(Yttrium::swap_bytes(Yttrium::Adler32{}.process(data, size).value()));
+		writer.write(Yt::swap_bytes(Yt::Adler32{}.process(data, size).value()));
 		return buffer;
 	}
 }
 
-namespace Yttrium
+namespace Yt
 {
 	bool write_png(Writer& writer, const ImageInfo& info, const void* data)
 	{
@@ -195,11 +195,11 @@ namespace Yttrium
 		if (!Image::transform(info, data, png_info, image_buffer.begin() + 1))
 			return false;
 
-		for (std::size_t i = 0; i < image_buffer.size(); i += stride)
+		for (size_t i = 0; i < image_buffer.size(); i += stride)
 			image_buffer[i] = to_underlying(PngStandardFilterType::None);
 
 		const auto compressed_buffer = make_zlib_buffer(image_buffer.data(), image_buffer.size());
-		prefix.idat.length = swap_bytes(static_cast<std::uint32_t>(compressed_buffer.size()));
+		prefix.idat.length = swap_bytes(static_cast<uint32_t>(compressed_buffer.size()));
 
 		PngSuffix suffix;
 		suffix.idat.crc = swap_bytes(Crc32{}.process(&prefix.idat.type, sizeof prefix.idat.type).process(compressed_buffer.data(), compressed_buffer.size()).value());

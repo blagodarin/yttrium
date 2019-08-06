@@ -19,7 +19,7 @@
 
 #include "gl.h"
 
-namespace Yttrium
+namespace Yt
 {
 	class Matrix4;
 

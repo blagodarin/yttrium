@@ -19,7 +19,7 @@
 
 #include "../gui.h"
 
-namespace Yttrium
+namespace Yt
 {
 	ButtonWidget::ButtonWidget(GuiPrivate& gui, std::unique_ptr<WidgetData>&& data)
 		: Widget{ gui, std::move(data) }

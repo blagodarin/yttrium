@@ -30,7 +30,7 @@ namespace
 		int argc = 0;
 		std::vector<char*> argv;
 		{
-			const Yttrium::SmartPtr<LPWSTR, ::LocalFree> argv_w{ ::CommandLineToArgvW(::GetCommandLineW(), &argc) };
+			const Yt::SmartPtr<LPWSTR, ::LocalFree> argv_w{ ::CommandLineToArgvW(::GetCommandLineW(), &argc) };
 			for (int i = 0; i < argc; ++i)
 			{
 				const auto buffer_size = ::WideCharToMultiByte(CP_UTF8, 0, argv_w[i], -1, nullptr, 0, nullptr, nullptr);

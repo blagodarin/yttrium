@@ -30,7 +30,7 @@
 
 namespace
 {
-	std::unique_ptr<Yttrium::AudioDecoder> create_audio_decoder(std::unique_ptr<Yttrium::Source>&& source)
+	std::unique_ptr<Yt::AudioDecoder> create_audio_decoder(std::unique_ptr<Yt::Source>&& source)
 	{
 		if (!source)
 			throw std::logic_error{ "Can't create AudioDecoder from an empty Source" };
@@ -39,18 +39,18 @@ namespace
 		{
 			switch (signature)
 			{
-			case Yttrium::make_cc('R', 'I', 'F', 'F'): return std::make_unique<Yttrium::WavDecoder>(std::move(source));
+			case Yt::make_cc('R', 'I', 'F', 'F'): return std::make_unique<Yt::WavDecoder>(std::move(source));
 #if Y_USE_OGG_VORBIS
-			case Yttrium::make_cc('O', 'g', 'g', 'S'): return std::make_unique<Yttrium::OggVorbisDecoder>(std::move(source));
+			case Yt::make_cc('O', 'g', 'g', 'S'): return std::make_unique<Yt::OggVorbisDecoder>(std::move(source));
 #endif
 			default: break;
 			}
 		}
-		throw Yttrium::DataError{ "Unknown audio format" };
+		throw Yt::DataError{ "Unknown audio format" };
 	}
 }
 
-namespace Yttrium
+namespace Yt
 {
 	AudioReader::AudioReader(std::unique_ptr<Source>&& source)
 		: _decoder{ ::create_audio_decoder(std::move(source)) }

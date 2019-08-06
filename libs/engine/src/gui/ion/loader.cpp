@@ -36,93 +36,91 @@
 
 namespace
 {
-	using namespace Yttrium;
-
 	struct OnKey
 	{
 		std::string_view _key;
-		GuiActions _on_press;
-		GuiActions _on_release;
+		Yt::GuiActions _on_press;
+		Yt::GuiActions _on_release;
 	};
 
-	GuiActions read_actions(IonReader& ion, IonToken& token)
+	Yt::GuiActions read_actions(Yt::IonReader& ion, Yt::IonToken& token)
 	{
-		GuiActions actions;
+		Yt::GuiActions actions;
 		token.check_object_begin();
-		for (token.next(ion); token.type() != IonToken::Type::ObjectEnd; token.next(ion))
+		for (token.next(ion); token.type() != Yt::IonToken::Type::ObjectEnd; token.next(ion))
 		{
 			const auto action = token.to_name();
 			if (action == "call")
-				actions.add<GuiAction_Call>(token.next(ion).to_value());
+				actions.add<Yt::GuiAction_Call>(token.next(ion).to_value());
 			else if (action == "enter")
-				actions.add<GuiAction_Enter>(token.next(ion).to_value());
+				actions.add<Yt::GuiAction_Enter>(token.next(ion).to_value());
 			else if (action == "quit")
-				actions.add<GuiAction_Quit>();
+				actions.add<Yt::GuiAction_Quit>();
 			else if (action == "return")
-				actions.add<GuiAction_Return>();
+				actions.add<Yt::GuiAction_Return>();
 			else if (action == "return_to")
-				actions.add<GuiAction_ReturnTo>(token.next(ion).to_value());
+				actions.add<Yt::GuiAction_ReturnTo>(token.next(ion).to_value());
 			else
-				throw GuiDataError{ "Unknown action \"", action, "\"" };
+				throw Yt::GuiDataError{ "Unknown action \"", action, "\"" };
 		}
 		token.next(ion);
 		return actions;
 	}
 
-	OnKey read_on_key(IonReader& ion, IonToken& token)
+	OnKey read_on_key(Yt::IonReader& ion, Yt::IonToken& token)
 	{
 		OnKey on_key;
 		on_key._key = token.to_value();
 		on_key._on_press = ::read_actions(ion, token.next(ion));
-		if (token.type() == IonToken::Type::ObjectBegin)
+		if (token.type() == Yt::IonToken::Type::ObjectBegin)
 			on_key._on_release = ::read_actions(ion, token);
 		return on_key;
 	}
 
-	bool update_rect(RectF& rect, IonReader& ion, IonToken& token)
+	bool update_rect(Yt::RectF& rect, Yt::IonReader& ion, Yt::IonToken& token)
 	{
-		if (token.type() != IonToken::Type::StringValue)
+		if (token.type() != Yt::IonToken::Type::StringValue)
 			return false;
 		if (!token.text().empty())
 		{
 			float x = 0;
-			if (!from_chars(token.text(), x))
+			if (!Yt::from_chars(token.text(), x))
 				return false;
 			rect = { { x, rect.top() }, rect.size() };
 		}
-		if (token.next(ion).type() != IonToken::Type::StringValue)
+		if (token.next(ion).type() != Yt::IonToken::Type::StringValue)
 			return true;
 		if (!token.text().empty())
 		{
 			float y = 0;
-			if (!from_chars(token.text(), y))
+			if (!Yt::from_chars(token.text(), y))
 				return false;
 			rect = { { rect.left(), y }, rect.size() };
 		}
-		if (token.next(ion).type() != IonToken::Type::StringValue)
+		if (token.next(ion).type() != Yt::IonToken::Type::StringValue)
 			return true;
 		if (!token.text().empty())
 		{
 			float width = 0;
-			if (!from_chars(token.text(), width))
+			if (!Yt::from_chars(token.text(), width))
 				return false;
-			rect = { rect.top_left(), SizeF{ width, rect.height() } };
+			rect = { rect.top_left(), Yt::SizeF{ width, rect.height() } };
 		}
-		if (token.next(ion).type() != IonToken::Type::StringValue)
+		if (token.next(ion).type() != Yt::IonToken::Type::StringValue)
 			return true;
 		if (!token.text().empty())
 		{
 			float height = 0;
-			if (!from_chars(token.text(), height))
+			if (!Yt::from_chars(token.text(), height))
 				return false;
-			rect = { rect.top_left(), SizeF{ rect.width(), height } };
+			rect = { rect.top_left(), Yt::SizeF{ rect.width(), height } };
 		}
 		token.next(ion);
 		return true;
 	}
 }
 
-namespace Yttrium
+namespace Yt
 {
 	class GuiIonLoader
 	{
@@ -242,7 +240,7 @@ namespace Yttrium
 			{ "translation", &GuiIonLoader::load_translation },
 		};
 
-		for (auto token = ion.read(); token.type() != Yttrium::IonToken::Type::End;)
+		for (auto token = ion.read(); token.type() != IonToken::Type::End;)
 		{
 			Flags<Attribute> attributes;
 			for (;;)

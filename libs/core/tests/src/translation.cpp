@@ -24,53 +24,47 @@
 
 #include <catch2/catch.hpp>
 
-using Yttrium::Buffer;
-using Yttrium::Source;
-using Yttrium::TemporaryFile;
-using Yttrium::Translation;
-using Yttrium::Writer;
-
 TEST_CASE("translation.load")
 {
-	const auto translation = Translation::load(*Source::from(::make_buffer("tr \"hello\" \"Hello\" tr \"world\" \"world!\"")));
+	const auto translation = Yt::Translation::load(*Yt::Source::from(::make_buffer("tr \"hello\" \"Hello\" tr \"world\" \"world!\"")));
 	CHECK(translation->translate("hello") == "Hello");
 	CHECK(translation->translate("world") == "world!");
 }
 
 TEST_CASE("translation.load.empty")
 {
-	const auto translation = Translation::load(*Source::from(Buffer{}));
+	const auto translation = Yt::Translation::load(*Yt::Source::from(Yt::Buffer{}));
 	CHECK(translation->translate("hello") == "hello");
 	CHECK(translation->translate("world") == "world");
 }
 
 TEST_CASE("translation.remove_obsolete")
 {
-	const auto translation = Translation::load(*Source::from(::make_buffer("tr \"hello\" \"Hello\" tr \"world\" \"world!\"")));
+	const auto translation = Yt::Translation::load(*Yt::Source::from(::make_buffer("tr \"hello\" \"Hello\" tr \"world\" \"world!\"")));
 	translation->add("world");
 	translation->remove_obsolete();
 
-	TemporaryFile file;
-	translation->save(Writer{ file });
-	CHECK(Source::from(file)->to_string() == "tr \"world\" \"world!\"\n");
+	Yt::TemporaryFile file;
+	translation->save(Yt::Writer{ file });
+	CHECK(Yt::Source::from(file)->to_string() == "tr \"world\" \"world!\"\n");
 }
 
 TEST_CASE("translation.save")
 {
-	const auto translation = Translation::load(*Source::from(Buffer{}));
+	const auto translation = Yt::Translation::load(*Yt::Source::from(Yt::Buffer{}));
 	translation->add("hello");
 	translation->add("world");
 
-	TemporaryFile file;
-	translation->save(Writer{ file });
-	CHECK(Source::from(file)->to_string() == "tr \"hello\" \"\"\ntr \"world\" \"\"\n");
+	Yt::TemporaryFile file;
+	translation->save(Yt::Writer{ file });
+	CHECK(Yt::Source::from(file)->to_string() == "tr \"hello\" \"\"\ntr \"world\" \"\"\n");
 }
 
 TEST_CASE("translation.save.empty")
 {
-	const auto translation = Translation::load(*Source::from(Buffer{}));
+	const auto translation = Yt::Translation::load(*Yt::Source::from(Yt::Buffer{}));
 
-	TemporaryFile file;
-	translation->save(Writer{ file });
-	CHECK(Source::from(file)->to_string().empty());
+	Yt::TemporaryFile file;
+	translation->save(Yt::Writer{ file });
+	CHECK(Yt::Source::from(file)->to_string().empty());
 }

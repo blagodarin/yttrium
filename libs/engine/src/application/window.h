@@ -26,7 +26,7 @@
 
 #include <functional>
 
-namespace Yttrium
+namespace Yt
 {
 	class RenderPass;
 	struct UpdateEvent;

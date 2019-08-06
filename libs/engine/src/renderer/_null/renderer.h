@@ -21,7 +21,7 @@
 #include <yttrium/renderer/mesh.h>
 #include "../backend.h"
 
-namespace Yttrium
+namespace Yt
 {
 	class WindowBackend;
 

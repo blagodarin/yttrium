@@ -22,7 +22,7 @@
 
 #include <chrono>
 
-namespace Yttrium
+namespace Yt
 {
 	class InputWidget : public Widget
 	{

@@ -21,7 +21,7 @@
 
 #include <string>
 
-namespace Yttrium
+namespace Yt
 {
 	inline bool ends_with(std::string_view string, std::string_view with) noexcept
 	{

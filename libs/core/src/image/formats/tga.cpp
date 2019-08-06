@@ -94,7 +94,7 @@ namespace
 	};
 }
 
-namespace Yttrium
+namespace Yt
 {
 	bool read_tga_header(Reader& reader, ImageInfo& info)
 	{

@@ -20,7 +20,7 @@
 #include <yttrium/memory/buffer.h>
 #include "backend.h"
 
-namespace Yttrium
+namespace Yt
 {
 	class AudioReader;
 	class Sound;

@@ -23,7 +23,7 @@
 #include "gui/logic/line_editor.h"
 #include "renderer/debug_renderer.h"
 
-namespace Yttrium
+namespace Yt
 {
 	class ConsolePrivate
 	{

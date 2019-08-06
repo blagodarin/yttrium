@@ -23,7 +23,7 @@
 
 #include <vulkan/vulkan.h>
 
-namespace Yttrium
+namespace Yt
 {
 	class VulkanContext;
 
@@ -200,5 +200,5 @@ namespace Yttrium
 	do \
 	{ \
 		if (const auto result = (call)) \
-			::Yttrium::vulkan_result_check(result, #call); \
+			::Yt::vulkan_result_check(result, #call); \
 	} while (false)

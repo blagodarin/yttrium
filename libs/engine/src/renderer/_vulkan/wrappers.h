@@ -23,7 +23,7 @@
 #include <stdexcept>
 #include <tuple>
 
-namespace Yttrium
+namespace Yt
 {
 	class VulkanDepthBuffer;
 	class VulkanVertexFormat;

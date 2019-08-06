@@ -20,7 +20,7 @@
 #include <yttrium/script/context.h>
 #include <yttrium/script/value.h>
 
-namespace Yttrium
+namespace Yt
 {
 	const ScriptValue* ScriptArgs::operator[](size_t index) const
 	{

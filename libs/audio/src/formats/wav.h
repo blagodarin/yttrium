@@ -19,7 +19,7 @@
 
 #include "../decoder.h"
 
-namespace Yttrium
+namespace Yt
 {
 	class WavDecoder final : public AudioDecoder
 	{

@@ -25,20 +25,18 @@
 
 namespace
 {
-	using namespace Yttrium;
-
-	void draw_debug_char(RenderPassImpl& pass, size_t x, size_t y, size_t width, size_t height, const Color4f& color, uint8_t value)
+	void draw_debug_char(Yt::RenderPassImpl& pass, size_t x, size_t y, size_t width, size_t height, const Yt::Color4f& color, uint8_t value)
 	{
 		pass.draw_rect(
-			{ { static_cast<float>(x * DebugTexture::char_width), static_cast<float>(y * DebugTexture::char_height) },
-				SizeF{ static_cast<float>(width * DebugTexture::char_width), static_cast<float>(height * DebugTexture::char_height) } },
+			{ { static_cast<float>(x * Yt::DebugTexture::char_width), static_cast<float>(y * Yt::DebugTexture::char_height) },
+				Yt::SizeF{ static_cast<float>(width * Yt::DebugTexture::char_width), static_cast<float>(height * Yt::DebugTexture::char_height) } },
 			color,
-			{ { DebugTexture::coords[value][0][0], DebugTexture::coords[value][0][1] },
-				Vector2{ DebugTexture::coords[value][1][0], DebugTexture::coords[value][1][1] } });
+			{ { Yt::DebugTexture::coords[value][0][0], Yt::DebugTexture::coords[value][0][1] },
+				Yt::Vector2{ Yt::DebugTexture::coords[value][1][0], Yt::DebugTexture::coords[value][1][1] } });
 	}
 }
 
-namespace Yttrium
+namespace Yt
 {
 	DebugRenderer::DebugRenderer(RenderPass& pass)
 		: _pass{ static_cast<RenderPassImpl&>(pass) }

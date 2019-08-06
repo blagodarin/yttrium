@@ -21,7 +21,7 @@
 
 #include <string_view>
 
-namespace Yttrium
+namespace Yt
 {
 	Y_ENGINE_API Key lookup_key(std::string_view name);
 }

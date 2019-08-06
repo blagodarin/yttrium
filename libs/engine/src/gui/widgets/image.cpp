@@ -17,7 +17,7 @@
 
 #include "image.h"
 
-namespace Yttrium
+namespace Yt
 {
 	ImageWidget::ImageWidget(GuiPrivate& gui, std::unique_ptr<WidgetData>&& data)
 		: Widget{ gui, std::move(data) }

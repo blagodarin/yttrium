@@ -25,7 +25,7 @@
 #include <cstring>
 #include <limits>
 
-namespace Yttrium
+namespace Yt
 {
 	bool transform_audio(void* dst, const AudioFormat& dst_format, const void* src, const AudioFormat& src_format, size_t frames)
 	{

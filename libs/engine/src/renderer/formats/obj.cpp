@@ -49,7 +49,7 @@ namespace
 	class ObjState
 	{
 	public:
-		bool process_line(const std::string& line, Yttrium::MeshData& data)
+		bool process_line(const std::string& line, Yt::MeshData& data)
 		{
 			std::smatch match;
 			if (std::regex_match(line, match, _obj_v_regex))
@@ -72,23 +72,21 @@ namespace
 			return true;
 		}
 
-		bool finalize(Yttrium::MeshData& data)
+		bool finalize(Yt::MeshData& data)
 		{
-			using Yttrium::VA;
-
 			switch (_face_format)
 			{
 			case FaceFormat::v:
-				data._vertex_format = { VA::f3 };
+				data._vertex_format = { Yt::VA::f3 };
 				return true;
 			case FaceFormat::vt:
-				data._vertex_format = { VA::f3, VA::f2 };
+				data._vertex_format = { Yt::VA::f3, Yt::VA::f2 };
 				return true;
 			case FaceFormat::vn:
-				data._vertex_format = { VA::f3, VA::f3 };
+				data._vertex_format = { Yt::VA::f3, Yt::VA::f3 };
 				return true;
 			case FaceFormat::vtn:
-				data._vertex_format = { VA::f3, VA::f2, VA::f3 };
+				data._vertex_format = { Yt::VA::f3, Yt::VA::f2, Yt::VA::f3 };
 				return true;
 			default:
 				return false;
@@ -151,7 +149,7 @@ namespace
 			return {};
 		}
 
-		bool process_index(const std::tuple<size_t, size_t, size_t>& index, Yttrium::MeshData& data)
+		bool process_index(const std::tuple<size_t, size_t, size_t>& index, Yt::MeshData& data)
 		{
 			const auto index_v = std::get<0>(index);
 			const auto index_t = std::get<1>(index);
@@ -167,7 +165,7 @@ namespace
 				return true;
 			}
 
-			Yttrium::BufferAppender<float> appender(data._vertex_data);
+			Yt::BufferAppender<float> appender(data._vertex_data);
 			appender << _vertices[index_v].x << _vertices[index_v].y << _vertices[index_v].z;
 			if (index_t != _no_index)
 				appender << _texcoords[index_t].x << _texcoords[index_t].y;
@@ -181,9 +179,9 @@ namespace
 
 	private:
 		FaceFormat _face_format = FaceFormat::unknown;
-		std::vector<Yttrium::Vector3> _vertices;
-		std::vector<Yttrium::Vector2> _texcoords;
-		std::vector<Yttrium::Vector3> _normals;
+		std::vector<Yt::Vector3> _vertices;
+		std::vector<Yt::Vector2> _texcoords;
+		std::vector<Yt::Vector3> _normals;
 		std::vector<std::tuple<size_t, size_t, size_t>> _indices;
 	};
 
@@ -199,7 +197,7 @@ namespace
 	}
 }
 
-namespace Yttrium
+namespace Yt
 {
 	MeshData load_obj_mesh(const Source& source, std::string_view source_name)
 	{

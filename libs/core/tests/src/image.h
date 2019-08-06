@@ -21,7 +21,7 @@
 
 #include <cstring>
 
-namespace Yttrium
+namespace Yt
 {
 	inline bool operator==(const Image& a, const Image& b) noexcept
 	{

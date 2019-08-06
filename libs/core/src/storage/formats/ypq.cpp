@@ -36,7 +36,7 @@ namespace
 		uint32_t index_size = 0;
 		uint32_t reserved = 0;
 
-		static constexpr auto Signature = Yttrium::make_cc('\xDF', 'Y', 'P', 'Q');
+		static constexpr auto Signature = Yt::make_cc('\xDF', 'Y', 'P', 'Q');
 	};
 
 	struct YpqEntry
@@ -49,7 +49,7 @@ namespace
 #pragma pack(pop)
 }
 
-namespace Yttrium
+namespace Yt
 {
 	struct YpqReader::Entry
 	{

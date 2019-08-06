@@ -21,7 +21,7 @@
 
 #include <memory>
 
-namespace Yttrium
+namespace Yt
 {
 	enum class ImageOrientation;
 	class RectF;

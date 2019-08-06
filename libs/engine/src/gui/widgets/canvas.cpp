@@ -19,7 +19,7 @@
 
 #include "../gui.h"
 
-namespace Yttrium
+namespace Yt
 {
 	CanvasWidget::CanvasWidget(GuiPrivate& gui, std::unique_ptr<WidgetData>&& data, std::string_view name)
 		: Widget{ gui, std::move(data) }

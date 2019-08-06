@@ -25,7 +25,7 @@
 #include <cassert>
 #include <limits>
 
-namespace Yttrium
+namespace Yt
 {
 	size_t Reader::read(void* data, size_t size)
 	{

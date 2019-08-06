@@ -21,7 +21,7 @@
 
 #include <algorithm>
 
-namespace Yttrium
+namespace Yt
 {
 	/// Integral rectangle.
 	class Rect

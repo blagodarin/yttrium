@@ -27,7 +27,7 @@
 #include <map>
 #include <optional>
 
-namespace Yttrium
+namespace Yt
 {
 	class Font;
 	class RenderPass;

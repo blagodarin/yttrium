@@ -21,7 +21,7 @@
 
 #include <vector>
 
-namespace Yttrium
+namespace Yt
 {
 	class ScriptCode;
 	class ScriptContext;

@@ -20,12 +20,12 @@
 
 #include <catch2/catch.hpp>
 
-using Yttrium::Point;
-using Yttrium::Rect;
-using Yttrium::RectF;
-using Yttrium::Size;
-using Yttrium::SizeF;
-using Yttrium::Vector2;
+using Yt::Point;
+using Yt::Rect;
+using Yt::RectF;
+using Yt::Size;
+using Yt::SizeF;
+using Yt::Vector2;
 
 TEST_CASE("rect")
 {

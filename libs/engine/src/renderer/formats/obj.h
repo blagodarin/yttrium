@@ -19,7 +19,7 @@
 
 #include <string_view>
 
-namespace Yttrium
+namespace Yt
 {
 	class MeshData;
 	class Source;

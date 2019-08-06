@@ -20,7 +20,7 @@
 #include <yttrium/renderer/mesh.h>
 #include "buffer.h"
 
-namespace Yttrium
+namespace Yt
 {
 	struct VulkanMesh final : public Mesh
 	{

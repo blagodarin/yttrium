@@ -21,7 +21,7 @@
 
 #include <cmath>
 
-namespace Yttrium
+namespace Yt
 {
 	class Vector2
 	{

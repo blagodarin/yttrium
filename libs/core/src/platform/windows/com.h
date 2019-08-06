@@ -21,7 +21,7 @@
 
 #include <comip.h>
 
-namespace Yttrium
+namespace Yt
 {
 	class Y_CORE_API ComInitializer
 	{

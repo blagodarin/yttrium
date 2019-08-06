@@ -31,42 +31,40 @@
 
 #include <optional>
 
-using namespace Yttrium;
-
 class MinimapCanvas;
 
 class Game
 {
 public:
-	explicit Game(const Storage&);
+	explicit Game(const Yt::Storage&);
 	~Game();
 
 	void run();
 
 private:
-	void draw_minimap(RenderPass&, const RectF&);
-	void draw_scene(RenderPass&, const Vector2&);
-	void update(const UpdateEvent&);
+	void draw_minimap(Yt::RenderPass&, const Yt::RectF&);
+	void draw_scene(Yt::RenderPass&, const Yt::Vector2&);
+	void update(const Yt::UpdateEvent&);
 
 private:
-	const Storage& _storage;
-	Application _application;
-	Window _window{ _application };
-	ResourceLoader _resource_loader{ _storage, &_window.render_manager() };
-	ScriptContext _script;
-	Gui _gui{ "data/gui.ion", _resource_loader, _script };
+	const Yt::Storage& _storage;
+	Yt::Application _application;
+	Yt::Window _window{ _application };
+	Yt::ResourceLoader _resource_loader{ _storage, &_window.render_manager() };
+	Yt::ScriptContext _script;
+	Yt::Gui _gui{ "data/gui.ion", _resource_loader, _script };
 	bool _debug_text_visible = false;
 	std::string _debug_text;
 	Model _cube{ _resource_loader, "data/cube.obj", "data/cube.material" };
 	Model _checkerboard{ _resource_loader, "data/checkerboard.obj", "data/checkerboard.material" };
 
-	Vector3 _position{ 0, -8.5, 16 };
-	Euler _rotation{ 0, -60, 0 };
+	Yt::Vector3 _position{ 0, -8.5, 16 };
+	Yt::Euler _rotation{ 0, -60, 0 };
 
-	Line3 _cursor_ray{ { 0, 0, 0 }, { 0, 0, 0 } };
-	const Plane _board_plane{ { 0, 0, 1 }, { 0, 0, 0 } };
-	std::optional<Vector2> _board_point;
-	std::optional<Quad> _visibility_quad;
+	Yt::Line3 _cursor_ray{ { 0, 0, 0 }, { 0, 0, 0 } };
+	const Yt::Plane _board_plane{ { 0, 0, 1 }, { 0, 0, 0 } };
+	std::optional<Yt::Vector2> _board_point;
+	std::optional<Yt::Quad> _visibility_quad;
 
 	std::unique_ptr<MinimapCanvas> _minimap_canvas;
 };

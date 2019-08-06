@@ -61,7 +61,7 @@ namespace
 	};
 }
 
-namespace Yttrium
+namespace Yt
 {
 	GuiPrivate::GuiPrivate(ScriptContext& script_context, const std::shared_ptr<AudioManager>& audio_manager) noexcept
 		: _script_context{ script_context }

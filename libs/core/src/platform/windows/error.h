@@ -21,7 +21,7 @@
 
 #include <string>
 
-namespace Yttrium
+namespace Yt
 {
 	Y_CORE_API std::string error_to_string(unsigned long, std::string_view fallback_message = {});
 	Y_CORE_API void log_last_error(const char* function) noexcept;

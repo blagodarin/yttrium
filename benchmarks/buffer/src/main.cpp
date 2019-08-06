@@ -24,11 +24,11 @@
 
 namespace
 {
-	const auto Granularity = Yttrium::Buffer::memory_granularity();
+	const auto Granularity = Yt::Buffer::memory_granularity();
 	constexpr size_t MaxBlocks = 1024; // 64 MiB.
 
 	template <size_t BlockSize, size_t BlockCount>
-	void allocate(std::array<Yttrium::Buffer, BlockCount>& buffers)
+	void allocate(std::array<Yt::Buffer, BlockCount>& buffers)
 	{
 		for (auto& buffer : buffers)
 			buffer.reset(BlockSize);
@@ -46,7 +46,7 @@ namespace
 	}
 
 	template <size_t BlockSize, size_t BlockCount>
-	void allocate_and_touch(std::array<Yttrium::Buffer, BlockCount>& buffers)
+	void allocate_and_touch(std::array<Yt::Buffer, BlockCount>& buffers)
 	{
 		for (auto& buffer : buffers)
 		{
@@ -72,7 +72,7 @@ namespace
 	}
 
 	template <size_t BlockSize, size_t BlockCount>
-	void allocate_and_fill(std::array<Yttrium::Buffer, BlockCount>& buffers)
+	void allocate_and_fill(std::array<Yt::Buffer, BlockCount>& buffers)
 	{
 		for (auto& buffer : buffers)
 		{
@@ -101,7 +101,7 @@ TEST_CASE("Allocate")
 	BENCHMARK_ADVANCED("buffer (63 KiB)")
 	(Catch::Benchmark::Chronometer meter)
 	{
-		std::array<Yttrium::Buffer, MaxBlocks> buffers;
+		std::array<Yt::Buffer, MaxBlocks> buffers;
 		meter.measure([&buffers] { ::allocate<63 * 1024>(buffers); });
 	};
 
@@ -115,7 +115,7 @@ TEST_CASE("Allocate")
 	BENCHMARK_ADVANCED("buffer (127 KiB)")
 	(Catch::Benchmark::Chronometer meter)
 	{
-		std::array<Yttrium::Buffer, MaxBlocks / 2> buffers;
+		std::array<Yt::Buffer, MaxBlocks / 2> buffers;
 		meter.measure([&buffers] { ::allocate<127 * 1024>(buffers); });
 	};
 
@@ -129,7 +129,7 @@ TEST_CASE("Allocate")
 	BENCHMARK_ADVANCED("buffer (255 KiB)")
 	(Catch::Benchmark::Chronometer meter)
 	{
-		std::array<Yttrium::Buffer, MaxBlocks / 4> buffers;
+		std::array<Yt::Buffer, MaxBlocks / 4> buffers;
 		meter.measure([&buffers] { ::allocate<255 * 1024>(buffers); });
 	};
 
@@ -143,7 +143,7 @@ TEST_CASE("Allocate")
 	BENCHMARK_ADVANCED("buffer (511 KiB)")
 	(Catch::Benchmark::Chronometer meter)
 	{
-		std::array<Yttrium::Buffer, MaxBlocks / 8> buffers;
+		std::array<Yt::Buffer, MaxBlocks / 8> buffers;
 		meter.measure([&buffers] { ::allocate<511 * 1024>(buffers); });
 	};
 
@@ -157,7 +157,7 @@ TEST_CASE("Allocate")
 	BENCHMARK_ADVANCED("buffer (1023 KiB)")
 	(Catch::Benchmark::Chronometer meter)
 	{
-		std::array<Yttrium::Buffer, MaxBlocks / 16> buffers;
+		std::array<Yt::Buffer, MaxBlocks / 16> buffers;
 		meter.measure([&buffers] { ::allocate<1023 * 1024>(buffers); });
 	};
 
@@ -174,7 +174,7 @@ TEST_CASE("Allocate and touch")
 	BENCHMARK_ADVANCED("buffer (63 KiB)")
 	(Catch::Benchmark::Chronometer meter)
 	{
-		std::array<Yttrium::Buffer, MaxBlocks> buffers;
+		std::array<Yt::Buffer, MaxBlocks> buffers;
 		meter.measure([&buffers] { ::allocate_and_touch<63 * 1024>(buffers); });
 	};
 
@@ -188,7 +188,7 @@ TEST_CASE("Allocate and touch")
 	BENCHMARK_ADVANCED("buffer (127 KiB)")
 	(Catch::Benchmark::Chronometer meter)
 	{
-		std::array<Yttrium::Buffer, MaxBlocks / 2> buffers;
+		std::array<Yt::Buffer, MaxBlocks / 2> buffers;
 		meter.measure([&buffers] { ::allocate_and_touch<127 * 1024>(buffers); });
 	};
 
@@ -202,7 +202,7 @@ TEST_CASE("Allocate and touch")
 	BENCHMARK_ADVANCED("buffer (255 KiB)")
 	(Catch::Benchmark::Chronometer meter)
 	{
-		std::array<Yttrium::Buffer, MaxBlocks / 4> buffers;
+		std::array<Yt::Buffer, MaxBlocks / 4> buffers;
 		meter.measure([&buffers] { ::allocate_and_touch<255 * 1024>(buffers); });
 	};
 
@@ -216,7 +216,7 @@ TEST_CASE("Allocate and touch")
 	BENCHMARK_ADVANCED("buffer (511 KiB)")
 	(Catch::Benchmark::Chronometer meter)
 	{
-		std::array<Yttrium::Buffer, MaxBlocks / 8> buffers;
+		std::array<Yt::Buffer, MaxBlocks / 8> buffers;
 		meter.measure([&buffers] { ::allocate_and_touch<511 * 1024>(buffers); });
 	};
 
@@ -230,7 +230,7 @@ TEST_CASE("Allocate and touch")
 	BENCHMARK_ADVANCED("buffer (1023 KiB)")
 	(Catch::Benchmark::Chronometer meter)
 	{
-		std::array<Yttrium::Buffer, MaxBlocks / 16> buffers;
+		std::array<Yt::Buffer, MaxBlocks / 16> buffers;
 		meter.measure([&buffers] { ::allocate_and_touch<1023 * 1024>(buffers); });
 	};
 
@@ -247,7 +247,7 @@ TEST_CASE("Allocate and fill")
 	BENCHMARK_ADVANCED("buffer (63 KiB)")
 	(Catch::Benchmark::Chronometer meter)
 	{
-		std::array<Yttrium::Buffer, MaxBlocks> buffers;
+		std::array<Yt::Buffer, MaxBlocks> buffers;
 		meter.measure([&buffers] { ::allocate_and_fill<63 * 1024>(buffers); });
 	};
 
@@ -261,7 +261,7 @@ TEST_CASE("Allocate and fill")
 	BENCHMARK_ADVANCED("buffer (127 KiB)")
 	(Catch::Benchmark::Chronometer meter)
 	{
-		std::array<Yttrium::Buffer, MaxBlocks / 2> buffers;
+		std::array<Yt::Buffer, MaxBlocks / 2> buffers;
 		meter.measure([&buffers] { ::allocate_and_fill<127 * 1024>(buffers); });
 	};
 
@@ -275,7 +275,7 @@ TEST_CASE("Allocate and fill")
 	BENCHMARK_ADVANCED("buffer (255 KiB)")
 	(Catch::Benchmark::Chronometer meter)
 	{
-		std::array<Yttrium::Buffer, MaxBlocks / 4> buffers;
+		std::array<Yt::Buffer, MaxBlocks / 4> buffers;
 		meter.measure([&buffers] { ::allocate_and_fill<255 * 1024>(buffers); });
 	};
 
@@ -289,7 +289,7 @@ TEST_CASE("Allocate and fill")
 	BENCHMARK_ADVANCED("buffer (511 KiB)")
 	(Catch::Benchmark::Chronometer meter)
 	{
-		std::array<Yttrium::Buffer, MaxBlocks / 8> buffers;
+		std::array<Yt::Buffer, MaxBlocks / 8> buffers;
 		meter.measure([&buffers] { ::allocate_and_fill<511 * 1024>(buffers); });
 	};
 
@@ -303,7 +303,7 @@ TEST_CASE("Allocate and fill")
 	BENCHMARK_ADVANCED("buffer (1023 KiB)")
 	(Catch::Benchmark::Chronometer meter)
 	{
-		std::array<Yttrium::Buffer, MaxBlocks / 16> buffers;
+		std::array<Yt::Buffer, MaxBlocks / 16> buffers;
 		meter.measure([&buffers] { ::allocate_and_fill<1023 * 1024>(buffers); });
 	};
 

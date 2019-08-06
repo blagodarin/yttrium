@@ -21,7 +21,7 @@
 
 #include <memory>
 
-namespace Yttrium
+namespace Yt
 {
 	class AudioReader;
 	class Sound;

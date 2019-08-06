@@ -26,7 +26,7 @@
 #include <algorithm>
 #include <unordered_map>
 
-namespace Yttrium
+namespace Yt
 {
 	struct ScriptCommandContext
 	{

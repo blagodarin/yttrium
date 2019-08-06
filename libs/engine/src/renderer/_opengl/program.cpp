@@ -19,7 +19,7 @@
 
 #include <yttrium/logger.h>
 
-namespace Yttrium
+namespace Yt
 {
 	GlProgram::GlProgram(GlShaderHandle&& vertex_shader, GlShaderHandle&& fragment_shader, const GlApi& gl)
 		: _vertex_shader{ std::move(vertex_shader) }

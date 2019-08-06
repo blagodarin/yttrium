@@ -20,7 +20,7 @@
 #include <yttrium/api.h>
 #include <yttrium/utils/flags.h>
 
-namespace Yttrium
+namespace Yt
 {
 	/// Input key.
 	enum class Key

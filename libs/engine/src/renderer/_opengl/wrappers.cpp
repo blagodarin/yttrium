@@ -22,7 +22,7 @@
 #include <cassert>
 #include <stdexcept>
 
-namespace Yttrium
+namespace Yt
 {
 	GlBufferHandle::GlBufferHandle(const GlApi& gl, GLenum target)
 		: _gl{ gl }

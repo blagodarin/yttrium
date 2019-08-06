@@ -20,7 +20,7 @@
 #include <yttrium/renderer/program.h>
 #include "../texture.h"
 
-namespace Yttrium
+namespace Yt
 {
 	std::unique_ptr<RenderProgram> NullRenderer::create_program(const std::string&, const std::string&)
 	{

@@ -20,12 +20,12 @@
 
 #include <catch2/catch.hpp>
 
-namespace Yttrium
+namespace Yt
 {
 	constexpr bool operator==(const Matrix4& a, const Matrix4& b) noexcept { return a.x == b.x && a.y == b.y && a.z == b.z && a.t == b.t; }
 }
 
-using Yttrium::Matrix4;
+using Yt::Matrix4;
 
 TEST_CASE("matrix4.construction")
 {
@@ -107,7 +107,7 @@ TEST_CASE("matrix4.det")
 
 TEST_CASE("matrix4.euler")
 {
-	const Matrix4 actual{ Yttrium::Euler{ 30, 45, 60 } };
+	const Matrix4 actual{ Yt::Euler{ 30, 45, 60 } };
 	const auto expected = Matrix4::rotation(30, { 0, 0, -1 }) * Matrix4::rotation(45, { 1, 0, 0 }) * Matrix4::rotation(60, { 0, 1, 0 });
 	CHECK(actual.x.x == Approx{ expected.x.x }.epsilon(3e-5));
 	CHECK(actual.x.y == Approx{ expected.x.y }.epsilon(3e-5));
@@ -176,7 +176,7 @@ TEST_CASE("matrix4.inverse")
 
 TEST_CASE("matrix4.perspective")
 {
-	using Yttrium::Vector3;
+	using Yt::Vector3;
 
 	const auto m = Matrix4::perspective({ 1, 1 }, 90, 1, 2);
 	{
@@ -231,7 +231,7 @@ TEST_CASE("matrix4.perspective")
 
 TEST_CASE("matrix4.projection_2d")
 {
-	using Yttrium::Vector3;
+	using Yt::Vector3;
 
 	const auto m = Matrix4::projection_2d({ 640, 480 }, -.25, .75);
 	{

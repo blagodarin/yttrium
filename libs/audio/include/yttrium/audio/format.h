@@ -19,7 +19,7 @@
 
 #include <cstddef>
 
-namespace Yttrium
+namespace Yt
 {
 	enum class AudioSample
 	{

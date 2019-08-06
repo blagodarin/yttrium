@@ -35,7 +35,7 @@ namespace
 		return { signature, static_cast<size_t>(end - signature) };
 	}
 
-	class AlsaError : public Yttrium::BadCall
+	class AlsaError : public Yt::BadCall
 	{
 	public:
 		AlsaError(std::string_view function, int error)
@@ -50,7 +50,7 @@ namespace
 			throw AlsaError{ ::function_name(#call), x }; \
 	} while (false)
 
-namespace Yttrium
+namespace Yt
 {
 	AlsaAudioBackend::AlsaAudioBackend(unsigned frames_per_second)
 		: _buffer_format{ AudioSample::f32, AudioBufferChannels, frames_per_second }

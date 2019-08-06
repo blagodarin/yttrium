@@ -22,7 +22,7 @@
 #include <memory>
 #include <stdexcept>
 
-namespace Yttrium
+namespace Yt
 {
 	class Color4f;
 	class Source;

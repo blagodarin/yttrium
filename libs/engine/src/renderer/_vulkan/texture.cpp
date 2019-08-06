@@ -19,7 +19,7 @@
 
 #include "renderer.h"
 
-namespace Yttrium
+namespace Yt
 {
 	VulkanTexture2D::VulkanTexture2D(RenderBackend& backend, VulkanContext& context, const ImageInfo& info, bool has_mipmaps, VkFormat vk_format, const void* data)
 		: BackendTexture2D{ backend, info, has_mipmaps }

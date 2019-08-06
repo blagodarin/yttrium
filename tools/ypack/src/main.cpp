@@ -34,13 +34,13 @@ namespace
 	void check(bool condition, Args&&... args)
 	{
 		if (!condition)
-			throw Yttrium::DataError{ std::forward<Args>(args)... };
+			throw Yt::DataError{ std::forward<Args>(args)... };
 	}
 }
 
 int ymain(int argc, char** argv)
 {
-	Yttrium::Logger logger;
+	Yt::Logger logger;
 
 	if (argc != 3)
 	{
@@ -64,12 +64,12 @@ int ymain(int argc, char** argv)
 	std::vector<std::string> paths;
 	try
 	{
-		auto source = Yttrium::Source::from(index_path);
+		auto source = Yt::Source::from(index_path);
 		check(static_cast<bool>(source), "Bad index file");
-		Yttrium::IonReader ion{ *source };
+		Yt::IonReader ion{ *source };
 		ion.read().check_name("package");
 		ion.read().check_list_begin();
-		for (auto token = ion.read(); token.type() != Yttrium::IonToken::Type::ListEnd; token = ion.read())
+		for (auto token = ion.read(); token.type() != Yt::IonToken::Type::ListEnd; token = ion.read())
 			paths.emplace_back(std::string{ token.to_value() });
 		ion.read().check_end();
 	}
@@ -86,7 +86,7 @@ int ymain(int argc, char** argv)
 		return 0;
 	}
 
-	auto package = Yttrium::PackageWriter::create(package_path, Yttrium::PackageType::Ypq);
+	auto package = Yt::PackageWriter::create(package_path, Yt::PackageType::Ypq);
 	if (!package)
 	{
 		std::cerr << "ERROR: Unable to open " << package_path << " for writing\n";

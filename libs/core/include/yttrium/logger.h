@@ -22,7 +22,7 @@
 #include <functional>
 #include <memory>
 
-namespace Yttrium
+namespace Yt
 {
 	/// Asynchronous logger.
 	class Y_CORE_API Logger

@@ -24,7 +24,7 @@
 
 TEST_CASE("utils_string.ends_with")
 {
-	using Yttrium::ends_with;
+	using Yt::ends_with;
 
 	CHECK(ends_with("", ""));
 	CHECK(ends_with("test", ""));
@@ -36,7 +36,7 @@ TEST_CASE("utils_string.ends_with")
 
 TEST_CASE("utils_string.make_string")
 {
-	using Yttrium::make_string;
+	using Yt::make_string;
 
 	CHECK(make_string() == "");
 	CHECK(make_string("") == "");
@@ -83,7 +83,7 @@ TEST_CASE("utils_string.make_string")
 
 TEST_CASE("utils_string.from_chars.int32")
 {
-	using Yttrium::from_chars;
+	using Yt::from_chars;
 
 	int32_t i = 0;
 
@@ -114,7 +114,7 @@ TEST_CASE("utils_string.from_chars.int32")
 
 TEST_CASE("utils_string.to_number.uint32")
 {
-	using Yttrium::from_chars;
+	using Yt::from_chars;
 
 	uint32_t u = 1;
 
@@ -145,7 +145,7 @@ TEST_CASE("utils_string.to_number.uint32")
 
 TEST_CASE("utils_string.from_chars.double")
 {
-	using Yttrium::from_chars;
+	using Yt::from_chars;
 
 	double d = -1.;
 
@@ -207,7 +207,7 @@ TEST_CASE("utils_string.time_from_chars")
 	const auto time_from_chars = [](std::string_view text) {
 		const auto copy = std::make_unique<char[]>(text.size());
 		std::memcpy(copy.get(), text.data(), text.size());
-		return Yttrium::time_from_chars({ copy.get(), text.size() });
+		return Yt::time_from_chars({ copy.get(), text.size() });
 	};
 
 	CHECK(time_from_chars("1") == 1'000);

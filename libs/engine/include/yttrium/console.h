@@ -21,7 +21,7 @@
 
 #include <memory>
 
-namespace Yttrium
+namespace Yt
 {
 	class KeyEvent;
 	class RenderPass;

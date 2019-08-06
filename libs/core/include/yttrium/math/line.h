@@ -19,7 +19,7 @@
 
 #include <yttrium/math/plane.h>
 
-namespace Yttrium
+namespace Yt
 {
 	class Line3
 	{

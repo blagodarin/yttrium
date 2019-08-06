@@ -22,7 +22,7 @@
 #include <variant>
 #include <vector>
 
-namespace Yttrium
+namespace Yt
 {
 	class GuiPrivate;
 

@@ -24,7 +24,7 @@
 #include <cassert>
 #include <vector>
 
-namespace Yttrium
+namespace Yt
 {
 	class IonWriterPrivate
 	{

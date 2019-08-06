@@ -27,41 +27,39 @@
 
 #include <catch2/catch.hpp>
 
-using namespace Yttrium;
-
 namespace
 {
-	std::unique_ptr<Source> open_packed(const PackageReader& package, std::string_view name)
+	std::unique_ptr<Yt::Source> open_packed(const Yt::PackageReader& package, std::string_view name)
 	{
 		const auto& names = package.names();
-		return package.open(static_cast<std::size_t>(std::find(names.begin(), names.end(), name) - names.begin()));
+		return package.open(static_cast<size_t>(std::find(names.begin(), names.end(), name) - names.begin()));
 	}
 }
 
 TEST_CASE("package")
 {
-	Buffer buffer1{ 100003 };
+	Yt::Buffer buffer1{ 100003 };
 	::memset(buffer1.data(), 1, buffer1.size());
 
-	Buffer buffer2{ 100019 };
+	Yt::Buffer buffer2{ 100019 };
 	::memset(buffer2.data(), 2, buffer2.size());
 
-	Buffer buffer3{ 100043 };
+	Yt::Buffer buffer3{ 100043 };
 	::memset(buffer3.data(), 3, buffer3.size());
 
-	TemporaryFile file1;
-	Writer{ file1 }.write_all(buffer1);
+	Yt::TemporaryFile file1;
+	Yt::Writer{ file1 }.write_all(buffer1);
 
-	TemporaryFile file2;
-	Writer{ file2 }.write_all(buffer2);
+	Yt::TemporaryFile file2;
+	Yt::Writer{ file2 }.write_all(buffer2);
 
-	TemporaryFile file3;
-	Writer{ file3 }.write_all(buffer3);
+	Yt::TemporaryFile file3;
+	Yt::Writer{ file3 }.write_all(buffer3);
 
-	TemporaryFile package_file;
+	Yt::TemporaryFile package_file;
 
 	{
-		const auto package_writer = PackageWriter::create(package_file.path(), PackageType::Ypq);
+		const auto package_writer = Yt::PackageWriter::create(package_file.path(), Yt::PackageType::Ypq);
 		REQUIRE(package_writer);
 		REQUIRE(package_writer->add(file1.path().string()));
 		REQUIRE(package_writer->add(file2.path().string()));
@@ -69,12 +67,12 @@ TEST_CASE("package")
 		REQUIRE(package_writer->commit());
 	}
 
-	std::unique_ptr<Source> packed_file1;
-	std::unique_ptr<Source> packed_file2;
-	std::unique_ptr<Source> packed_file3;
+	std::unique_ptr<Yt::Source> packed_file1;
+	std::unique_ptr<Yt::Source> packed_file2;
+	std::unique_ptr<Yt::Source> packed_file3;
 
 	{
-		const auto package = PackageReader::create(package_file.path(), PackageType::Ypq);
+		const auto package = Yt::PackageReader::create(package_file.path(), Yt::PackageType::Ypq);
 		REQUIRE(package);
 
 		packed_file3 = ::open_packed(*package, file3.path().string());
@@ -98,18 +96,18 @@ TEST_CASE("package")
 
 TEST_CASE("package.file_size")
 {
-	TemporaryFile file1;
-	Writer{ file1 }.write_all(Buffer(1, "1"));
+	Yt::TemporaryFile file1;
+	Yt::Writer{ file1 }.write_all(Yt::Buffer(1, "1"));
 
-	TemporaryFile file2;
-	Writer{ file2 }.write_all(Buffer(1, "2"));
+	Yt::TemporaryFile file2;
+	Yt::Writer{ file2 }.write_all(Yt::Buffer(1, "2"));
 
-	TemporaryFile file3;
-	Writer{ file3 }.write_all(Buffer(1, "3"));
+	Yt::TemporaryFile file3;
+	Yt::Writer{ file3 }.write_all(Yt::Buffer(1, "3"));
 
-	TemporaryFile package_file;
+	Yt::TemporaryFile package_file;
 	{
-		const auto package_writer = PackageWriter::create(package_file.path(), PackageType::Ypq);
+		const auto package_writer = Yt::PackageWriter::create(package_file.path(), Yt::PackageType::Ypq);
 		REQUIRE(package_writer);
 		REQUIRE(package_writer->add(file1.path().string()));
 		REQUIRE(package_writer->add(file2.path().string()));
@@ -117,7 +115,7 @@ TEST_CASE("package.file_size")
 		REQUIRE(package_writer->commit());
 	}
 
-	const auto package = PackageReader::create(package_file.path(), PackageType::Ypq);
+	const auto package = Yt::PackageReader::create(package_file.path(), Yt::PackageType::Ypq);
 	REQUIRE(package);
 
 	auto packed_file = ::open_packed(*package, file2.path().string());
@@ -130,19 +128,19 @@ TEST_CASE("package.file_size")
 
 TEST_CASE("package.duplicates")
 {
-	TemporaryFile package_file;
-	TemporaryFile file;
+	Yt::TemporaryFile package_file;
+	Yt::TemporaryFile file;
 	{
-		const auto package_writer = PackageWriter::create(package_file.path(), PackageType::Ypq);
+		const auto package_writer = Yt::PackageWriter::create(package_file.path(), Yt::PackageType::Ypq);
 		REQUIRE(package_writer);
-		Writer{ file }.write_all(Buffer{ 1, "1" });
+		Yt::Writer{ file }.write_all(Yt::Buffer{ 1, "1" });
 		REQUIRE(package_writer->add(file.path().string()));
-		Writer{ file }.write_all(Buffer{ 2, "23" });
+		Yt::Writer{ file }.write_all(Yt::Buffer{ 2, "23" });
 		REQUIRE(package_writer->add(file.path().string()));
 		REQUIRE(package_writer->commit());
 	}
 
-	const auto package = PackageReader::create(package_file.path(), PackageType::Ypq);
+	const auto package = Yt::PackageReader::create(package_file.path(), Yt::PackageType::Ypq);
 	REQUIRE(package);
 
 	auto packed_file = ::open_packed(*package, file.path().string());

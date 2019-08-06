@@ -17,7 +17,7 @@
 
 #pragma once
 
-namespace Yttrium
+namespace Yt
 {
 	template <typename I, typename P>
 	constexpr I forward_find_if(I iterator, const P& predicate)

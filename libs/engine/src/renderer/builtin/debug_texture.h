@@ -19,7 +19,7 @@
 
 #include <cstdint>
 
-namespace Yttrium::DebugTexture
+namespace Yt::DebugTexture
 {
 	constexpr uint8_t char_width = 8;
 	constexpr uint8_t char_height = 16;

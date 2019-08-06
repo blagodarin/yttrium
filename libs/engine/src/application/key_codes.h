@@ -19,11 +19,11 @@
 
 #include <yttrium/key.h>
 
-namespace Yttrium
+namespace Yt
 {
 	// This mapping is based on <uapi/linux/input-event-codes.h> from Linux source code.
 	// Key codes from X11/XCB are off by 0x08; this offset is included in the mapping.
-	constexpr Key map_linux_key_code(std::uint8_t code) noexcept
+	constexpr Key map_linux_key_code(uint8_t code) noexcept
 	{
 		switch (code)
 		{

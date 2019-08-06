@@ -22,7 +22,7 @@
 #include "../formats.h"
 #include "bmp.h"
 
-namespace Yttrium
+namespace Yt
 {
 	bool read_ico_header(Reader& reader, ImageInfo& info)
 	{

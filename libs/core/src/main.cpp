@@ -17,7 +17,7 @@
 
 #include "memory/buffer_memory.h"
 
-namespace Yttrium
+namespace Yt
 {
 	BufferMemory _buffer_memory;
 }

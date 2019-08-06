@@ -20,23 +20,23 @@
 #include <yttrium/image.h>
 
 template <unsigned size>
-inline Yttrium::Image make_gray8_test_image()
+inline Yt::Image make_gray8_test_image()
 {
-	Yttrium::Buffer buffer{ size * size };
+	Yt::Buffer buffer{ size * size };
 	auto data = &buffer[0];
 	for (unsigned y = 0; y < size; ++y)
 		for (unsigned x = 0; x < size; ++x)
-			*data++ = static_cast<std::uint8_t>(y < size / 2 ? x * size + y / 2 : (size - 1 - x) * size + (size - 1 - y) / 2);
-	return { { size, size, Yttrium::PixelFormat::Gray8 }, buffer.data() };
+			*data++ = static_cast<uint8_t>(y < size / 2 ? x * size + y / 2 : (size - 1 - x) * size + (size - 1 - y) / 2);
+	return { { size, size, Yt::PixelFormat::Gray8 }, buffer.data() };
 }
 
-inline Yttrium::Image make_test_image(bool with_alpha, Yttrium::ImageOrientation orientation = Yttrium::ImageOrientation::XRightYDown)
+inline Yt::Image make_test_image(bool with_alpha, Yt::ImageOrientation orientation = Yt::ImageOrientation::XRightYDown)
 {
-	Yttrium::Buffer buffer(16 * 16 * (with_alpha ? 4 : 3));
+	Yt::Buffer buffer(16 * 16 * (with_alpha ? 4 : 3));
 	auto data = &buffer[0];
 	for (int row = 0; row < 16; ++row)
 	{
-		const auto y = orientation == Yttrium::ImageOrientation::XRightYDown ? row : 15 - row;
+		const auto y = orientation == Yt::ImageOrientation::XRightYDown ? row : 15 - row;
 		for (int x = 0; x < 16; ++x)
 		{
 			int b = 0;
@@ -67,5 +67,5 @@ inline Yttrium::Image make_test_image(bool with_alpha, Yttrium::ImageOrientation
 				*data++ = static_cast<uint8_t>(x * 16 + 15);
 		}
 	}
-	return { { 16, 16, with_alpha ? Yttrium::PixelFormat::Bgra32 : Yttrium::PixelFormat::Bgr24, orientation }, buffer.data() };
+	return { { 16, 16, with_alpha ? Yt::PixelFormat::Bgra32 : Yt::PixelFormat::Bgr24, orientation }, buffer.data() };
 }

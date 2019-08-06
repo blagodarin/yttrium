@@ -27,7 +27,7 @@
 
 #include <string>
 
-namespace Yttrium
+namespace Yt
 {
 	class BackendTexture2D;
 	class Matrix4;

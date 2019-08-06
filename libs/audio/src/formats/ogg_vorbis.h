@@ -25,7 +25,7 @@
 
 #include <vorbis/vorbisfile.h>
 
-namespace Yttrium
+namespace Yt
 {
 	class OggVorbisDecoder final : public AudioDecoder
 	{

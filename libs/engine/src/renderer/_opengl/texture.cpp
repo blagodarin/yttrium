@@ -19,7 +19,7 @@
 
 #include <utility>
 
-namespace Yttrium
+namespace Yt
 {
 	GlTexture2D::GlTexture2D(RenderBackend& backend, const ImageInfo& info, bool has_mipmaps, GlTextureHandle&& texture)
 		: BackendTexture2D{ backend, info, has_mipmaps }
