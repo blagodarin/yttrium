@@ -18,7 +18,7 @@
 #include "wgl.h"
 
 #include <yttrium/exceptions.h>
-#include "../../renderer/_opengl/version.h"
+#include "../../renderer/opengl/version.h"
 #include "../opengl.h"
 
 #include <cstring>

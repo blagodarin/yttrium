@@ -25,7 +25,7 @@
 #include <yttrium/renderer/textured_rect.h>
 #include <yttrium/utils/string.h>
 #include "backend.h"
-#include "builtin/builtin.h"
+#include "builtin.h"
 #include "debug_renderer.h"
 #include "texture.h"
 

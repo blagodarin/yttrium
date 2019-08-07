@@ -83,26 +83,26 @@ endif()
 
 if(UNIX)
 	if(Y_RENDERER_OPENGL)
-		y_sources(yengine "src/application/_x11"
-			src/application/_x11/application.cpp
-			src/application/_x11/application.h
-			src/application/_x11/glx.cpp
-			src/application/_x11/glx.h
-			src/application/_x11/window.cpp
-			src/application/_x11/window.h
+		y_sources(yengine "src/application/x11"
+			src/application/x11/application.cpp
+			src/application/x11/application.h
+			src/application/x11/glx.cpp
+			src/application/x11/glx.h
+			src/application/x11/window.cpp
+			src/application/x11/window.h
 			)
 		target_include_directories(yengine SYSTEM PRIVATE ${X11_INCLUDE_DIR})
 		target_link_libraries(yengine PRIVATE ${X11_X11_LIB})
 		if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 			# Xlib macros (DefaultScreen, RootWindow) produce old-style-cast warnings.
-			set_property(SOURCE src/application/_x11/application.cpp src/application/_x11/window.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-old-style-cast)
+			set_property(SOURCE src/application/x11/application.cpp src/application/x11/window.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-old-style-cast)
 		endif()
 	else()
-		y_sources(yengine "src/application/_xcb"
-			src/application/_xcb/application.cpp
-			src/application/_xcb/application.h
-			src/application/_xcb/window.cpp
-			src/application/_xcb/window.h
+		y_sources(yengine "src/application/xcb"
+			src/application/xcb/application.cpp
+			src/application/xcb/application.h
+			src/application/xcb/window.cpp
+			src/application/xcb/window.h
 			)
 		target_link_libraries(yengine PRIVATE xcb xcb-image xcb-xkb xkbcommon xkbcommon-x11)
 		if(Y_RENDERER_VULKAN)
@@ -110,20 +110,20 @@ if(UNIX)
 		endif()
 		if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 			# https://bugs.freedesktop.org/show_bug.cgi?id=74080
-			set_property(SOURCE src/application/_xcb/window.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-keyword-macro)
+			set_property(SOURCE src/application/xcb/window.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-keyword-macro)
 		endif()
 	endif()
 elseif(WIN32)
-	y_sources(yengine "src/application/_windows"
-		src/application/_windows/application.cpp
-		src/application/_windows/application.h
-		src/application/_windows/window.cpp
-		src/application/_windows/window.h
+	y_sources(yengine "src/application/windows"
+		src/application/windows/application.cpp
+		src/application/windows/application.h
+		src/application/windows/window.cpp
+		src/application/windows/window.h
 		)
 	if(Y_RENDERER_OPENGL)
-		y_sources(yengine "src/application/_windows"
-			src/application/_windows/wgl.cpp
-			src/application/_windows/wgl.h
+		y_sources(yengine "src/application/windows"
+			src/application/windows/wgl.cpp
+			src/application/windows/wgl.h
 			)
 	endif()
 endif()
@@ -170,14 +170,26 @@ y_sources(yengine "src/gui/widgets"
 	src/gui/widgets/label.h
 	)
 
+y_sources(yengine "src/model"
+	src/model/mesh_data.cpp
+	src/model/mesh_data.h
+	)
+
+y_sources(yengine "src/model/formats"
+	src/model/formats/obj.cpp
+	src/model/formats/obj.h
+	)
+
 y_sources(yengine "src/renderer"
 	src/renderer/backend.h
+	src/renderer/builtin.cpp
+	src/renderer/builtin.h
 	src/renderer/debug_renderer.cpp
 	src/renderer/debug_renderer.h
+	src/renderer/debug_texture.cpp
+	src/renderer/debug_texture.h
 	src/renderer/material.cpp
 	src/renderer/material.h
-	src/renderer/mesh_data.cpp
-	src/renderer/mesh_data.h
 	src/renderer/modifiers.cpp
 	src/renderer/pass.cpp
 	src/renderer/pass.h
@@ -187,41 +199,29 @@ y_sources(yengine "src/renderer"
 	src/renderer/texture.h
 	)
 
-y_sources(yengine "src/renderer/builtin"
-	src/renderer/builtin/builtin.h
-	src/renderer/builtin/builtin.cpp
-	src/renderer/builtin/debug_texture.cpp
-	src/renderer/builtin/debug_texture.h
-	)
-
-y_sources(yengine "src/renderer/formats"
-	src/renderer/formats/obj.cpp
-	src/renderer/formats/obj.h
-	)
-
 if(Y_RENDERER_OPENGL)
-	y_sources(yengine "src/renderer/_opengl"
-		src/renderer/_opengl/api.h
-		src/renderer/_opengl/gl.cpp
-		src/renderer/_opengl/gl.h
-		src/renderer/_opengl/mesh.h
-		src/renderer/_opengl/program.cpp
-		src/renderer/_opengl/program.h
-		src/renderer/_opengl/renderer.cpp
-		src/renderer/_opengl/renderer.h
-		src/renderer/_opengl/texture.cpp
-		src/renderer/_opengl/texture.h
-		src/renderer/_opengl/version.h
-		src/renderer/_opengl/wrappers.cpp
-		src/renderer/_opengl/wrappers.h
+	y_sources(yengine "src/renderer/opengl"
+		src/renderer/opengl/api.h
+		src/renderer/opengl/gl.cpp
+		src/renderer/opengl/gl.h
+		src/renderer/opengl/mesh.h
+		src/renderer/opengl/program.cpp
+		src/renderer/opengl/program.h
+		src/renderer/opengl/renderer.cpp
+		src/renderer/opengl/renderer.h
+		src/renderer/opengl/texture.cpp
+		src/renderer/opengl/texture.h
+		src/renderer/opengl/version.h
+		src/renderer/opengl/wrappers.cpp
+		src/renderer/opengl/wrappers.h
 		)
 	add_yrc_sources(yengine
-		src/renderer/_opengl/2d_fs.glsl
-		src/renderer/_opengl/2d_vs.glsl
+		src/renderer/opengl/2d_fs.glsl
+		src/renderer/opengl/2d_vs.glsl
 		)
-	source_group("src\\renderer\\_opengl" FILES
-		src/renderer/_opengl/2d_fs.glsl
-		src/renderer/_opengl/2d_vs.glsl
+	source_group("src\\renderer\\opengl" FILES
+		src/renderer/opengl/2d_fs.glsl
+		src/renderer/opengl/2d_vs.glsl
 		)
 	target_link_libraries(yengine PRIVATE OpenGL::GL)
 	if(WIN32)
@@ -237,40 +237,40 @@ if(Y_RENDERER_OPENGL)
 		target_include_directories(yengine SYSTEM PRIVATE ${GLEXT_INCLUDE_DIR} ${WGLEXT_INCLUDE_DIR})
 	endif()
 	if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-		set_property(SOURCE src/renderer/_opengl/gl.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-useless-cast)
+		set_property(SOURCE src/renderer/opengl/gl.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-useless-cast)
 	endif()
 elseif(Y_RENDERER_VULKAN)
-	y_sources(yengine "src/renderer/_vulkan"
-		src/renderer/_vulkan/buffer.cpp
-		src/renderer/_vulkan/buffer.h
-		src/renderer/_vulkan/context.cpp
-		src/renderer/_vulkan/context.h
-		src/renderer/_vulkan/depth_buffer.cpp
-		src/renderer/_vulkan/depth_buffer.h
-		src/renderer/_vulkan/handles.cpp
-		src/renderer/_vulkan/handles.h
-		src/renderer/_vulkan/helpers.cpp
-		src/renderer/_vulkan/helpers.h
-		src/renderer/_vulkan/mesh.cpp
-		src/renderer/_vulkan/mesh.h
-		src/renderer/_vulkan/program.cpp
-		src/renderer/_vulkan/program.h
-		src/renderer/_vulkan/renderer.cpp
-		src/renderer/_vulkan/renderer.h
-		src/renderer/_vulkan/swapchain.cpp
-		src/renderer/_vulkan/swapchain.h
-		src/renderer/_vulkan/texture.cpp
-		src/renderer/_vulkan/texture.h
-		src/renderer/_vulkan/wrappers.cpp
-		src/renderer/_vulkan/wrappers.h
+	y_sources(yengine "src/renderer/vulkan"
+		src/renderer/vulkan/buffer.cpp
+		src/renderer/vulkan/buffer.h
+		src/renderer/vulkan/context.cpp
+		src/renderer/vulkan/context.h
+		src/renderer/vulkan/depth_buffer.cpp
+		src/renderer/vulkan/depth_buffer.h
+		src/renderer/vulkan/handles.cpp
+		src/renderer/vulkan/handles.h
+		src/renderer/vulkan/helpers.cpp
+		src/renderer/vulkan/helpers.h
+		src/renderer/vulkan/mesh.cpp
+		src/renderer/vulkan/mesh.h
+		src/renderer/vulkan/program.cpp
+		src/renderer/vulkan/program.h
+		src/renderer/vulkan/renderer.cpp
+		src/renderer/vulkan/renderer.h
+		src/renderer/vulkan/swapchain.cpp
+		src/renderer/vulkan/swapchain.h
+		src/renderer/vulkan/texture.cpp
+		src/renderer/vulkan/texture.h
+		src/renderer/vulkan/wrappers.cpp
+		src/renderer/vulkan/wrappers.h
 		)
 	add_yglslc_sources(yengine
-		FRAGMENT src/renderer/_vulkan/2d_fs.glsl
-		VERTEX src/renderer/_vulkan/2d_vs.glsl
+		FRAGMENT src/renderer/vulkan/2d_fs.glsl
+		VERTEX src/renderer/vulkan/2d_vs.glsl
 		)
-	source_group("src\\renderer\\_vulkan" FILES
-		src/renderer/_vulkan/2d_fs.glsl
-		src/renderer/_vulkan/2d_vs.glsl
+	source_group("src\\renderer\\vulkan" FILES
+		src/renderer/vulkan/2d_fs.glsl
+		src/renderer/vulkan/2d_vs.glsl
 		)
 	target_link_libraries(yengine PRIVATE Vulkan::Vulkan)
 	if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
@@ -278,9 +278,9 @@ elseif(Y_RENDERER_VULKAN)
 		target_compile_options(yengine PRIVATE -Wno-zero-as-null-pointer-constant)
 	endif()
 else()
-	y_sources(yengine "src/renderer/_null"
-		src/renderer/_null/renderer.cpp
-		src/renderer/_null/renderer.h
+	y_sources(yengine "src/renderer/null"
+		src/renderer/null/renderer.cpp
+		src/renderer/null/renderer.h
 		)
 endif()
 
