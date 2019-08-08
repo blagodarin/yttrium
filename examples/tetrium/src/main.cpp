@@ -229,8 +229,8 @@ int ymain(int, char**)
 	Yt::Gui gui{ "data/gui.ion", resource_loader, script, audio };
 	gui.on_quit([&window] { window.close(); });
 
-	application.on_update([&script, &gui, &logic](const Yt::UpdateEvent& event) {
-		if (logic.advance(static_cast<int>(event.milliseconds.count())))
+	application.on_update([&script, &gui, &logic](std::chrono::milliseconds advance) {
+		if (logic.advance(static_cast<int>(advance.count())))
 		{
 			script.set("score", logic.score());
 			script.set("lines", logic.lines());
@@ -241,7 +241,7 @@ int ymain(int, char**)
 	});
 
 	window.on_key_event([&gui](const Yt::KeyEvent& event) { gui.process_key_event(event); });
-	window.on_render([&gui](Yt::RenderPass& pass, const Yt::Vector2& cursor) { gui.draw(pass, cursor); });
+	window.on_render([&gui](Yt::RenderPass& pass, const Yt::Vector2& cursor, const Yt::RenderReport&) { gui.draw(pass, cursor); });
 	window.on_screenshot([](Yt::Image&& image) { image.save(Yt::Writer{ ::make_screenshot_path() }, Yt::ImageFormat::Png); });
 	window.on_text_input([&gui](std::string_view text) { gui.process_text_input(text); });
 

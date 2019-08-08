@@ -29,7 +29,7 @@
 namespace Yt
 {
 	class RenderPass;
-	struct UpdateEvent;
+	struct RenderReport;
 	class Window;
 
 	class WindowPrivate final : private WindowBackendCallbacks
@@ -38,7 +38,7 @@ namespace Yt
 		explicit WindowPrivate(Application&);
 
 		bool process_events() { return _backend.process_events(); }
-		void render(UpdateEvent&);
+		void render(RenderReport& next_report, const RenderReport& last_report);
 		void update();
 
 	private:
@@ -64,7 +64,7 @@ namespace Yt
 		bool _take_screenshot = false;
 		std::function<void(int, int)> _on_cursor_moved;
 		std::function<void(const KeyEvent&)> _on_key_event;
-		std::function<void(RenderPass&, const Vector2&)> _on_render;
+		std::function<void(RenderPass&, const Vector2&, const RenderReport&)> _on_render;
 		std::function<void(Image&&)> _on_screenshot;
 		std::function<void(std::string_view)> _on_text_input;
 

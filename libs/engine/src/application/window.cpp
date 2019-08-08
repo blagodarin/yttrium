@@ -34,21 +34,14 @@ namespace Yt
 			on_resize_event(*size);
 	}
 
-	void WindowPrivate::render(UpdateEvent& update)
+	void WindowPrivate::render(RenderReport& next_report, const RenderReport& last_report)
 	{
 		{
-			RenderPassImpl pass{ *_renderer._backend, _renderer_builtin, _render_pass_data, _size };
+			RenderPassImpl pass{ *_renderer._backend, _renderer_builtin, _render_pass_data, _size, next_report };
 			PushProgram program{ pass, _renderer_builtin._program_2d.get() };
 			Push2D projection{ pass };
 			if (_on_render)
-				_on_render(pass, Vector2{ _cursor });
-			const auto& statistics = pass.statistics();
-			update.triangles += statistics._triangles;
-			update.draw_calls += statistics._draw_calls;
-			update.texture_switches += statistics._texture_switches;
-			update.redundant_texture_switches += statistics._redundant_texture_switches;
-			update.shader_switches += statistics._shader_switches;
-			update.redundant_shader_switches += statistics._redundant_shader_switches;
+				_on_render(pass, Vector2{ _cursor }, last_report);
 			pass.draw_debug_text();
 		}
 		_backend.swap_buffers();
@@ -163,7 +156,7 @@ namespace Yt
 		_private->_on_key_event = callback;
 	}
 
-	void Window::on_render(const std::function<void(RenderPass&, const Vector2&)>& callback)
+	void Window::on_render(const std::function<void(RenderPass&, const Vector2&, const RenderReport&)>& callback)
 	{
 		_private->_on_render = callback;
 	}

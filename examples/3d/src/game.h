@@ -42,9 +42,10 @@ public:
 	void run();
 
 private:
+	void draw_debug_text(Yt::RenderPass&, const Yt::RenderReport&);
 	void draw_minimap(Yt::RenderPass&, const Yt::RectF&);
 	void draw_scene(Yt::RenderPass&, const Yt::Vector2&);
-	void update(const Yt::UpdateEvent&);
+	void update(std::chrono::milliseconds);
 
 private:
 	const Yt::Storage& _storage;
@@ -54,7 +55,6 @@ private:
 	Yt::ScriptContext _script;
 	Yt::Gui _gui{ "data/gui.ion", _resource_loader, _script };
 	bool _debug_text_visible = false;
-	std::string _debug_text;
 	Model _cube{ _resource_loader, "data/cube.obj", "data/cube.material" };
 	Model _checkerboard{ _resource_loader, "data/checkerboard.obj", "data/checkerboard.material" };
 

@@ -62,6 +62,7 @@ y_sources(yengine "include/renderer"
 	include/yttrium/renderer/modifiers.h
 	include/yttrium/renderer/pass.h
 	include/yttrium/renderer/program.h
+	include/yttrium/renderer/report.h
 	include/yttrium/renderer/texture.h
 	include/yttrium/renderer/textured_rect.h
 	)

@@ -18,23 +18,24 @@
 #pragma once
 
 #include <atomic>
+#include <chrono>
 #include <functional>
 
 namespace Yt
 {
 	class Application;
-	struct UpdateEvent;
 	class WindowPrivate;
 
 	class ApplicationPrivate
 	{
 	public:
+		bool process_events();
 		WindowPrivate* window() const noexcept { return _window.load(); }
 
 		static void add_window(Application&, WindowPrivate&);
 
 	private:
-		std::function<void(const UpdateEvent&)> _on_update;
+		std::function<void(std::chrono::milliseconds)> _on_update;
 		std::atomic<WindowPrivate*> _window{ nullptr };
 
 		friend Application;

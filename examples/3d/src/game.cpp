@@ -21,6 +21,7 @@
 #include <yttrium/key.h>
 #include <yttrium/math/matrix.h>
 #include <yttrium/math/rect.h>
+#include <yttrium/renderer/report.h>
 #include <yttrium/renderer/modifiers.h>
 #include <yttrium/renderer/pass.h>
 #include <yttrium/storage/writer.h>
@@ -101,13 +102,13 @@ Game::Game(const Yt::Storage& storage)
 	: _storage{ storage }
 	, _minimap_canvas{ std::make_unique<MinimapCanvas>(_position, _visibility_quad) }
 {
-	_application.on_update([this](const Yt::UpdateEvent& event) { update(event); });
+	_application.on_update([this](std::chrono::milliseconds advance) { update(advance); });
 
 	_script.define("debug", [this](const Yt::ScriptCall&) { _debug_text_visible = !_debug_text_visible; });
 	_script.define("screenshot", [this](const Yt::ScriptCall&) { _window.take_screenshot(); });
 
 	_window.on_key_event([this](const Yt::KeyEvent& event) { _gui.process_key_event(event); });
-	_window.on_render([this](Yt::RenderPass& pass, const Yt::Vector2& cursor) {
+	_window.on_render([this](Yt::RenderPass& pass, const Yt::Vector2& cursor, const Yt::RenderReport& report) {
 		draw_scene(pass, cursor);
 		_gui.draw(pass, cursor);
 		{
@@ -115,7 +116,7 @@ Game::Game(const Yt::Storage& storage)
 			pass.draw_rect(Yt::RectF{ cursor, Yt::SizeF{ 2, 2 } }, { 1, 1, 0, 1 });
 		}
 		if (_debug_text_visible)
-			pass.add_debug_text(_debug_text);
+			draw_debug_text(pass, report);
 	});
 	_window.on_screenshot([](Yt::Image&& image) { image.save(Yt::Writer{ ::make_screenshot_path() }, Yt::ImageFormat::Png); });
 
@@ -131,6 +132,26 @@ void Game::run()
 	_window.set_title(_gui.title());
 	_window.show();
 	_application.run();
+}
+
+void Game::draw_debug_text(Yt::RenderPass& pass, const Yt::RenderReport& report)
+{
+	std::string debug_text;
+	Yt::append_to(debug_text,
+		"FPS: ", report._fps, '\n',
+		"MaxFrameTime: ", report._max_frame_time.count(), " ms\n",
+		"Triangles: ", report._triangles, '\n',
+		"DrawCalls: ", report._draw_calls, '\n',
+		"TextureSwitches: ", report._texture_switches, " (Redundant: ", report._extra_texture_switches, ")\n",
+		"ShaderSwitches: ", report._shader_switches, " (Redundant: ", report._extra_shader_switches, ")\n",
+		"X: ", _position.x, ", Y: ", _position.y, ", Z: ", _position.z, '\n',
+		"Cell: (");
+	if (_board_point)
+		Yt::append_to(debug_text, static_cast<int>(_board_point->x), ",", static_cast<int>(_board_point->y));
+	else
+		Yt::append_to(debug_text, "none");
+	Yt::append_to(debug_text, ")");
+	pass.add_debug_text(debug_text);
 }
 
 void Game::draw_scene(Yt::RenderPass& pass, const Yt::Vector2& cursor)
@@ -162,7 +183,7 @@ void Game::draw_scene(Yt::RenderPass& pass, const Yt::Vector2& cursor)
 	_checkerboard.draw(pass);
 }
 
-void Game::update(const Yt::UpdateEvent& update)
+void Game::update(std::chrono::milliseconds advance)
 {
 	const bool move_forward = _window.cursor()._y < 10;
 	const bool move_backward = _window.size()._height - _window.cursor()._y <= 10;
@@ -172,7 +193,7 @@ void Game::update(const Yt::UpdateEvent& update)
 	if (move_forward != move_backward || move_left != move_right)
 	{
 		constexpr auto speed = 16.f; // Units per second.
-		const auto distance = static_cast<float>(update.milliseconds.count()) * speed / 1000;
+		const auto distance = static_cast<float>(advance.count()) * speed / 1000;
 		const auto offset = (move_forward || move_backward) && (move_left || move_right) ? distance * static_cast<float>(M_SQRT1_2) : distance;
 
 		Yt::Vector3 movement{ 0, 0, 0 };
@@ -187,20 +208,4 @@ void Game::update(const Yt::UpdateEvent& update)
 
 		_position = ::clamp_position(_position + movement);
 	}
-
-	_debug_text.clear();
-	Yt::append_to(_debug_text,
-		"FPS: ", update.fps.value_or(-1), '\n',
-		"MaxFrameTime: ", update.max_frame_time.count(), '\n',
-		"Triangles: ", update.triangles, '\n',
-		"DrawCalls: ", update.draw_calls, '\n',
-		"TextureSwitches: ", update.texture_switches, " (Redundant: ", update.redundant_texture_switches, ")\n",
-		"ShaderSwitches: ", update.shader_switches, " (Redundant: ", update.redundant_shader_switches, ")\n",
-		"X: ", _position.x, ", Y: ", _position.y, ", Z: ", _position.z, '\n',
-		"Cell: (");
-	if (_board_point)
-		Yt::append_to(_debug_text, static_cast<int>(_board_point->x), ",", static_cast<int>(_board_point->y));
-	else
-		Yt::append_to(_debug_text, "none");
-	Yt::append_to(_debug_text, ")");
 }

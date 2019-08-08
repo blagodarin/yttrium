@@ -22,6 +22,7 @@
 #include <yttrium/math/quad.h>
 #include <yttrium/memory/buffer_appender.h>
 #include <yttrium/renderer/program.h>
+#include <yttrium/renderer/report.h>
 #include <yttrium/renderer/textured_rect.h>
 #include <yttrium/utils/string.h>
 #include "backend.h"
@@ -47,19 +48,20 @@ namespace Yt
 	struct RenderPassImpl::Batch2D
 	{
 		RenderBackend::Vertex2D* _vertices = nullptr;
-		std::uint16_t* _indices = nullptr;
-		std::size_t _base_index = 0;
+		uint16_t* _indices = nullptr;
+		size_t _base_index = 0;
 	};
 
 	RenderPassData::RenderPassData() = default;
 
 	RenderPassData::~RenderPassData() noexcept = default;
 
-	RenderPassImpl::RenderPassImpl(RenderBackend& backend, RenderBuiltin& builtin, RenderPassData& data, const Size& window_size)
+	RenderPassImpl::RenderPassImpl(RenderBackend& backend, RenderBuiltin& builtin, RenderPassData& data, const Size& window_size, RenderReport& report)
 		: _backend{ backend }
 		, _builtin{ builtin }
 		, _data{ data }
 		, _window_size{ window_size }
+		, _report{ report }
 	{
 		_data._debug_text.clear();
 		_backend.clear();
@@ -81,8 +83,8 @@ namespace Yt
 	void RenderPassImpl::draw_mesh(const Mesh& mesh)
 	{
 		update_state();
-		_statistics._triangles += _backend.draw_mesh(mesh);
-		++_statistics._draw_calls;
+		_report._triangles += _backend.draw_mesh(mesh);
+		++_report._draw_calls;
 	}
 
 	void RenderPassImpl::draw_quad(const Quad& quad, const Color4f& color)
@@ -95,11 +97,11 @@ namespace Yt
 		// cppcheck-suppress unreadVariable
 		batch._vertices[3] = { quad._c, color, _texture_rect.bottom_right() };
 
-		batch._indices[0] = static_cast<std::uint16_t>(batch._base_index);
-		batch._indices[1] = static_cast<std::uint16_t>(batch._base_index + 1);
-		batch._indices[2] = static_cast<std::uint16_t>(batch._base_index + 2);
+		batch._indices[0] = static_cast<uint16_t>(batch._base_index);
+		batch._indices[1] = static_cast<uint16_t>(batch._base_index + 1);
+		batch._indices[2] = static_cast<uint16_t>(batch._base_index + 2);
 		// cppcheck-suppress unreadVariable
-		batch._indices[3] = static_cast<std::uint16_t>(batch._base_index + 3);
+		batch._indices[3] = static_cast<uint16_t>(batch._base_index + 3);
 	}
 
 	void RenderPassImpl::draw_rect(const RectF& rect, const Color4f& color)
@@ -199,11 +201,11 @@ namespace Yt
 		// cppcheck-suppress unreadVariable
 		batch._vertices[3] = { position.bottom_right(), color, texture.bottom_right() };
 
-		batch._indices[0] = static_cast<std::uint16_t>(batch._base_index);
-		batch._indices[1] = static_cast<std::uint16_t>(batch._base_index + 1);
-		batch._indices[2] = static_cast<std::uint16_t>(batch._base_index + 2);
+		batch._indices[0] = static_cast<uint16_t>(batch._base_index);
+		batch._indices[1] = static_cast<uint16_t>(batch._base_index + 1);
+		batch._indices[2] = static_cast<uint16_t>(batch._base_index + 2);
 		// cppcheck-suppress unreadVariable
-		batch._indices[3] = static_cast<std::uint16_t>(batch._base_index + 3);
+		batch._indices[3] = static_cast<uint16_t>(batch._base_index + 3);
 	}
 
 	void RenderPassImpl::pop_program() noexcept
@@ -343,8 +345,8 @@ namespace Yt
 		const bool has_top_border = py0 != py1;
 		const bool has_bottom_border = py2 != py3;
 
-		const auto row_vertices = 2 + static_cast<std::size_t>(has_left_border) + static_cast<std::size_t>(has_right_border);
-		const auto stripe_count = 1 + static_cast<std::size_t>(has_top_border) + static_cast<std::size_t>(has_bottom_border);
+		const auto row_vertices = 2 + static_cast<size_t>(has_left_border) + static_cast<size_t>(has_right_border);
+		const auto stripe_count = 1 + static_cast<size_t>(has_top_border) + static_cast<size_t>(has_bottom_border);
 		const auto vertex_count = row_vertices * (stripe_count + 1);
 		const auto index_count = 2 * (stripe_count * row_vertices + stripe_count - 1);
 
@@ -391,17 +393,17 @@ namespace Yt
 			*batch._vertices++ = { { px2, py3 }, color, { tx2, ty3 } };
 		*batch._vertices = { { px3, py3 }, color, { tx3, ty3 } };
 
-		for (std::size_t i = 0; i < stripe_count; ++i)
+		for (size_t i = 0; i < stripe_count; ++i)
 		{
 			if (i > 0)
 			{
-				*batch._indices++ = static_cast<std::uint16_t>(batch._base_index + row_vertices - 1);
-				*batch._indices++ = static_cast<std::uint16_t>(batch._base_index);
+				*batch._indices++ = static_cast<uint16_t>(batch._base_index + row_vertices - 1);
+				*batch._indices++ = static_cast<uint16_t>(batch._base_index);
 			}
-			for (std::size_t j = 0; j < row_vertices; ++j)
+			for (size_t j = 0; j < row_vertices; ++j)
 			{
-				*batch._indices++ = static_cast<std::uint16_t>(batch._base_index + j);
-				*batch._indices++ = static_cast<std::uint16_t>(batch._base_index + j + row_vertices);
+				*batch._indices++ = static_cast<uint16_t>(batch._base_index + j);
+				*batch._indices++ = static_cast<uint16_t>(batch._base_index + j + row_vertices);
 			}
 			batch._base_index += row_vertices;
 		}
@@ -409,15 +411,15 @@ namespace Yt
 
 	void RenderPassImpl::flush_2d() noexcept
 	{
-		assert(_data._vertices_2d.size() / sizeof(RenderBackend::Vertex2D) <= std::size_t{ std::numeric_limits<uint16_t>::max() } + 1);
+		assert(_data._vertices_2d.size() / sizeof(RenderBackend::Vertex2D) <= size_t{ std::numeric_limits<uint16_t>::max() } + 1);
 		if (_data._vertices_2d.size() == 0)
 			return;
 
 		_builtin._program_2d->set_uniform("mvp", full_matrix());
 		update_state();
 		_backend.flush_2d(_data._vertices_2d, _data._indices_2d);
-		_statistics._triangles += _data._indices_2d.size() / sizeof(uint16_t) - 2;
-		++_statistics._draw_calls;
+		_report._triangles += _data._indices_2d.size() / sizeof(uint16_t) - 2;
+		++_report._draw_calls;
 		_data._vertices_2d.resize(0);
 		_data._indices_2d.resize(0);
 	}
@@ -429,26 +431,26 @@ namespace Yt
 		_texture_borders = {};
 	}
 
-	RenderPassImpl::Batch2D RenderPassImpl::prepare_batch_2d(std::size_t vertex_count, std::size_t index_count)
+	RenderPassImpl::Batch2D RenderPassImpl::prepare_batch_2d(size_t vertex_count, size_t index_count)
 	{
 		auto next_index = _data._vertices_2d.size() / sizeof(RenderBackend::Vertex2D);
-		if (next_index > std::numeric_limits<std::uint16_t>::max() - vertex_count)
+		if (next_index > std::numeric_limits<uint16_t>::max() - vertex_count)
 		{
 			flush_2d();
 			next_index = 0;
 		}
 		const auto vertex_buffer_size = _data._vertices_2d.size() + sizeof(RenderBackend::Vertex2D) * vertex_count;
-		const auto index_buffer_size = _data._indices_2d.size() + sizeof(std::uint16_t) * (index_count + (next_index > 0 ? 2 : 0));
+		const auto index_buffer_size = _data._indices_2d.size() + sizeof(uint16_t) * (index_count + (next_index > 0 ? 2 : 0));
 		_data._vertices_2d.reserve(vertex_buffer_size);
 		_data._indices_2d.reserve(index_buffer_size);
 		auto* const vertices = reinterpret_cast<RenderBackend::Vertex2D*>(_data._vertices_2d.end());
-		auto* indices = reinterpret_cast<std::uint16_t*>(_data._indices_2d.end());
+		auto* indices = reinterpret_cast<uint16_t*>(_data._indices_2d.end());
 		_data._vertices_2d.resize(vertex_buffer_size);
 		_data._indices_2d.resize(index_buffer_size);
 		if (next_index > 0)
 		{
-			*indices++ = static_cast<std::uint16_t>(next_index - 1);
-			*indices++ = static_cast<std::uint16_t>(next_index);
+			*indices++ = static_cast<uint16_t>(next_index - 1);
+			*indices++ = static_cast<uint16_t>(next_index);
 		}
 		return { vertices, indices, next_index };
 	}
@@ -463,13 +465,12 @@ namespace Yt
 			{
 				_current_program = program;
 				_backend.set_program(program);
-				++_statistics._shader_switches;
+				++_report._shader_switches;
 #ifndef NDEBUG
-				const auto i = std::find(_data._seen_programs.begin(), _data._seen_programs.end(), program);
-				if (i == _data._seen_programs.end())
+				if (std::none_of(_data._seen_programs.begin(), _data._seen_programs.end(), [program](const auto seen_program) { return program == seen_program; }))
 					_data._seen_programs.emplace_back(program);
 				else
-					++_statistics._redundant_shader_switches;
+					++_report._extra_shader_switches;
 #endif
 			}
 		}
@@ -482,13 +483,12 @@ namespace Yt
 			{
 				_current_texture = texture;
 				_backend.set_texture(*texture, _current_texture_filter);
-				++_statistics._texture_switches;
+				++_report._texture_switches;
 #ifndef NDEBUG
-				const auto i = std::find(_data._seen_textures.begin(), _data._seen_textures.end(), texture);
-				if (i == _data._seen_textures.end())
+				if (std::none_of(_data._seen_textures.begin(), _data._seen_textures.end(), [texture](const auto seen_texture) { return texture == seen_texture; }))
 					_data._seen_textures.emplace_back(texture);
 				else
-					++_statistics._redundant_texture_switches;
+					++_report._extra_texture_switches;
 #endif
 			}
 		}

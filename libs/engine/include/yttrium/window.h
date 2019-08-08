@@ -26,6 +26,7 @@
 namespace Yt
 {
 	class Application;
+	struct RenderReport;
 	class Image;
 	class KeyEvent;
 	class Point;
@@ -60,7 +61,7 @@ namespace Yt
 		void on_key_event(const std::function<void(const KeyEvent&)>&);
 
 		///
-		void on_render(const std::function<void(RenderPass&, const Vector2& cursor)>&);
+		void on_render(const std::function<void(RenderPass&, const Vector2& cursor, const RenderReport&)>&);
 
 		/// Sets a callback to be called when a screenshot image is ready.
 		void on_screenshot(const std::function<void(Image&&)>&);
