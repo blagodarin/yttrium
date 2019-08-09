@@ -17,46 +17,40 @@
 
 #pragma once
 
-#include <yttrium/application.h>
-#include <yttrium/gui/gui.h>
 #include <yttrium/math/euler.h>
 #include <yttrium/math/line.h>
 #include <yttrium/math/point.h>
 #include <yttrium/math/quad.h>
-#include <yttrium/resource_loader.h>
-#include <yttrium/script/context.h>
-#include <yttrium/storage/storage.h>
-#include <yttrium/window.h>
 #include "model.h"
 
+#include <chrono>
 #include <optional>
+
+namespace Yt
+{
+	class Gui;
+	class RenderReport;
+	class ResourceLoader;
+	class Window;
+}
 
 class MinimapCanvas;
 
 class Game
 {
 public:
-	explicit Game(const Yt::Storage&);
+	Game(Yt::ResourceLoader&, Yt::Gui&);
 	~Game();
 
-	void run();
-
-private:
-	void draw_debug_text(Yt::RenderPass&, const Yt::RenderReport&);
-	void draw_minimap(Yt::RenderPass&, const Yt::RectF&);
+	void draw_debug_graphics(Yt::RenderPass&, const Yt::Vector2& cursor, const Yt::RenderReport&);
 	void draw_scene(Yt::RenderPass&, const Yt::Vector2&);
-	void update(std::chrono::milliseconds);
+	void toggle_debug_text() noexcept { _debug_text_visible = !_debug_text_visible; }
+	void update(const Yt::Window&, std::chrono::milliseconds);
 
 private:
-	const Yt::Storage& _storage;
-	Yt::Application _application;
-	Yt::Window _window{ _application };
-	Yt::ResourceLoader _resource_loader{ _storage, &_window.render_manager() };
-	Yt::ScriptContext _script;
-	Yt::Gui _gui{ "data/gui.ion", _resource_loader, _script };
 	bool _debug_text_visible = false;
-	Model _cube{ _resource_loader, "data/cube.obj", "data/cube.material" };
-	Model _checkerboard{ _resource_loader, "data/checkerboard.obj", "data/checkerboard.material" };
+	Model _cube;
+	Model _checkerboard;
 
 	Yt::Vector3 _position{ 0, -8.5, 16 };
 	Yt::Euler _rotation{ 0, -60, 0 };

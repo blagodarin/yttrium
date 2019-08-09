@@ -17,15 +17,15 @@
 
 #include "game.h"
 
-#include <yttrium/image.h>
+#include <yttrium/gui/gui.h>
 #include <yttrium/key.h>
 #include <yttrium/math/matrix.h>
 #include <yttrium/math/rect.h>
 #include <yttrium/renderer/report.h>
 #include <yttrium/renderer/modifiers.h>
 #include <yttrium/renderer/pass.h>
-#include <yttrium/storage/writer.h>
 #include <yttrium/utils/string.h>
+#include <yttrium/window.h>
 #include "../../common/include/utils.h"
 
 #include <cmath>
@@ -98,60 +98,41 @@ private:
 	std::optional<Yt::Vector2> _cursor;
 };
 
-Game::Game(const Yt::Storage& storage)
-	: _storage{ storage }
+Game::Game(Yt::ResourceLoader& resource_loader, Yt::Gui& gui)
+	: _cube{ resource_loader, "data/cube.obj", "data/cube.material" }
+	, _checkerboard{ resource_loader, "data/checkerboard.obj", "data/checkerboard.material" }
 	, _minimap_canvas{ std::make_unique<MinimapCanvas>(_position, _visibility_quad) }
 {
-	_application.on_update([this](std::chrono::milliseconds advance) { update(advance); });
-
-	_script.define("debug", [this](const Yt::ScriptCall&) { _debug_text_visible = !_debug_text_visible; });
-	_script.define("screenshot", [this](const Yt::ScriptCall&) { _window.take_screenshot(); });
-
-	_window.on_key_event([this](const Yt::KeyEvent& event) { _gui.process_key_event(event); });
-	_window.on_render([this](Yt::RenderPass& pass, const Yt::Vector2& cursor, const Yt::RenderReport& report) {
-		draw_scene(pass, cursor);
-		_gui.draw(pass, cursor);
-		{
-			Yt::PushTexture push_texture{ pass, nullptr };
-			pass.draw_rect(Yt::RectF{ cursor, Yt::SizeF{ 2, 2 } }, { 1, 1, 0, 1 });
-		}
-		if (_debug_text_visible)
-			draw_debug_text(pass, report);
-	});
-	_window.on_screenshot([](Yt::Image&& image) { image.save(Yt::Writer{ ::make_screenshot_path() }, Yt::ImageFormat::Png); });
-
-	_gui.bind_canvas("minimap", *_minimap_canvas);
-	_gui.on_quit([this] { _window.close(); });
+	gui.bind_canvas("minimap", *_minimap_canvas);
 }
 
 Game::~Game() = default;
 
-void Game::run()
+void Game::draw_debug_graphics(Yt::RenderPass& pass, const Yt::Vector2& cursor, const Yt::RenderReport& report)
 {
-	_gui.start();
-	_window.set_title(_gui.title());
-	_window.show();
-	_application.run();
-}
-
-void Game::draw_debug_text(Yt::RenderPass& pass, const Yt::RenderReport& report)
-{
-	std::string debug_text;
-	Yt::append_to(debug_text,
-		"FPS: ", report._fps, '\n',
-		"MaxFrameTime: ", report._max_frame_time.count(), " ms\n",
-		"Triangles: ", report._triangles, '\n',
-		"DrawCalls: ", report._draw_calls, '\n',
-		"TextureSwitches: ", report._texture_switches, " (Redundant: ", report._extra_texture_switches, ")\n",
-		"ShaderSwitches: ", report._shader_switches, " (Redundant: ", report._extra_shader_switches, ")\n",
-		"X: ", _position.x, ", Y: ", _position.y, ", Z: ", _position.z, '\n',
-		"Cell: (");
-	if (_board_point)
-		Yt::append_to(debug_text, static_cast<int>(_board_point->x), ",", static_cast<int>(_board_point->y));
-	else
-		Yt::append_to(debug_text, "none");
-	Yt::append_to(debug_text, ")");
-	pass.add_debug_text(debug_text);
+	{
+		Yt::PushTexture push_texture{ pass, nullptr };
+		pass.draw_rect(Yt::RectF{ cursor, Yt::SizeF{ 2, 2 } }, { 1, 1, 0, 1 });
+	}
+	if (_debug_text_visible)
+	{
+		std::string debug_text;
+		Yt::append_to(debug_text,
+			"FPS: ", report._fps, '\n',
+			"MaxFrameTime: ", report._max_frame_time.count(), " ms\n",
+			"Triangles: ", report._triangles, '\n',
+			"DrawCalls: ", report._draw_calls, '\n',
+			"TextureSwitches: ", report._texture_switches, " (Redundant: ", report._extra_texture_switches, ")\n",
+			"ShaderSwitches: ", report._shader_switches, " (Redundant: ", report._extra_shader_switches, ")\n",
+			"X: ", _position.x, ", Y: ", _position.y, ", Z: ", _position.z, '\n',
+			"Cell: (");
+		if (_board_point)
+			Yt::append_to(debug_text, static_cast<int>(_board_point->x), ",", static_cast<int>(_board_point->y));
+		else
+			Yt::append_to(debug_text, "none");
+		Yt::append_to(debug_text, ")");
+		pass.add_debug_text(debug_text);
+	}
 }
 
 void Game::draw_scene(Yt::RenderPass& pass, const Yt::Vector2& cursor)
@@ -183,12 +164,12 @@ void Game::draw_scene(Yt::RenderPass& pass, const Yt::Vector2& cursor)
 	_checkerboard.draw(pass);
 }
 
-void Game::update(std::chrono::milliseconds advance)
+void Game::update(const Yt::Window& window, std::chrono::milliseconds advance)
 {
-	const bool move_forward = _window.cursor()._y < 10;
-	const bool move_backward = _window.size()._height - _window.cursor()._y <= 10;
-	const bool move_left = _window.cursor()._x < 10;
-	const bool move_right = _window.size()._width - _window.cursor()._x <= 10;
+	const bool move_forward = window.cursor()._y < 10;
+	const bool move_backward = window.size()._height - window.cursor()._y <= 10;
+	const bool move_left = window.cursor()._x < 10;
+	const bool move_right = window.size()._width - window.cursor()._x <= 10;
 
 	if (move_forward != move_backward || move_left != move_right)
 	{

@@ -15,14 +15,21 @@
 // limitations under the License.
 //
 
+#include <yttrium/application.h>
+#include <yttrium/gui/gui.h>
 #include <yttrium/logger.h>
 #include <yttrium/main.h>
+#include <yttrium/resource_loader.h>
+#include <yttrium/script/context.h>
+#include <yttrium/storage/storage.h>
+#include <yttrium/storage/writer.h>
+#include <yttrium/window.h>
 #include "../../common/include/utils.h"
 #include "game.h"
 
 namespace
 {
-	void make_checkerboard_texture(Yt::Storage& storage, const std::string& name)
+	void make_checkerboard_texture(Yt::Storage& storage, std::string_view name)
 	{
 		storage.attach_buffer(name, ::make_bgra_tga(128, 128, [](size_t x, size_t y) {
 			return ((x ^ y) & 1) ? Yt::Bgra32{ 0xdd, 0xdd, 0xdd } : Yt::Bgra32{ 0x00, 0x00, 0x00 };
@@ -33,11 +40,37 @@ namespace
 int ymain(int, char**)
 {
 	Yt::Logger logger;
+
 	Yt::Storage storage{ Yt::Storage::UseFileSystem::Never };
 	storage.attach_package("3d.ypq");
 	::make_checkerboard_texture(storage, "data/checkerboard.tga");
 
-	Game game{ storage };
-	game.run();
+	Yt::ScriptContext script;
+
+	Yt::Application application;
+
+	Yt::Window window{ application };
+	script.define("screenshot", [&window](const Yt::ScriptCall&) { window.take_screenshot(); });
+	window.on_screenshot([](Yt::Image&& image) { image.save(Yt::Writer{ ::make_screenshot_path() }, Yt::ImageFormat::Png); });
+
+	Yt::ResourceLoader resource_loader{ storage, &window.render_manager() };
+
+	Yt::Gui gui{ "data/gui.ion", resource_loader, script };
+	window.on_key_event([&gui](const Yt::KeyEvent& event) { gui.process_key_event(event); });
+	gui.on_quit([&window] { window.close(); });
+
+	Game game{ resource_loader, gui };
+	script.define("debug", [&game](const Yt::ScriptCall&) { game.toggle_debug_text(); });
+	application.on_update([&window, &game](std::chrono::milliseconds advance) { game.update(window, advance); });
+	window.on_render([&gui, &game](Yt::RenderPass& pass, const Yt::Vector2& cursor, const Yt::RenderReport& report) {
+		game.draw_scene(pass, cursor);
+		gui.draw(pass, cursor);
+		game.draw_debug_graphics(pass, cursor, report);
+	});
+
+	gui.start();
+	window.set_title(gui.title());
+	window.show();
+	application.run();
 	return 0;
 }
