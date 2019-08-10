@@ -17,15 +17,22 @@
 
 #include "game.h"
 
+#include <yttrium/exceptions.h>
 #include <yttrium/gui/gui.h>
+#include <yttrium/ion/reader.h>
+#include <yttrium/ion/writer.h>
 #include <yttrium/key.h>
+#include <yttrium/logger.h>
 #include <yttrium/math/matrix.h>
 #include <yttrium/math/rect.h>
 #include <yttrium/renderer/report.h>
 #include <yttrium/renderer/modifiers.h>
 #include <yttrium/renderer/pass.h>
+#include <yttrium/storage/source.h>
+#include <yttrium/storage/writer.h>
 #include <yttrium/utils/string.h>
 #include <yttrium/window.h>
+#include "../../../libs/core/src/utils/string.h"
 #include "../../common/include/utils.h"
 
 #include <cmath>
@@ -104,9 +111,43 @@ Game::Game(Yt::ResourceLoader& resource_loader, Yt::Gui& gui)
 	, _minimap_canvas{ std::make_unique<MinimapCanvas>(_position, _visibility_quad) }
 {
 	gui.bind_canvas("minimap", *_minimap_canvas);
+	if (const auto source = Yt::Source::from(Yt::user_data_path("yttrium-3d") / "save.ion"))
+	{
+		auto debug = false;
+		auto x = _position.x;
+		auto y = _position.y;
+		try
+		{
+			Yt::IonReader ion{ *source };
+			for (auto token = ion.read(); token.type() != Yt::IonToken::Type::End; token = ion.read())
+				if (const auto name = token.to_name(); name == "X")
+					Yt::from_chars(ion.read().to_value(), x);
+				else if (name == "Y")
+					Yt::from_chars(ion.read().to_value(), y);
+				else if (name == "Debug")
+					debug = true;
+			_debug_text_visible = debug;
+			_position = ::clamp_position({ x, y, _position.z });
+		}
+		catch (const Yt::IonError& e)
+		{
+			Yt::Logger::log("Bad settings: ", e.what());
+		}
+	}
 }
 
-Game::~Game() = default;
+Game::~Game()
+{
+	Yt::Writer writer{ Yt::user_data_path("yttrium-3d") / "save.ion" };
+	Yt::IonWriter ion{ writer, Yt::IonWriter::Formatting::Pretty };
+	if (_debug_text_visible)
+		ion.add_name("Debug");
+	ion.add_name("X");
+	ion.add_value(Yt::make_string(_position.x));
+	ion.add_name("Y");
+	ion.add_value(Yt::make_string(_position.y));
+	ion.flush();
+}
 
 void Game::draw_debug_graphics(Yt::RenderPass& pass, const Yt::Vector2& cursor, const Yt::RenderReport& report)
 {

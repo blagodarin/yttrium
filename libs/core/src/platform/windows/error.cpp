@@ -65,9 +65,9 @@ namespace Yt
 		{
 			std::array<char, Logger::MaxMessageSize + 1> buffer;
 			if (const auto description = ::windows_error_description(error))
-				std::snprintf(buffer.data(), buffer.size(), "(ERROR) %s failed: [0x%08X] %s", function, static_cast<unsigned>(error), description.get());
+				std::snprintf(buffer.data(), buffer.size(), "[%s] (0x%08X) %s", function, static_cast<unsigned>(error), description.get());
 			else
-				std::snprintf(buffer.data(), buffer.size(), "(ERROR) %s failed: [0x%08X].", function, static_cast<unsigned>(error));
+				std::snprintf(buffer.data(), buffer.size(), "[%s] (0x%08X)", function, static_cast<unsigned>(error));
 			Logger::write(buffer.data());
 		}
 	}

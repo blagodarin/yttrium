@@ -29,14 +29,16 @@ namespace Yt
 	{
 		const auto error = errno;
 		std::array<char, Logger::MaxMessageSize + 1> buffer;
-		const auto written = static_cast<size_t>(std::snprintf(buffer.data(), buffer.size(), "(ERROR) %s failed: ", function));
+		const auto written = static_cast<size_t>(std::snprintf(buffer.data(), buffer.size(), "[%s] (%d) ", function, error));
 		if (written < Logger::MaxMessageSize)
 		{
-			// cppcheck-suppress unreadVariable
-			[[maybe_unused]] const auto status = ::strerror_r(error, buffer.data() + written, buffer.size() - written);
+			const auto status = ::strerror_r(error, buffer.data() + written, buffer.size() - written);
 #if (_POSIX_C_SOURCE >= 200112L) && !_GNU_SOURCE
 			if (status != 0)
 				buffer[written - 2] = '\0'; // Strip ": ".
+#else
+			if (status != buffer.data() + written)
+				std::snprintf(buffer.data() + written, buffer.size() - written, "%s", status);
 #endif
 		}
 		Logger::write(buffer.data());

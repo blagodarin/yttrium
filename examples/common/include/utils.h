@@ -19,6 +19,7 @@
 
 #include <yttrium/image.h>
 #include <yttrium/math/color.h>
+#include <yttrium/storage/paths.h>
 
 #include <array>
 #include <ctime>
@@ -42,7 +43,7 @@ inline auto make_bgra_tga(size_t width, size_t height, const std::function<Yt::B
 	return image.to_buffer(Yt::ImageFormat::Tga);
 }
 
-inline std::string make_screenshot_path()
+inline std::filesystem::path make_screenshot_path()
 {
 	const auto time = std::time(nullptr);
 	::tm tm;
@@ -53,5 +54,5 @@ inline std::string make_screenshot_path()
 #endif
 	std::array<char, 24> buffer;
 	buffer[std::strftime(buffer.data(), buffer.size(), "%Y-%m-%d_%H-%M-%S.png", &tm)] = '\0';
-	return buffer.data();
+	return Yt::user_export_path() / buffer.data();
 }

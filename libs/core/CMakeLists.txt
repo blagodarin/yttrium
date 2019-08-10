@@ -79,6 +79,7 @@ y_sources(ycore "include/script"
 
 y_sources(ycore "include/storage"
 	include/yttrium/storage/package.h
+	include/yttrium/storage/paths.h
 	include/yttrium/storage/reader.h
 	include/yttrium/storage/source.h
 	include/yttrium/storage/storage.h
@@ -141,6 +142,7 @@ if(UNIX)
 		src/platform/posix/error.cpp
 		src/platform/posix/error.h
 		src/platform/posix/file.cpp
+		src/platform/posix/paths.cpp
 		src/platform/posix/temporary_file.cpp
 		src/platform/posix/temporary_file.h
 		src/platform/posix/virtual_memory.cpp
@@ -153,6 +155,7 @@ elseif(WIN32)
 		src/platform/windows/error.cpp
 		src/platform/windows/error.h
 		src/platform/windows/file.cpp
+		src/platform/windows/paths.cpp
 		src/platform/windows/temporary_file.cpp
 		src/platform/windows/virtual_memory.cpp
 		)
