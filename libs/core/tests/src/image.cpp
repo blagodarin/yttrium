@@ -49,33 +49,6 @@ TEST_CASE("image.compare")
 	}
 }
 
-TEST_CASE("image.convert.jpeg420_to_bgra")
-{
-	const std::array<uint8_t, 6> jpeg420{
-		0x00, 0x55,
-		0xaa, 0xff,
-		0x80,
-		0x80
-	};
-
-	const std::array<uint8_t, 16> bgra{
-		0x00, 0x00, 0x00, 0xff, 0x55, 0x55, 0x55, 0xff,
-		0xaa, 0xaa, 0xaa, 0xff, 0xff, 0xff, 0xff, 0xff
-	};
-
-	Yt::YCbCrComponents components;
-	components.y = jpeg420.data();
-	components.y_stride = 2;
-	components.cb = components.y + components.y_stride * 2;
-	components.cbcr_stride = 1;
-	components.cr = components.cb + components.cbcr_stride;
-
-	Yt::Buffer output{ bgra.size() };
-	std::memset(output.data(), 0xee, output.size());
-	Yt::convert_jpeg420_to_bgra(2, 2, components, output.data(), 8);
-	CHECK(std::memcmp(output.data(), bgra.data(), bgra.size()) == 0);
-}
-
 TEST_CASE("image.transform.bgr_to_bgra")
 {
 	const std::array<uint8_t, 24> bgr{

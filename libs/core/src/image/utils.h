@@ -24,26 +24,12 @@
 
 namespace Yt
 {
-	void copy_image_rgb_bgr(std::size_t width, std::size_t height, const std::uint8_t* src, std::ptrdiff_t src_stride, std::uint8_t* dst, std::ptrdiff_t dst_stride) noexcept;
-	void copy_image_rgb_bgra(std::size_t width, std::size_t height, const std::uint8_t* src, std::ptrdiff_t src_stride, std::uint8_t* dst, std::ptrdiff_t dst_stride) noexcept;
-	void copy_image_rgb_rgba(std::size_t width, std::size_t height, const std::uint8_t* src, std::ptrdiff_t src_stride, std::uint8_t* dst, std::ptrdiff_t dst_stride) noexcept;
-	void copy_image_rgba_bgra(std::size_t width, std::size_t height, const std::uint8_t* src, std::ptrdiff_t src_stride, std::uint8_t* dst, std::ptrdiff_t dst_stride) noexcept;
-	void copy_image_x_x(std::size_t width, std::size_t height, const std::uint8_t* src, std::ptrdiff_t src_stride, std::uint8_t* dst, std::ptrdiff_t dst_stride) noexcept;
-	void copy_image_x_xxxa(std::size_t width, std::size_t height, const std::uint8_t* src, std::ptrdiff_t src_stride, std::uint8_t* dst, std::ptrdiff_t dst_stride) noexcept;
-	void copy_image_x_xxxx(std::size_t width, std::size_t height, const std::uint8_t* src, std::ptrdiff_t src_stride, std::uint8_t* dst, std::ptrdiff_t dst_stride) noexcept;
-	void copy_image_xa_xxxa(std::size_t width, std::size_t height, const std::uint8_t* src, std::ptrdiff_t src_stride, std::uint8_t* dst, std::ptrdiff_t dst_stride) noexcept;
-
-	struct YCbCrComponents
-	{
-		const std::uint8_t* y;
-		std::size_t y_stride;
-		const std::uint8_t* cb;
-		std::size_t cbcr_stride;
-		const std::uint8_t* cr;
-	};
-
-	Y_CORE_API void convert_jpeg420_to_bgra(std::size_t width, std::size_t height, const YCbCrComponents&, void* dst, std::size_t dst_stride) noexcept;
-	void convert_jpeg444_to_bgra(std::size_t width, std::size_t height, const YCbCrComponents&, void* dst, std::size_t dst_stride) noexcept;
-
-	void upsample_2x2_linear(std::size_t width, std::size_t height, const std::uint8_t* src, std::size_t src_stride, std::uint8_t* dst, std::size_t dst_stride) noexcept;
+	void copy_image_rgb_bgr(size_t width, size_t height, const uint8_t* src, ptrdiff_t src_stride, uint8_t* dst, ptrdiff_t dst_stride) noexcept;
+	void copy_image_rgb_bgra(size_t width, size_t height, const uint8_t* src, ptrdiff_t src_stride, uint8_t* dst, ptrdiff_t dst_stride) noexcept;
+	void copy_image_rgb_rgba(size_t width, size_t height, const uint8_t* src, ptrdiff_t src_stride, uint8_t* dst, ptrdiff_t dst_stride) noexcept;
+	void copy_image_rgba_bgra(size_t width, size_t height, const uint8_t* src, ptrdiff_t src_stride, uint8_t* dst, ptrdiff_t dst_stride) noexcept;
+	void copy_image_x_x(size_t width, size_t height, const uint8_t* src, ptrdiff_t src_stride, uint8_t* dst, ptrdiff_t dst_stride) noexcept;
+	void copy_image_x_xxxa(size_t width, size_t height, const uint8_t* src, ptrdiff_t src_stride, uint8_t* dst, ptrdiff_t dst_stride) noexcept;
+	void copy_image_x_xxxx(size_t width, size_t height, const uint8_t* src, ptrdiff_t src_stride, uint8_t* dst, ptrdiff_t dst_stride) noexcept;
+	void copy_image_xa_xxxa(size_t width, size_t height, const uint8_t* src, ptrdiff_t src_stride, uint8_t* dst, ptrdiff_t dst_stride) noexcept;
 }

@@ -33,7 +33,13 @@ if(BUILD_SHARED_LIBS)
 	target_compile_definitions(ycore INTERFACE Y_CORE_IMPORT)
 endif()
 if(WIN32)
+	find_package(Y3_jpeg REQUIRED)
 	target_compile_definitions(ycore PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
+	target_link_libraries(ycore PRIVATE Y3::jpeg)
+else()
+	find_package(JPEG REQUIRED)
+	mark_as_advanced(jconfig_dir)
+	target_link_libraries(ycore PRIVATE JPEG::JPEG)
 endif()
 
 y_sources(ycore "include"
@@ -116,6 +122,14 @@ y_sources(ycore "src/image/formats"
 	src/image/formats/png.cpp
 	src/image/formats/tga.cpp
 	)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+	set_property(SOURCE src/image/formats/jpeg.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-tautological-type-limit-compare)
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+	set_property(SOURCE src/image/formats/jpeg.cpp APPEND PROPERTY COMPILE_OPTIONS
+		/wd4324 # '`anonymous-namespace'::JpegErrorHandler': structure was padded due to alignment specifier
+		/wd4611 # interaction between '_setjmp' and C++ object destruction is non-portable
+		)
+endif()
 
 y_sources(ycore "src/ion"
 	src/ion/reader.cpp
