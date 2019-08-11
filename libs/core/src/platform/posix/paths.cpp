@@ -31,6 +31,11 @@ namespace
 
 namespace Yt
 {
+	std::filesystem::path screenshots_path()
+	{
+		return ::home_directory_path();
+	}
+
 	std::filesystem::path user_data_path(std::string_view application_name)
 	{
 		std::string buffer = ".";

@@ -28,6 +28,7 @@
 #include <yttrium/renderer/report.h>
 #include <yttrium/renderer/modifiers.h>
 #include <yttrium/renderer/pass.h>
+#include <yttrium/storage/paths.h>
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/writer.h>
 #include <yttrium/utils/string.h>

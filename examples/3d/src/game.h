@@ -29,7 +29,7 @@
 namespace Yt
 {
 	class Gui;
-	class RenderReport;
+	struct RenderReport;
 	class ResourceLoader;
 	class Window;
 }

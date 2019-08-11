@@ -242,7 +242,7 @@ int ymain(int, char**)
 
 	window.on_key_event([&gui](const Yt::KeyEvent& event) { gui.process_key_event(event); });
 	window.on_render([&gui](Yt::RenderPass& pass, const Yt::Vector2& cursor, const Yt::RenderReport&) { gui.draw(pass, cursor); });
-	window.on_screenshot([](Yt::Image&& image) { image.save(Yt::Writer{ ::make_screenshot_path() }, Yt::ImageFormat::Png); });
+	window.on_screenshot([](Yt::Image&& image) { image.save_as_screenshot(Yt::ImageFormat::Png); });
 	window.on_text_input([&gui](std::string_view text) { gui.process_text_input(text); });
 
 	TetriumGraphics graphics{ window.render_manager() };

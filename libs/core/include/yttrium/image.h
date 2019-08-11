@@ -144,6 +144,9 @@ namespace Yt
 		///
 		bool save(Writer&&, ImageFormat) const;
 
+		/// Saves the image to the default screenshot location with an auto-generated name.
+		bool save_as_screenshot(ImageFormat) const;
+
 		///
 		Buffer to_buffer(ImageFormat) const;
 

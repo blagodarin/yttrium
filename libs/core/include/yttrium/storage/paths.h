@@ -23,6 +23,9 @@
 
 namespace Yt
 {
+	//! Returns the default path for screenshots.
+	Y_CORE_API std::filesystem::path screenshots_path();
+
 	//! Path for user-specific data (e. g. configuration files or saved state).
 	Y_CORE_API std::filesystem::path user_data_path(std::string_view application_name);
 

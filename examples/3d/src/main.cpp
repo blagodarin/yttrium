@@ -21,6 +21,7 @@
 #include <yttrium/main.h>
 #include <yttrium/resource_loader.h>
 #include <yttrium/script/context.h>
+#include <yttrium/storage/paths.h>
 #include <yttrium/storage/storage.h>
 #include <yttrium/storage/writer.h>
 #include <yttrium/window.h>
@@ -51,7 +52,7 @@ int ymain(int, char**)
 
 	Yt::Window window{ application };
 	script.define("screenshot", [&window](const Yt::ScriptCall&) { window.take_screenshot(); });
-	window.on_screenshot([](Yt::Image&& image) { image.save(Yt::Writer{ ::make_screenshot_path() }, Yt::ImageFormat::Png); });
+	window.on_screenshot([](Yt::Image&& image) { image.save_as_screenshot(Yt::ImageFormat::Png); });
 
 	Yt::ResourceLoader resource_loader{ storage, &window.render_manager() };
 
