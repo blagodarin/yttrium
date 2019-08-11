@@ -18,7 +18,7 @@
 #include "window.h"
 
 #include <yttrium/exceptions.h>
-#include <yttrium/image.h>
+#include <yttrium/image/image.h>
 #include <yttrium/key.h>
 #include <yttrium/math/point.h>
 #include <yttrium/math/size.h>

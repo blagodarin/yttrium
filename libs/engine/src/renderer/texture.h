@@ -19,7 +19,7 @@
 
 #include <yttrium/renderer/texture.h>
 
-#include <yttrium/image.h>
+#include <yttrium/image/image.h>
 #include <yttrium/math/size.h>
 
 namespace Yt

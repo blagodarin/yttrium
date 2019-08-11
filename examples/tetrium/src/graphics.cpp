@@ -17,7 +17,7 @@
 
 #include "graphics.h"
 
-#include <yttrium/image.h>
+#include <yttrium/image/image.h>
 #include <yttrium/math/margins.h>
 #include <yttrium/math/rect.h>
 #include <yttrium/math/vector.h>

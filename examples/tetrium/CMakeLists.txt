@@ -16,7 +16,6 @@
 #
 
 set(_src
-	../common/include/utils.h
 	src/graphics.cpp
 	src/graphics.h
 	src/logic.cpp

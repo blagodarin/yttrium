@@ -17,7 +17,7 @@
 
 #include "formats.h"
 
-#include <yttrium/image.h>
+#include <yttrium/image/image.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/storage/source.h>
 #include <yttrium/utils/numeric.h>
@@ -32,8 +32,8 @@ namespace Yt
 		{
 			struct
 			{
-				std::uint16_t ab = 0;
-				std::uint16_t cd = 0;
+				uint16_t ab = 0;
+				uint16_t cd = 0;
 			} signature;
 			static_assert(sizeof signature == 4);
 			if (!source.read_at(0, signature))

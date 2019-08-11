@@ -33,8 +33,6 @@
 #include <yttrium/storage/writer.h>
 #include <yttrium/utils/string.h>
 #include <yttrium/window.h>
-#include "../../../libs/core/src/utils/string.h"
-#include "../../common/include/utils.h"
 
 #include <cmath>
 
@@ -114,11 +112,11 @@ Game::Game(Yt::ResourceLoader& resource_loader, Yt::Gui& gui)
 	gui.bind_canvas("minimap", *_minimap_canvas);
 	if (const auto source = Yt::Source::from(Yt::user_data_path("yttrium-3d") / "save.ion"))
 	{
-		auto debug = false;
-		auto x = _position.x;
-		auto y = _position.y;
 		try
 		{
+			auto debug = false;
+			auto x = _position.x;
+			auto y = _position.y;
 			Yt::IonReader ion{ *source };
 			for (auto token = ion.read(); token.type() != Yt::IonToken::Type::End; token = ion.read())
 				if (const auto name = token.to_name(); name == "X")

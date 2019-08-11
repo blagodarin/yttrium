@@ -17,7 +17,7 @@
 
 #include "bmp.h"
 
-#include <yttrium/image.h>
+#include <yttrium/image/image.h>
 #include <yttrium/storage/reader.h>
 #include "../formats.h"
 

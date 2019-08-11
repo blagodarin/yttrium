@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <yttrium/image.h>
+#include <yttrium/image/image.h>
 
 #include <cstring>
 

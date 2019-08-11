@@ -15,7 +15,7 @@
 // limitations under the License.
 //
 
-#include <yttrium/image.h>
+#include <yttrium/image/image.h>
 #include <yttrium/storage/writer.h>
 #include <yttrium/utils/numeric.h>
 #include "../../utils/adler32.h"

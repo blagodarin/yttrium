@@ -17,25 +17,15 @@
 
 #pragma once
 
-#include <yttrium/image.h>
-#include <yttrium/math/color.h>
+#include <yttrium/api.h>
 
 #include <functional>
 
-inline auto make_bgra_tga(size_t width, size_t height, const std::function<Yt::Bgra32(size_t, size_t)>& callback)
+namespace Yt
 {
-	Yt::Image image({ width, height, Yt::PixelFormat::Bgra32 });
-	for (size_t y = 0; y < height; ++y)
-	{
-		for (size_t x = 0; x < width; ++x)
-		{
-			const auto pixel = static_cast<uint8_t*>(image.data()) + y * image.info().stride() + x * 4;
-			const auto color = callback(x, y);
-			pixel[0] = color._b;
-			pixel[1] = color._g;
-			pixel[2] = color._r;
-			pixel[3] = color._a;
-		}
-	}
-	return image.to_buffer(Yt::ImageFormat::Tga);
+	class Bgra32;
+	class Buffer;
+
+	//!
+	Y_CORE_API Buffer make_bgra32_tga(size_t width, size_t height, const std::function<Yt::Bgra32(size_t, size_t)>& callback);
 }

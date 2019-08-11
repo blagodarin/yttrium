@@ -39,9 +39,13 @@ endif()
 y_sources(ycore "include"
 	include/yttrium/api.h
 	include/yttrium/exceptions.h
-	include/yttrium/image.h
 	include/yttrium/logger.h
 	include/yttrium/translation.h
+	)
+
+y_sources(ycore "include/image"
+	include/yttrium/image/image.h
+	include/yttrium/image/utils.h
 	)
 
 y_sources(ycore "include/ion"

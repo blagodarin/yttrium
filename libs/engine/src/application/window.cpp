@@ -19,7 +19,7 @@
 #include "window.h"
 
 #include <yttrium/application.h>
-#include <yttrium/image.h>
+#include <yttrium/image/image.h>
 #include <yttrium/renderer/modifiers.h>
 
 // TODO: Windowed mode.

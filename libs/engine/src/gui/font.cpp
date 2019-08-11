@@ -19,7 +19,7 @@
 
 #include <yttrium/exceptions.h>
 #include <yttrium/gui/text_capture.h>
-#include <yttrium/image.h>
+#include <yttrium/image/image.h>
 #include <yttrium/math/size.h>
 #include <yttrium/renderer/manager.h>
 #include <yttrium/renderer/texture.h>
@@ -59,7 +59,7 @@ namespace Yt
 		void load(Buffer&& buffer)
 		{
 			assert(!_face);
-			if (buffer.size() > static_cast<std::size_t>(std::numeric_limits<FT_Long>::max())
+			if (buffer.size() > static_cast<size_t>(std::numeric_limits<FT_Long>::max())
 				|| FT_New_Memory_Face(_library, static_cast<const FT_Byte*>(buffer.data()), static_cast<FT_Long>(buffer.size()), 0, &_face))
 				throw DataError{ "Failed to load font" };
 			_face_buffer = std::move(buffer);
@@ -69,16 +69,16 @@ namespace Yt
 	class FontImpl : public Font
 	{
 	public:
-		FontImpl(const Source& source, RenderManager& render_manager, std::size_t size)
+		FontImpl(const Source& source, RenderManager& render_manager, size_t size)
 			: _size{ static_cast<int>(size) }
 			, _image{ { size * 32, size * 32, PixelFormat::Intensity8 } }
 		{
 			_freetype.load(source.to_buffer());
 			_has_kerning = FT_HAS_KERNING(_freetype._face);
 			FT_Set_Pixel_Sizes(_freetype._face, 0, static_cast<FT_UInt>(size));
-			std::size_t x_offset = 0;
-			std::size_t y_offset = 0;
-			std::size_t row_height = 0;
+			size_t x_offset = 0;
+			size_t y_offset = 0;
+			size_t row_height = 0;
 			const auto baseline = static_cast<FT_Int>(size) * _freetype._face->ascender / _freetype._face->height;
 			for (FT_UInt char_code = 0; char_code < 65536; ++char_code)
 			{
@@ -99,7 +99,7 @@ namespace Yt
 				if (y_offset + glyph->bitmap.rows > _image.info().height())
 					break; // TODO: Report error.
 				auto src = glyph->bitmap.buffer;
-				auto dst = static_cast<std::uint8_t*>(_image.data()) + _image.info().stride() * y_offset + x_offset;
+				auto dst = static_cast<uint8_t*>(_image.data()) + _image.info().stride() * y_offset + x_offset;
 				for (unsigned y = 0; y < glyph->bitmap.rows; ++y)
 				{
 					std::memcpy(dst, src, glyph->bitmap.width);
@@ -128,7 +128,7 @@ namespace Yt
 			const auto scaling = font_size / static_cast<float>(_size);
 
 			float selection_left = 0;
-			const auto do_capture = [font_size, capture, &current_x, current_y, &selection_left](std::size_t offset) {
+			const auto do_capture = [font_size, capture, &current_x, current_y, &selection_left](size_t offset) {
 				if (!capture)
 					return;
 
@@ -153,7 +153,7 @@ namespace Yt
 			};
 
 			auto previous = _chars.end();
-			for (std::size_t i = 0; i < text.size();)
+			for (size_t i = 0; i < text.size();)
 			{
 				const auto offset = i;
 				const auto current = _chars.find(Utf8::next_codepoint(text, i));
@@ -177,7 +177,7 @@ namespace Yt
 		{
 			int width = 0;
 			auto previous = _chars.end();
-			for (std::size_t i = 0; i < text.size();)
+			for (size_t i = 0; i < text.size();)
 			{
 				const auto current = _chars.find(Utf8::next_codepoint(text, i));
 				if (current == _chars.end())

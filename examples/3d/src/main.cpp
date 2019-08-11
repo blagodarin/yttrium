@@ -17,22 +17,24 @@
 
 #include <yttrium/application.h>
 #include <yttrium/gui/gui.h>
+#include <yttrium/image/image.h>
+#include <yttrium/image/utils.h>
 #include <yttrium/logger.h>
 #include <yttrium/main.h>
+#include <yttrium/math/color.h>
 #include <yttrium/resource_loader.h>
 #include <yttrium/script/context.h>
 #include <yttrium/storage/paths.h>
 #include <yttrium/storage/storage.h>
 #include <yttrium/storage/writer.h>
 #include <yttrium/window.h>
-#include "../../common/include/utils.h"
 #include "game.h"
 
 namespace
 {
 	void make_checkerboard_texture(Yt::Storage& storage, std::string_view name)
 	{
-		storage.attach_buffer(name, ::make_bgra_tga(128, 128, [](size_t x, size_t y) {
+		storage.attach_buffer(name, Yt::make_bgra32_tga(128, 128, [](size_t x, size_t y) {
 			return ((x ^ y) & 1) ? Yt::Bgra32{ 0xdd, 0xdd, 0xdd } : Yt::Bgra32{ 0x00, 0x00, 0x00 };
 		}));
 	}

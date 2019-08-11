@@ -15,7 +15,7 @@
 // limitations under the License.
 //
 
-#include <yttrium/image.h>
+#include <yttrium/image/image.h>
 
 #include <yttrium/storage/paths.h>
 #include <yttrium/storage/writer.h>
