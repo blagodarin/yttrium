@@ -15,6 +15,8 @@
 # limitations under the License.
 #
 
+find_package(Y3_jpeg REQUIRED)
+
 set(_src
 	src/intrinsics.h
 	src/main.cpp
@@ -26,20 +28,14 @@ source_group("src" FILES ${_src})
 
 include_config(ycore ${PROJECT_BINARY_DIR}/config.h)
 target_include_directories(ycore PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-target_link_libraries(ycore PRIVATE Threads::Threads)
+target_link_libraries(ycore PRIVATE Y3::jpeg Threads::Threads)
 set_property(TARGET ycore PROPERTY FOLDER "libs")
 if(BUILD_SHARED_LIBS)
 	set_property(TARGET ycore PROPERTY DEFINE_SYMBOL Y_CORE_EXPORT)
 	target_compile_definitions(ycore INTERFACE Y_CORE_IMPORT)
 endif()
 if(WIN32)
-	find_package(Y3_jpeg REQUIRED)
 	target_compile_definitions(ycore PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
-	target_link_libraries(ycore PRIVATE Y3::jpeg)
-else()
-	find_package(JPEG REQUIRED)
-	mark_as_advanced(jconfig_dir)
-	target_link_libraries(ycore PRIVATE JPEG::JPEG)
 endif()
 
 y_sources(ycore "include"

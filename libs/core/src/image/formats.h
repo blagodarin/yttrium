@@ -35,14 +35,9 @@ namespace Yt
 	bool read_ico_header(Reader&, ImageInfo&);
 	bool read_tga_header(Reader&, ImageInfo&);
 
-	enum class Upsampling
-	{
-		Nearest,
-		Linear,
-	};
+	bool read_jpeg(const void*, size_t, ImageInfo&, Buffer&);
 
-	Y_CORE_API bool read_jpeg(const void*, size_t, ImageInfo&, Buffer&, Upsampling);
-
+	bool write_jpeg(Writer&, const ImageInfo&, const void*);
 	bool write_png(Writer&, const ImageInfo&, const void*);
 	bool write_tga(Writer&, const ImageInfo&, const void*);
 

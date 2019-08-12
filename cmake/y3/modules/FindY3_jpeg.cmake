@@ -17,9 +17,15 @@
 
 include(${CMAKE_CURRENT_LIST_DIR}/../helpers/find.cmake)
 
+if(WIN32)
+	set(_library "jpeg-static")
+else()
+	set(_library "jpeg")
+endif()
+
 y3_find_package(jpeg C
 	HEADER "jpeglib.h"
-	LIBRARY "jpeg-static"
+	LIBRARY ${_library}
 	VERSION_HEADER "jconfig.h"
 	VERSION_REGEX "^#define[ \t]+LIBJPEG_TURBO_VERSION[ \t]+(.+)"
 	VERSION_SUFFIX "turbo")
