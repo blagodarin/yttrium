@@ -48,13 +48,13 @@ TEST_CASE("image.load_ico32")
 	CHECK(*image == reference_image);
 }
 
-TEST_CASE("image.load_jpeg24")
+TEST_CASE("image.load_jpg24")
 {
-	const auto jpeg_image = Yt::Image::load(*Yt::Source::from("jpeg24.jpeg"));
+	const auto jpeg_image = Yt::Image::load(*Yt::Source::from("gradient24.jpg"));
 	REQUIRE(jpeg_image);
 	REQUIRE(jpeg_image->info().pixel_format() == Yt::PixelFormat::Bgra32);
 
-	const auto tga_image = Yt::Image::load(*Yt::Source::from("jpeg24.tga"));
+	const auto tga_image = Yt::Image::load(*Yt::Source::from("gradient24.jpg.tga"));
 	REQUIRE(tga_image);
 	REQUIRE(tga_image->info().pixel_format() == Yt::PixelFormat::Bgra32);
 
@@ -80,6 +80,13 @@ TEST_CASE("image.load_tga32")
 	const auto image = Yt::Image::load(*Yt::Source::from("gradient32.tga"));
 	REQUIRE(image);
 	CHECK(*image == ::make_test_image(true));
+}
+
+TEST_CASE("image.save_jpg24")
+{
+	Yt::TemporaryFile file;
+	REQUIRE(::make_test_image(false).save(Yt::Writer{ file }, Yt::ImageFormat::Jpeg));
+	CHECK(Yt::Source::from(file)->to_buffer() == Yt::Source::from("gradient24.jpg")->to_buffer());
 }
 
 TEST_CASE("image.save_png24")

@@ -62,10 +62,12 @@ int main()
 		if (writer.write(file_header) && writer.write(info_header))
 			::write_color_gradient(writer, false, Yt::ImageOrientation::XRightYDown);
 	}
-	if (const auto source = Yt::Source::from("jpeg24.jpeg"))
-		if (const auto jpeg = Yt::Image::load(*source))
-			jpeg->save(Yt::Writer{ "jpeg24.tga" }, Yt::ImageFormat::Tga);
-	::make_test_image(false, Yt::ImageOrientation::XRightYDown).save(Yt::Writer{ "gradient24.jpeg" }, Yt::ImageFormat::Jpeg);
+	{
+		Yt::Buffer buffer;
+		::make_test_image(false, Yt::ImageOrientation::XRightYDown).save(Yt::Writer{ buffer }, Yt::ImageFormat::Jpeg);
+		Yt::Writer{ "gradient24.jpg" }.write_all(buffer);
+		Yt::Image::load(*Yt::Source::from(std::move(buffer)))->save(Yt::Writer{ "gradient24.jpg.tga" }, Yt::ImageFormat::Tga);
+	}
 	::make_test_image(false, Yt::ImageOrientation::XRightYDown).save(Yt::Writer{ "gradient24.png" }, Yt::ImageFormat::Png);
 	::make_test_image(false, Yt::ImageOrientation::XRightYDown).save(Yt::Writer{ "gradient24.tga" }, Yt::ImageFormat::Tga);
 	{
