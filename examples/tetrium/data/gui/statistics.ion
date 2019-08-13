@@ -33,7 +33,7 @@ screen "statistics"
 
 	stretch
 	{
-		image { texture "data/textures/background.jpeg" }
+		image { texture "data/textures/background.jpg" }
 	}
 
 	center "640" "480"

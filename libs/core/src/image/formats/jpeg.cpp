@@ -52,6 +52,8 @@ namespace
 		bool compress(const Yt::ImageInfo& info, const void* data) noexcept
 		{
 			assert(!_created);
+			if (info.orientation() != Yt::ImageOrientation::XRightYDown && info.orientation() != Yt::ImageOrientation::XRightYUp)
+				return false;
 			if (info.width() > JPEG_MAX_DIMENSION || info.height() > JPEG_MAX_DIMENSION)
 				return false;
 			if (setjmp(_jmp_buf))
@@ -93,8 +95,12 @@ namespace
 			_compress.dct_method = JDCT_ISLOW;
 			::jpeg_set_quality(&_compress, 100, TRUE);
 			::jpeg_start_compress(&_compress, TRUE);
-			for (auto row = static_cast<const JSAMPLE*>(data); _compress.next_scanline < _compress.image_height; row += info.stride())
-				::jpeg_write_scanlines(&_compress, const_cast<JSAMPLE**>(&row), 1);
+			if (info.orientation() == Yt::ImageOrientation::XRightYDown)
+				for (auto row = static_cast<const JSAMPLE*>(data); _compress.next_scanline < _compress.image_height; row += info.stride())
+					::jpeg_write_scanlines(&_compress, const_cast<JSAMPLE**>(&row), 1);
+			else
+				for (auto row = static_cast<const JSAMPLE*>(data) + info.frame_size(); _compress.next_scanline < _compress.image_height; row -= info.stride())
+					::jpeg_write_scanlines(&_compress, const_cast<JSAMPLE**>(&row), 1);
 			::jpeg_finish_compress(&_compress);
 			return true;
 		}
