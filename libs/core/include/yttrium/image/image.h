@@ -142,13 +142,13 @@ namespace Yt
 		const ImageInfo& info() const noexcept { return _info; }
 
 		///
-		bool save(Writer&&, ImageFormat) const;
+		bool save(Writer&&, ImageFormat, int quality = 100) const;
 
 		/// Saves the image to the default screenshot location with an auto-generated name.
-		bool save_as_screenshot(ImageFormat) const;
+		bool save_as_screenshot(ImageFormat, int quality = 100) const;
 
 		///
-		Buffer to_buffer(ImageFormat) const;
+		Buffer to_buffer(ImageFormat, int quality = 100) const;
 
 		///
 		static bool transform(const ImageInfo&, const void* src_data, const ImageInfo&, void* dst_data) noexcept;

@@ -54,7 +54,7 @@ int ymain(int, char**)
 
 	Yt::Window window{ application };
 	script.define("screenshot", [&window](const Yt::ScriptCall&) { window.take_screenshot(); });
-	window.on_screenshot([](Yt::Image&& image) { image.save_as_screenshot(Yt::ImageFormat::Jpeg); });
+	window.on_screenshot([](Yt::Image&& image) { image.save_as_screenshot(Yt::ImageFormat::Jpeg, 90); });
 
 	Yt::ResourceLoader resource_loader{ storage, &window.render_manager() };
 

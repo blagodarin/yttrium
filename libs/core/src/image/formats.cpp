@@ -22,6 +22,7 @@
 #include <yttrium/storage/source.h>
 #include <yttrium/utils/numeric.h>
 
+#include <algorithm>
 #include <new>
 
 namespace Yt
@@ -110,12 +111,13 @@ namespace Yt
 		return reader.read(buffer.data(), frame_size) == frame_size;
 	}
 
-	bool write_image(Writer& writer, ImageFormat format, const ImageInfo& info, const void* data)
+	bool write_image(Writer&& writer, ImageFormat format, int quality, const ImageInfo& info, const void* data)
 	{
+		quality = std::clamp(quality, 0, 100);
 		switch (format)
 		{
 		case ImageFormat::Tga: return write_tga(writer, info, data);
-		case ImageFormat::Jpeg: return write_jpeg(writer, info, data);
+		case ImageFormat::Jpeg: return write_jpeg(writer, info, data, quality);
 		case ImageFormat::Png: return write_png(writer, info, data);
 		default: return false;
 		}
