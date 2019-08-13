@@ -26,6 +26,7 @@ matrix:
             - libxcb-xkb-dev
             - libxkbcommon-dev
             - libxkbcommon-x11-dev
+            - nasm
             - ninja-build
 
     - os: linux
@@ -43,6 +44,7 @@ matrix:
             - libxcb-xkb-dev
             - libxkbcommon-dev
             - libxkbcommon-x11-dev
+            - yasm
             - ninja-build
 
     - os: linux
@@ -63,6 +65,7 @@ matrix:
             - libasound2-dev
             - libgl-dev
             - libvorbis-dev
+            - yasm
             - ninja-build
 
     - os: linux
@@ -99,6 +102,7 @@ matrix:
             - libxcb-xkb-dev
             - libxkbcommon-dev
             - libxkbcommon-x11-dev
+            - nasm
             - ninja-build
 
     - os: linux
@@ -114,6 +118,7 @@ matrix:
             - libgl-dev
             - libstdc++-8-dev
             - libvorbis-dev
+            - nasm
             - ninja-build
 
     - os: linux
@@ -137,7 +142,7 @@ matrix:
 before_install:
   - cmake --version
   - if [ -n "${CLANG}" ]; then export CC=clang-${CLANG} CXX=clang++-${CLANG}; fi
-  - if [ -n "${GCC}" ]; then export CC=gcc-${GCC} CXX=g++-${GCC} LDFLAGS=-fuse-ld=gold; fi
+  - if [ -n "${GCC}" ]; then export ASM_NASM=$(which yasm) CC=gcc-${GCC} CXX=g++-${GCC} LDFLAGS=-fuse-ld=gold; fi
 
 install:
   - mkdir "${HOME}/y3.prefix" && pushd "${HOME}/y3.prefix"

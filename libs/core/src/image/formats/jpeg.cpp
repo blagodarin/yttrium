@@ -32,7 +32,7 @@ namespace
 	class JpegCompressor
 	{
 	public:
-		JpegCompressor(Yt::Writer& writer)
+		explicit JpegCompressor(Yt::Writer& writer)
 			: _writer{ writer }
 		{
 			_destination.init_destination = reset_buffer;
