@@ -29,7 +29,7 @@ namespace Yt
 
 		virtual void reserve(uint64_t) = 0;
 		virtual void resize(uint64_t) = 0;
-		virtual size_t write_at(uint64_t, const void*, size_t) = 0;
+		virtual size_t write_at(uint64_t, const void*, size_t) noexcept = 0;
 
 	private:
 		uint64_t _size = 0;
@@ -45,7 +45,7 @@ namespace Yt
 
 		void reserve(uint64_t) override;
 		void resize(uint64_t) override;
-		size_t write_at(uint64_t, const void*, size_t) override;
+		size_t write_at(uint64_t, const void*, size_t) noexcept override;
 
 	private:
 		Buffer& _buffer;

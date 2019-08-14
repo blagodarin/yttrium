@@ -188,15 +188,10 @@ namespace Yt
 		::jpeg_calc_output_dimensions(&decompressor);
 
 		info = { decompressor.output_width, decompressor.output_height, Yt::PixelFormat::Bgra32 };
-
-		try
-		{
-			buffer.reset(info.frame_size());
-		}
-		catch (const std::bad_alloc&)
+		if (!buffer.try_reset(info.frame_size()))
 		{
 			::jpeg_destroy_decompress(&decompressor);
-			throw;
+			return false;
 		}
 
 		decompressor.do_fancy_upsampling = TRUE;

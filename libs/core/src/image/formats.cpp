@@ -100,15 +100,8 @@ namespace Yt
 		}
 
 		const auto frame_size = info.frame_size();
-		try
-		{
-			buffer.reset(frame_size);
-		}
-		catch (const std::bad_alloc&)
-		{
-			return false;
-		}
-		return reader.read(buffer.data(), frame_size) == frame_size;
+		return buffer.try_reset(frame_size)
+			&& reader.read(buffer.data(), frame_size) == frame_size;
 	}
 
 	bool write_image(Writer&& writer, ImageFormat format, int quality, const ImageInfo& info, const void* data)

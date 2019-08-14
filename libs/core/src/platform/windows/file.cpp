@@ -83,7 +83,7 @@ namespace Yt
 				throw std::system_error{ static_cast<int>(::GetLastError()), std::system_category() };
 		}
 
-		size_t write_at(uint64_t offset, const void* data, size_t size) override
+		size_t write_at(uint64_t offset, const void* data, size_t size) noexcept override
 		{
 			DWORD result = 0;
 			OVERLAPPED overlapped = {};

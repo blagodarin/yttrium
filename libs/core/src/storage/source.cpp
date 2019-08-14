@@ -132,12 +132,12 @@ namespace Yt
 		return std::make_unique<ProxySource>(source, actual_base, std::min(size, source_size - actual_base));
 	}
 
-	Buffer Source::to_buffer(std::size_t padding_size) const
+	Buffer Source::to_buffer(size_t padding_size) const
 	{
 		const auto source_size = size();
-		if (source_size > std::numeric_limits<std::size_t>::max() - padding_size)
+		if (source_size > std::numeric_limits<size_t>::max() - padding_size)
 			throw std::bad_alloc{};
-		const auto size = static_cast<std::size_t>(source_size);
+		const auto size = static_cast<size_t>(source_size);
 		Buffer buffer{ size + padding_size };
 		if (read_at(0, buffer.data(), size) != size)
 			throw std::system_error{ std::make_error_code(std::errc::io_error) };

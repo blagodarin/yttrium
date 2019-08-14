@@ -22,7 +22,6 @@
 #include <yttrium/storage/temporary_file.h>
 #include "../platform/file.h"
 
-#include <algorithm>
 #include <cassert>
 #include <cstring>
 #include <limits>
@@ -49,14 +48,14 @@ namespace Yt
 		_buffer.resize(static_cast<size_t>(size));
 	}
 
-	size_t BufferWriter::write_at(uint64_t offset, const void* data, size_t size)
+	size_t BufferWriter::write_at(uint64_t offset, const void* data, size_t size) noexcept
 	{
 		assert(offset <= std::numeric_limits<size_t>::max());
-		if (size > std::numeric_limits<size_t>::max() - offset)
-			throw std::bad_alloc{};
+		if (const auto max_size = std::numeric_limits<size_t>::max() - offset; size > max_size)
+			size = max_size;
 		const auto required_size = static_cast<size_t>(offset + size);
-		if (required_size > _buffer.size())
-			_buffer.resize(required_size);
+		if (required_size > _buffer.size() && !_buffer.try_resize(required_size))
+			size = _buffer.size() - offset;
 		std::memcpy(_buffer.begin() + offset, data, size);
 		return size;
 	}
@@ -76,7 +75,7 @@ namespace Yt
 	{
 	}
 
-	uint64_t Writer::offset() const
+	uint64_t Writer::offset() const noexcept
 	{
 		return _private ? _private->_offset : 0;
 	}
@@ -93,7 +92,7 @@ namespace Yt
 			_private->resize(size);
 	}
 
-	bool Writer::seek(uint64_t offset)
+	bool Writer::seek(uint64_t offset) noexcept
 	{
 		if (!_private || offset > _private->_size)
 			return false;
@@ -101,22 +100,23 @@ namespace Yt
 		return true;
 	}
 
-	uint64_t Writer::size() const
+	uint64_t Writer::size() const noexcept
 	{
 		return _private ? _private->_size : 0;
 	}
 
-	size_t Writer::write(const void* data, size_t size)
+	size_t Writer::write(const void* data, size_t size) noexcept
 	{
 		if (!_private)
 			return 0;
 		const auto result = write_at(_private->_offset, data, size);
 		_private->_offset += result;
-		_private->_size = std::max(_private->_size, _private->_offset);
+		if (_private->_size < _private->_offset)
+			_private->_size = _private->_offset;
 		return result;
 	}
 
-	bool Writer::write_all(const Buffer& buffer)
+	bool Writer::write_all(const Buffer& buffer) noexcept
 	{
 		return write(buffer.data(), buffer.size()) == buffer.size();
 	}
@@ -137,18 +137,19 @@ namespace Yt
 		return total_size == source.size();
 	}
 
-	bool Writer::write_all(std::string_view string)
+	bool Writer::write_all(std::string_view string) noexcept
 	{
 		return write(string.data(), string.size()) == string.size();
 	}
 
-	size_t Writer::write_at(uint64_t offset, const void* data, size_t size)
+	size_t Writer::write_at(uint64_t offset, const void* data, size_t size) noexcept
 	{
 		if (!_private || offset > _private->_size)
 			return 0;
 		const auto result = _private->write_at(offset, data, size);
 		if (result > 0)
-			_private->_size = std::max(_private->_size, offset + result);
+			if (const auto new_size = offset + result; new_size > _private->_size)
+				_private->_size = new_size;
 		return result;
 	}
 

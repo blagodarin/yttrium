@@ -44,7 +44,7 @@ namespace Yt
 		explicit Writer(TemporaryFile&);
 
 		/// Returns the current offset.
-		uint64_t offset() const;
+		uint64_t offset() const noexcept;
 
 		///
 		void reserve(uint64_t);
@@ -53,42 +53,36 @@ namespace Yt
 		void resize(uint64_t);
 
 		/// Sets the current offset.
-		bool seek(uint64_t);
+		bool seek(uint64_t) noexcept;
 
 		/// Returns the size of the target data.
-		uint64_t size() const;
+		uint64_t size() const noexcept;
 
 		/// Writes data to the target.
-		size_t write(const void*, size_t);
+		size_t write(const void*, size_t) noexcept;
 
 		/// Writes data to the target.
 		template <typename T>
-		bool write(const T& data)
-		{
-			return write(&data, sizeof data) == sizeof data;
-		}
+		bool write(const T& data) noexcept { return write(&data, sizeof data) == sizeof data; }
 
 		/// Writes data to the target.
-		bool write_all(const void* data, size_t size) { return write(data, size) == size; }
+		bool write_all(const void* data, size_t size) noexcept { return write(data, size) == size; }
 
 		///
-		bool write_all(const Buffer&);
+		bool write_all(const Buffer&) noexcept;
 
 		///
 		bool write_all(const Source&);
 
 		///
-		bool write_all(std::string_view);
+		bool write_all(std::string_view) noexcept;
 
 		/// Writes data at the specified offset.
-		size_t write_at(uint64_t offset, const void* data, size_t size);
+		size_t write_at(uint64_t offset, const void* data, size_t size) noexcept;
 
 		/// Writes data at the specified offset.
 		template <typename T>
-		bool write_at(uint64_t offset, const T& data)
-		{
-			return write_at(offset, &data, sizeof data) == sizeof data;
-		}
+		bool write_at(uint64_t offset, const T& data) noexcept { return write_at(offset, &data, sizeof data) == sizeof data; }
 
 	private:
 		std::unique_ptr<class WriterPrivate> _private;

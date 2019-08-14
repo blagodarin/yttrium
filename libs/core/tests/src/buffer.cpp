@@ -52,86 +52,68 @@ TEST_CASE("buffer")
 	}
 }
 
-TEST_CASE("buffer.reserve")
+TEST_CASE("buffer.try_reserve")
 {
 	Buffer buffer;
 
-	buffer.reserve(1);
+	REQUIRE(buffer.try_reserve(1));
 	CHECK(buffer.size() == 0);
 	CHECK(buffer.capacity() == granularity);
 
-	const auto data1 = buffer.data();
-	CHECK(data1);
+	{
+		const auto data = buffer.data();
+		CHECK(data);
+		REQUIRE(buffer.try_reserve(granularity));
+		CHECK(buffer.size() == 0);
+		CHECK(buffer.capacity() == granularity);
+		CHECK(buffer.data() == data);
+	}
 
-	buffer.reserve(granularity);
-	CHECK(buffer.size() == 0);
-	CHECK(buffer.capacity() == granularity);
-	CHECK(buffer.data() == data1);
-
-	buffer.reserve(granularity + 1);
-	CHECK(buffer.size() == 0);
-	CHECK(buffer.capacity() == granularity * 2);
-
-	const auto data2 = buffer.data();
-	CHECK(data2);
-
-	buffer.reserve(granularity);
+	REQUIRE(buffer.try_reserve(granularity + 1));
 	CHECK(buffer.size() == 0);
 	CHECK(buffer.capacity() == granularity * 2);
-	CHECK(buffer.data() == data2);
+
+	{
+		const auto data = buffer.data();
+		CHECK(data);
+		REQUIRE(buffer.try_reserve(granularity));
+		CHECK(buffer.size() == 0);
+		CHECK(buffer.capacity() == granularity * 2);
+		CHECK(buffer.data() == data);
+	}
 }
 
-TEST_CASE("buffer.reset")
+TEST_CASE("buffer.try_reset")
 {
 	Buffer buffer;
 
-	buffer.reset(1);
+	REQUIRE(buffer.try_reset(1));
 	CHECK(buffer.size() == 1);
 	CHECK(buffer.capacity() == granularity);
 
-	buffer.reset(granularity + 1);
+	REQUIRE(buffer.try_reset(granularity + 1));
 	CHECK(buffer.size() == granularity + 1);
 	CHECK(buffer.capacity() == granularity * 2);
 }
 
-TEST_CASE("buffer.resize")
+TEST_CASE("buffer.try_resize")
 {
 	Buffer buffer;
 
-	buffer.resize(1);
+	REQUIRE(buffer.try_resize(1));
 	CHECK(buffer.size() == 1);
 	CHECK(buffer.capacity() == granularity);
 
-	buffer.resize(granularity + 1);
+	REQUIRE(buffer.try_resize(granularity + 1));
 	CHECK(buffer.size() == granularity + 1);
 	CHECK(buffer.capacity() == granularity * 2);
 
-	const auto data_before_resize = buffer.data();
-	buffer.resize(granularity);
-	CHECK(buffer.size() == granularity);
-	CHECK(buffer.capacity() == granularity * 2);
-	CHECK(buffer.data() == data_before_resize);
-}
-
-TEST_CASE("buffer.shrink_to_fit")
-{
-	Buffer buffer(granularity * 2);
-	CHECK(buffer.size() == granularity * 2);
-	CHECK(buffer.capacity() == granularity * 2);
-
-	buffer.resize(granularity);
-	CHECK(buffer.size() == granularity);
-	CHECK(buffer.capacity() == granularity * 2);
-
-	buffer.shrink_to_fit();
-	CHECK(buffer.size() == granularity);
-	CHECK(buffer.capacity() == granularity);
-
-	buffer.resize(0);
-	CHECK(buffer.size() == 0);
-	CHECK(buffer.capacity() == granularity);
-
-	buffer.shrink_to_fit();
-	CHECK(buffer.size() == 0);
-	CHECK(buffer.capacity() == 0);
+	{
+		const auto data = buffer.data();
+		CHECK(data);
+		REQUIRE(buffer.try_resize(granularity));
+		CHECK(buffer.size() == granularity);
+		CHECK(buffer.capacity() == granularity * 2);
+		CHECK(buffer.data() == data);
+	}
 }
