@@ -40,7 +40,7 @@ namespace Yt
 				log_last_error("CloseHandle");
 		}
 
-		size_t read_at(uint64_t offset, void* data, size_t size) const override
+		size_t read_at(uint64_t offset, void* data, size_t size) const noexcept override
 		{
 			DWORD result = 0;
 			OVERLAPPED overlapped = {};
@@ -49,10 +49,7 @@ namespace Yt
 			return ::ReadFile(_handle, data, static_cast<DWORD>(size), &result, &overlapped) ? result : 0;
 		}
 
-		uint64_t size() const noexcept override
-		{
-			return _size;
-		}
+		uint64_t size() const noexcept override { return _size; }
 
 	private:
 		const HANDLE _handle;
@@ -69,18 +66,6 @@ namespace Yt
 		{
 			if (!::CloseHandle(_handle))
 				log_last_error("CloseHandle");
-		}
-
-		void reserve(uint64_t) override
-		{
-		}
-
-		void resize(uint64_t size) override
-		{
-			LARGE_INTEGER offset;
-			offset.QuadPart = size;
-			if (!::SetFilePointerEx(_handle, offset, nullptr, FILE_BEGIN) || !::SetEndOfFile(_handle))
-				throw std::system_error{ static_cast<int>(::GetLastError()), std::system_category() };
 		}
 
 		size_t write_at(uint64_t offset, const void* data, size_t size) noexcept override

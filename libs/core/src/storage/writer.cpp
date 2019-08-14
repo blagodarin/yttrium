@@ -15,6 +15,7 @@
 // limitations under the License.
 //
 
+#include <yttrium/storage/writer.h>
 #include "writer.h"
 
 #include <yttrium/memory/buffer.h>
@@ -34,18 +35,10 @@ namespace Yt
 		_buffer.resize(0);
 	}
 
-	void BufferWriter::reserve(uint64_t size)
+	bool BufferWriter::try_reserve(uint64_t size) noexcept
 	{
-		if (size > std::numeric_limits<size_t>::max())
-			throw std::bad_alloc{};
-		_buffer.reserve(static_cast<size_t>(size));
-	}
-
-	void BufferWriter::resize(uint64_t size)
-	{
-		if (size > std::numeric_limits<size_t>::max())
-			throw std::bad_alloc{};
-		_buffer.resize(static_cast<size_t>(size));
+		return size <= std::numeric_limits<size_t>::max()
+			&& _buffer.try_reserve(static_cast<size_t>(size));
 	}
 
 	size_t BufferWriter::write_at(uint64_t offset, const void* data, size_t size) noexcept
@@ -80,16 +73,9 @@ namespace Yt
 		return _private ? _private->_offset : 0;
 	}
 
-	void Writer::reserve(uint64_t size)
+	bool Writer::try_reserve(uint64_t size) noexcept
 	{
-		if (_private)
-			_private->reserve(size);
-	}
-
-	void Writer::resize(uint64_t size)
-	{
-		if (_private)
-			_private->resize(size);
+		return _private && _private->try_reserve(size);
 	}
 
 	bool Writer::seek(uint64_t offset) noexcept
@@ -155,6 +141,6 @@ namespace Yt
 
 	Writer::Writer() noexcept = default;
 	Writer::Writer(Writer&&) noexcept = default;
-	Writer::~Writer() = default;
+	Writer::~Writer() noexcept = default;
 	Writer& Writer::operator=(Writer&&) noexcept = default;
 }

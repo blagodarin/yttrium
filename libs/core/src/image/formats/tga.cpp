@@ -185,8 +185,7 @@ namespace Yt
 			return false;
 		}
 
-		writer.reserve(sizeof header + info.frame_size());
-		if (!writer.write(header))
+		if (!writer.try_reserve(sizeof header + info.frame_size()) || !writer.write(header))
 			return false;
 
 		auto scanline = static_cast<const uint8_t*>(data);

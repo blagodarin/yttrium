@@ -47,10 +47,7 @@ namespace Yt
 		uint64_t offset() const noexcept;
 
 		///
-		void reserve(uint64_t);
-
-		///
-		void resize(uint64_t);
+		bool try_reserve(uint64_t) noexcept;
 
 		/// Sets the current offset.
 		bool seek(uint64_t) noexcept;
@@ -91,8 +88,8 @@ namespace Yt
 	public:
 		Writer() noexcept;
 		Writer(Writer&&) noexcept;
-		~Writer();
+		~Writer() noexcept;
 		Writer& operator=(Writer&&) noexcept;
-		explicit operator bool() const { return static_cast<bool>(_private); }
+		explicit operator bool() const noexcept { return static_cast<bool>(_private); }
 	};
 }

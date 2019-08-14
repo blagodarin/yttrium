@@ -17,18 +17,21 @@
 
 #pragma once
 
-#include <yttrium/storage/writer.h>
+#include <cstdint>
+#include <cstddef>
 
 namespace Yt
 {
+	class Buffer;
+	class Writer;
+
 	class WriterPrivate
 	{
 	public:
 		WriterPrivate() noexcept = default;
 		virtual ~WriterPrivate() noexcept = default;
 
-		virtual void reserve(uint64_t) = 0;
-		virtual void resize(uint64_t) = 0;
+		virtual bool try_reserve(uint64_t) noexcept { return true; }
 		virtual size_t write_at(uint64_t, const void*, size_t) noexcept = 0;
 
 	private:
@@ -43,8 +46,7 @@ namespace Yt
 	public:
 		explicit BufferWriter(Buffer&) noexcept;
 
-		void reserve(uint64_t) override;
-		void resize(uint64_t) override;
+		bool try_reserve(uint64_t) noexcept override;
 		size_t write_at(uint64_t, const void*, size_t) noexcept override;
 
 	private:
