@@ -32,7 +32,7 @@ namespace Yt
 	BufferWriter::BufferWriter(Buffer& buffer) noexcept
 		: _buffer{ buffer }
 	{
-		_buffer.resize(0);
+		_buffer.clear();
 	}
 
 	bool BufferWriter::try_reserve(uint64_t size) noexcept
@@ -41,12 +41,13 @@ namespace Yt
 			&& _buffer.try_reserve(static_cast<size_t>(size));
 	}
 
-	size_t BufferWriter::write_at(uint64_t offset, const void* data, size_t size) noexcept
+	size_t BufferWriter::write_at(uint64_t offset64, const void* data, size_t size) noexcept
 	{
-		assert(offset <= std::numeric_limits<size_t>::max());
+		assert(offset64 <= std::numeric_limits<size_t>::max());
+		const auto offset = static_cast<size_t>(offset64);
 		if (const auto max_size = std::numeric_limits<size_t>::max() - offset; size > max_size)
 			size = max_size;
-		const auto required_size = static_cast<size_t>(offset + size);
+		const auto required_size = offset + size;
 		if (required_size > _buffer.size() && !_buffer.try_resize(required_size))
 			size = _buffer.size() - offset;
 		std::memcpy(_buffer.begin() + offset, data, size);
@@ -95,7 +96,7 @@ namespace Yt
 	{
 		if (!_private)
 			return 0;
-		const auto result = write_at(_private->_offset, data, size);
+		const auto result = _private->write_at(_private->_offset, data, size);
 		_private->_offset += result;
 		if (_private->_size < _private->_offset)
 			_private->_size = _private->_offset;
@@ -121,22 +122,6 @@ namespace Yt
 				break;
 		}
 		return total_size == source.size();
-	}
-
-	bool Writer::write_all(std::string_view string) noexcept
-	{
-		return write(string.data(), string.size()) == string.size();
-	}
-
-	size_t Writer::write_at(uint64_t offset, const void* data, size_t size) noexcept
-	{
-		if (!_private || offset > _private->_size)
-			return 0;
-		const auto result = _private->write_at(offset, data, size);
-		if (result > 0)
-			if (const auto new_size = offset + result; new_size > _private->_size)
-				_private->_size = new_size;
-		return result;
 	}
 
 	Writer::Writer() noexcept = default;

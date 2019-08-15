@@ -21,12 +21,10 @@
 
 #include <filesystem>
 #include <memory>
-#include <string_view>
 
 namespace Yt
 {
 	class Buffer;
-	class Reader;
 	class Source;
 	class TemporaryFile;
 
@@ -70,16 +68,6 @@ namespace Yt
 
 		///
 		bool write_all(const Source&);
-
-		///
-		bool write_all(std::string_view) noexcept;
-
-		/// Writes data at the specified offset.
-		size_t write_at(uint64_t offset, const void* data, size_t size) noexcept;
-
-		/// Writes data at the specified offset.
-		template <typename T>
-		bool write_at(uint64_t offset, const T& data) noexcept { return write_at(offset, &data, sizeof data) == sizeof data; }
 
 	private:
 		std::unique_ptr<class WriterPrivate> _private;

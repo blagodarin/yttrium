@@ -46,6 +46,9 @@ namespace Yt
 		constexpr size_t capacity() const noexcept { return _capacity; }
 
 		///
+		constexpr void clear() noexcept { _size = 0; }
+
+		///
 		constexpr void* data() noexcept { return _data; }
 		constexpr const void* data() const noexcept { return _data; }
 

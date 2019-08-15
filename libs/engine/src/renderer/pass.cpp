@@ -420,8 +420,8 @@ namespace Yt
 		_backend.flush_2d(_data._vertices_2d, _data._indices_2d);
 		_report._triangles += _data._indices_2d.size() / sizeof(uint16_t) - 2;
 		++_report._draw_calls;
-		_data._vertices_2d.resize(0);
-		_data._indices_2d.resize(0);
+		_data._vertices_2d.clear();
+		_data._indices_2d.clear();
 	}
 
 	void RenderPassImpl::reset_texture_state()
