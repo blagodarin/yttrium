@@ -17,14 +17,9 @@
 
 #pragma once
 
-#include <yttrium/math/euler.h>
-#include <yttrium/math/line.h>
-#include <yttrium/math/point.h>
-#include <yttrium/math/quad.h>
 #include "model.h"
 
 #include <chrono>
-#include <optional>
 
 namespace Yt
 {
@@ -32,8 +27,10 @@ namespace Yt
 	struct RenderReport;
 	class ResourceLoader;
 	class Window;
+	class Vector2;
 }
 
+class GameState;
 class MinimapCanvas;
 
 class Game
@@ -44,21 +41,12 @@ public:
 
 	void draw_debug_graphics(Yt::RenderPass&, const Yt::Vector2& cursor, const Yt::RenderReport&);
 	void draw_scene(Yt::RenderPass&, const Yt::Vector2&);
-	void toggle_debug_text() noexcept { _debug_text_visible = !_debug_text_visible; }
+	void toggle_debug_text() noexcept;
 	void update(const Yt::Window&, std::chrono::milliseconds);
 
 private:
-	bool _debug_text_visible = false;
 	Model _cube;
 	Model _checkerboard;
-
-	Yt::Vector3 _position{ 0, -8.5, 16 };
-	Yt::Euler _rotation{ 0, -60, 0 };
-
-	Yt::Line3 _cursor_ray{ { 0, 0, 0 }, { 0, 0, 0 } };
-	const Yt::Plane _board_plane{ { 0, 0, 1 }, { 0, 0, 0 } };
-	std::optional<Yt::Vector2> _board_point;
-	std::optional<Yt::Quad> _visibility_quad;
-
-	std::unique_ptr<MinimapCanvas> _minimap_canvas;
+	const std::unique_ptr<GameState> _state;
+	const std::unique_ptr<MinimapCanvas> _minimap_canvas;
 };
