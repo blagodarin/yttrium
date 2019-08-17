@@ -35,6 +35,7 @@
 #include <yttrium/storage/writer.h>
 #include <yttrium/utils/string.h>
 #include <yttrium/window.h>
+#include "model.h"
 
 #include <cmath>
 #include <optional>
@@ -157,6 +158,42 @@ public:
 	}
 };
 
+class WorldCanvas final : public Yt::Canvas
+{
+public:
+	explicit WorldCanvas(GameState& state, Yt::ResourceLoader& resource_loader)
+		: _state{ state }
+		, _cube{ resource_loader, "data/cube.obj", "data/cube.material" }
+		, _checkerboard{ resource_loader, "data/checkerboard.obj", "data/checkerboard.material" }
+	{
+	}
+
+	void on_draw(Yt::RenderPass& pass, const Yt::RectF&, std::chrono::milliseconds) override // TODO: Use the provided rect.
+	{
+		Yt::Push3D projection{ pass, Yt::Matrix4::perspective(pass.window_size(), 35, .5, 256), _state.camera_matrix() };
+		_state.update_visible_area(pass);
+		if (_cursor)
+			_state.update_board_point(pass, *_cursor);
+		if (_state._board_point)
+		{
+			Yt::PushTransformation t{ pass, Yt::Matrix4::translation({ _state._board_point->x + .5f, _state._board_point->y + .5f, .5f }) };
+			_cube.draw(pass);
+		}
+		_checkerboard.draw(pass);
+	}
+
+	void on_mouse_move(const Yt::RectF&, const Yt::Vector2& cursor) override
+	{
+		_cursor = cursor;
+	}
+
+private:
+	GameState& _state;
+	Model _cube;
+	Model _checkerboard;
+	std::optional<Yt::Vector2> _cursor;
+};
+
 class MinimapCanvas final : public Yt::Canvas
 {
 public:
@@ -213,17 +250,17 @@ private:
 };
 
 Game::Game(Yt::ResourceLoader& resource_loader, Yt::Gui& gui)
-	: _cube{ resource_loader, "data/cube.obj", "data/cube.material" }
-	, _checkerboard{ resource_loader, "data/checkerboard.obj", "data/checkerboard.material" }
-	, _state{ std::make_unique<GameState>() }
-	, _minimap_canvas{ std::make_unique<MinimapCanvas>(*_state) }
+	: _state{ std::make_unique<GameState>() }
+	, _world{ std::make_unique<WorldCanvas>(*_state, resource_loader) }
+	, _minimap{ std::make_unique<MinimapCanvas>(*_state) }
 {
-	gui.bind_canvas("minimap", *_minimap_canvas);
+	gui.bind_canvas("world", *_world);
+	gui.bind_canvas("minimap", *_minimap);
 	if (const auto source = Yt::Source::from(Yt::user_data_path("yttrium-3d") / "save.ion"))
 		_state->load(*source);
 }
 
-Game::~Game()
+Game::~Game() noexcept
 {
 	_state->save(Yt::Writer{ Yt::user_data_path("yttrium-3d") / "save.ion" });
 }
@@ -235,19 +272,6 @@ void Game::draw_debug_graphics(Yt::RenderPass& pass, const Yt::Vector2& cursor, 
 		pass.draw_rect(Yt::RectF{ cursor, Yt::SizeF{ 2, 2 } }, { 1, 1, 0, 1 });
 	}
 	_state->update_debug_text(pass, report);
-}
-
-void Game::draw_scene(Yt::RenderPass& pass, const Yt::Vector2& cursor)
-{
-	Yt::Push3D projection{ pass, Yt::Matrix4::perspective(pass.window_size(), 35, .5, 256), _state->camera_matrix() };
-	_state->update_visible_area(pass);
-	_state->update_board_point(pass, cursor);
-	if (_state->_board_point)
-	{
-		Yt::PushTransformation t{ pass, Yt::Matrix4::translation({ _state->_board_point->x + .5f, _state->_board_point->y + .5f, .5f }) };
-		_cube.draw(pass);
-	}
-	_checkerboard.draw(pass);
 }
 
 void Game::toggle_debug_text() noexcept

@@ -66,7 +66,6 @@ int ymain(int, char**)
 	script.define("debug", [&game](const Yt::ScriptCall&) { game.toggle_debug_text(); });
 	application.on_update([&window, &game](std::chrono::milliseconds advance) { game.update(window, advance); });
 	window.on_render([&gui, &game](Yt::RenderPass& pass, const Yt::Vector2& cursor, const Yt::RenderReport& report) {
-		game.draw_scene(pass, cursor);
 		gui.draw(pass, cursor);
 		game.draw_debug_graphics(pass, cursor, report);
 	});

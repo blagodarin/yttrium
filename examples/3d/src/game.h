@@ -17,13 +17,13 @@
 
 #pragma once
 
-#include "model.h"
-
 #include <chrono>
+#include <memory>
 
 namespace Yt
 {
 	class Gui;
+	class RenderPass;
 	struct RenderReport;
 	class ResourceLoader;
 	class Window;
@@ -32,21 +32,20 @@ namespace Yt
 
 class GameState;
 class MinimapCanvas;
+class WorldCanvas;
 
 class Game
 {
 public:
 	Game(Yt::ResourceLoader&, Yt::Gui&);
-	~Game();
+	~Game() noexcept;
 
 	void draw_debug_graphics(Yt::RenderPass&, const Yt::Vector2& cursor, const Yt::RenderReport&);
-	void draw_scene(Yt::RenderPass&, const Yt::Vector2&);
 	void toggle_debug_text() noexcept;
 	void update(const Yt::Window&, std::chrono::milliseconds);
 
 private:
-	Model _cube;
-	Model _checkerboard;
 	const std::unique_ptr<GameState> _state;
-	const std::unique_ptr<MinimapCanvas> _minimap_canvas;
+	const std::unique_ptr<WorldCanvas> _world;
+	const std::unique_ptr<MinimapCanvas> _minimap;
 };

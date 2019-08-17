@@ -49,6 +49,7 @@ namespace Yt
 
 		void draw(RenderPass&, const Widget* hover_widget, const Widget* click_widget) const;
 		void update(const RectF&);
+		void update_cursor(const Vector2& cursor, const Widget* except);
 
 	private:
 		const Placement _placement;

@@ -69,16 +69,15 @@ namespace Yt
 			}
 		}
 
-		void set_hover(const Vector2& cursor, Widget* widget)
+		const Widget* set_hover(const Vector2& cursor, Widget* widget)
 		{
 			_hover_cursor = cursor;
 			_hover_widget = widget;
-			if (_click_widget && cursor != _click_cursor)
-			{
-				_click_cursor.x = std::clamp(cursor.x, _click_widget->render_rect().left(), _click_widget->render_rect().right() - 1);
-				_click_cursor.y = std::clamp(cursor.y, _click_widget->render_rect().top(), _click_widget->render_rect().bottom() - 1);
-				_click_widget->process_mouse_move(_click_cursor);
-			}
+			if (!_click_widget || cursor == _click_cursor)
+				return nullptr;
+			_click_cursor = _click_widget->clamp(cursor);
+			_click_widget->process_mouse_move(_click_cursor);
+			return _click_widget;
 		}
 
 	private:
@@ -157,12 +156,17 @@ namespace Yt
 		const RectF rect{ {}, pass.window_size() };
 		for (const auto& layout : _layouts)
 			layout->update(rect);
+		const Widget* handled_cursor = nullptr;
 		if (cursor)
-			_activity->set_hover(*cursor, widget_at(*cursor));
+			handled_cursor = _activity->set_hover(*cursor, widget_at(*cursor));
 		else
 			_activity->reset();
 		for (const auto& layout : _layouts)
+		{
+			if (cursor)
+				layout->update_cursor(*cursor, handled_cursor);
 			layout->draw(pass, _activity->hover_widget(), _activity->click_widget());
+		}
 		if (cursor)
 		{
 			switch (_cursor)
