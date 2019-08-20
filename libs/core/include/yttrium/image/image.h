@@ -44,7 +44,7 @@ namespace Yt
 		Auto, ///< Automatic detection.
 		Tga,  ///< Truevision TARGA (TGA) file format.
 		Png,  ///< Portable Network Graphics (PNG) file format (write only).
-		Jpeg, ///< Joint Photographic Experts Group (JPEG) file format (read only).
+		Jpeg, ///< Joint Photographic Experts Group (JPEG) file format.
 		Dds,  ///< DirectDraw Surface (DDS) file format (read only).
 		Bmp,  ///< Windows bitmap (BMP) file format (read only).
 		Ico,  ///< Windows icon (ICO) file format (read only).
@@ -62,28 +62,28 @@ namespace Yt
 	{
 	public:
 		ImageInfo() noexcept = default;
-		constexpr ImageInfo(std::size_t width, std::size_t height, std::size_t stride, PixelFormat pixel_format, ImageOrientation orientation = ImageOrientation::XRightYDown) noexcept
+		constexpr ImageInfo(size_t width, size_t height, size_t stride, PixelFormat pixel_format, ImageOrientation orientation = ImageOrientation::XRightYDown) noexcept
 			: _width{ width }, _height{ height }, _stride{ stride }, _pixel_format{ pixel_format }, _orientation{ orientation } {}
-		constexpr ImageInfo(std::size_t width, std::size_t height, PixelFormat pixel_format, ImageOrientation orientation = ImageOrientation::XRightYDown) noexcept
+		constexpr ImageInfo(size_t width, size_t height, PixelFormat pixel_format, ImageOrientation orientation = ImageOrientation::XRightYDown) noexcept
 			: ImageInfo{ width, height, stride(width, pixel_format), pixel_format, orientation } {}
-		constexpr ImageInfo(std::size_t width, std::size_t height, PixelFormat pixel_format, std::size_t alignment, ImageOrientation orientation = ImageOrientation::XRightYDown) noexcept
+		constexpr ImageInfo(size_t width, size_t height, PixelFormat pixel_format, size_t alignment, ImageOrientation orientation = ImageOrientation::XRightYDown) noexcept
 			: ImageInfo{ width, height, stride(width, pixel_format, alignment), pixel_format, orientation } {}
 
-		constexpr std::size_t frame_size() const noexcept { return _stride * _height; }
-		constexpr std::size_t height() const noexcept { return _height; }
+		constexpr size_t frame_size() const noexcept { return _stride * _height; }
+		constexpr size_t height() const noexcept { return _height; }
 		constexpr ImageOrientation orientation() const noexcept { return _orientation; }
 		constexpr PixelFormat pixel_format() const noexcept { return _pixel_format; }
-		constexpr std::size_t stride() const noexcept { return _stride; }
-		constexpr std::size_t width() const noexcept { return _width; }
+		constexpr size_t stride() const noexcept { return _stride; }
+		constexpr size_t width() const noexcept { return _width; }
 
 		///
-		static constexpr std::size_t stride(std::size_t width, PixelFormat format, std::size_t alignment = 1) noexcept
+		static constexpr size_t stride(size_t width, PixelFormat format, size_t alignment = 1) noexcept
 		{
 			return (width * pixel_size(format) + alignment - 1) / alignment * alignment;
 		}
 
 		///
-		static constexpr std::size_t pixel_size(PixelFormat format) noexcept
+		static constexpr size_t pixel_size(PixelFormat format) noexcept
 		{
 			switch (format)
 			{
@@ -103,9 +103,9 @@ namespace Yt
 		}
 
 	private:
-		std::size_t _width;
-		std::size_t _height;
-		std::size_t _stride;
+		size_t _width;
+		size_t _height;
+		size_t _stride;
 		PixelFormat _pixel_format;
 		ImageOrientation _orientation;
 	};
@@ -142,10 +142,13 @@ namespace Yt
 		const ImageInfo& info() const noexcept { return _info; }
 
 		///
-		bool save(Writer&&, ImageFormat) const;
+		bool save(Writer&&, ImageFormat, int quality = 100) const;
+
+		/// Saves the image to the default screenshot location with an auto-generated name.
+		bool save_as_screenshot(ImageFormat, int quality = 100) const;
 
 		///
-		Buffer to_buffer(ImageFormat) const;
+		Buffer to_buffer(ImageFormat, int quality = 100) const;
 
 		///
 		static bool transform(const ImageInfo&, const void* src_data, const ImageInfo&, void* dst_data) noexcept;

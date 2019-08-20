@@ -22,43 +22,9 @@
 #include <chrono>
 #include <functional>
 #include <memory>
-#include <optional>
 
 namespace Yt
 {
-	///
-	struct UpdateEvent
-	{
-		/// Milliseconds to update the time by.
-		std::chrono::milliseconds milliseconds{ 0 };
-
-		/// Current updates per second (frames per second, FPS) rate.
-		std::optional<int> fps;
-
-		/// Maximum frame time in milliseconds.
-		std::chrono::milliseconds max_frame_time{ 0 };
-
-		/// Number of triangles rendered.
-		size_t triangles = 0;
-
-		/// Number of draw calls issued.
-		size_t draw_calls = 0;
-
-		/// Number of texture switches.
-		size_t texture_switches = 0;
-
-		/// Number of redundant texture switches, i.e. those which set a texture that had already been set in that frame.
-		/// \note Works only in debug mode.
-		size_t redundant_texture_switches = 0;
-
-		/// Number of shader switches.
-		size_t shader_switches = 0;
-
-		/// Number of redundant shader switches, i.e. those which set a GPU program that had already been set in that frame.
-		/// \note Works only in debug mode.
-		size_t redundant_shader_switches = 0;
-	};
-
 	///
 	class Y_ENGINE_API Application
 	{
@@ -67,7 +33,7 @@ namespace Yt
 		~Application() noexcept;
 
 		///
-		void on_update(const std::function<void(const UpdateEvent&)>&);
+		void on_update(const std::function<void(std::chrono::milliseconds)>&);
 
 		///
 		void run();

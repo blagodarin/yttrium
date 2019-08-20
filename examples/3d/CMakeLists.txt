@@ -16,7 +16,6 @@
 #
 
 set(_src
-	../common/include/utils.h
 	src/game.cpp
 	src/game.h
 	src/main.cpp

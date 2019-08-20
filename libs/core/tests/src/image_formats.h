@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <yttrium/image.h>
+#include <yttrium/image/image.h>
 
 template <unsigned size>
 inline Yt::Image make_gray8_test_image()

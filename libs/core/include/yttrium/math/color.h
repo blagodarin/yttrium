@@ -25,27 +25,17 @@ namespace Yt
 	class Bgra32
 	{
 	public:
-		std::uint8_t _b, _g, _r, _a;
+		uint8_t _b, _g, _r, _a;
 
 		Bgra32() noexcept = default;
 
 		template <typename B, typename G, typename R, typename = std::enable_if_t<std::is_integral_v<B> && std::is_integral_v<G> && std::is_integral_v<R>>>
 		constexpr explicit Bgra32(B b, G g, R r) noexcept
-			: _b{ static_cast<std::uint8_t>(b) }
-			, _g{ static_cast<std::uint8_t>(g) }
-			, _r{ static_cast<std::uint8_t>(r) }
-			, _a{ 0xff }
-		{
-		}
+			: _b{ static_cast<uint8_t>(b) }, _g{ static_cast<uint8_t>(g) }, _r{ static_cast<uint8_t>(r) }, _a{ 0xff } {}
 
 		template <typename B, typename G, typename R, typename A, typename = std::enable_if_t<std::is_integral_v<B> && std::is_integral_v<G> && std::is_integral_v<R> && std::is_integral_v<A>>>
 		constexpr explicit Bgra32(B b, G g, R r, A a) noexcept
-			: _b{ static_cast<std::uint8_t>(b) }
-			, _g{ static_cast<std::uint8_t>(g) }
-			, _r{ static_cast<std::uint8_t>(r) }
-			, _a{ static_cast<std::uint8_t>(a) }
-		{
-		}
+			: _b{ static_cast<uint8_t>(b) }, _g{ static_cast<uint8_t>(g) }, _r{ static_cast<uint8_t>(r) }, _a{ static_cast<uint8_t>(a) } {}
 	};
 
 	class Color4f

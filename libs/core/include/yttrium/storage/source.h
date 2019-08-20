@@ -52,14 +52,14 @@ namespace Yt
 		virtual const void* data() const noexcept { return nullptr; }
 
 		/// Reads data from the source at the specified offset.
-		bool read_all_at(uint64_t offset, void* data, size_t size) const { return read_at(offset, data, size) == size; }
+		bool read_all_at(uint64_t offset, void* data, size_t size) const noexcept { return read_at(offset, data, size) == size; }
 
 		/// Reads the specified number of bytes of Source data at the specified offset.
-		virtual size_t read_at(uint64_t, void*, size_t) const = 0;
+		virtual size_t read_at(uint64_t, void*, size_t) const noexcept = 0;
 
 		/// Reads data from the source at the specified offset.
 		template <typename T>
-		bool read_at(uint64_t offset, T& data) const { return read_at(offset, &data, sizeof data) == sizeof data; }
+		bool read_at(uint64_t offset, T& data) const noexcept { return read_at(offset, &data, sizeof data) == sizeof data; }
 
 		/// Returns the size of the Source data.
 		virtual uint64_t size() const noexcept = 0;

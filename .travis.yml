@@ -9,7 +9,7 @@ matrix:
     - os: linux
       dist: xenial
       compiler: clang
-      env: CLANG=8 CONFIG=Debug DLL=ON RENDERER=null Y3=catch2,cppcheck ANALYZE=1
+      env: CLANG=8 CONFIG=Debug DLL=ON RENDERER=null Y3=catch2,cppcheck,jpeg ANALYZE=1
       addons:
         apt:
           sources: &all_sources
@@ -26,12 +26,13 @@ matrix:
             - libxcb-xkb-dev
             - libxkbcommon-dev
             - libxkbcommon-x11-dev
+            - nasm
             - ninja-build
 
     - os: linux
       dist: xenial
       compiler: gcc
-      env: GCC=9 CONFIG=Release DLL=OFF RENDERER=null Y3=catch2 BENCHMARK=1
+      env: GCC=9 CONFIG=Release DLL=OFF RENDERER=null Y3=catch2,jpeg BENCHMARK=1
       addons: &gcc9_xcb
         apt:
           sources: *all_sources
@@ -43,18 +44,19 @@ matrix:
             - libxcb-xkb-dev
             - libxkbcommon-dev
             - libxkbcommon-x11-dev
+            - yasm
             - ninja-build
 
     - os: linux
       dist: xenial
       compiler: gcc
-      env: GCC=9 CONFIG=Debug DLL=ON RENDERER=null Y3=catch2,lcov COVERAGE=1
+      env: GCC=9 CONFIG=Debug DLL=ON RENDERER=null Y3=catch2,jpeg,lcov COVERAGE=1
       addons: *gcc9_xcb
 
     - os: linux
       dist: xenial
       compiler: gcc
-      env: GCC=9 CONFIG=Release DLL=OFF RENDERER=opengl Y3=catch2
+      env: GCC=9 CONFIG=Release DLL=OFF RENDERER=opengl Y3=catch2,jpeg
       addons: &gcc9_x11
         apt:
           sources: *all_sources
@@ -63,30 +65,31 @@ matrix:
             - libasound2-dev
             - libgl-dev
             - libvorbis-dev
+            - yasm
             - ninja-build
 
     - os: linux
       dist: xenial
       compiler: gcc
-      env: GCC=9 CONFIG=Debug DLL=ON RENDERER=opengl Y3=catch2
+      env: GCC=9 CONFIG=Debug DLL=ON RENDERER=opengl Y3=catch2,jpeg
       addons: *gcc9_x11
 
     - os: linux
       dist: xenial
       compiler: gcc
-      env: GCC=9 CONFIG=Release DLL=OFF RENDERER=vulkan Y3=catch2,glslang,vulkan
+      env: GCC=9 CONFIG=Release DLL=OFF RENDERER=vulkan Y3=catch2,glslang,jpeg,vulkan
       addons: *gcc9_xcb
 
     - os: linux
       dist: xenial
       compiler: gcc
-      env: GCC=9 CONFIG=Debug DLL=ON RENDERER=vulkan Y3=catch2,glslang,vulkan
+      env: GCC=9 CONFIG=Debug DLL=ON RENDERER=vulkan Y3=catch2,glslang,jpeg,vulkan
       addons: *gcc9_xcb
 
     - os: linux
       dist: xenial
       compiler: clang
-      env: CLANG=8 CONFIG=Release DLL=OFF RENDERER=null Y3=catch2 BENCHMARK=1
+      env: CLANG=8 CONFIG=Release DLL=OFF RENDERER=null Y3=catch2,jpeg BENCHMARK=1
       addons: &clang_xcb
         apt:
           sources: *all_sources
@@ -99,12 +102,13 @@ matrix:
             - libxcb-xkb-dev
             - libxkbcommon-dev
             - libxkbcommon-x11-dev
+            - nasm
             - ninja-build
 
     - os: linux
       dist: xenial
       compiler: clang
-      env: CLANG=8 CONFIG=Release DLL=OFF RENDERER=opengl Y3=catch2
+      env: CLANG=8 CONFIG=Release DLL=OFF RENDERER=opengl Y3=catch2,jpeg
       addons: &clang_x11
         apt:
           sources: *all_sources
@@ -114,30 +118,31 @@ matrix:
             - libgl-dev
             - libstdc++-8-dev
             - libvorbis-dev
+            - nasm
             - ninja-build
 
     - os: linux
       dist: xenial
       compiler: clang
-      env: CLANG=8 CONFIG=Debug DLL=ON RENDERER=opengl Y3=catch2
+      env: CLANG=8 CONFIG=Debug DLL=ON RENDERER=opengl Y3=catch2,jpeg
       addons: *clang_x11
 
     - os: linux
       dist: xenial
       compiler: clang
-      env: CLANG=8 CONFIG=Release DLL=OFF RENDERER=vulkan Y3=catch2,glslang,vulkan
+      env: CLANG=8 CONFIG=Release DLL=OFF RENDERER=vulkan Y3=catch2,glslang,jpeg,vulkan
       addons: *clang_xcb
 
     - os: linux
       dist: xenial
       compiler: clang
-      env: CLANG=8 CONFIG=Debug DLL=ON RENDERER=vulkan Y3=catch2,glslang,vulkan
+      env: CLANG=8 CONFIG=Debug DLL=ON RENDERER=vulkan Y3=catch2,glslang,jpeg,vulkan
       addons: *clang_xcb
 
 before_install:
   - cmake --version
   - if [ -n "${CLANG}" ]; then export CC=clang-${CLANG} CXX=clang++-${CLANG}; fi
-  - if [ -n "${GCC}" ]; then export CC=gcc-${GCC} CXX=g++-${GCC} LDFLAGS=-fuse-ld=gold; fi
+  - if [ -n "${GCC}" ]; then export ASM_NASM=$(which yasm) CC=gcc-${GCC} CXX=g++-${GCC} LDFLAGS=-fuse-ld=gold; fi
 
 install:
   - mkdir "${HOME}/y3.prefix" && pushd "${HOME}/y3.prefix"

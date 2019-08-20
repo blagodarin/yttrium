@@ -15,22 +15,43 @@
 // limitations under the License.
 //
 
-#include <yttrium/image.h>
+#include <yttrium/image/image.h>
 
+#include <yttrium/storage/paths.h>
 #include <yttrium/storage/writer.h>
 #include <yttrium/utils/numeric.h>
 #include "../utils/string.h"
 #include "formats.h"
 #include "utils.h"
 
+#include <array>
 #include <cassert>
 #include <cstring>
+#include <ctime>
 
 // TODO: Compressed images (e. g. compressed textures).
 // TODO: Multi-level images (e. g. textures with mipmaps).
 // TODO: Separate image header/data loading.
 // TODO: Image packs (lists of image headers with filenames and raw image data offsets).
 // TODO: Loading image data into the specified buffer (e. g. into mapped texture memory).
+
+namespace
+{
+	const char* image_extension(Yt::ImageFormat format)
+	{
+		switch (format)
+		{
+		case Yt::ImageFormat::Auto: break;
+		case Yt::ImageFormat::Tga: return ".tga";
+		case Yt::ImageFormat::Png: return ".png";
+		case Yt::ImageFormat::Jpeg: return ".jpg";
+		case Yt::ImageFormat::Dds: return ".dds";
+		case Yt::ImageFormat::Bmp: return ".bmp";
+		case Yt::ImageFormat::Ico: return ".ico";
+		}
+		return "";
+	}
+}
 
 namespace Yt
 {
@@ -55,15 +76,30 @@ namespace Yt
 	{
 	}
 
-	bool Image::save(Writer&& writer, ImageFormat format) const
+	bool Image::save(Writer&& writer, ImageFormat format, int quality) const
 	{
-		return write_image(writer, format, _info, _buffer.data());
+		return write_image(std::move(writer), format, quality, _info, _buffer.data());
 	}
 
-	Buffer Image::to_buffer(ImageFormat format) const
+	bool Image::save_as_screenshot(ImageFormat format, int quality) const
+	{
+		const auto time = std::time(nullptr);
+		::tm tm;
+#ifdef _MSC_VER
+		::localtime_s(&tm, &time);
+#else
+		::localtime_r(&time, &tm);
+#endif
+		std::array<char, 24> buffer;
+		const auto offset = std::strftime(buffer.data(), buffer.size(), "%Y-%m-%d_%H-%M-%S", &tm);
+		std::snprintf(buffer.data() + offset, buffer.size() - offset, "%s", ::image_extension(format));
+		return write_image(Writer{ screenshots_path() / buffer.data() }, format, quality, _info, _buffer.data());
+	}
+
+	Buffer Image::to_buffer(ImageFormat format, int quality) const
 	{
 		Buffer buffer;
-		return save(Writer{ buffer }, format) ? std::move(buffer) : Buffer{};
+		return write_image(Writer{ buffer }, format, quality, _info, _buffer.data()) ? std::move(buffer) : Buffer{};
 	}
 
 	bool Image::transform(const ImageInfo& src_info, const void* src_data, const ImageInfo& dst_info, void* dst_data) noexcept

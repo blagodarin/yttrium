@@ -21,6 +21,8 @@
 #include <yttrium/audio/utils.h>
 #include <yttrium/exceptions.h>
 #include <yttrium/gui/gui.h>
+#include <yttrium/image/image.h>
+#include <yttrium/image/utils.h>
 #include <yttrium/logger.h>
 #include <yttrium/main.h>
 #include <yttrium/renderer/modifiers.h>
@@ -33,25 +35,22 @@
 #include <yttrium/storage/storage.h>
 #include <yttrium/storage/writer.h>
 #include <yttrium/window.h>
-#include "../../common/include/utils.h"
 #include "graphics.h"
 
 namespace
 {
-	template <size_t button_size>
-	void make_buttons_texture(Yt::Storage& storage, const std::string& name)
+	void make_buttons_texture(Yt::Storage& storage, const std::string& name, size_t button_size)
 	{
 		constexpr size_t button_styles = 4;
-		storage.attach_buffer(name, ::make_bgra_tga(button_size, button_size * button_styles, [](size_t, size_t y) {
+		storage.attach_buffer(name, Yt::make_bgra32_tga(button_size, button_size * button_styles, [button_size](size_t, size_t y) {
 			const auto style = y / button_size;
 			return Yt::Bgra32{ 0xff, 0x44 * style, 0x44 * style };
 		}));
 	}
 
-	template <size_t size>
-	void make_cursor_texture(Yt::Storage& storage, const std::string& name)
+	void make_cursor_texture(Yt::Storage& storage, const std::string& name, size_t size)
 	{
-		storage.attach_buffer(name, ::make_bgra_tga(size, size, [](size_t x, size_t y) {
+		storage.attach_buffer(name, Yt::make_bgra32_tga(size, size, [size](size_t x, size_t y) {
 			if (y > 2 * x || 2 * y < x || (y > 2 * (size - x) && x > 2 * (size - y)))
 				return Yt::Bgra32{ 0, 0, 0, 0 };
 			else
@@ -219,8 +218,8 @@ int ymain(int, char**)
 
 	Yt::Storage storage{ Yt::Storage::UseFileSystem::Never };
 	storage.attach_package("tetrium.ypq");
-	::make_buttons_texture<16>(storage, "data/textures/buttons.tga");
-	::make_cursor_texture<64>(storage, "data/textures/cursor.tga");
+	::make_buttons_texture(storage, "data/textures/buttons.tga", 16);
+	::make_cursor_texture(storage, "data/textures/cursor.tga", 64);
 	::make_sound(storage, "data/sounds/sound.wav");
 
 	const auto audio = try_create<Yt::AudioManager>();
@@ -229,8 +228,8 @@ int ymain(int, char**)
 	Yt::Gui gui{ "data/gui.ion", resource_loader, script, audio };
 	gui.on_quit([&window] { window.close(); });
 
-	application.on_update([&script, &gui, &logic](const Yt::UpdateEvent& event) {
-		if (logic.advance(static_cast<int>(event.milliseconds.count())))
+	application.on_update([&script, &gui, &logic](std::chrono::milliseconds advance) {
+		if (logic.advance(static_cast<int>(advance.count())))
 		{
 			script.set("score", logic.score());
 			script.set("lines", logic.lines());
@@ -241,8 +240,8 @@ int ymain(int, char**)
 	});
 
 	window.on_key_event([&gui](const Yt::KeyEvent& event) { gui.process_key_event(event); });
-	window.on_render([&gui](Yt::RenderPass& pass, const Yt::Vector2& cursor) { gui.draw(pass, cursor); });
-	window.on_screenshot([](Yt::Image&& image) { image.save(Yt::Writer{ ::make_screenshot_path() }, Yt::ImageFormat::Png); });
+	window.on_render([&gui](Yt::RenderPass& pass, const Yt::Vector2& cursor, const Yt::RenderReport&) { gui.draw(pass, cursor); });
+	window.on_screenshot([](Yt::Image&& image) { image.save_as_screenshot(Yt::ImageFormat::Jpeg, 90); });
 	window.on_text_input([&gui](std::string_view text) { gui.process_text_input(text); });
 
 	TetriumGraphics graphics{ window.render_manager() };

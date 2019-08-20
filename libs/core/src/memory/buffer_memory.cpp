@@ -21,19 +21,11 @@
 #include "../platform/virtual_memory.h"
 
 #include <cassert>
+#include <cstddef>
 #include <cstring>
-#include <new>
 
 namespace
 {
-	void* allocate_big_block(size_t size)
-	{
-		const auto data = Yt::vm_allocate(size);
-		if (!data)
-			throw std::bad_alloc{};
-		return data;
-	}
-
 	size_t level_from_capacity(size_t capacity) noexcept
 	{
 		assert(Yt::is_power_of_2(capacity));
@@ -43,56 +35,50 @@ namespace
 		assert(size_t{ 1 } << level == capacity);
 		return level;
 	}
+
+	struct Block
+	{
+		void* _next;
+	};
 }
 
 namespace Yt
 {
-	BufferMemory::~BufferMemory() = default;
+	BufferMemory::~BufferMemory() noexcept = default;
 
-	void* BufferMemory::allocate(size_t capacity)
+	void* BufferMemory::allocate(size_t capacity) noexcept
 	{
 		assert(capacity > 0 && capacity == capacity_for_size(capacity));
-		void* data = nullptr;
 		if (capacity > MaxSmallBlockSize)
+			return vm_allocate(capacity);
+		const auto matching_level = ::level_from_capacity(capacity);
+		std::scoped_lock lock{ _small_blocks_mutex };
+		if (const auto matching_block = _small_blocks[matching_level])
 		{
-			data = ::allocate_big_block(capacity);
+			_small_blocks[matching_level] = static_cast<Block*>(matching_block)->_next;
+			return matching_block;
 		}
-		else
+		auto block_level = matching_level + 1;
+		void* block = nullptr;
+		for (; block_level <= MaxSmallBlockLevel; ++block_level)
 		{
-			const auto level = ::level_from_capacity(capacity);
+			if (block = _small_blocks[block_level]; block)
 			{
-				std::lock_guard<std::mutex> lock{ _small_blocks_mutex };
-				data = _small_blocks[level];
-				if (data)
-					_small_blocks[level] = *reinterpret_cast<void**>(data);
-				else
-				{
-					auto i = level + 1;
-					for (; i <= MaxSmallBlockLevel; ++i)
-					{
-						if (data = _small_blocks[i]; data)
-						{
-							_small_blocks[i] = *reinterpret_cast<void**>(data);
-							break;
-						}
-					}
-					if (!data)
-					{
-						// TODO: Try to merge smaller blocks before allocating a new big one.
-						assert(size_t{ 1 } << i == 2 * MaxSmallBlockSize);
-						data = ::allocate_big_block(2 * MaxSmallBlockSize);
-					}
-					do
-					{
-						--i;
-						*reinterpret_cast<void**>(data) = _small_blocks[i];
-						_small_blocks[i] = data;
-						data = static_cast<uint8_t*>(data) + (size_t{ 1 } << i);
-					} while (i > level);
-				}
+				_small_blocks[block_level] = static_cast<Block*>(block)->_next;
+				break;
 			}
 		}
-		return data;
+		if (!block)
+			if (block = vm_allocate(2 * MaxSmallBlockSize); !block) // TODO: Try merging smaller blocks before allocating a new big one.
+				return nullptr;
+		do
+		{
+			--block_level;
+			static_cast<Block*>(block)->_next = _small_blocks[block_level];
+			_small_blocks[block_level] = block;
+			block = static_cast<std::byte*>(block) + (size_t{ 1 } << block_level);
+		} while (block_level > matching_level);
+		return block;
 	}
 
 	void BufferMemory::deallocate(void* data, size_t capacity) noexcept
@@ -100,36 +86,24 @@ namespace Yt
 		assert(data);
 		assert(capacity > 0 && capacity == capacity_for_size(capacity));
 		if (capacity > MaxSmallBlockSize)
-		{
-			vm_deallocate(data, capacity);
-		}
-		else
-		{
-			const auto level = ::level_from_capacity(capacity);
-			{
-				std::lock_guard<std::mutex> lock{ _small_blocks_mutex };
-				*reinterpret_cast<void**>(data) = _small_blocks[level];
-				_small_blocks[level] = data;
-			}
-		}
+			return vm_deallocate(data, capacity);
+		const auto level = ::level_from_capacity(capacity);
+		std::scoped_lock lock{ _small_blocks_mutex };
+		static_cast<Block*>(data)->_next = _small_blocks[level];
+		_small_blocks[level] = data;
 	}
 
-	void* BufferMemory::reallocate(void* old_data, size_t old_capacity, size_t new_capacity, size_t old_size)
+	void* BufferMemory::reallocate(void* old_data, size_t old_capacity, size_t new_capacity, size_t old_size) noexcept
 	{
 		assert(old_data);
 		assert(old_capacity > 0 && old_capacity == capacity_for_size(old_capacity));
 		assert(new_capacity > 0 && new_capacity == capacity_for_size(new_capacity));
 		assert(old_capacity != new_capacity);
 		if (old_capacity > MaxSmallBlockSize && new_capacity > MaxSmallBlockSize)
-		{
-			const auto new_data = vm_reallocate(old_data, old_capacity, new_capacity);
-			if (!new_data)
-				throw std::bad_alloc{};
-			return new_data;
-		}
-		// This situation is rare, so let's do something simple.
-		// TODO: Remap the first part of the big allocation into the small free block if one is available.
+			return vm_reallocate(old_data, old_capacity, new_capacity);
 		const auto new_data = allocate(new_capacity);
+		if (!new_data)
+			return nullptr;
 		if (old_size > 0)
 			::memcpy(new_data, old_data, old_size);
 		deallocate(old_data, old_capacity);

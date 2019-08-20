@@ -15,6 +15,8 @@
 # limitations under the License.
 #
 
+find_package(Y3_jpeg REQUIRED)
+
 set(_src
 	src/intrinsics.h
 	src/main.cpp
@@ -26,7 +28,7 @@ source_group("src" FILES ${_src})
 
 include_config(ycore ${PROJECT_BINARY_DIR}/config.h)
 target_include_directories(ycore PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-target_link_libraries(ycore PRIVATE Threads::Threads)
+target_link_libraries(ycore PRIVATE Y3::jpeg Threads::Threads)
 set_property(TARGET ycore PROPERTY FOLDER "libs")
 if(BUILD_SHARED_LIBS)
 	set_property(TARGET ycore PROPERTY DEFINE_SYMBOL Y_CORE_EXPORT)
@@ -39,9 +41,13 @@ endif()
 y_sources(ycore "include"
 	include/yttrium/api.h
 	include/yttrium/exceptions.h
-	include/yttrium/image.h
 	include/yttrium/logger.h
 	include/yttrium/translation.h
+	)
+
+y_sources(ycore "include/image"
+	include/yttrium/image/image.h
+	include/yttrium/image/utils.h
 	)
 
 y_sources(ycore "include/ion"
@@ -79,6 +85,7 @@ y_sources(ycore "include/script"
 
 y_sources(ycore "include/storage"
 	include/yttrium/storage/package.h
+	include/yttrium/storage/paths.h
 	include/yttrium/storage/reader.h
 	include/yttrium/storage/source.h
 	include/yttrium/storage/storage.h
@@ -111,6 +118,14 @@ y_sources(ycore "src/image/formats"
 	src/image/formats/png.cpp
 	src/image/formats/tga.cpp
 	)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+	set_property(SOURCE src/image/formats/jpeg.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-tautological-type-limit-compare)
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+	set_property(SOURCE src/image/formats/jpeg.cpp APPEND PROPERTY COMPILE_OPTIONS
+		/wd4324 # '`anonymous-namespace'::JpegErrorHandler': structure was padded due to alignment specifier
+		/wd4611 # interaction between '_setjmp' and C++ object destruction is non-portable
+		)
+endif()
 
 y_sources(ycore "src/ion"
 	src/ion/reader.cpp
@@ -141,6 +156,7 @@ if(UNIX)
 		src/platform/posix/error.cpp
 		src/platform/posix/error.h
 		src/platform/posix/file.cpp
+		src/platform/posix/paths.cpp
 		src/platform/posix/temporary_file.cpp
 		src/platform/posix/temporary_file.h
 		src/platform/posix/virtual_memory.cpp
@@ -153,6 +169,7 @@ elseif(WIN32)
 		src/platform/windows/error.cpp
 		src/platform/windows/error.h
 		src/platform/windows/file.cpp
+		src/platform/windows/paths.cpp
 		src/platform/windows/temporary_file.cpp
 		src/platform/windows/virtual_memory.cpp
 		)

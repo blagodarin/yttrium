@@ -38,7 +38,7 @@ namespace Yt
 			return _data;
 		}
 
-		size_t read_at(uint64_t offset, void* data, size_t size) const override
+		size_t read_at(uint64_t offset, void* data, size_t size) const noexcept override
 		{
 			if (offset >= _size)
 				return 0;
@@ -70,7 +70,7 @@ namespace Yt
 			return _buffer->data();
 		}
 
-		size_t read_at(uint64_t offset, void* data, size_t size) const override
+		size_t read_at(uint64_t offset, void* data, size_t size) const noexcept override
 		{
 			if (offset >= _buffer->size())
 				return 0;
@@ -94,7 +94,7 @@ namespace Yt
 		ProxySource(const std::shared_ptr<const Source>& source, uint64_t base, uint64_t size) noexcept
 			: _source{ source }, _base{ base }, _size{ size } {}
 
-		size_t read_at(uint64_t offset, void* data, size_t size) const override
+		size_t read_at(uint64_t offset, void* data, size_t size) const noexcept override
 		{
 			return offset <= std::numeric_limits<uint64_t>::max() - _base ? _source->read_at(_base + offset, data, static_cast<size_t>(std::min<uint64_t>(size, _size - offset))) : 0;
 		}
@@ -132,12 +132,12 @@ namespace Yt
 		return std::make_unique<ProxySource>(source, actual_base, std::min(size, source_size - actual_base));
 	}
 
-	Buffer Source::to_buffer(std::size_t padding_size) const
+	Buffer Source::to_buffer(size_t padding_size) const
 	{
 		const auto source_size = size();
-		if (source_size > std::numeric_limits<std::size_t>::max() - padding_size)
+		if (source_size > std::numeric_limits<size_t>::max() - padding_size)
 			throw std::bad_alloc{};
-		const auto size = static_cast<std::size_t>(source_size);
+		const auto size = static_cast<size_t>(source_size);
 		Buffer buffer{ size + padding_size };
 		if (read_at(0, buffer.data(), size) != size)
 			throw std::system_error{ std::make_error_code(std::errc::io_error) };

@@ -18,7 +18,7 @@
 #include "builtin.h"
 
 #include <yttrium/exceptions.h>
-#include <yttrium/image.h>
+#include <yttrium/image/image.h>
 #include <yttrium/renderer/program.h>
 #include "backend.h"
 #include "debug_texture.h"

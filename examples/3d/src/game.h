@@ -17,54 +17,35 @@
 
 #pragma once
 
-#include <yttrium/application.h>
-#include <yttrium/gui/gui.h>
-#include <yttrium/math/euler.h>
-#include <yttrium/math/line.h>
-#include <yttrium/math/point.h>
-#include <yttrium/math/quad.h>
-#include <yttrium/resource_loader.h>
-#include <yttrium/script/context.h>
-#include <yttrium/storage/storage.h>
-#include <yttrium/window.h>
-#include "model.h"
+#include <chrono>
+#include <memory>
 
-#include <optional>
+namespace Yt
+{
+	class Gui;
+	class RenderPass;
+	struct RenderReport;
+	class ResourceLoader;
+	class Window;
+	class Vector2;
+}
 
+class GameState;
 class MinimapCanvas;
+class WorldCanvas;
 
 class Game
 {
 public:
-	explicit Game(const Yt::Storage&);
-	~Game();
+	Game(Yt::ResourceLoader&, Yt::Gui&);
+	~Game() noexcept;
 
-	void run();
-
-private:
-	void draw_minimap(Yt::RenderPass&, const Yt::RectF&);
-	void draw_scene(Yt::RenderPass&, const Yt::Vector2&);
-	void update(const Yt::UpdateEvent&);
+	void draw_debug_graphics(Yt::RenderPass&, const Yt::Vector2& cursor, const Yt::RenderReport&);
+	void toggle_debug_text() noexcept;
+	void update(const Yt::Window&, std::chrono::milliseconds);
 
 private:
-	const Yt::Storage& _storage;
-	Yt::Application _application;
-	Yt::Window _window{ _application };
-	Yt::ResourceLoader _resource_loader{ _storage, &_window.render_manager() };
-	Yt::ScriptContext _script;
-	Yt::Gui _gui{ "data/gui.ion", _resource_loader, _script };
-	bool _debug_text_visible = false;
-	std::string _debug_text;
-	Model _cube{ _resource_loader, "data/cube.obj", "data/cube.material" };
-	Model _checkerboard{ _resource_loader, "data/checkerboard.obj", "data/checkerboard.material" };
-
-	Yt::Vector3 _position{ 0, -8.5, 16 };
-	Yt::Euler _rotation{ 0, -60, 0 };
-
-	Yt::Line3 _cursor_ray{ { 0, 0, 0 }, { 0, 0, 0 } };
-	const Yt::Plane _board_plane{ { 0, 0, 1 }, { 0, 0, 0 } };
-	std::optional<Yt::Vector2> _board_point;
-	std::optional<Yt::Quad> _visibility_quad;
-
-	std::unique_ptr<MinimapCanvas> _minimap_canvas;
+	const std::unique_ptr<GameState> _state;
+	const std::unique_ptr<WorldCanvas> _world;
+	const std::unique_ptr<MinimapCanvas> _minimap;
 };

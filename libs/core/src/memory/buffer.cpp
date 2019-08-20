@@ -19,8 +19,9 @@
 
 #include "buffer_memory.h"
 
-#include <algorithm>
+#include <cassert>
 #include <cstring>
+#include <new>
 
 namespace Yt
 {
@@ -29,6 +30,8 @@ namespace Yt
 		, _capacity{ BufferMemory::capacity_for_size(_size) }
 		, _data{ _capacity > 0 ? _buffer_memory.allocate(_capacity) : nullptr }
 	{
+		if (!_data && _capacity > 0)
+			throw std::bad_alloc{};
 	}
 
 	Buffer::Buffer(size_t size, const void* data)
@@ -40,58 +43,39 @@ namespace Yt
 
 	void Buffer::reserve(size_t capacity)
 	{
-		if (capacity <= _capacity)
-			return;
-		const auto new_capacity = BufferMemory::capacity_for_size(capacity);
-		const auto new_data = _data
-			? _buffer_memory.reallocate(_data, _capacity, new_capacity, _size)
-			: _buffer_memory.allocate(new_capacity);
-		_capacity = new_capacity;
-		_data = new_data;
+		if (!try_grow(capacity, _size, false))
+			throw std::bad_alloc{};
 	}
 
 	void Buffer::reset(size_t size)
 	{
-		if (size > _capacity)
-		{
-			const auto new_capacity = BufferMemory::capacity_for_size(size);
-			const auto new_data = _data
-				? _buffer_memory.reallocate(_data, _capacity, new_capacity, 0)
-				: _buffer_memory.allocate(new_capacity);
-			_capacity = new_capacity;
-			_data = new_data;
-		}
-		_size = size;
+		if (!try_grow(size, 0, true))
+			throw std::bad_alloc{};
 	}
 
 	void Buffer::resize(size_t size)
 	{
-		if (size > _capacity)
+		if (!try_grow(size, size < _size ? size : _size, true))
+			throw std::bad_alloc{};
+	}
+
+	bool Buffer::try_grow(size_t allocate_bytes, size_t copy_bytes, bool do_resize) noexcept
+	{
+		if (allocate_bytes > _capacity)
 		{
-			const auto new_capacity = BufferMemory::capacity_for_size(size);
+			assert(allocate_bytes >= copy_bytes);
+			const auto new_capacity = BufferMemory::capacity_for_size(allocate_bytes);
 			const auto new_data = _data
-				? _buffer_memory.reallocate(_data, _capacity, new_capacity, std::min(size, _size))
+				? _buffer_memory.reallocate(_data, _capacity, new_capacity, copy_bytes)
 				: _buffer_memory.allocate(new_capacity);
+			if (!new_data)
+				return false;
 			_capacity = new_capacity;
 			_data = new_data;
 		}
-		_size = size;
-	}
-
-	void Buffer::shrink_to_fit()
-	{
-		const auto new_capacity = BufferMemory::capacity_for_size(_size);
-		if (new_capacity < _capacity)
-		{
-			if (!new_capacity)
-			{
-				_buffer_memory.deallocate(_data, _capacity);
-				_data = nullptr;
-			}
-			else
-				_data = _buffer_memory.reallocate(_data, _capacity, new_capacity, _size);
-			_capacity = new_capacity;
-		}
+		if (do_resize)
+			_size = allocate_bytes;
+		return true;
 	}
 
 	size_t Buffer::memory_granularity() noexcept

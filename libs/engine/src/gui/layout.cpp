@@ -101,4 +101,11 @@ namespace Yt
 			widget->set_render_rect(screen_rect);
 		}
 	}
+
+	void GuiLayout::update_cursor(const Vector2& cursor, const Widget* except)
+	{
+		for (const auto& widget : _widgets)
+			if (widget->track_hover() && widget.get() != except)
+				widget->process_mouse_move(widget->clamp(cursor));
+	}
 }

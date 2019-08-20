@@ -46,6 +46,9 @@ namespace Yt
 		constexpr size_t capacity() const noexcept { return _capacity; }
 
 		///
+		constexpr void clear() noexcept { _size = 0; }
+
+		///
 		constexpr void* data() noexcept { return _data; }
 		constexpr const void* data() const noexcept { return _data; }
 
@@ -66,8 +69,14 @@ namespace Yt
 		/// Returns the requested size of the buffer.
 		constexpr size_t size() const noexcept { return _size; }
 
-		/// Releases unused buffer capacity if possible.
-		void shrink_to_fit();
+		///
+		bool try_reserve(size_t capacity) noexcept { return try_grow(capacity, _size, false); }
+
+		///
+		bool try_reset(size_t size) noexcept { return try_grow(size, 0, true); }
+
+		///
+		bool try_resize(size_t size) noexcept { return try_grow(size, size < _size ? size : _size, true); }
 
 		///
 		constexpr uint8_t& operator[](size_t offset) noexcept { return static_cast<uint8_t*>(_data)[offset]; }
@@ -81,6 +90,9 @@ namespace Yt
 		~Buffer() noexcept;
 		Buffer& operator=(const Buffer&) = delete;
 		Buffer& operator=(Buffer&&) noexcept;
+
+	private:
+		bool try_grow(size_t allocate_bytes, size_t copy_bytes, bool do_resize) noexcept;
 
 	private:
 		size_t _size = 0;

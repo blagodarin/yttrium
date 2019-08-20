@@ -166,6 +166,7 @@ namespace Yt
 		void load_widget_sound(WidgetData&, IonReader&, IonToken&) const;
 		void load_widget_state(WidgetData&, IonReader&, IonToken&) const;
 		void load_widget_text(WidgetData&, IonReader&, IonToken&) const;
+		void load_widget_track_hover(WidgetData&, IonReader&, IonToken&) const;
 
 		void load_style_align(WidgetData::StyleData&, IonReader&, IonToken&) const;
 		void load_style_borders(WidgetData::StyleData&, IonReader&, IonToken&) const;
@@ -539,6 +540,7 @@ namespace Yt
 			{ "sound", &GuiIonLoader::load_widget_sound },
 			{ "state", &GuiIonLoader::load_widget_state },
 			{ "text", &GuiIonLoader::load_widget_text },
+			{ "track_hover", &GuiIonLoader::load_widget_track_hover },
 		};
 
 		static const std::unordered_map<std::string_view, WidgetData::Style> styles{
@@ -659,6 +661,11 @@ namespace Yt
 	{
 		data._text = token.translatable() && _translation ? _translation->translate(token.to_value()) : token.to_value();
 		token.next(ion);
+	}
+
+	void GuiIonLoader::load_widget_track_hover(WidgetData& data, IonReader&, IonToken&) const
+	{
+		data._track_hover = true;
 	}
 
 	void GuiIonLoader::load_style_align(WidgetData::StyleData& data, IonReader& ion, IonToken& token) const

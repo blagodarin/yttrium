@@ -15,7 +15,7 @@
 // limitations under the License.
 //
 
-#include <yttrium/image.h>
+#include <yttrium/image/image.h>
 #include <yttrium/storage/writer.h>
 #include <yttrium/utils/numeric.h>
 #include "../../utils/adler32.h"
@@ -207,7 +207,9 @@ namespace Yt
 		suffix.iend.type = PngChunkType::IEND;
 		suffix.iend.crc = swap_bytes(Crc32{}.process(&suffix.iend.type, sizeof suffix.iend.type).value());
 
-		writer.reserve(sizeof prefix + compressed_buffer.size() + sizeof suffix);
-		return writer.write(prefix) && writer.write(compressed_buffer.data(), compressed_buffer.size()) && writer.write(suffix);
+		return writer.try_reserve(sizeof prefix + compressed_buffer.size() + sizeof suffix)
+			&& writer.write(prefix)
+			&& writer.write(compressed_buffer.data(), compressed_buffer.size())
+			&& writer.write(suffix);
 	}
 }

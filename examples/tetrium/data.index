@@ -14,5 +14,5 @@ package
 	"data/i18n/ru.ion"
 	"data/icon.ico"
 	"data/music/music.ogg"
-	"data/textures/background.jpeg"
+	"data/textures/background.jpg"
 ]

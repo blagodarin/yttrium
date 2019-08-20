@@ -28,10 +28,5 @@ namespace Yt
 		return string.size() >= with.size() && string.substr(string.size() - with.size()) == with;
 	}
 
-	Y_CORE_API bool from_chars(std::string_view, int32_t&) noexcept;
-	Y_CORE_API bool from_chars(std::string_view, uint32_t&) noexcept;
-	Y_CORE_API bool from_chars(std::string_view, float&) noexcept;
-	Y_CORE_API bool from_chars(std::string_view, double&) noexcept;
-
 	Y_CORE_API int time_from_chars(std::string_view) noexcept;
 }

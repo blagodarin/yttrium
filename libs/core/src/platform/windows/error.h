@@ -24,6 +24,7 @@
 namespace Yt
 {
 	Y_CORE_API std::string error_to_string(unsigned long, std::string_view fallback_message = {});
+	Y_CORE_API void log_error(const char* function, unsigned long error) noexcept;
 	Y_CORE_API void log_last_error(const char* function) noexcept;
 	Y_CORE_API void throw_last_error(std::string_view function);
 }

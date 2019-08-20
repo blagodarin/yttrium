@@ -112,7 +112,7 @@ TEST_CASE("utils_string.from_chars.int32")
 	CHECK(!from_chars("A", i));
 }
 
-TEST_CASE("utils_string.to_number.uint32")
+TEST_CASE("utils_string.from_chars.uint32")
 {
 	using Yt::from_chars;
 

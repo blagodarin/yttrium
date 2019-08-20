@@ -43,16 +43,13 @@ namespace Yt
 				report_errno("close");
 		}
 
-		size_t read_at(uint64_t offset, void* data, size_t size) const override
+		size_t read_at(uint64_t offset, void* data, size_t size) const noexcept override
 		{
 			const auto result = ::pread(_descriptor, data, size, static_cast<int64_t>(offset));
 			return result != -1 ? static_cast<size_t>(result) : 0;
 		}
 
-		uint64_t size() const noexcept override
-		{
-			return _size;
-		}
+		uint64_t size() const noexcept override { return _size; }
 
 	private:
 		const int _descriptor;
@@ -72,17 +69,7 @@ namespace Yt
 				report_errno("close");
 		}
 
-		void reserve(uint64_t) override
-		{
-		}
-
-		void resize(uint64_t size) override
-		{
-			if (::ftruncate(_descriptor, static_cast<int64_t>(size)) == -1)
-				throw std::system_error{ errno, std::generic_category() };
-		}
-
-		size_t write_at(uint64_t offset, const void* data, size_t size) override
+		size_t write_at(uint64_t offset, const void* data, size_t size) noexcept override
 		{
 			const auto result = ::pwrite(_descriptor, data, size, static_cast<int64_t>(offset));
 			return result != -1 ? static_cast<size_t>(result) : 0;

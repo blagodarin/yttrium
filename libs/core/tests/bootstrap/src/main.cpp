@@ -15,6 +15,7 @@
 // limitations under the License.
 //
 
+#include <yttrium/logger.h>
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/writer.h>
 #include "../../../src/image/formats/bmp.h"
@@ -35,6 +36,7 @@ namespace
 
 int main()
 {
+	Yt::Logger logger;
 	::make_gray8_test_image<16>().save(Yt::Writer{ "gradient8.tga" }, Yt::ImageFormat::Tga);
 	{
 		Yt::BmpFileHeader file_header;
@@ -60,9 +62,12 @@ int main()
 		if (writer.write(file_header) && writer.write(info_header))
 			::write_color_gradient(writer, false, Yt::ImageOrientation::XRightYDown);
 	}
-	if (const auto source = Yt::Source::from("gradient24.jpeg"))
-		if (const auto jpeg = Yt::Image::load(*source))
-			jpeg->save(Yt::Writer{ "gradient24.jpeg.tga" }, Yt::ImageFormat::Tga);
+	{
+		Yt::Buffer buffer;
+		::make_test_image(false, Yt::ImageOrientation::XRightYDown).save(Yt::Writer{ buffer }, Yt::ImageFormat::Jpeg);
+		Yt::Writer{ "gradient24.jpg" }.write_all(buffer);
+		Yt::Image::load(*Yt::Source::from(std::move(buffer)))->save(Yt::Writer{ "gradient24.jpg.tga" }, Yt::ImageFormat::Tga);
+	}
 	::make_test_image(false, Yt::ImageOrientation::XRightYDown).save(Yt::Writer{ "gradient24.png" }, Yt::ImageFormat::Png);
 	::make_test_image(false, Yt::ImageOrientation::XRightYDown).save(Yt::Writer{ "gradient24.tga" }, Yt::ImageFormat::Tga);
 	{

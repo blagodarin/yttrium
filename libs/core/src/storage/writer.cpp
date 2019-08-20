@@ -15,6 +15,7 @@
 // limitations under the License.
 //
 
+#include <yttrium/storage/writer.h>
 #include "writer.h"
 
 #include <yttrium/memory/buffer.h>
@@ -22,7 +23,6 @@
 #include <yttrium/storage/temporary_file.h>
 #include "../platform/file.h"
 
-#include <algorithm>
 #include <cassert>
 #include <cstring>
 #include <limits>
@@ -32,31 +32,24 @@ namespace Yt
 	BufferWriter::BufferWriter(Buffer& buffer) noexcept
 		: _buffer{ buffer }
 	{
-		_buffer.resize(0);
+		_buffer.clear();
 	}
 
-	void BufferWriter::reserve(uint64_t size)
+	bool BufferWriter::try_reserve(uint64_t size) noexcept
 	{
-		if (size > std::numeric_limits<size_t>::max())
-			throw std::bad_alloc{};
-		_buffer.reserve(static_cast<size_t>(size));
+		return size <= std::numeric_limits<size_t>::max()
+			&& _buffer.try_reserve(static_cast<size_t>(size));
 	}
 
-	void BufferWriter::resize(uint64_t size)
+	size_t BufferWriter::write_at(uint64_t offset64, const void* data, size_t size) noexcept
 	{
-		if (size > std::numeric_limits<size_t>::max())
-			throw std::bad_alloc{};
-		_buffer.resize(static_cast<size_t>(size));
-	}
-
-	size_t BufferWriter::write_at(uint64_t offset, const void* data, size_t size)
-	{
-		assert(offset <= std::numeric_limits<size_t>::max());
-		if (size > std::numeric_limits<size_t>::max() - offset)
-			throw std::bad_alloc{};
-		const auto required_size = static_cast<size_t>(offset + size);
-		if (required_size > _buffer.size())
-			_buffer.resize(required_size);
+		assert(offset64 <= std::numeric_limits<size_t>::max());
+		const auto offset = static_cast<size_t>(offset64);
+		if (const auto max_size = std::numeric_limits<size_t>::max() - offset; size > max_size)
+			size = max_size;
+		const auto required_size = offset + size;
+		if (required_size > _buffer.size() && !_buffer.try_resize(required_size))
+			size = _buffer.size() - offset;
 		std::memcpy(_buffer.begin() + offset, data, size);
 		return size;
 	}
@@ -76,24 +69,17 @@ namespace Yt
 	{
 	}
 
-	uint64_t Writer::offset() const
+	uint64_t Writer::offset() const noexcept
 	{
 		return _private ? _private->_offset : 0;
 	}
 
-	void Writer::reserve(uint64_t size)
+	bool Writer::try_reserve(uint64_t size) noexcept
 	{
-		if (_private)
-			_private->reserve(size);
+		return _private && _private->try_reserve(size);
 	}
 
-	void Writer::resize(uint64_t size)
-	{
-		if (_private)
-			_private->resize(size);
-	}
-
-	bool Writer::seek(uint64_t offset)
+	bool Writer::seek(uint64_t offset) noexcept
 	{
 		if (!_private || offset > _private->_size)
 			return false;
@@ -101,22 +87,23 @@ namespace Yt
 		return true;
 	}
 
-	uint64_t Writer::size() const
+	uint64_t Writer::size() const noexcept
 	{
 		return _private ? _private->_size : 0;
 	}
 
-	size_t Writer::write(const void* data, size_t size)
+	size_t Writer::write(const void* data, size_t size) noexcept
 	{
 		if (!_private)
 			return 0;
-		const auto result = write_at(_private->_offset, data, size);
+		const auto result = _private->write_at(_private->_offset, data, size);
 		_private->_offset += result;
-		_private->_size = std::max(_private->_size, _private->_offset);
+		if (_private->_size < _private->_offset)
+			_private->_size = _private->_offset;
 		return result;
 	}
 
-	bool Writer::write_all(const Buffer& buffer)
+	bool Writer::write_all(const Buffer& buffer) noexcept
 	{
 		return write(buffer.data(), buffer.size()) == buffer.size();
 	}
@@ -137,23 +124,8 @@ namespace Yt
 		return total_size == source.size();
 	}
 
-	bool Writer::write_all(std::string_view string)
-	{
-		return write(string.data(), string.size()) == string.size();
-	}
-
-	size_t Writer::write_at(uint64_t offset, const void* data, size_t size)
-	{
-		if (!_private || offset > _private->_size)
-			return 0;
-		const auto result = _private->write_at(offset, data, size);
-		if (result > 0)
-			_private->_size = std::max(_private->_size, offset + result);
-		return result;
-	}
-
 	Writer::Writer() noexcept = default;
 	Writer::Writer(Writer&&) noexcept = default;
-	Writer::~Writer() = default;
+	Writer::~Writer() noexcept = default;
 	Writer& Writer::operator=(Writer&&) noexcept = default;
 }

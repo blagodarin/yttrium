@@ -35,6 +35,7 @@ namespace Yt
 	class RenderBackend;
 	class RenderBuiltin;
 	class RenderProgram;
+	struct RenderReport;
 
 	enum class RenderMatrixType
 	{
@@ -69,7 +70,7 @@ namespace Yt
 	class RenderPassImpl : public RenderPass
 	{
 	public:
-		RenderPassImpl(RenderBackend&, RenderBuiltin&, RenderPassData&, const Size& window_size);
+		RenderPassImpl(RenderBackend&, RenderBuiltin&, RenderPassData&, const Size& window_size, RenderReport&);
 		~RenderPassImpl() noexcept override;
 
 		void add_debug_text(std::string_view) override;
@@ -84,16 +85,6 @@ namespace Yt
 		SizeF window_size() const override;
 
 	public:
-		struct Statistics
-		{
-			size_t _triangles = 0;
-			size_t _draw_calls = 0;
-			size_t _texture_switches = 0;
-			size_t _redundant_texture_switches = 0;
-			size_t _shader_switches = 0;
-			size_t _redundant_shader_switches = 0;
-		};
-
 		RenderBuiltin& builtin() const noexcept { return _builtin; }
 		void draw_debug_text();
 		void draw_rect(const RectF& position, const Color4f&, const RectF& texture);
@@ -106,7 +97,6 @@ namespace Yt
 		void push_projection_3d(const Matrix4& projection, const Matrix4& view);
 		Flags<Texture2D::Filter> push_texture(const Texture2D*, Flags<Texture2D::Filter>);
 		void push_transformation(const Matrix4&);
-		Statistics statistics() const noexcept { return _statistics; }
 
 	private:
 		struct Batch2D;
@@ -114,7 +104,7 @@ namespace Yt
 		const BackendTexture2D* current_texture_2d() const;
 		void draw_rect(const RectF& position, const Color4f&, const RectF& texture, const MarginsF& borders);
 		void flush_2d() noexcept;
-		Batch2D prepare_batch_2d(std::size_t vertex_count, std::size_t index_count);
+		Batch2D prepare_batch_2d(size_t vertex_count, size_t index_count);
 		void reset_texture_state();
 		void update_state();
 
@@ -123,6 +113,7 @@ namespace Yt
 		RenderBuiltin& _builtin;
 		RenderPassData& _data;
 		const SizeF _window_size;
+		RenderReport& _report;
 
 		const Texture2D* _current_texture = nullptr;
 		Flags<Texture2D::Filter> _current_texture_filter = Texture2D::NearestFilter;
@@ -132,7 +123,5 @@ namespace Yt
 
 		const RenderProgram* _current_program = nullptr;
 		bool _reset_program = false;
-
-		Statistics _statistics;
 	};
 }

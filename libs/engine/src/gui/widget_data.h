@@ -115,6 +115,7 @@ namespace Yt
 		std::map<Action, GuiActions> _actions;
 		std::optional<Style> _fixed_style;
 		std::string _text;
+		bool _track_hover = false;
 
 		void run(GuiPrivate&, Action) const;
 		StyleData& style_data(Style);

@@ -59,17 +59,20 @@ namespace Yt
 		return make_string("[0x", Hex32{ code }, "].");
 	}
 
+	void log_error(const char* function, unsigned long error) noexcept
+	{
+		std::array<char, Logger::MaxMessageSize + 1> buffer;
+		if (const auto description = ::windows_error_description(error))
+			std::snprintf(buffer.data(), buffer.size(), "[%s] (0x%08X) %s", function, static_cast<unsigned>(error), description.get());
+		else
+			std::snprintf(buffer.data(), buffer.size(), "[%s] (0x%08X)", function, static_cast<unsigned>(error));
+		Logger::write(buffer.data());
+	}
+
 	void log_last_error(const char* function) noexcept
 	{
 		if (const auto error = ::GetLastError(); error != ERROR_SUCCESS)
-		{
-			std::array<char, Logger::MaxMessageSize + 1> buffer;
-			if (const auto description = ::windows_error_description(error))
-				std::snprintf(buffer.data(), buffer.size(), "(ERROR) %s failed: [0x%08X] %s", function, static_cast<unsigned>(error), description.get());
-			else
-				std::snprintf(buffer.data(), buffer.size(), "(ERROR) %s failed: [0x%08X].", function, static_cast<unsigned>(error));
-			Logger::write(buffer.data());
-		}
+			log_error(function, error);
 	}
 
 	void throw_last_error(std::string_view function)

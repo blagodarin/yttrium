@@ -28,7 +28,7 @@ environment:
       ARCH: amd64
       DLL: ON
       TESTS: ON
-      Y3: catch2,freetype,vorbis,opengl
+      Y3: catch2,freetype,jpeg,vorbis,opengl
       BENCHMARK: OFF
       PUBLISH: ON
 
@@ -37,7 +37,7 @@ environment:
       ARCH: amd64
       DLL: ON
       TESTS: ON
-      Y3: catch2,freetype,vorbis,opengl
+      Y3: catch2,freetype,jpeg,vorbis,opengl
       BENCHMARK: OFF
       PUBLISH: OFF
 
@@ -46,7 +46,7 @@ environment:
       ARCH: amd64
       DLL: OFF
       TESTS: ON
-      Y3: catch2,freetype,vorbis,opengl
+      Y3: catch2,freetype,jpeg,vorbis,opengl
       BENCHMARK: OFF
       PUBLISH: OFF
 
@@ -55,7 +55,7 @@ environment:
       ARCH: amd64
       DLL: OFF
       TESTS: ON
-      Y3: catch2,freetype,vorbis,opengl
+      Y3: catch2,freetype,jpeg,vorbis,opengl
       BENCHMARK: OFF
       PUBLISH: OFF
 
@@ -66,7 +66,7 @@ environment:
       ARCH: x86
       DLL: ON
       TESTS: OFF
-      Y3: freetype,vorbis
+      Y3: freetype,jpeg,vorbis
       BENCHMARK: OFF
       PUBLISH: OFF
 

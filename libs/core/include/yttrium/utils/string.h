@@ -58,6 +58,12 @@ namespace Yt
 	}
 
 	///
+	Y_CORE_API bool from_chars(std::string_view, int32_t&) noexcept;
+	Y_CORE_API bool from_chars(std::string_view, uint32_t&) noexcept;
+	Y_CORE_API bool from_chars(std::string_view, float&) noexcept;
+	Y_CORE_API bool from_chars(std::string_view, double&) noexcept;
+
+	///
 	template <typename... Args>
 	std::string make_string(Args&&... args)
 	{

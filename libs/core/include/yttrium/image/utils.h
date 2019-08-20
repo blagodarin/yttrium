@@ -17,29 +17,15 @@
 
 #pragma once
 
-#include <yttrium/image/image.h>
+#include <yttrium/api.h>
 
-#include <cstring>
+#include <functional>
 
 namespace Yt
 {
-	inline bool operator==(const Image& a, const Image& b) noexcept
-	{
-		const auto info = a.info();
-		if (info != b.info())
-			return false;
-		for (std::size_t y = 0; y < info.height(); ++y)
-		{
-			const auto a_row = static_cast<const std::uint8_t*>(a.data()) + y * info.stride();
-			const auto b_row = static_cast<const std::uint8_t*>(b.data()) + y * info.stride();
-			if (std::memcmp(a_row, b_row, info.width() * ImageInfo::pixel_size(info.pixel_format())))
-				return false;
-		}
-		return true;
-	}
+	class Bgra32;
+	class Buffer;
 
-	inline bool operator!=(const Image& a, const Image& b) noexcept
-	{
-		return !(a == b);
-	}
+	//!
+	Y_CORE_API Buffer make_bgra32_tga(size_t width, size_t height, const std::function<Yt::Bgra32(size_t, size_t)>& callback);
 }

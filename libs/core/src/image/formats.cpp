@@ -17,11 +17,12 @@
 
 #include "formats.h"
 
-#include <yttrium/image.h>
+#include <yttrium/image/image.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/storage/source.h>
 #include <yttrium/utils/numeric.h>
 
+#include <algorithm>
 #include <new>
 
 namespace Yt
@@ -32,8 +33,8 @@ namespace Yt
 		{
 			struct
 			{
-				std::uint16_t ab = 0;
-				std::uint16_t cd = 0;
+				uint16_t ab = 0;
+				uint16_t cd = 0;
 			} signature;
 			static_assert(sizeof signature == 4);
 			if (!source.read_at(0, signature))
@@ -79,12 +80,8 @@ namespace Yt
 			break;
 		case ImageFormat::Jpeg:
 		{
-			// Pad JPEG image with extra End-Of-Image marker so we can get rid
-			// of the "are we finished?" check during bitstream decoding.
-			auto input = source.to_buffer(2);
-			input.end()[0] = 0xff;
-			input.end()[1] = 0xd9;
-			return read_jpeg(input.data(), input.size() + 2, info, buffer, Upsampling::Linear);
+			auto input = source.to_buffer();
+			return read_jpeg(input.data(), input.size(), info, buffer);
 		}
 		case ImageFormat::Dds:
 			if (!read_dds_header(reader, info))
@@ -103,22 +100,17 @@ namespace Yt
 		}
 
 		const auto frame_size = info.frame_size();
-		try
-		{
-			buffer.reset(frame_size);
-		}
-		catch (const std::bad_alloc&)
-		{
-			return false;
-		}
-		return reader.read(buffer.data(), frame_size) == frame_size;
+		return buffer.try_reset(frame_size)
+			&& reader.read(buffer.data(), frame_size) == frame_size;
 	}
 
-	bool write_image(Writer& writer, ImageFormat format, const ImageInfo& info, const void* data)
+	bool write_image(Writer&& writer, ImageFormat format, int quality, const ImageInfo& info, const void* data)
 	{
+		quality = std::clamp(quality, 0, 100);
 		switch (format)
 		{
 		case ImageFormat::Tga: return write_tga(writer, info, data);
+		case ImageFormat::Jpeg: return write_jpeg(writer, info, data, quality);
 		case ImageFormat::Png: return write_png(writer, info, data);
 		default: return false;
 		}
