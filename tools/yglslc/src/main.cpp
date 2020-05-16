@@ -23,7 +23,7 @@
 #include <iostream>
 #include <vector>
 
-#include <SPIRV/GlslangToSpv.h>
+#include <glslang/SPIRV/GlslangToSpv.h>
 
 namespace
 {
