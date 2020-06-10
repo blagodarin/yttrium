@@ -1,6 +1,6 @@
 #
 # This file is part of the Yttrium toolkit.
-# Copyright (C) 2019 Sergei Blagodarin.
+# Copyright (C) 2020 Sergei Blagodarin.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -152,13 +152,15 @@ function(y3_git_clone _url)
 		file(REMOVE_RECURSE ${_dir})
 	endif()
 	unset(_clone_options)
-	if(NOT _arg_COMMIT)
+	if(_arg_COMMIT)
+		list(APPEND _clone_options --no-checkout)
+	else()
 		list(APPEND _clone_options --depth 1)
 	endif()
-	y3_run(COMMAND ${GIT_EXECUTABLE} clone ${_clone_options} ${_url}
+	y3_run(COMMAND ${GIT_EXECUTABLE} clone ${_clone_options} ${_url} ${_arg_DIR}
 		WORKING_DIRECTORY ${BUILD_DIR})
 	if(_arg_COMMIT)
-		y3_run(COMMAND ${GIT_EXECUTABLE} reset --hard ${_arg_COMMIT}
+		y3_run(COMMAND ${GIT_EXECUTABLE} checkout ${_arg_COMMIT}
 			WORKING_DIRECTORY ${_dir})
 	endif()
 endfunction()
@@ -217,6 +219,7 @@ endfunction()
 
 y3_package(vorbis REQUIRES ogg)
 y3_package(jpeg REQUIRES nasm)
+y3_package(aulos)
 y3_package(catch2)
 y3_package(cppcheck)
 y3_package(freetype)
@@ -229,6 +232,18 @@ y3_package(opengl)
 y3_package(vulkan)
 
 y3_bootstrap()
+
+if("aulos" IN_LIST _y3_packages)
+	set(_version "0.0.4")
+	set(_package "aulos-${_version}")
+	y3_git_clone("https://github.com/blagodarin/aulos.git" DIR ${_package} TAG "3af3251f854a5c87e680b99779a425c31f803338") # 0.0.4 with fixed output paths.
+	y3_cmake(${_package} TARGET "aulos")
+	file(INSTALL
+		${BUILD_DIR}/${_package}/aulos/common.hpp
+		${BUILD_DIR}/${_package}/aulos/composition.hpp
+		${BUILD_DIR}/${_package}/aulos/data.hpp
+		DESTINATION ${PREFIX_DIR}/include/aulos)
+endif()
 
 if("catch2" IN_LIST _y3_packages)
 	set(_version "2.12.1")

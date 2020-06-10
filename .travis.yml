@@ -9,7 +9,7 @@ matrix:
     - os: linux
       dist: xenial
       compiler: clang
-      env: CLANG=8 CONFIG=Debug DLL=ON RENDERER=null Y3=catch2,cppcheck,jpeg ANALYZE=1
+      env: CLANG=8 CONFIG=Debug DLL=ON RENDERER=null Y3=aulos,catch2,cppcheck,jpeg ANALYZE=1
       addons:
         apt:
           sources: &all_sources
@@ -32,7 +32,7 @@ matrix:
     - os: linux
       dist: xenial
       compiler: gcc
-      env: GCC=9 CONFIG=Release DLL=OFF RENDERER=null Y3=catch2,jpeg BENCHMARK=1
+      env: GCC=9 CONFIG=Release DLL=OFF RENDERER=null Y3=aulos,catch2,jpeg BENCHMARK=1
       addons: &gcc9_xcb
         apt:
           sources: *all_sources
@@ -50,13 +50,13 @@ matrix:
     - os: linux
       dist: xenial
       compiler: gcc
-      env: GCC=9 CONFIG=Debug DLL=ON RENDERER=null Y3=catch2,jpeg,lcov COVERAGE=1
+      env: GCC=9 CONFIG=Debug DLL=ON RENDERER=null Y3=aulos,catch2,jpeg,lcov COVERAGE=1
       addons: *gcc9_xcb
 
     - os: linux
       dist: xenial
       compiler: gcc
-      env: GCC=9 CONFIG=Release DLL=OFF RENDERER=opengl Y3=catch2,jpeg
+      env: GCC=9 CONFIG=Release DLL=OFF RENDERER=opengl Y3=aulos,catch2,jpeg
       addons: &gcc9_x11
         apt:
           sources: *all_sources
@@ -71,25 +71,25 @@ matrix:
     - os: linux
       dist: xenial
       compiler: gcc
-      env: GCC=9 CONFIG=Debug DLL=ON RENDERER=opengl Y3=catch2,jpeg
+      env: GCC=9 CONFIG=Debug DLL=ON RENDERER=opengl Y3=aulos,catch2,jpeg
       addons: *gcc9_x11
 
     - os: linux
       dist: xenial
       compiler: gcc
-      env: GCC=9 CONFIG=Release DLL=OFF RENDERER=vulkan Y3=catch2,glslang,jpeg,vulkan
+      env: GCC=9 CONFIG=Release DLL=OFF RENDERER=vulkan Y3=aulos,catch2,glslang,jpeg,vulkan
       addons: *gcc9_xcb
 
     - os: linux
       dist: xenial
       compiler: gcc
-      env: GCC=9 CONFIG=Debug DLL=ON RENDERER=vulkan Y3=catch2,glslang,jpeg,vulkan
+      env: GCC=9 CONFIG=Debug DLL=ON RENDERER=vulkan Y3=aulos,catch2,glslang,jpeg,vulkan
       addons: *gcc9_xcb
 
     - os: linux
       dist: xenial
       compiler: clang
-      env: CLANG=8 CONFIG=Release DLL=OFF RENDERER=null Y3=catch2,jpeg BENCHMARK=1
+      env: CLANG=8 CONFIG=Release DLL=OFF RENDERER=null Y3=aulos,catch2,jpeg BENCHMARK=1
       addons: &clang_xcb
         apt:
           sources: *all_sources
@@ -108,7 +108,7 @@ matrix:
     - os: linux
       dist: xenial
       compiler: clang
-      env: CLANG=8 CONFIG=Release DLL=OFF RENDERER=opengl Y3=catch2,jpeg
+      env: CLANG=8 CONFIG=Release DLL=OFF RENDERER=opengl Y3=aulos,catch2,jpeg
       addons: &clang_x11
         apt:
           sources: *all_sources
@@ -124,19 +124,19 @@ matrix:
     - os: linux
       dist: xenial
       compiler: clang
-      env: CLANG=8 CONFIG=Debug DLL=ON RENDERER=opengl Y3=catch2,jpeg
+      env: CLANG=8 CONFIG=Debug DLL=ON RENDERER=opengl Y3=aulos,catch2,jpeg
       addons: *clang_x11
 
     - os: linux
       dist: xenial
       compiler: clang
-      env: CLANG=8 CONFIG=Release DLL=OFF RENDERER=vulkan Y3=catch2,glslang,jpeg,vulkan
+      env: CLANG=8 CONFIG=Release DLL=OFF RENDERER=vulkan Y3=aulos,catch2,glslang,jpeg,vulkan
       addons: *clang_xcb
 
     - os: linux
       dist: xenial
       compiler: clang
-      env: CLANG=8 CONFIG=Debug DLL=ON RENDERER=vulkan Y3=catch2,glslang,jpeg,vulkan
+      env: CLANG=8 CONFIG=Debug DLL=ON RENDERER=vulkan Y3=aulos,catch2,glslang,jpeg,vulkan
       addons: *clang_xcb
 
 before_install:
@@ -156,7 +156,7 @@ script:
   - if [ -z "${ANALYZE}" ] && [ -z "${BENCHMARK}" ] && [ -z "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DENABLE_SANITIZERS=ON"; fi
   - if [ -n "${ANALYZE}" ]; then CMAKE_OPTIONS+=" -DENABLE_CLANG_FORMAT=ON -DENABLE_CLANG_TIDY=ON -DENABLE_CPPCHECK=ON -DENABLE_DIFF=ON"; fi
   - if [ -n "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DENABLE_COVERAGE=ON -DENABLE_COVERAGE_LCOV=ON"; fi
-  - cmake -H. -B"${HOME}/yttrium.build" -G"Ninja" -DBUILD_SHARED_LIBS=${DLL} -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=${CONFIG} -DCMAKE_INSTALL_PREFIX="${HOME}/yttrium.install" -DCMAKE_PREFIX_PATH="${HOME}/y3.prefix" -DY_RENDERER=${RENDERER} ${CMAKE_OPTIONS}
+  - cmake -H. -B"${HOME}/yttrium.build" -G"Ninja" -DBUILD_SHARED_LIBS=${DLL} -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=${CONFIG} -DCMAKE_INSTALL_PREFIX="${HOME}/yttrium.install" -DCMAKE_PREFIX_PATH="${HOME}/y3.prefix" -DY_RENDERER=${RENDERER} -DY_USE_OGG_VORBIS=OFF ${CMAKE_OPTIONS}
   - pushd "${HOME}/yttrium.build"
   - if [ -n "${ANALYZE}" ]; then cmake --build . --target cppcheck; fi
   - if [ -n "${ANALYZE}" ]; then cmake --build . --target tidy; fi

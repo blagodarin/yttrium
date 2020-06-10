@@ -10,7 +10,7 @@ environment:
       ARCH: x86
       DLL: OFF
       TESTS: ON
-      Y3: catch2,freetype,jpeg,vorbis
+      Y3: aulos,catch2,freetype,jpeg
       BENCHMARK: ON
       PUBLISH: OFF
 
@@ -19,7 +19,7 @@ environment:
       ARCH: amd64
       DLL: OFF
       TESTS: ON
-      Y3: catch2,freetype,jpeg,vorbis
+      Y3: aulos,catch2,freetype,jpeg
       BENCHMARK: ON
       PUBLISH: OFF
 
@@ -28,7 +28,7 @@ environment:
       ARCH: amd64
       DLL: ON
       TESTS: ON
-      Y3: catch2,freetype,jpeg,vorbis,opengl
+      Y3: aulos,catch2,freetype,jpeg,opengl
       BENCHMARK: OFF
       PUBLISH: ON
 
@@ -37,7 +37,7 @@ environment:
       ARCH: amd64
       DLL: ON
       TESTS: ON
-      Y3: catch2,freetype,jpeg,vorbis,opengl
+      Y3: aulos,catch2,freetype,jpeg,opengl
       BENCHMARK: OFF
       PUBLISH: OFF
 
@@ -46,7 +46,7 @@ environment:
       ARCH: amd64
       DLL: OFF
       TESTS: ON
-      Y3: catch2,freetype,jpeg,vorbis,opengl
+      Y3: aulos,catch2,freetype,jpeg,opengl
       BENCHMARK: OFF
       PUBLISH: OFF
 
@@ -55,7 +55,7 @@ environment:
       ARCH: amd64
       DLL: OFF
       TESTS: ON
-      Y3: catch2,freetype,jpeg,vorbis,opengl
+      Y3: aulos,catch2,freetype,jpeg,opengl
       BENCHMARK: OFF
       PUBLISH: OFF
 
@@ -66,7 +66,7 @@ environment:
       ARCH: x86
       DLL: ON
       TESTS: OFF
-      Y3: freetype,jpeg,vorbis
+      Y3: aulos,freetype,jpeg
       BENCHMARK: OFF
       PUBLISH: OFF
 
@@ -88,10 +88,10 @@ build_script:
   - set BUILD_DIR=%APPVEYOR_BUILD_FOLDER%\_build
   - set INSTALL_DIR=%APPVEYOR_BUILD_FOLDER%\_install
   - mkdir %BUILD_DIR% && cd %BUILD_DIR%
-  - if "%TESTS%"=="ON" cmake -G Ninja %APPVEYOR_BUILD_FOLDER% -DBUILD_BENCHMARKS=%BENCHMARK% -DBUILD_EXAMPLES=ON -DBUILD_SHARED_LIBS=%DLL% -DBUILD_TESTS=%TESTS% -DCMAKE_BUILD_TYPE=%CONFIG% -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% -DCMAKE_PREFIX_PATH=%PREFIX_DIR% -DINSTALL_EXAMPLES=%PUBLISH% -DY_RENDERER=%RENDERER%
+  - if "%TESTS%"=="ON" cmake -G Ninja %APPVEYOR_BUILD_FOLDER% -DBUILD_BENCHMARKS=%BENCHMARK% -DBUILD_EXAMPLES=ON -DBUILD_SHARED_LIBS=%DLL% -DBUILD_TESTS=%TESTS% -DCMAKE_BUILD_TYPE=%CONFIG% -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% -DCMAKE_PREFIX_PATH=%PREFIX_DIR% -DINSTALL_EXAMPLES=%PUBLISH% -DY_RENDERER=%RENDERER% -DY_USE_OGG_VORBIS=OFF
   - if "%TESTS%"=="ON" cmake --build .
   - if "%TESTS%"=="ON" cmake --build . --target install
-  - if not "%TESTS%"=="ON" cmake -G "Visual Studio 16 2019" -A Win32 %APPVEYOR_BUILD_FOLDER% -DBUILD_BENCHMARKS=%BENCHMARK% -DBUILD_EXAMPLES=ON -DBUILD_SHARED_LIBS=%DLL% -DBUILD_TESTS=%TESTS% -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% -DCMAKE_PREFIX_PATH=%PREFIX_DIR% -DINSTALL_EXAMPLES=%PUBLISH% -DY_RENDERER=%RENDERER%
+  - if not "%TESTS%"=="ON" cmake -G "Visual Studio 16 2019" -A Win32 %APPVEYOR_BUILD_FOLDER% -DBUILD_BENCHMARKS=%BENCHMARK% -DBUILD_EXAMPLES=ON -DBUILD_SHARED_LIBS=%DLL% -DBUILD_TESTS=%TESTS% -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% -DCMAKE_PREFIX_PATH=%PREFIX_DIR% -DINSTALL_EXAMPLES=%PUBLISH% -DY_RENDERER=%RENDERER% -DY_USE_OGG_VORBIS=OFF
   - if not "%TESTS%"=="ON" cmake --build . --config Debug -- /nologo "/verbosity:minimal"
   - if not "%TESTS%"=="ON" cmake --build . --config Release -- /nologo "/verbosity:minimal"
   - if not "%TESTS%"=="ON" cmake --build . --config Release --target install -- /nologo "/verbosity:minimal"
