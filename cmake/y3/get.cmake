@@ -246,11 +246,11 @@ if("aulos" IN_LIST _y3_packages)
 endif()
 
 if("catch2" IN_LIST _y3_packages)
-	set(_version "2.12.1")
+	set(_version "2.12.2")
 	set(_package "Catch2-${_version}")
 	y3_download("https://github.com/catchorg/Catch2/archive/v${_version}.tar.gz"
 		NAME "${_package}.tar.gz"
-		SHA1 "52ace7f07fc83552bc4458430b0520479018e302")
+		SHA1 "3244a6cd2d63498c3dd1f46c6326a6fac5ab110a")
 	y3_extract("${_package}.tar.gz" DIR ${_package})
 	y3_cmake(${_package} HEADER_ONLY
 		OPTIONS -DCATCH_BUILD_TESTING=OFF -DCATCH_INSTALL_DOCS=OFF -DCATCH_INSTALL_HELPERS=OFF -DPKGCONFIG_INSTALL_DIR=${CMAKE_BINARY_DIR}/.trash)

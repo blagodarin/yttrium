@@ -30,6 +30,11 @@ endif()
 include_config(test_engine ${PROJECT_BINARY_DIR}/config.h)
 target_link_libraries(test_engine PRIVATE ycore yengine ytest)
 set_target_properties(test_engine PROPERTIES FOLDER "tests")
+if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+	target_compile_options(test_engine PRIVATE
+		/wd5204 # class has virtual functions, but its trivial destructor is not virtual; instances of objects derived from this class may not be destructed correctly
+		)
+endif()
 
 add_test(NAME engine COMMAND test_engine --reporter compact)
 add_custom_target(check_engine

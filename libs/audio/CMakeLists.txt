@@ -57,6 +57,11 @@ if(WIN32)
 		src/backends/wasapi.cpp
 		src/backends/wasapi.h
 		)
+	if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+		set_property(SOURCE src/backends/wasapi.cpp APPEND PROPERTY COMPILE_OPTIONS
+			/wd5204 # class has virtual functions, but its trivial destructor is not virtual; instances of objects derived from this class may not be destructed correctly
+			)
+	endif()
 else()
 	find_package(ALSA REQUIRED)
 	target_link_libraries(yaudio PRIVATE ALSA::ALSA)

@@ -173,6 +173,11 @@ elseif(WIN32)
 		src/platform/windows/temporary_file.cpp
 		src/platform/windows/virtual_memory.cpp
 		)
+	if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+		set_property(SOURCE src/platform/windows/com.cpp APPEND PROPERTY COMPILE_OPTIONS
+			/wd5204 # class has virtual functions, but its trivial destructor is not virtual; instances of objects derived from this class may not be destructed correctly
+			)
+	endif()
 endif()
 
 y_sources(ycore "src/script"

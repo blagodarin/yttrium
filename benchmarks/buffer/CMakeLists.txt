@@ -25,6 +25,11 @@ source_group("src" FILES ${_src})
 target_compile_definitions(benchmark_buffer PRIVATE CATCH_CONFIG_ENABLE_BENCHMARKING)
 target_link_libraries(benchmark_buffer PRIVATE ycore ytest)
 set_target_properties(benchmark_buffer PROPERTIES FOLDER "benchmarks")
+if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+	target_compile_options(benchmark_buffer PRIVATE
+		/wd5204 # class has virtual functions, but its trivial destructor is not virtual; instances of objects derived from this class may not be destructed correctly
+		)
+endif()
 
 add_custom_target(b_buffer
 	COMMAND benchmark_buffer

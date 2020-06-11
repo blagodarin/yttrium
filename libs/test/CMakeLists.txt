@@ -32,3 +32,8 @@ target_compile_definitions(ytest PRIVATE CATCH_CONFIG_ENABLE_BENCHMARKING)
 target_include_directories(ytest PUBLIC include)
 target_link_libraries(ytest PUBLIC Catch2::Catch2 PRIVATE ycore)
 set_target_properties(ytest PROPERTIES FOLDER "libs")
+if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+	target_compile_options(ytest PRIVATE
+		/wd5204 # class has virtual functions, but its trivial destructor is not virtual; instances of objects derived from this class may not be destructed correctly
+		)
+endif()

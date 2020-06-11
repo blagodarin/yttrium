@@ -54,6 +54,11 @@ endif()
 include_config(test_core ${PROJECT_BINARY_DIR}/config.h)
 target_link_libraries(test_core PRIVATE ycore ytest)
 set_target_properties(test_core PROPERTIES FOLDER "tests")
+if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+	target_compile_options(test_core PRIVATE
+		/wd5204 # class has virtual functions, but its trivial destructor is not virtual; instances of objects derived from this class may not be destructed correctly
+		)
+endif()
 
 add_test(NAME core COMMAND test_core --reporter compact WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data)
 add_custom_target(check_core
