@@ -1,5 +1,8 @@
+constParameter
+constStatement
+constVariable
 internalAstError
 missingInclude
-syntaxError
+noValidConfiguration
 unusedFunction
 useStlAlgorithm

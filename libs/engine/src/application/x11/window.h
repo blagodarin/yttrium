@@ -22,6 +22,7 @@
 #include "glx.h"
 
 #include <optional>
+#include <string>
 
 namespace Yt
 {

@@ -218,6 +218,7 @@ namespace Yt
 	void ResourceLoader::release_unused()
 	{
 		_private->release_unused();
+		// cppcheck-suppress assertWithSideEffect
 		assert(!_private->release_unused());
 	}
 
