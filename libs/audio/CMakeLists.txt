@@ -1,6 +1,6 @@
 #
 # This file is part of the Yttrium toolkit.
-# Copyright (C) 2019 Sergei Blagodarin.
+# Copyright (C) 2020 Sergei Blagodarin.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+find_package(Aulos 0.0.4 REQUIRED)
 
 set(_src
 	src/backend.h
@@ -35,7 +37,7 @@ source_group("src" FILES ${_src})
 
 include_config(yaudio ${PROJECT_BINARY_DIR}/config.h)
 target_include_directories(yaudio PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-target_link_libraries(yaudio PRIVATE ycore Threads::Threads)
+target_link_libraries(yaudio PRIVATE ycore Aulos::aulos Threads::Threads)
 set_property(TARGET yaudio PROPERTY FOLDER "libs")
 if(BUILD_SHARED_LIBS)
 	set_property(TARGET yaudio PROPERTY DEFINE_SYMBOL Y_AUDIO_EXPORT)
@@ -72,6 +74,8 @@ else()
 endif()
 
 y_sources(yaudio "src/formats"
+	src/formats/aulos.cpp
+	src/formats/aulos.h
 	src/formats/wav.cpp
 	src/formats/wav.h
 	)

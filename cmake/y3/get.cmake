@@ -43,7 +43,7 @@ function(y3_run)
 endfunction()
 
 function(y3_cmake _dir)
-	cmake_parse_arguments(_arg "HEADER_ONLY" "TARGET" "CL;OPTIONS" ${ARGN})
+	cmake_parse_arguments(_arg "HEADER_ONLY;SIMPLE" "TARGET" "CL;OPTIONS" ${ARGN})
 	set(_source_dir ${BUILD_DIR}/${_dir})
 	if(_arg_HEADER_ONLY)
 		set(_configs ${_y3_config})
@@ -60,22 +60,23 @@ function(y3_cmake _dir)
 		set(_env_cl "CL=$ENV{CL} ${_cl}")
 	endif()
 	foreach(_config ${_configs})
-		if(WIN32)
-			set(_output_suffix "/${_config}")
-		else()
-			unset(_output_suffix)
+		set(_options -DCMAKE_BUILD_TYPE=${_config} -DCMAKE_INSTALL_PREFIX=${PREFIX_DIR})
+		if(NOT _arg_SIMPLE)
+			if(WIN32)
+				set(_output_suffix "/${_config}")
+			else()
+				unset(_output_suffix)
+			endif()
+			list(APPEND _options
+				-DCMAKE_ARCHIVE_OUTPUT_DIRECTORY=${PREFIX_DIR}/lib${_output_suffix}
+				-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=${PREFIX_DIR}/lib${_output_suffix}
+				-DCMAKE_RUNTIME_OUTPUT_DIRECTORY=${PREFIX_DIR}/bin)
+			if(WIN32)
+				list(APPEND _options -DCMAKE_COMPILE_PDB_OUTPUT_DIRECTORY=${PREFIX_DIR}/lib${_output_suffix})
+			endif()
 		endif()
-		set(_options
-			-DCMAKE_ARCHIVE_OUTPUT_DIRECTORY=${PREFIX_DIR}/lib${_output_suffix}
-			-DCMAKE_BUILD_TYPE=${_config}
-			-DCMAKE_INSTALL_PREFIX=${PREFIX_DIR}
-			-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=${PREFIX_DIR}/lib${_output_suffix}
-			-DCMAKE_RUNTIME_OUTPUT_DIRECTORY=${PREFIX_DIR}/bin)
 		if(PIC)
 			list(APPEND _options -DCMAKE_POSITION_INDEPENDENT_CODE=ON)
-		endif()
-		if(WIN32)
-			list(APPEND _options -DCMAKE_COMPILE_PDB_OUTPUT_DIRECTORY=${PREFIX_DIR}/lib${_output_suffix})
 		endif()
 		set(_build_dir ${_source_dir}-${_config})
 		if(EXISTS ${_build_dir})
@@ -236,13 +237,8 @@ y3_bootstrap()
 if("aulos" IN_LIST _y3_packages)
 	set(_version "0.0.4")
 	set(_package "aulos-${_version}")
-	y3_git_clone("https://github.com/blagodarin/aulos.git" DIR ${_package} TAG "3af3251f854a5c87e680b99779a425c31f803338") # 0.0.4 with fixed output paths.
-	y3_cmake(${_package} TARGET "aulos")
-	file(INSTALL
-		${BUILD_DIR}/${_package}/aulos/common.hpp
-		${BUILD_DIR}/${_package}/aulos/composition.hpp
-		${BUILD_DIR}/${_package}/aulos/data.hpp
-		DESTINATION ${PREFIX_DIR}/include/aulos)
+	y3_git_clone("https://github.com/blagodarin/aulos.git" DIR ${_package} TAG "f328318f0a97906927f5c0dc1225081f8c91a1b4") # 0.0.4 with fixed CMake scripts.
+	y3_cmake(${_package} SIMPLE)
 endif()
 
 if("catch2" IN_LIST _y3_packages)
