@@ -30,6 +30,7 @@ namespace Yt
 	{
 	public:
 		explicit AulosDecoder(std::unique_ptr<Source>&&);
+		~AulosDecoder() noexcept override;
 
 		size_t read_frames(void*, size_t) override;
 		bool seek_frame(uint64_t) override;

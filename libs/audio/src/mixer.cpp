@@ -71,7 +71,7 @@ namespace Yt
 		if (music == _music)
 			return;
 		if (music)
-			music->seek_frame(0);
+			music->restart();
 		_music = music;
 	}
 
@@ -79,7 +79,7 @@ namespace Yt
 	{
 		_sound = std::static_pointer_cast<SoundImpl>(sound);
 		if (_sound)
-			_sound->_reader.seek_frame(0);
+			_sound->_reader.restart();
 	}
 
 	bool AudioMixer::read(void* out, size_t out_frames, Buffer& in_buffer, AudioReader& reader)

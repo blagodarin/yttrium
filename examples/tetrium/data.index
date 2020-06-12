@@ -13,6 +13,7 @@ package
 	"data/i18n/en.ion"
 	"data/i18n/ru.ion"
 	"data/icon.ico"
-	"data/music/music.ogg"
+	"data/music/grande_valse_brillante.aulos"
+	"data/music/prelude_in_g_minor.aulos"
 	"data/textures/background.jpg"
 ]

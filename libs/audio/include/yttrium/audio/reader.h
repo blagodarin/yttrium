@@ -42,8 +42,8 @@ namespace Yt
 		///
 		size_t read_frames(void* buffer, size_t frames);
 
-		/// Moves the audio offset to the specified position in frames.
-		bool seek_frame(uint64_t frame);
+		///
+		void restart();
 
 		///
 		bool set_loop(std::chrono::milliseconds from, std::chrono::milliseconds to = std::chrono::milliseconds::max()) noexcept;

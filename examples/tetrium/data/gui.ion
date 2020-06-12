@@ -3,11 +3,14 @@ translation "data/i18n/en.ion"
 title `Tetrium`
 icon "data/icon.ico"
 
-music "default"
+music "menus"
 {
-	file "data/music/music.ogg"
-	end "1:18.40"
-	loop "0:04.95"
+	file "data/music/prelude_in_g_minor.aulos"
+}
+
+music "game"
+{
+	file "data/music/grande_valse_brillante.aulos"
 }
 
 font "source_sans_pro"

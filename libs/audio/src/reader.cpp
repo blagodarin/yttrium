@@ -19,6 +19,7 @@
 
 #include <yttrium/exceptions.h>
 #include <yttrium/utils/numeric.h>
+#include "formats/aulos.h"
 #include "formats/wav.h"
 
 #if Y_USE_OGG_VORBIS
@@ -43,7 +44,7 @@ namespace
 #if Y_USE_OGG_VORBIS
 			case Yt::make_cc('O', 'g', 'g', 'S'): return std::make_unique<Yt::OggVorbisDecoder>(std::move(source));
 #endif
-			default: break;
+			default: return std::make_unique<Yt::AulosDecoder>(std::move(source));
 			}
 		}
 		throw Yt::DataError{ "Unknown audio format" };
@@ -80,9 +81,9 @@ namespace Yt
 		}
 	}
 
-	bool AudioReader::seek_frame(uint64_t frame)
+	void AudioReader::restart()
 	{
-		return frame < _end_frame && _decoder->seek_frame(frame);
+		_decoder->seek_frame(0);
 	}
 
 	bool AudioReader::set_loop(std::chrono::milliseconds from, std::chrono::milliseconds to) noexcept

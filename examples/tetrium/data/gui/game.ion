@@ -17,6 +17,7 @@ screen "game"
 	on_key "esc" { enter "pause" }
 
 	cursor { none }
+	music "game"
 
 	stretch
 	{
