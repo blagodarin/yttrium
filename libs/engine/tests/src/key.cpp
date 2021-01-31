@@ -17,7 +17,7 @@
 
 #include "../../src/gui/key_lookup.h"
 
-#include <catch2/catch.hpp>
+#include <doctest.h>
 
 TEST_CASE("key_event")
 {

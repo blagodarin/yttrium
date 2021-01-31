@@ -20,7 +20,9 @@
 #include <yttrium/storage/source.h>
 #include "iostream.h"
 
-#include <catch2/catch.hpp>
+#include <memory>
+
+#include <doctest.h>
 
 TEST_CASE("reader.size")
 {
@@ -93,7 +95,7 @@ TEST_CASE("reader.read_line")
 		std::string comment;
 	};
 
-	SECTION("unbuffered")
+	SUBCASE("unbuffered")
 	{
 		static const Entry entries[]{
 			{ 17, "\n", "Short newline" },
@@ -104,7 +106,7 @@ TEST_CASE("reader.read_line")
 
 		for (const auto& entry : entries)
 		{
-			INFO(entry.comment)
+			INFO(entry.comment);
 			const std::string text(entry.text_size, 'A');
 			const std::string data = text + entry.newline;
 			const auto source = Yt::Source::from(data.data(), data.size());
@@ -119,7 +121,7 @@ TEST_CASE("reader.read_line")
 		}
 	}
 
-	SECTION("buffered")
+	SUBCASE("buffered")
 	{
 		static const Entry entries[]{
 			{ 31, "\n", "Short newline, one buffer" },
@@ -135,7 +137,7 @@ TEST_CASE("reader.read_line")
 
 		for (const auto& entry : entries)
 		{
-			INFO(entry.comment)
+			INFO(entry.comment);
 			const std::string text(entry.text_size, 'A');
 			const std::string data = text + entry.newline;
 			const auto source = Yt::Source::from(Yt::Source::from(data.data(), data.size()), 0, data.size());

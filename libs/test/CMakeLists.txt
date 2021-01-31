@@ -29,8 +29,8 @@ y_sources(ytest "include"
 
 include_config(ytest ${PROJECT_BINARY_DIR}/config.h)
 target_compile_definitions(ytest PRIVATE CATCH_CONFIG_ENABLE_BENCHMARKING)
-target_include_directories(ytest PUBLIC include)
-target_link_libraries(ytest PUBLIC Catch2::Catch2 PRIVATE ycore)
+target_include_directories(ytest PUBLIC include ${PROJECT_BINARY_DIR})
+target_link_libraries(ytest PRIVATE ycore)
 set_target_properties(ytest PROPERTIES FOLDER "libs")
 if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 	target_compile_options(ytest PRIVATE

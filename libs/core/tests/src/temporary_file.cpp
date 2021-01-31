@@ -20,7 +20,7 @@
 #include <yttrium/storage/temporary_file.h>
 #include <yttrium/storage/writer.h>
 
-#include <catch2/catch.hpp>
+#include <doctest.h>
 
 TEST_CASE("temporary_file")
 {

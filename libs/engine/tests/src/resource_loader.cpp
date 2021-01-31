@@ -23,7 +23,7 @@
 #include <yttrium/storage/storage.h>
 #include <yttrium/test/utils.h>
 
-#include <catch2/catch.hpp>
+#include <doctest.h>
 
 const std::string_view _translation_data = "tr \"foo\" \"bar\"";
 

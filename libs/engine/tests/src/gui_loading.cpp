@@ -26,7 +26,7 @@
 
 #include <unordered_map>
 
-#include <catch2/catch.hpp>
+#include <doctest.h>
 
 TEST_CASE("gui.load")
 {
@@ -54,12 +54,12 @@ TEST_CASE("gui.load")
 		source("root screen `` { } " + data);
 	};
 
-	SECTION("")
+	SUBCASE("")
 	{
 		CHECK_THROWS_AS(fragment("test"), GuiDataError);
 	}
 
-	SECTION("cursor")
+	SUBCASE("cursor")
 	{
 		CHECK_NOTHROW(fragment("cursor { default }"));
 		CHECK_NOTHROW(fragment("cursor { custom }"));
@@ -70,7 +70,7 @@ TEST_CASE("gui.load")
 		CHECK_THROWS_AS(fragment("cursor { test }"), GuiDataError);
 	}
 
-	SECTION("class")
+	SUBCASE("class")
 	{
 		CHECK_NOTHROW(fragment("class `test` { }"));
 		CHECK_NOTHROW(fragment("class `test` { } class `another_test` { }"));
@@ -81,7 +81,7 @@ TEST_CASE("gui.load")
 		CHECK_THROWS_AS(fragment("class `test` { test }"), GuiDataError);
 	}
 
-	SECTION("class.align")
+	SUBCASE("class.align")
 	{
 		CHECK_NOTHROW(fragment("class `test` { align `bottom` }"));
 		CHECK_NOTHROW(fragment("class `test` { align `bottom` `left` }"));
@@ -114,7 +114,7 @@ TEST_CASE("gui.load")
 		CHECK_THROWS_AS(fragment("class `test` { align `top` `test` }"), GuiDataError);
 	}
 
-	SECTION("load.class.borders")
+	SUBCASE("load.class.borders")
 	{
 		CHECK_NOTHROW(fragment("class `test` { borders `1.0` `2.0` `3.0` `4.0` }"));
 
@@ -129,19 +129,19 @@ TEST_CASE("gui.load")
 		CHECK_THROWS_AS(fragment("class `test` { borders `1.0` `2.0` `3.0` `test` }"), GuiDataError);
 	}
 
-	SECTION("class.color")
+	SUBCASE("class.color")
 	{
 		CHECK_NOTHROW(fragment("class `test` { color #12345678 }"));
 	}
 
-	SECTION("class.text_color")
+	SUBCASE("class.text_color")
 	{
 		CHECK_NOTHROW(fragment("class `test` { text_color #12345678 }"));
 	}
 
-	SECTION("class.style")
+	SUBCASE("class.style")
 	{
-		SECTION("checked")
+		SUBCASE("checked")
 		{
 			CHECK_NOTHROW(fragment("class `test` { checked { } }"));
 			CHECK_NOTHROW(fragment("class `test` { checked { } checked { } }"));
@@ -158,7 +158,7 @@ TEST_CASE("gui.load")
 			CHECK_THROWS_AS(fragment("class `test` { checked { pressed { } } }"), GuiDataError);
 		}
 
-		SECTION("disabled")
+		SUBCASE("disabled")
 		{
 			CHECK_NOTHROW(fragment("class `test` { disabled { } }"));
 			CHECK_NOTHROW(fragment("class `test` { disabled { } disabled { } }"));
@@ -175,7 +175,7 @@ TEST_CASE("gui.load")
 			CHECK_THROWS_AS(fragment("class `test` { disabled { pressed { } } }"), GuiDataError);
 		}
 
-		SECTION("hovered")
+		SUBCASE("hovered")
 		{
 			CHECK_NOTHROW(fragment("class `test` { hovered { } }"));
 			CHECK_NOTHROW(fragment("class `test` { hovered { } hovered { } }"));
@@ -192,7 +192,7 @@ TEST_CASE("gui.load")
 			CHECK_THROWS_AS(fragment("class `test` { hovered { pressed { } } }"), GuiDataError);
 		}
 
-		SECTION("pressed")
+		SUBCASE("pressed")
 		{
 			CHECK_NOTHROW(fragment("class `test` { pressed { } }"));
 			CHECK_NOTHROW(fragment("class `test` { pressed { } pressed { } }"));
@@ -210,7 +210,7 @@ TEST_CASE("gui.load")
 		}
 	}
 
-	SECTION("class.text_size")
+	SUBCASE("class.text_size")
 	{
 		CHECK_NOTHROW(fragment("class `test` { text_size `0.25` }"));
 
@@ -219,7 +219,7 @@ TEST_CASE("gui.load")
 		CHECK_THROWS_AS(fragment("class `test` { text_size `test` }"), GuiDataError);
 	}
 
-	SECTION("class.texture_rect")
+	SUBCASE("class.texture_rect")
 	{
 		CHECK_NOTHROW(fragment("class `test` { texture_rect `1.0` }"));
 		CHECK_NOTHROW(fragment("class `test` { texture_rect `1.0` `2.0` }"));
@@ -238,7 +238,7 @@ TEST_CASE("gui.load")
 		CHECK_THROWS_AS(fragment("class `test` { texture_rect `1.0` `2.0` `3.0` `test` }"), GuiDataError);
 	}
 
-	SECTION("include")
+	SUBCASE("include")
 	{
 		CHECK_THROWS_AS(fragment("include"), IonError);
 		CHECK_THROWS_AS(fragment("include `test.ion`"), ResourceError);
@@ -249,7 +249,7 @@ TEST_CASE("gui.load")
 		CHECK_THROWS_AS(fragment("include `test.ion` `test.ion`"), IonError);
 	}
 
-	SECTION("on_*")
+	SUBCASE("on_*")
 	{
 		CHECK_NOTHROW(fragment("on_key `` { call `test` }"));
 		CHECK_THROWS_AS(fragment("on_key `` { call }"), IonError);
@@ -274,7 +274,7 @@ TEST_CASE("gui.load")
 		CHECK_NOTHROW(fragment("on_key `` { call `test` enter `test` quit return return_to `test` }"));
 	}
 
-	SECTION("on_key")
+	SUBCASE("on_key")
 	{
 		CHECK_NOTHROW(fragment("on_key `` { }"));
 		CHECK_NOTHROW(fragment("on_key `` { } { }"));
@@ -289,7 +289,7 @@ TEST_CASE("gui.load")
 		CHECK_THROWS_AS(fragment("on_key `` { } { } { }"), IonError);
 	}
 
-	SECTION("screen")
+	SUBCASE("screen")
 	{
 		CHECK_NOTHROW(source("root screen `` { }"));
 		CHECK_NOTHROW(source("root screen `main` { }"));
@@ -314,7 +314,7 @@ TEST_CASE("gui.load")
 		CHECK_THROWS_AS(fragment("screen `test` { test }"), GuiDataError);
 	}
 
-	SECTION("screen.cursor")
+	SUBCASE("screen.cursor")
 	{
 		CHECK_NOTHROW(fragment("screen `test` { cursor { default } }"));
 		CHECK_NOTHROW(fragment("screen `test` { cursor { custom } }"));
@@ -325,16 +325,16 @@ TEST_CASE("gui.load")
 		CHECK_THROWS_AS(fragment("screen `test` { cursor { test } }"), GuiDataError);
 	}
 
-	SECTION("screen.on")
+	SUBCASE("screen.on")
 	{
-		SECTION("enter")
+		SUBCASE("enter")
 		{
 			CHECK_NOTHROW(fragment("screen `test` { on_enter { call `test` } }"));
 
 			CHECK_THROWS_AS(fragment("screen `test` { on_enter }"), IonError);
 			CHECK_THROWS_AS(fragment("screen `test` { on_enter { call `test` } { call `test` } }"), IonError);
 		}
-		SECTION("event")
+		SUBCASE("event")
 		{
 			CHECK_NOTHROW(fragment("screen `test` { on_event `test` { call `test` } }"));
 
@@ -343,7 +343,7 @@ TEST_CASE("gui.load")
 			CHECK_THROWS_AS(fragment("screen `test` { on_event `test` }"), IonError);
 			CHECK_THROWS_AS(fragment("screen `test` { on_event `test` { call `test` } { call `test` } }"), IonError);
 		}
-		SECTION("key")
+		SUBCASE("key")
 		{
 			CHECK_NOTHROW(fragment("screen `test` { on_key `test` { call `test` } }"));
 			CHECK_NOTHROW(fragment("screen `test` { on_key `test` { call `test` } { call `test` } }"));
@@ -353,7 +353,7 @@ TEST_CASE("gui.load")
 			CHECK_THROWS_AS(fragment("screen `test` { on_key `test` }"), IonError);
 			CHECK_THROWS_AS(fragment("screen `test` { on_key `test` { call `test` } { call `test` } { call `test` } }"), IonError);
 		}
-		SECTION("return")
+		SUBCASE("return")
 		{
 			CHECK_NOTHROW(fragment("screen `test` { on_return { call `test` } }"));
 
@@ -362,9 +362,9 @@ TEST_CASE("gui.load")
 		}
 	}
 
-	SECTION("screen.layout")
+	SUBCASE("screen.layout")
 	{
-		SECTION("center")
+		SUBCASE("center")
 		{
 			CHECK_NOTHROW(fragment("screen `test` { center `4.0` `3.0` { } }"));
 
@@ -377,7 +377,7 @@ TEST_CASE("gui.load")
 			CHECK_THROWS_AS(fragment("screen `test` { center `4.0` `test` { } }"), GuiDataError);
 		}
 
-		SECTION("left")
+		SUBCASE("left")
 		{
 			CHECK_NOTHROW(fragment("screen `test` { left `4.0` { } }"));
 
@@ -387,7 +387,7 @@ TEST_CASE("gui.load")
 			CHECK_THROWS_AS(fragment("screen `test` { left `test` { } }"), GuiDataError);
 		}
 
-		SECTION("right")
+		SUBCASE("right")
 		{
 			CHECK_NOTHROW(fragment("screen `test` { right `4.0` { } }"));
 
@@ -397,7 +397,7 @@ TEST_CASE("gui.load")
 			CHECK_THROWS_AS(fragment("screen `test` { right `test` { } }"), GuiDataError);
 		}
 
-		SECTION("stretch")
+		SUBCASE("stretch")
 		{
 			CHECK_NOTHROW(fragment("screen `test` { stretch { } }"));
 			CHECK_NOTHROW(fragment("screen `test` { stretch `4.0` `3.0` { } }"));
@@ -409,9 +409,9 @@ TEST_CASE("gui.load")
 		}
 	}
 
-	SECTION("screen.layout_widget")
+	SUBCASE("screen.layout_widget")
 	{
-		SECTION("button")
+		SUBCASE("button")
 		{
 			CHECK_NOTHROW(fragment("screen `test` { stretch { button { } } }"));
 			CHECK_NOTHROW(fragment("screen `test` { stretch { button { on_click { call `test` } } } }"));
@@ -420,7 +420,7 @@ TEST_CASE("gui.load")
 			CHECK_NOTHROW(fragment("screen `test` { stretch { button `test` { } } }"));
 		}
 
-		SECTION("button.align")
+		SUBCASE("button.align")
 		{
 			CHECK_NOTHROW(fragment("screen `test` { stretch { button { align `bottom` } } }"));
 			CHECK_NOTHROW(fragment("screen `test` { stretch { button { align `bottom` `left` } } }"));
@@ -433,7 +433,7 @@ TEST_CASE("gui.load")
 			CHECK_NOTHROW(fragment("screen `test` { stretch { button { align `top` `right` } } }"));
 		}
 
-		SECTION("button.class")
+		SUBCASE("button.class")
 		{
 			CHECK_NOTHROW(fragment("class `test` { } screen `test` { stretch { button [`test`] { } } }"));
 
@@ -441,7 +441,7 @@ TEST_CASE("gui.load")
 			CHECK_THROWS_AS(fragment("screen `test` { stretch { button [`test`] { } } }"), GuiDataError);
 		}
 
-		SECTION("button.position")
+		SUBCASE("button.position")
 		{
 			CHECK_NOTHROW(fragment("screen `test` { stretch { button { position `1.0` } } }"));
 			CHECK_NOTHROW(fragment("screen `test` { stretch { button { position `1.0` `2.0` } } }"));
@@ -456,7 +456,7 @@ TEST_CASE("gui.load")
 			CHECK_THROWS_AS(fragment("screen `test` { stretch { button { position `1.0` `2.0` `3.0` `test` } } }"), GuiDataError);
 		}
 
-		SECTION("button.state")
+		SUBCASE("button.state")
 		{
 			CHECK_NOTHROW(fragment("screen `test` { stretch { button { state `checked` } } }"));
 			CHECK_NOTHROW(fragment("screen `test` { stretch { button { state `disabled` } } }"));
@@ -468,7 +468,7 @@ TEST_CASE("gui.load")
 			CHECK_THROWS_AS(fragment("screen `test` { stretch { button { state `test` } } }"), GuiDataError);
 		}
 
-		SECTION("button.style")
+		SUBCASE("button.style")
 		{
 			CHECK_NOTHROW(fragment("screen `test` { stretch { button { checked { } } } }"));
 			CHECK_NOTHROW(fragment("screen `test` { stretch { button { disabled { } } } }"));
@@ -476,7 +476,7 @@ TEST_CASE("gui.load")
 			CHECK_NOTHROW(fragment("screen `test` { stretch { button { pressed { } } } }"));
 		}
 
-		SECTION("button.text")
+		SUBCASE("button.text")
 		{
 			CHECK_NOTHROW(fragment("screen `test` { stretch { button { text \"test\" } } }"));
 			CHECK_NOTHROW(fragment("screen `test` { stretch { button { text `test` } } }"));
@@ -485,7 +485,7 @@ TEST_CASE("gui.load")
 			CHECK_THROWS_AS(fragment("screen `test` { stretch { button { text { } } } }"), IonError);
 		}
 
-		SECTION("other")
+		SUBCASE("other")
 		{
 			CHECK_NOTHROW(fragment("screen `test` { stretch { canvas { } } }"));
 			CHECK_NOTHROW(fragment("screen `test` { stretch { image { } } }"));
@@ -496,7 +496,7 @@ TEST_CASE("gui.load")
 		}
 	}
 
-	SECTION("translation")
+	SUBCASE("translation")
 	{
 		CHECK_THROWS_AS(fragment("translation"), IonError);
 		CHECK_THROWS_AS(fragment("translation `translation.ion`"), ResourceError);

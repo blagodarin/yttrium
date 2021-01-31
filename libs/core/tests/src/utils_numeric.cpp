@@ -20,7 +20,7 @@
 #include <array>
 #include <limits>
 
-#include <catch2/catch.hpp>
+#include <doctest.h>
 
 TEST_CASE("utils.clamp_to_uint8")
 {

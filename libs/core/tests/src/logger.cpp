@@ -21,7 +21,7 @@
 #include <mutex>
 #include <thread>
 
-#include <catch2/catch.hpp>
+#include <doctest.h>
 
 TEST_CASE("logger.flush")
 {

@@ -18,7 +18,7 @@
 #include <yttrium/math/rect.h>
 #include "iostream.h"
 
-#include <catch2/catch.hpp>
+#include <doctest.h>
 
 using Yt::Point;
 using Yt::Rect;

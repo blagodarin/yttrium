@@ -22,7 +22,7 @@
 #include <yttrium/test/utils.h>
 #include <yttrium/translation.h>
 
-#include <catch2/catch.hpp>
+#include <doctest.h>
 
 TEST_CASE("translation.load")
 {

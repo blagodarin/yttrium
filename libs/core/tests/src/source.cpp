@@ -23,7 +23,7 @@
 
 #include <cstring>
 
-#include <catch2/catch.hpp>
+#include <doctest.h>
 
 TEST_CASE("source.from")
 {

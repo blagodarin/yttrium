@@ -31,7 +31,7 @@ matrix:
     - os: linux
       dist: bionic
       compiler: gcc
-      env: GCC=10 CONFIG=Release DLL=OFF RENDERER=null Y3=aulos,catch2,jpeg BENCHMARK=1
+      env: GCC=10 CONFIG=Release DLL=OFF RENDERER=null Y3=aulos,catch2,jpeg
       addons: &gcc_xcb
         apt:
           sources: *all_sources
@@ -88,7 +88,7 @@ matrix:
     - os: linux
       dist: bionic
       compiler: clang
-      env: CLANG=9 CONFIG=Release DLL=OFF RENDERER=null Y3=aulos,catch2,jpeg BENCHMARK=1
+      env: CLANG=9 CONFIG=Release DLL=OFF RENDERER=null Y3=aulos,catch2,jpeg
       addons: &clang_xcb
         apt:
           sources: *all_sources
@@ -153,9 +153,8 @@ install:
   - if [ -n "${COVERAGE}" ]; then pip install --user codecov; fi
 
 script:
-  - if [ -z "${BENCHMARK}" ] && [ -z "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DBUILD_EXAMPLES=ON -DINSTALL_EXAMPLES=ON"; fi
-  - if [ -n "${ANALYZE}" ] || [ -n "${BENCHMARK}" ]; then CMAKE_OPTIONS+=" -DBUILD_BENCHMARKS=ON"; fi
-  - if [ -z "${ANALYZE}" ] && [ -z "${BENCHMARK}" ] && [ -z "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DENABLE_SANITIZERS=ON"; fi
+  - if [ -z "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DBUILD_EXAMPLES=ON -DINSTALL_EXAMPLES=ON"; fi
+  - if [ -z "${ANALYZE}" ] && [ -z "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DENABLE_SANITIZERS=ON"; fi
   - if [ -n "${ANALYZE}" ]; then CMAKE_OPTIONS+=" -DENABLE_CLANG_FORMAT=ON -DENABLE_CLANG_TIDY=ON -DENABLE_CPPCHECK=ON -DENABLE_DIFF=ON"; fi
   - if [ -n "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DENABLE_COVERAGE=ON -DENABLE_COVERAGE_LCOV=ON"; fi
   - cmake -H. -B"${HOME}/yttrium.build" -G"Ninja" -DBUILD_SHARED_LIBS=${DLL} -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=${CONFIG} -DCMAKE_INSTALL_PREFIX="${HOME}/yttrium.install" -DCMAKE_PREFIX_PATH="${HOME}/y3.prefix" -DY_RENDERER=${RENDERER} -DY_USE_OGG_VORBIS=OFF ${CMAKE_OPTIONS}
@@ -166,13 +165,12 @@ script:
   - if [ -n "${ANALYZE}" ]; then cmake --build . --target diff; fi
   - if [ -z "${ANALYZE}" ]; then TERM=dumb cmake --build .; fi
   - if [ -z "${ANALYZE}" ]; then ctest --output-on-failure; fi
-  - if [ -z "${ANALYZE}" ] && [ -z "${BENCHMARK}" ] && [ -z "${COVERAGE}" ]; then cmake --build . --target install; fi
+  - if [ -z "${ANALYZE}" ] && [ -z "${COVERAGE}" ]; then cmake --build . --target install; fi
   # lcov 1.14 doesn't work with GCC 9.x, see https://github.com/linux-test-project/lcov/issues/58
   #- if [ -n "${COVERAGE}" ]; then cmake --build . --target lcov; fi
   - popd
 
 after_success:
-  - if [ -n "${BENCHMARK}" ]; then cmake --build "${HOME}/yttrium.build" --target benchmark; fi
   - if [ -n "${COVERAGE}" ]; then codecov --gcov-root "${HOME}/yttrium.build" --gcov-exec gcov-${GCC} --gcov-args "-s `pwd`"; fi
 
 notifications:

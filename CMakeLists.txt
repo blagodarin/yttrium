@@ -15,12 +15,19 @@
 # limitations under the License.
 #
 
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.15)
 
 project(Yttrium VERSION 0.0.1 LANGUAGES CXX)
 
 include(CMakePackageConfigHelpers)
+include(FetchContent)
 include(GNUInstallDirs)
+
+FetchContent_Declare(Primal GIT_REPOSITORY https://github.com/blagodarin/primal.git GIT_TAG 34cd5ce9714d2a69d1245a203cb90e3884ce6f8d)
+FetchContent_Declare(Aulos GIT_REPOSITORY https://github.com/blagodarin/aulos.git GIT_TAG v0.0.5)
+FetchContent_MakeAvailable(Primal Aulos)
+
+primal_defaults()
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 set(CMAKE_CXX_STANDARD 20)
@@ -32,12 +39,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
 set(CMAKE_THREAD_PREFER_PTHREAD ON)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
 
-set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER ".phony")
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-
 include(cmake/utils.cmake)
 
-option(BUILD_BENCHMARKS "Build benchmarks" OFF)
 option(BUILD_EXAMPLES "Build examples" OFF)
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 option(BUILD_TESTS "Build tests" OFF)
@@ -195,7 +198,6 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 	list(APPEND RC_FLAGS /nologo)
 
 	# Warnings.
-	string(REGEX REPLACE " /W3" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}") # TODO: Remove after upgrade to CMake 3.15.
 	add_compile_options(/WX /Wall
 		/wd4061 # enumerator '___' in switch of enum '___' is not explicitly handled by a case label
 		/wd4191 # 'reinterpret_cast': unsafe conversion from '___' to '___'
@@ -225,7 +227,6 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 		/wd5039 # pointer or reference to potentially throwing function passed to extern C function under -EHc. Undefined behavior may occur if this function throws an exception.
 		/wd5045 # Compiler will insert Spectre mitigation for memory load if /Qspectre switch specified
 		/wd5220 # a non-static data member with a volatile qualified type no longer implies
-		/Wv:18
 		)
 endif()
 
@@ -252,30 +253,16 @@ add_subdirectory(tools/ytr)
 
 add_subdirectory(libs/engine)
 
-if(BUILD_TESTS OR BUILD_BENCHMARKS)
-	find_package(Catch2 2.9.1 REQUIRED)
-	mark_as_advanced(Catch2_DIR)
-	add_subdirectory(libs/test)
-endif()
-
 if(BUILD_TESTS)
 	enable_testing()
+	primal_download("https://raw.githubusercontent.com/onqtam/doctest/2.4.4/doctest/doctest.h" SHA1 "7c25b870f3e0cde6d6c8596c60f3592fe557989a")
+	add_subdirectory(libs/test)
 	add_subdirectory(libs/audio/tests)
 	add_subdirectory(libs/core/tests)
 	add_subdirectory(libs/core/tests/bootstrap)
 	add_subdirectory(libs/engine/tests)
 	add_custom_target(check DEPENDS check_audio check_core check_engine)
 	set_target_properties(check PROPERTIES FOLDER ".phony")
-endif()
-
-if(BUILD_BENCHMARKS)
-	add_subdirectory(benchmarks/buffer)
-	add_custom_target(benchmark
-		COMMAND benchmark_buffer
-		WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-		COMMENT "Running benchmarks"
-		VERBATIM)
-	set_target_properties(benchmark PROPERTIES FOLDER ".phony")
 endif()
 
 if(BUILD_EXAMPLES)

@@ -24,7 +24,7 @@
 
 #include <sstream>
 
-#include <catch2/catch.hpp>
+#include <doctest.h>
 
 namespace Yt
 {

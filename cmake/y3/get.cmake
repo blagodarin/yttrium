@@ -220,8 +220,6 @@ endfunction()
 
 y3_package(vorbis REQUIRES ogg)
 y3_package(jpeg REQUIRES nasm)
-y3_package(aulos)
-y3_package(catch2)
 y3_package(cppcheck)
 y3_package(freetype)
 y3_package(glslang)
@@ -233,24 +231,6 @@ y3_package(opengl)
 y3_package(vulkan)
 
 y3_bootstrap()
-
-if("aulos" IN_LIST _y3_packages)
-	set(_version "0.0.5")
-	set(_package "aulos-${_version}")
-	y3_git_clone("https://github.com/blagodarin/aulos.git" DIR ${_package} COMMIT "v${_version}")
-	y3_cmake(${_package} SIMPLE)
-endif()
-
-if("catch2" IN_LIST _y3_packages)
-	set(_version "2.13.4")
-	set(_package "Catch2-${_version}")
-	y3_download("https://github.com/catchorg/Catch2/archive/v${_version}.tar.gz"
-		NAME "${_package}.tar.gz"
-		SHA1 "b8417c5c87ab385c9f56576aefbcc098fb923e57")
-	y3_extract("${_package}.tar.gz" DIR ${_package})
-	y3_cmake(${_package} HEADER_ONLY
-		OPTIONS -DCATCH_BUILD_TESTING=OFF -DCATCH_INSTALL_DOCS=OFF -DCATCH_INSTALL_HELPERS=OFF -DPKGCONFIG_INSTALL_DIR=${CMAKE_BINARY_DIR}/.trash)
-endif()
 
 if("cppcheck" IN_LIST _y3_packages)
 	set(_version "1.90")

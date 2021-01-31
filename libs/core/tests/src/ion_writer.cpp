@@ -19,7 +19,7 @@
 #include <yttrium/ion/writer.h>
 #include <yttrium/storage/writer.h>
 
-#include <catch2/catch.hpp>
+#include <doctest.h>
 
 using Yt::Buffer;
 using Yt::IonWriter;
@@ -46,7 +46,7 @@ TEST_CASE("ion.writer.compact")
 {
 	TestData ion{ IonWriter::Formatting::Compact };
 
-	SECTION("names")
+	SUBCASE("names")
 	{
 		ion->add_name("name1");
 		ion->add_name("name2");
@@ -54,7 +54,7 @@ TEST_CASE("ion.writer.compact")
 		CHECK(ion.to_string() == "name1 name2");
 	}
 
-	SECTION("values")
+	SUBCASE("values")
 	{
 		ion->add_name("name1");
 		ion->add_value("value1");
@@ -64,7 +64,7 @@ TEST_CASE("ion.writer.compact")
 		CHECK(ion.to_string() == "name1\"value1\"\"value2\"name2");
 	}
 
-	SECTION("lists")
+	SUBCASE("lists")
 	{
 		ion->add_name("name1");
 		ion->begin_list();
@@ -82,7 +82,7 @@ TEST_CASE("ion.writer.compact")
 		CHECK(ion.to_string() == "name1[\"value1\"[[][]]\"value2\"]name2");
 	}
 
-	SECTION("objects_and_names")
+	SUBCASE("objects_and_names")
 	{
 		ion->add_name("name1");
 		ion->begin_object();
@@ -98,7 +98,7 @@ TEST_CASE("ion.writer.compact")
 		CHECK(ion.to_string() == "name1{name2}{name3{}}name4");
 	}
 
-	SECTION("objects_and_values")
+	SUBCASE("objects_and_values")
 	{
 		ion->add_name("name1");
 		ion->begin_object();
@@ -112,7 +112,7 @@ TEST_CASE("ion.writer.compact")
 		CHECK(ion.to_string() == "name1{name2\"value1\"}\"value2\"{}");
 	}
 
-	SECTION("objects_and_lists")
+	SUBCASE("objects_and_lists")
 	{
 		ion->add_name("name1");
 		ion->begin_object();
@@ -153,7 +153,7 @@ TEST_CASE("ion.writer.escape")
 
 TEST_CASE("ion.writer.flush")
 {
-	SECTION("once.compact")
+	SUBCASE("once.compact")
 	{
 		TestData ion{ IonWriter::Formatting::Compact };
 		ion->add_name("name1");
@@ -161,7 +161,7 @@ TEST_CASE("ion.writer.flush")
 		CHECK(ion.to_string() == "name1");
 	}
 
-	SECTION("once.pretty")
+	SUBCASE("once.pretty")
 	{
 		TestData ion{ IonWriter::Formatting::Pretty };
 		ion->add_name("name1");
@@ -169,7 +169,7 @@ TEST_CASE("ion.writer.flush")
 		CHECK(ion.to_string() == "name1\n");
 	}
 
-	SECTION("twice.compact")
+	SUBCASE("twice.compact")
 	{
 		TestData ion{ IonWriter::Formatting::Compact };
 		ion->add_name("name1");
@@ -179,7 +179,7 @@ TEST_CASE("ion.writer.flush")
 		CHECK(ion.to_string() == "name1 name2");
 	}
 
-	SECTION("twice.pretty")
+	SUBCASE("twice.pretty")
 	{
 		TestData ion{ IonWriter::Formatting::Pretty };
 		ion->add_name("name1");
@@ -190,7 +190,7 @@ TEST_CASE("ion.writer.flush")
 								 "name2\n");
 	}
 
-	SECTION("sequential.compact")
+	SUBCASE("sequential.compact")
 	{
 		TestData ion{ IonWriter::Formatting::Compact };
 		ion->add_name("name1");
@@ -199,7 +199,7 @@ TEST_CASE("ion.writer.flush")
 		CHECK(ion.to_string() == "name1");
 	}
 
-	SECTION("sequential.pretty")
+	SUBCASE("sequential.pretty")
 	{
 		TestData ion{ IonWriter::Formatting::Pretty };
 		ion->add_name("name1");
@@ -208,14 +208,14 @@ TEST_CASE("ion.writer.flush")
 		CHECK(ion.to_string() == "name1\n");
 	}
 
-	SECTION("nothing.compact")
+	SUBCASE("nothing.compact")
 	{
 		TestData ion{ IonWriter::Formatting::Compact };
 		ion->flush();
 		CHECK(ion.to_string() == "");
 	}
 
-	SECTION("nothing.pretty")
+	SUBCASE("nothing.pretty")
 	{
 		TestData ion{ IonWriter::Formatting::Pretty };
 		ion->flush();
@@ -227,76 +227,76 @@ TEST_CASE("ion.writer.negative")
 {
 	TestData ion{ IonWriter::Formatting::Compact };
 
-	SECTION("Adding a name in a list")
+	SUBCASE("Adding a name in a list")
 	{
 		ion->add_name("name1");
 		ion->begin_list();
 		CHECK_THROWS_AS(ion->add_name("name2"), std::logic_error);
 	}
 
-	SECTION("Adding a root object value without a name")
+	SUBCASE("Adding a root object value without a name")
 	{
 		CHECK_THROWS_AS(ion->add_value("value1"), std::logic_error);
 	}
 
-	SECTION("Adding a value without a name")
+	SUBCASE("Adding a value without a name")
 	{
 		ion->add_name("name1");
 		ion->begin_object();
 		CHECK_THROWS_AS(ion->add_value("value1"), std::logic_error);
 	}
 
-	SECTION("Beginning a list in a root object")
+	SUBCASE("Beginning a list in a root object")
 	{
 		CHECK_THROWS_AS(ion->begin_list(), std::logic_error);
 	}
 
-	SECTION("Beginning a list in an object")
+	SUBCASE("Beginning a list in an object")
 	{
 		ion->add_name("name1");
 		ion->begin_object();
 		CHECK_THROWS_AS(ion->begin_list(), std::logic_error);
 	}
 
-	SECTION("Beginning an object in a root object")
+	SUBCASE("Beginning an object in a root object")
 	{
 		CHECK_THROWS_AS(ion->begin_object(), std::logic_error);
 	}
 
-	SECTION("Beginning an object in an object")
+	SUBCASE("Beginning an object in an object")
 	{
 		ion->add_name("name1");
 		ion->begin_object();
 		CHECK_THROWS_AS(ion->begin_object(), std::logic_error);
 	}
 
-	SECTION("Ending a list as an object")
+	SUBCASE("Ending a list as an object")
 	{
 		ion->add_name("name1");
 		ion->begin_list();
 		CHECK_THROWS_AS(ion->end_object(), std::logic_error);
 	}
 
-	SECTION("Ending an object as a list")
+	SUBCASE("Ending an object as a list")
 	{
 		ion->add_name("name1");
 		ion->begin_object();
 		CHECK_THROWS_AS(ion->end_list(), std::logic_error);
 	}
 
-	SECTION("Ending a root object")
+	SUBCASE("Ending a root object")
 	{
 		CHECK_THROWS_AS(ion->end_object(), std::logic_error);
 	}
 
-	SECTION("Flushing in a list")
+	SUBCASE("Flushing in a list")
 	{
 		ion->add_name("name1");
 		ion->begin_list();
 		CHECK_THROWS_AS(ion->flush(), std::logic_error);
 	}
 
-	SECTION("Flushing in a non-root object")
+	SUBCASE("Flushing in a non-root object")
 	{
 		ion->add_name("name1");
 		ion->begin_object();
@@ -308,7 +308,7 @@ TEST_CASE("ion.writer.pretty")
 {
 	TestData ion{ IonWriter::Formatting::Pretty };
 
-	SECTION("names")
+	SUBCASE("names")
 	{
 		ion->add_name("name1");
 		ion->add_name("name2");
@@ -317,7 +317,7 @@ TEST_CASE("ion.writer.pretty")
 								 "name2\n");
 	}
 
-	SECTION("values")
+	SUBCASE("values")
 	{
 		ion->add_name("name1");
 		ion->add_value("value1");
@@ -328,7 +328,7 @@ TEST_CASE("ion.writer.pretty")
 								 "name2\n");
 	}
 
-	SECTION("lists")
+	SUBCASE("lists")
 	{
 		ion->add_name("name1");
 		ion->begin_list();
@@ -347,7 +347,7 @@ TEST_CASE("ion.writer.pretty")
 								 "name2\n");
 	}
 
-	SECTION("objects_and_names")
+	SUBCASE("objects_and_names")
 	{
 		ion->add_name("name1");
 		ion->begin_object();
@@ -372,7 +372,7 @@ TEST_CASE("ion.writer.pretty")
 								 "name4\n");
 	}
 
-	SECTION("objects_and_values")
+	SUBCASE("objects_and_values")
 	{
 		ion->add_name("name1");
 		ion->begin_object();
@@ -391,7 +391,7 @@ TEST_CASE("ion.writer.pretty")
 								 "}\n");
 	}
 
-	SECTION("objects_and_lists")
+	SUBCASE("objects_and_lists")
 	{
 		ion->add_name("name1");
 		ion->begin_object();

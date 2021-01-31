@@ -21,7 +21,7 @@
 
 #include <array>
 
-#include <catch2/catch.hpp>
+#include <doctest.h>
 
 using Yt::Image;
 using Yt::PixelFormat;

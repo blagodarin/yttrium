@@ -15,6 +15,6 @@
 // limitations under the License.
 //
 
-#define CATCH_CONFIG_MAIN
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 
-#include <catch2/catch.hpp>
+#include <doctest.h>

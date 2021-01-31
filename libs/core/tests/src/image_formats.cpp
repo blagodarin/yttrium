@@ -23,7 +23,7 @@
 #include "image.h"
 #include "iostream.h"
 
-#include <catch2/catch.hpp>
+#include <doctest.h>
 
 TEST_CASE("image.load_bmp24")
 {

@@ -25,7 +25,7 @@
 #include <array>
 #include <cstring>
 
-#include <catch2/catch.hpp>
+#include <doctest.h>
 
 namespace
 {

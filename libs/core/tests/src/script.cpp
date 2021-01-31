@@ -18,7 +18,7 @@
 #include <yttrium/script/context.h>
 #include <yttrium/script/value.h>
 
-#include <catch2/catch.hpp>
+#include <doctest.h>
 
 TEST_CASE("script.context.find")
 {

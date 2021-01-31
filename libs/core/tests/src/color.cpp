@@ -17,7 +17,7 @@
 
 #include <yttrium/math/color.h>
 
-#include <catch2/catch.hpp>
+#include <doctest.h>
 
 TEST_CASE("color.bgra32")
 {

@@ -20,7 +20,7 @@
 
 #include <cstring>
 
-#include <catch2/catch.hpp>
+#include <doctest.h>
 
 TEST_CASE("test_utils.make_buffer")
 {

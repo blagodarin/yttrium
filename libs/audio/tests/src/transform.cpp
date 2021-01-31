@@ -22,7 +22,7 @@
 #include <array>
 #include <cstring>
 
-#include <catch2/catch.hpp>
+#include <doctest.h>
 
 TEST_CASE("audio.transform.i16_to_i16x2")
 {

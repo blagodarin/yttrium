@@ -15,8 +15,6 @@
 # limitations under the License.
 #
 
-find_package(Aulos 0.0.4 REQUIRED)
-
 set(_src
 	src/backend.h
 	src/decoder.h
@@ -37,7 +35,7 @@ source_group("src" FILES ${_src})
 
 include_config(yaudio ${PROJECT_BINARY_DIR}/config.h)
 target_include_directories(yaudio PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-target_link_libraries(yaudio PRIVATE ycore Aulos::aulos Threads::Threads)
+target_link_libraries(yaudio PRIVATE ycore aulos Threads::Threads)
 set_property(TARGET yaudio PROPERTY FOLDER "libs")
 if(BUILD_SHARED_LIBS)
 	set_property(TARGET yaudio PROPERTY DEFINE_SYMBOL Y_AUDIO_EXPORT)
