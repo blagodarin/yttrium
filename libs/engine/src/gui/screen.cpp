@@ -26,6 +26,7 @@
 #include "widget.h"
 
 #include <cassert>
+#include <iterator>
 
 namespace Yt
 {

@@ -1,3 +1,4 @@
-cmake/y3/patches/png.patch eol=lf
+cmake/y3/patches/*.patch eol=lf
 examples/tetrium/data/i18n/*.ion eol=lf
+*.aulos eol=lf
 *.h linguist-language=C++

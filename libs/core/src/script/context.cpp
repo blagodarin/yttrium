@@ -24,6 +24,7 @@
 #include <yttrium/utils/string.h>
 
 #include <algorithm>
+#include <iterator>
 #include <unordered_map>
 
 namespace Yt

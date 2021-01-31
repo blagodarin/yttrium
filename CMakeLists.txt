@@ -17,7 +17,7 @@
 
 cmake_minimum_required(VERSION 3.12)
 
-project(yttrium VERSION 0.0.1 LANGUAGES CXX)
+project(Yttrium VERSION 0.0.1 LANGUAGES CXX)
 
 include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
@@ -224,6 +224,8 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 		/wd5027 # move assignment operator was implicitly defined as deleted
 		/wd5039 # pointer or reference to potentially throwing function passed to extern C function under -EHc. Undefined behavior may occur if this function throws an exception.
 		/wd5045 # Compiler will insert Spectre mitigation for memory load if /Qspectre switch specified
+		/wd5220 # a non-static data member with a volatile qualified type no longer implies
+		/Wv:18
 		)
 endif()
 

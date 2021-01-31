@@ -1,11 +1,28 @@
---- CMakeLists.txt
-+++ CMakeLists.txt
-@@ -60,7 +60,7 @@
-     find_library(OGG_LIBRARIES NAMES ogg HINTS ${PC_OGG_LIBRARY_DIRS})
- else()
-     find_path(OGG_INCLUDE_DIRS NAMES ogg/ogg.h HINTS ${OGG_ROOT}/include PATH_SUFFIXES ogg)
--    find_library(OGG_LIBRARIES NAMES ogg HINTS ${OGG_ROOT}/lib ${OGG_ROOT}/lib64)
-+    find_library(OGG_LIBRARIES NAMES ogg HINTS ${OGG_ROOT}/lib ${OGG_ROOT}/lib64 PATH_SUFFIXES Debug MinSizeRel Release RelWithDebInfo)
- endif()
- include(FindPackageHandleStandardArgs)
- find_package_handle_standard_args(OGG DEFAULT_MSG OGG_INCLUDE_DIRS OGG_LIBRARIES)
+--- a/cmake/FindOgg.cmake
++++ b/cmake/FindOgg.cmake
+@@ -63,7 +63,7 @@
+         ${PC_OGG_LIBRARY_DIRS}
+         ${OGG_ROOT}
+     PATH_SUFFIXES
+-        lib
++        lib lib/Debug lib/MinSizeRel lib/Release lib/RelWithDebInfo
+ )
+ 
+ # Handle the QUIETLY and REQUIRED arguments and set OGG_FOUND
+--- a/lib/CMakeLists.txt
++++ b/lib/CMakeLists.txt
+@@ -79,11 +79,11 @@
+     add_library(vorbisfile ${VORBISFILE_SOURCES})
+ 
+     get_version_info(VORBIS_VERSION_INFO "V_LIB_CURRENT" "V_LIB_AGE" "V_LIB_REVISION")
+-    set_target_properties(vorbis PROPERTIES SOVERSION ${VORBIS_VERSION_INFO})
++    set_target_properties(vorbis PROPERTIES SOVERSION ${VORBIS_VERSION_INFO} COMPILE_PDB_NAME vorbis)
+     get_version_info(VORBISENC_VERSION_INFO "VE_LIB_CURRENT" "VE_LIB_AGE" "VE_LIB_REVISION")
+-    set_target_properties(vorbisenc PROPERTIES SOVERSION ${VORBISENC_VERSION_INFO})
++    set_target_properties(vorbisenc PROPERTIES SOVERSION ${VORBISENC_VERSION_INFO} COMPILE_PDB_NAME vorbisenc)
+     get_version_info(VORBISFILE_VERSION_INFO "VF_LIB_CURRENT" "VF_LIB_AGE" "VF_LIB_REVISION")
+-    set_target_properties(vorbisfile PROPERTIES SOVERSION ${VORBISFILE_VERSION_INFO})
++    set_target_properties(vorbisfile PROPERTIES SOVERSION ${VORBISFILE_VERSION_INFO} COMPILE_PDB_NAME vorbisfile)
+ 
+     target_include_directories(vorbis
+         PUBLIC

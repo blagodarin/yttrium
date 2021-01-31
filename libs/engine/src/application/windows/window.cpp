@@ -49,7 +49,7 @@ namespace Yt
 	{
 		RECT client_rect{ 0, 0, 0, 0 };
 		::GetClientRect(_hwnd, &client_rect);
-		_size = { client_rect.right - client_rect.left, client_rect.bottom - client_rect.top };
+		_size = { int{ client_rect.right - client_rect.left }, int{ client_rect.bottom - client_rect.top } };
 	}
 
 	void WindowBackend::close()

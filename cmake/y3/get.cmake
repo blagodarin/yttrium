@@ -235,18 +235,18 @@ y3_package(vulkan)
 y3_bootstrap()
 
 if("aulos" IN_LIST _y3_packages)
-	set(_version "0.0.4")
+	set(_version "0.0.5")
 	set(_package "aulos-${_version}")
-	y3_git_clone("https://github.com/blagodarin/aulos.git" DIR ${_package} TAG "f328318f0a97906927f5c0dc1225081f8c91a1b4") # 0.0.4 with fixed CMake scripts.
+	y3_git_clone("https://github.com/blagodarin/aulos.git" DIR ${_package} COMMIT "v${_version}")
 	y3_cmake(${_package} SIMPLE)
 endif()
 
 if("catch2" IN_LIST _y3_packages)
-	set(_version "2.12.2")
+	set(_version "2.13.4")
 	set(_package "Catch2-${_version}")
 	y3_download("https://github.com/catchorg/Catch2/archive/v${_version}.tar.gz"
 		NAME "${_package}.tar.gz"
-		SHA1 "3244a6cd2d63498c3dd1f46c6326a6fac5ab110a")
+		SHA1 "b8417c5c87ab385c9f56576aefbcc098fb923e57")
 	y3_extract("${_package}.tar.gz" DIR ${_package})
 	y3_cmake(${_package} HEADER_ONLY
 		OPTIONS -DCATCH_BUILD_TESTING=OFF -DCATCH_INSTALL_DOCS=OFF -DCATCH_INSTALL_HELPERS=OFF -DPKGCONFIG_INSTALL_DIR=${CMAKE_BINARY_DIR}/.trash)
@@ -264,11 +264,12 @@ if("cppcheck" IN_LIST _y3_packages)
 endif()
 
 if("freetype" IN_LIST _y3_packages)
-	set(_version "2.10.2")
+	set(_version "2.10.4")
 	set(_package "freetype-${_version}")
 	y3_download("https://downloads.sourceforge.net/project/freetype/freetype2/${_version}/${_package}.tar.gz"
-		SHA1 "2c53944cd7eaefb9cb207672d8a4368c31aa97c4")
+		SHA1 "040d6a4be23708132c85ef9df837eb3f8a04c4ab")
 	y3_extract("${_package}.tar.gz" DIR ${_package})
+	y3_git_apply(${_package} ${CMAKE_CURRENT_LIST_DIR}/patches/freetype.patch)
 	y3_cmake(${_package}
 		OPTIONS
 			-DCMAKE_DISABLE_FIND_PACKAGE_BrotliDec=ON
@@ -298,6 +299,7 @@ if("ogg" IN_LIST _y3_packages)
 	y3_download("http://downloads.xiph.org/releases/ogg/${_package}.tar.xz"
 		SHA1 "f07499a35566aa62affb5ca989f62eed5b8092c3")
 	y3_extract("${_package}.tar.xz" DIR ${_package})
+	y3_git_apply(${_package} ${CMAKE_CURRENT_LIST_DIR}/patches/ogg.patch)
 	y3_cmake(${_package} TARGET "ogg")
 	file(INSTALL
 		${BUILD_DIR}/${_package}-${_y3_config}/include/ogg/config_types.h
@@ -317,12 +319,12 @@ if("lcov" IN_LIST _y3_packages)
 endif()
 
 if("nasm" IN_LIST _y3_packages)
-	set(_version "2.14.02")
+	set(_version "2.15.05")
 	set(_package "nasm-${_version}")
 	if(WIN32)
 		y3_download("https://www.nasm.us/pub/nasm/releasebuilds/${_version}/win64/${_package}-win64.zip"
 			NAME "${_package}.zip"
-			SHA1 "d027f30446a96fa842335713c773e81ca8cff793")
+			SHA1 "f3d25401783109ec999508af4dc967facf64971a")
 		y3_extract("${_package}.zip" DIR ${_package})
 		set(NASM_EXECUTABLE ${BUILD_DIR}/${_package}/nasm.exe)
 	endif()
@@ -374,11 +376,12 @@ if("vulkan" IN_LIST _y3_packages)
 endif()
 
 if("jpeg" IN_LIST _y3_packages)
-	set(_version "2.0.4")
+	set(_version "2.0.6")
 	set(_package "libjpeg-turbo-${_version}")
 	y3_download("https://downloads.sourceforge.net/project/libjpeg-turbo/${_version}/${_package}.tar.gz"
-		SHA1 "163d8f96d0999526a117de0388624241b54dcd67")
+		SHA1 "5406c7676d7df89fb4da791ad5af51202910fb25")
 	y3_extract("${_package}.tar.gz" DIR ${_package})
+	y3_git_apply(${_package} ${CMAKE_CURRENT_LIST_DIR}/patches/jpeg.patch)
 	set(_options -DENABLE_SHARED=OFF -DREQUIRE_SIMD=ON -DWITH_ARITH_DEC=OFF -DWITH_ARITH_ENC=OFF -DWITH_TURBOJPEG=OFF)
 	if(WIN32)
 		list(APPEND _options -DCMAKE_ASM_NASM_COMPILER=${NASM_EXECUTABLE} -DWITH_CRT_DLL=ON)
@@ -394,12 +397,15 @@ if("jpeg" IN_LIST _y3_packages)
 endif()
 
 if("vorbis" IN_LIST _y3_packages)
-	set(_package "vorbis")
-	y3_git_clone("git://git.xiph.org/vorbis.git" DIR ${_package})
+	set(_version "1.3.7")
+	set(_package "libvorbis-${_version}")
+	y3_download("http://downloads.xiph.org/releases/vorbis/${_package}.tar.xz"
+		SHA1 "0a2dd71a999656b8091506839e8007a61a8fda1f")
+	y3_extract("${_package}.tar.xz" DIR ${_package})
 	y3_git_apply(${_package} ${CMAKE_CURRENT_LIST_DIR}/patches/vorbis.patch)
 	y3_cmake(${_package} TARGET "vorbisfile"
 		OPTIONS -DOGG_ROOT=${PREFIX_DIR}
-		CL -wd4244 -wd4267 -wd4305 -wd4996)
+		CL -wd4244 -wd4267 -wd4305)
 	file(INSTALL
 		${BUILD_DIR}/${_package}/include/vorbis/codec.h
 		${BUILD_DIR}/${_package}/include/vorbis/vorbisfile.h
