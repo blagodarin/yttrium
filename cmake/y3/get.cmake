@@ -233,14 +233,13 @@ y3_package(vulkan)
 y3_bootstrap()
 
 if("cppcheck" IN_LIST _y3_packages)
-	set(_version "1.90")
+	set(_version "2.3")
 	set(_package "cppcheck-${_version}")
 	y3_download("https://github.com/danmar/cppcheck/archive/${_version}.tar.gz"
 		NAME "${_package}.tar.gz"
-		SHA1 "852d69a60b6caf023a3420943ebdc29e99fd0349")
+		SHA1 "3c6ed1897bd671a58d372be325bbd42cb237ab49")
 	y3_extract("${_package}.tar.gz" DIR ${_package})
-	y3_cmake(${_package}
-		OPTIONS -DWARNINGS_ANSI_ISO=OFF)
+	y3_cmake(${_package})
 endif()
 
 if("freetype" IN_LIST _y3_packages)

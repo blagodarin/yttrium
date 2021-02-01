@@ -19,6 +19,7 @@
 #include <yttrium/test/utils.h>
 
 #include <cstring>
+#include <string>
 
 #include <doctest.h>
 

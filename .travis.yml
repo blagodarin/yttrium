@@ -7,17 +7,15 @@ matrix:
   include:
 
     - os: linux
-      dist: bionic
+      dist: focal
       compiler: clang
-      env: CLANG=9 CONFIG=Debug DLL=ON RENDERER=null Y3=aulos,catch2,cppcheck,jpeg ANALYZE=1
+      env: CLANG=11 CONFIG=Debug DLL=ON RENDERER=null Y3=cppcheck,jpeg ANALYZE=1
       addons:
         apt:
-          sources: &all_sources
-            - ubuntu-toolchain-r-test
           packages:
-            - clang-9
-            - clang-format-9
-            - clang-tidy-9
+            - clang-11
+            - clang-format-11
+            - clang-tidy-11
             - libasound2-dev
             - libstdc++-10-dev
             - libvorbis-dev
@@ -29,12 +27,11 @@ matrix:
             - ninja-build
 
     - os: linux
-      dist: bionic
+      dist: focal
       compiler: gcc
-      env: GCC=10 CONFIG=Release DLL=OFF RENDERER=null Y3=aulos,catch2,jpeg
+      env: GCC=10 CONFIG=Release DLL=OFF RENDERER=null Y3=jpeg
       addons: &gcc_xcb
         apt:
-          sources: *all_sources
           packages:
             - g++-10
             - libasound2-dev
@@ -47,18 +44,17 @@ matrix:
             - ninja-build
 
     - os: linux
-      dist: bionic
+      dist: focal
       compiler: gcc
-      env: GCC=10 CONFIG=Debug DLL=ON RENDERER=null Y3=aulos,catch2,jpeg,lcov COVERAGE=1
+      env: GCC=10 CONFIG=Debug DLL=ON RENDERER=null Y3=jpeg,lcov COVERAGE=1
       addons: *gcc_xcb
 
     - os: linux
-      dist: bionic
+      dist: focal
       compiler: gcc
-      env: GCC=10 CONFIG=Release DLL=OFF RENDERER=opengl Y3=aulos,catch2,jpeg
+      env: GCC=10 CONFIG=Release DLL=OFF RENDERER=opengl Y3=jpeg
       addons: &gcc_x11
         apt:
-          sources: *all_sources
           packages:
             - g++-10
             - libasound2-dev
@@ -68,32 +64,31 @@ matrix:
             - ninja-build
 
     - os: linux
-      dist: bionic
+      dist: focal
       compiler: gcc
-      env: GCC=10 CONFIG=Debug DLL=ON RENDERER=opengl Y3=aulos,catch2,jpeg
+      env: GCC=10 CONFIG=Debug DLL=ON RENDERER=opengl Y3=jpeg
       addons: *gcc_x11
 
     - os: linux
-      dist: bionic
+      dist: focal
       compiler: gcc
-      env: GCC=10 CONFIG=Release DLL=OFF RENDERER=vulkan Y3=aulos,catch2,glslang,jpeg,vulkan
+      env: GCC=10 CONFIG=Release DLL=OFF RENDERER=vulkan Y3=glslang,jpeg,vulkan
       addons: *gcc_xcb
 
     - os: linux
-      dist: bionic
+      dist: focal
       compiler: gcc
-      env: GCC=10 CONFIG=Debug DLL=ON RENDERER=vulkan Y3=aulos,catch2,glslang,jpeg,vulkan
+      env: GCC=10 CONFIG=Debug DLL=ON RENDERER=vulkan Y3=glslang,jpeg,vulkan
       addons: *gcc_xcb
 
     - os: linux
-      dist: bionic
+      dist: focal
       compiler: clang
-      env: CLANG=9 CONFIG=Release DLL=OFF RENDERER=null Y3=aulos,catch2,jpeg
+      env: CLANG=11 CONFIG=Release DLL=OFF RENDERER=null Y3=jpeg
       addons: &clang_xcb
         apt:
-          sources: *all_sources
           packages:
-            - clang-9
+            - clang-11
             - libasound2-dev
             - libstdc++-10-dev
             - libvorbis-dev
@@ -105,14 +100,13 @@ matrix:
             - ninja-build
 
     - os: linux
-      dist: bionic
+      dist: focal
       compiler: clang
-      env: CLANG=9 CONFIG=Release DLL=OFF RENDERER=opengl Y3=aulos,catch2,jpeg
+      env: CLANG=11 CONFIG=Release DLL=OFF RENDERER=opengl Y3=jpeg
       addons: &clang_x11
         apt:
-          sources: *all_sources
           packages:
-            - clang-9
+            - clang-11
             - libasound2-dev
             - libgl-dev
             - libstdc++-10-dev
@@ -121,30 +115,28 @@ matrix:
             - ninja-build
 
     - os: linux
-      dist: bionic
+      dist: focal
       compiler: clang
-      env: CLANG=9 CONFIG=Debug DLL=ON RENDERER=opengl Y3=aulos,catch2,jpeg
+      env: CLANG=11 CONFIG=Debug DLL=ON RENDERER=opengl Y3=jpeg
       addons: *clang_x11
 
     - os: linux
-      dist: bionic
+      dist: focal
       compiler: clang
-      env: CLANG=9 CONFIG=Release DLL=OFF RENDERER=vulkan Y3=aulos,catch2,glslang,jpeg,vulkan
+      env: CLANG=11 CONFIG=Release DLL=OFF RENDERER=vulkan Y3=glslang,jpeg,vulkan
       addons: *clang_xcb
 
     - os: linux
-      dist: bionic
+      dist: focal
       compiler: clang
-      env: CLANG=9 CONFIG=Debug DLL=ON RENDERER=vulkan Y3=aulos,catch2,glslang,jpeg,vulkan
+      env: CLANG=11 CONFIG=Debug DLL=ON RENDERER=vulkan Y3=glslang,jpeg,vulkan
       addons: *clang_xcb
 
 before_install:
-  - mkdir "${HOME}/_cmake" && pushd "${HOME}/_cmake"
-  - wget --output-document=- --quiet https://github.com/Kitware/CMake/releases/download/v3.17.3/cmake-3.17.3-Linux-x86_64.tar.gz | tar -x --gzip --strip-components 1
-  - export PATH="$(pwd)/bin:${PATH}"
-  - popd
   - if [ -n "${CLANG}" ]; then export CC=clang-${CLANG} CXX=clang++-${CLANG}; fi
   - if [ -n "${GCC}" ]; then export ASM_NASM=$(which yasm) CC=gcc-${GCC} CXX=g++-${GCC} LDFLAGS=-fuse-ld=gold; fi
+  - ${CXX} --version
+  - cmake --version
 
 install:
   - mkdir "${HOME}/y3.prefix" && pushd "${HOME}/y3.prefix"

@@ -3,6 +3,5 @@ constStatement
 constVariable
 internalAstError
 missingInclude
-noValidConfiguration
+objectIndex:libs/core/tests/src/matrix.cpp
 unusedFunction
-useStlAlgorithm

@@ -81,7 +81,7 @@ namespace
 			{
 				if (x_ < Border)
 					return x_ > y_ ? Top : x_ < y_ ? Left : TopLeft;
-				else if (rx < Border && y_ < Border)
+				else if (rx < Border)
 					return rx > y_ ? Top : rx < y_ ? Right : TopRight;
 				else
 					return Top;
@@ -91,7 +91,7 @@ namespace
 			{
 				if (x_ < Border)
 					return x_ > ry ? Bottom : x_ < ry ? Left : BottomLeft;
-				else if (rx < Border && ry < Border)
+				else if (rx < Border)
 					return rx > ry ? Bottom : rx < ry ? Right : BottomRight;
 				else
 					return Bottom;
