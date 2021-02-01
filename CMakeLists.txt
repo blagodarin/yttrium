@@ -24,7 +24,7 @@ include(FetchContent)
 include(GNUInstallDirs)
 
 FetchContent_Declare(Primal GIT_REPOSITORY https://github.com/blagodarin/primal.git GIT_TAG 34cd5ce9714d2a69d1245a203cb90e3884ce6f8d)
-FetchContent_Declare(Aulos GIT_REPOSITORY https://github.com/blagodarin/aulos.git GIT_TAG v0.0.5)
+FetchContent_Declare(Aulos GIT_REPOSITORY https://github.com/blagodarin/aulos.git GIT_TAG 86950166335360ed29b8f84aaabd821298afd7d7)
 FetchContent_MakeAvailable(Primal Aulos)
 
 primal_defaults()

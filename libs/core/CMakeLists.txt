@@ -217,8 +217,5 @@ y_sources(ycore "src/utils"
 	src/utils/string.h
 	)
 
+primal_install(ycore EXPORT YttriumTargets)
 install(DIRECTORY include/yttrium DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-install(TARGETS ycore EXPORT YttriumTargets
-	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

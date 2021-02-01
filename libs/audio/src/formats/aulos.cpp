@@ -20,6 +20,8 @@
 #include <yttrium/exceptions.h>
 
 #include <aulos/composition.hpp>
+#include <aulos/format.hpp>
+#include <aulos/renderer.hpp>
 
 #include <limits>
 
@@ -31,8 +33,9 @@ namespace Yt
 		auto composition = aulos::Composition::create(_source->to_string().c_str());
 		if (!composition)
 			throw DataError("Bad Aulos file");
-		_renderer = aulos::Renderer::create(*composition, 44'100, 2, true);
-		_format = { AudioSample::f32, _renderer->channels(), _renderer->samplingRate() };
+		const aulos::AudioFormat format{ 44'100, aulos::ChannelLayout::Stereo };
+		_renderer = aulos::Renderer::create(*composition, format, true);
+		_format = { AudioSample::f32, format.channelCount(), format.samplingRate() };
 		_total_frames = std::numeric_limits<uint64_t>::max();
 	}
 
@@ -40,8 +43,7 @@ namespace Yt
 
 	size_t AulosDecoder::read_frames(void* buffer, size_t frames)
 	{
-		const auto bytes_per_frame = _format.bytes_per_frame();
-		const auto result = _renderer->render(buffer, frames * bytes_per_frame) / bytes_per_frame;
+		const auto result = _renderer->render(static_cast<float*>(buffer), frames);
 		_current_frame += result;
 		return result;
 	}
@@ -49,7 +51,7 @@ namespace Yt
 	bool AulosDecoder::seek_frame(uint64_t frame)
 	{
 		_renderer->restart();
-		_current_frame = _renderer->skipSamples(static_cast<size_t>(frame));
+		_current_frame = _renderer->skipFrames(static_cast<size_t>(frame));
 		return true;
 	}
 }
