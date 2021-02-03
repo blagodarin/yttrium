@@ -23,14 +23,13 @@ include(CMakePackageConfigHelpers)
 include(FetchContent)
 include(GNUInstallDirs)
 
-FetchContent_Declare(Primal GIT_REPOSITORY https://github.com/blagodarin/primal.git GIT_TAG 34cd5ce9714d2a69d1245a203cb90e3884ce6f8d)
-FetchContent_Declare(Aulos GIT_REPOSITORY https://github.com/blagodarin/aulos.git GIT_TAG 86950166335360ed29b8f84aaabd821298afd7d7)
+FetchContent_Declare(Primal GIT_REPOSITORY https://github.com/blagodarin/primal.git GIT_TAG 12ab76b5b8eac1fd07884e1164acb995fe77eaf3)
+FetchContent_Declare(Aulos GIT_REPOSITORY https://github.com/blagodarin/aulos.git GIT_TAG 4186ec5e730c40d424db1b418ed2e855458df0cb)
 FetchContent_MakeAvailable(Primal Aulos)
 
-primal_defaults()
+primal_set_defaults()
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
-set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
@@ -107,6 +106,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 		-Wno-return-std-move-in-c++11
 		-Wno-switch-enum # enumeration value '___' not explicitly handled in switch
 		-Wno-weak-vtables # '___' has no out-of-line virtual method definitions; its vtable will be emitted in every translation unit
+		-Wno-zero-as-null-pointer-constant # False positives.
 		)
 
 	link_libraries(stdc++fs) # Required for GCC 8 standard library which is used by Clang.
