@@ -19,21 +19,18 @@
 
 #include <yttrium/audio/manager.h>
 
-#include <atomic>
-#include <condition_variable>
-#include <deque>
-#include <mutex>
-#include <thread>
-#include <variant>
+#include <aulosplay/player.hpp>
 
 namespace Yt
 {
-	class AudioBackend;
+	class AudioMixer;
 
-	class AudioManagerImpl final : public AudioManager
+	class AudioManagerImpl final
+		: public AudioManager
+		, private aulosplay::PlayerCallbacks
 	{
 	public:
-		explicit AudioManagerImpl(std::unique_ptr<AudioBackend>&&);
+		explicit AudioManagerImpl();
 		~AudioManagerImpl() noexcept override;
 
 		std::shared_ptr<Sound> create_sound(std::unique_ptr<Source>&&) override;
@@ -41,26 +38,13 @@ namespace Yt
 		void play_sound(const std::shared_ptr<Sound>&) override;
 
 	private:
-		void run();
+		void onPlaybackError(aulosplay::PlaybackError) override;
+		void onPlaybackError(std::string&&) override;
+		void onPlaybackStarted() override {}
+		void onPlaybackStopped() override {}
 
 	private:
-		struct PlayMusic
-		{
-			std::shared_ptr<AudioReader> _music;
-		};
-
-		struct PlaySound
-		{
-			std::shared_ptr<Sound> _sound;
-		};
-
-		using Command = std::variant<PlayMusic, PlaySound>;
-
-		const std::unique_ptr<AudioBackend> _backend;
-		std::mutex _mutex;
-		std::condition_variable _condition;
-		std::deque<Command> _commands;
-		std::atomic<bool> _done{ false };
-		std::thread _thread;
+		const std::shared_ptr<AudioMixer> _mixer;
+		std::unique_ptr<aulosplay::Player> _player;
 	};
 }

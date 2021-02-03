@@ -16,7 +16,6 @@
 #
 
 set(_src
-	src/backend.h
 	src/decoder.h
 	src/manager.cpp
 	src/manager.h
@@ -35,7 +34,7 @@ source_group("src" FILES ${_src})
 
 include_config(yaudio ${PROJECT_BINARY_DIR}/config.h)
 target_include_directories(yaudio PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-target_link_libraries(yaudio PRIVATE ycore aulos Threads::Threads)
+target_link_libraries(yaudio PRIVATE ycore aulos aulosplay)
 set_property(TARGET yaudio PROPERTY FOLDER "libs")
 if(BUILD_SHARED_LIBS)
 	set_property(TARGET yaudio PROPERTY DEFINE_SYMBOL Y_AUDIO_EXPORT)
@@ -50,26 +49,6 @@ y_sources(yaudio "include"
 	include/yttrium/audio/sound.h
 	include/yttrium/audio/utils.h
 	)
-
-if(WIN32)
-	target_compile_definitions(yaudio PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
-	y_sources(yaudio "src/backends"
-		src/backends/wasapi.cpp
-		src/backends/wasapi.h
-		)
-	if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-		set_property(SOURCE src/backends/wasapi.cpp APPEND PROPERTY COMPILE_OPTIONS
-			/wd5204 # class has virtual functions, but its trivial destructor is not virtual; instances of objects derived from this class may not be destructed correctly
-			)
-	endif()
-else()
-	find_package(ALSA REQUIRED)
-	target_link_libraries(yaudio PRIVATE ALSA::ALSA)
-	y_sources(yaudio "src/backends"
-		src/backends/alsa.cpp
-		src/backends/alsa.h
-		)
-endif()
 
 y_sources(yaudio "src/formats"
 	src/formats/aulos.cpp

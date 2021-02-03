@@ -3,5 +3,7 @@ constStatement
 constVariable
 internalAstError
 missingInclude
+noValidConfiguration
 objectIndex:libs/core/tests/src/matrix.cpp
+unmatchedSuppression
 unusedFunction

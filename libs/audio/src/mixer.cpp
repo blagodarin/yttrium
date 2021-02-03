@@ -29,7 +29,6 @@ namespace
 {
 	void add_saturate_f32(void* dst, const void* src, size_t count) noexcept
 	{
-		assert(count * sizeof(float) % Yt::AudioBackend::BlockAlignment == 0);
 		for (size_t i = 0; i < count; ++i)
 			static_cast<float*>(dst)[i] = std::clamp(static_cast<float*>(dst)[i] + static_cast<const float*>(src)[i], -1.f, 1.f);
 	}
@@ -41,33 +40,12 @@ namespace Yt
 		: _format{ format }
 	{
 		assert(_format.sample_type() == AudioSample::f32);
-	}
-
-	void AudioMixer::mix(const AudioBackend::BufferView& buffer)
-	{
-		assert(buffer._frames * _format.bytes_per_frame() % AudioBackend::BlockAlignment == 0);
-		auto out = buffer._data;
-		if (_music)
-		{
-			if (!read(out, buffer._frames, _conversion_buffer, *_music))
-				_music.reset();
-			else
-			{
-				_mix_buffer.reset(buffer._frames * _format.bytes_per_frame());
-				out = _mix_buffer.data();
-			}
-		}
-		if (_sound)
-		{
-			if (!read(out, buffer._frames, _conversion_buffer, _sound->_reader))
-				_sound.reset();
-			else if (out != buffer._data)
-				add_saturate_f32(buffer._data, out, buffer._frames * _format.channels());
-		}
+		assert(_format.channels() == 2);
 	}
 
 	void AudioMixer::play_music(const std::shared_ptr<AudioReader>& music)
 	{
+		std::lock_guard lock{ _mutex };
 		if (music == _music)
 			return;
 		if (music)
@@ -77,9 +55,41 @@ namespace Yt
 
 	void AudioMixer::play_sound(const std::shared_ptr<Sound>& sound)
 	{
+		std::lock_guard lock{ _mutex };
 		_sound = std::static_pointer_cast<SoundImpl>(sound);
 		if (_sound)
 			_sound->_reader.restart();
+	}
+
+	size_t AudioMixer::onRead(float* buffer, size_t maxFrames) noexcept
+	{
+		std::lock_guard lock{ _mutex };
+		if (!_music && !_sound)
+		{
+			std::memset(buffer, 0, maxFrames * _format.bytes_per_frame());
+		}
+		else
+		{
+			auto out = buffer;
+			if (_music)
+			{
+				if (!read(out, maxFrames, _conversion_buffer, *_music))
+					_music.reset();
+				else
+				{
+					_mix_buffer.reset(maxFrames * _format.bytes_per_frame());
+					out = static_cast<float*>(_mix_buffer.data());
+				}
+			}
+			if (_sound)
+			{
+				if (!read(out, maxFrames, _conversion_buffer, _sound->_reader))
+					_sound.reset();
+				else if (out != buffer)
+					add_saturate_f32(buffer, out, maxFrames * _format.channels());
+			}
+		}
+		return maxFrames;
 	}
 
 	bool AudioMixer::read(void* out, size_t out_frames, Buffer& in_buffer, AudioReader& reader)
