@@ -44,8 +44,6 @@ namespace
 
 namespace Yt
 {
-	BufferMemory::~BufferMemory() noexcept = default;
-
 	void* BufferMemory::allocate(size_t capacity) noexcept
 	{
 		assert(capacity > 0 && capacity == capacity_for_size(capacity));

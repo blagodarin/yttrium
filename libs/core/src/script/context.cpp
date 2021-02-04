@@ -125,7 +125,7 @@ namespace Yt
 		return nullptr;
 	}
 
-	int ScriptContext::get_int(const std::string& name, int default_value)
+	int ScriptContext::get_int(const std::string& name, int default_value) const
 	{
 		const auto value = find(name);
 		return value ? value->to_int() : default_value;

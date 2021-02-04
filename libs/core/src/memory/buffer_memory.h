@@ -29,7 +29,6 @@ namespace Yt
 		constexpr static size_t MaxSmallBlockSize = 1 << MaxSmallBlockLevel;
 
 		BufferMemory() = default;
-		~BufferMemory() noexcept;
 
 		void* allocate(size_t capacity) noexcept;
 		void deallocate(void* data, size_t capacity) noexcept;
@@ -47,5 +46,5 @@ namespace Yt
 		std::mutex _small_blocks_mutex;
 	};
 
-	extern BufferMemory _buffer_memory;
+	extern BufferMemory _buffer_memory; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 }

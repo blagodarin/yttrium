@@ -19,5 +19,5 @@
 
 namespace Yt
 {
-	BufferMemory _buffer_memory;
+	BufferMemory _buffer_memory; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 }

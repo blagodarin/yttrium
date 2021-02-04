@@ -98,6 +98,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 		-Wno-c++98-compat-pedantic
 		-Wno-covered-switch-default # default label in switch which covers all enumeration values
 		-Wno-ctad-maybe-unsupported
+		-Wno-double-promotion
 		-Wno-exit-time-destructors
 		-Wno-float-equal
 		-Wno-global-constructors

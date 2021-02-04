@@ -72,7 +72,7 @@ namespace Yt
 		ScriptValue* find(const std::string& name) const;
 
 		///
-		int get_int(const std::string& name, int default_value);
+		int get_int(const std::string& name, int default_value) const;
 
 		/// Get the root context.
 		/// \return Root context.

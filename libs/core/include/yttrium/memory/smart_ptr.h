@@ -82,7 +82,7 @@ namespace Yt
 		}
 
 	private:
-		static constexpr Value* Sentinel = Deleter::template Sentinel<Value>;
+		static constexpr Value* Sentinel = Deleter::template Sentinel<Value>; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 		Value* _pointer = Sentinel;
 	};
 
@@ -90,7 +90,7 @@ namespace Yt
 	struct SmartPtrFunctionDeleter
 	{
 		template <typename T>
-		static constexpr T* Sentinel = nullptr;
+		static constexpr T* Sentinel = nullptr; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 
 		template <typename T>
 		static void free(T* pointer) noexcept

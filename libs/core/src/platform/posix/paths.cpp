@@ -42,7 +42,7 @@ namespace Yt
 		buffer.reserve(buffer.size() + application_name.size());
 		buffer += application_name;
 		const auto home_path = ::home_directory_path();
-		const auto data_path = home_path / buffer;
+		auto data_path = home_path / buffer;
 		std::filesystem::create_directory(data_path, home_path);
 		return data_path;
 	}
