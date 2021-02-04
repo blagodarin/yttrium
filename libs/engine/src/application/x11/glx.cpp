@@ -82,7 +82,7 @@ namespace Yt
 		GLXFBConfig best_fbc{};
 		{
 			int fbc_count = 0;
-			const SmartPtr<GLXFBConfig, ::XFree> fbcs{ ::glXChooseFBConfig(display, screen, attributes, &fbc_count) };
+			const primal::CPtr<GLXFBConfig, ::XFree> fbcs{ ::glXChooseFBConfig(display, screen, attributes, &fbc_count) };
 			if (!fbcs)
 				throw InitializationError("Failed to obtain GLXFBConfigs");
 			int best_has_sample_buffers = 0;

@@ -23,8 +23,8 @@ include(CMakePackageConfigHelpers)
 include(FetchContent)
 include(GNUInstallDirs)
 
-FetchContent_Declare(Primal GIT_REPOSITORY https://github.com/blagodarin/primal.git GIT_TAG 12ab76b5b8eac1fd07884e1164acb995fe77eaf3)
-FetchContent_Declare(Aulos GIT_REPOSITORY https://github.com/blagodarin/aulos.git GIT_TAG 4186ec5e730c40d424db1b418ed2e855458df0cb)
+FetchContent_Declare(Primal GIT_REPOSITORY https://github.com/blagodarin/primal.git GIT_TAG 1c205877898c02749fc848f379ea5be24db6844d)
+FetchContent_Declare(Aulos GIT_REPOSITORY https://github.com/blagodarin/aulos.git GIT_TAG af9e625adc032451641361eb7f141be5d4c8e9b3)
 FetchContent_MakeAvailable(Primal Aulos)
 
 primal_set_defaults()

@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <yttrium/memory/smart_ptr.h>
+#include <primal/pointer.hpp>
 
 #include <GL/glx.h>
 
@@ -47,7 +47,7 @@ namespace Yt
 	private:
 		::Display* const _display;
 		const int _screen;
-		SmartPtr<XVisualInfo, ::XFree> _visual_info;
+		primal::CPtr<XVisualInfo, ::XFree> _visual_info;
 		GLXContext _context = nullptr;
 		Extensions _extensions;
 	};

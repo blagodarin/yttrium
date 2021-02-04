@@ -28,7 +28,7 @@ source_group("src" FILES ${_src})
 
 include_config(ycore ${PROJECT_BINARY_DIR}/config.h)
 target_include_directories(ycore PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-target_link_libraries(ycore PRIVATE Y3::jpeg Threads::Threads)
+target_link_libraries(ycore PRIVATE primal Y3::jpeg Threads::Threads)
 set_property(TARGET ycore PROPERTY FOLDER "libs")
 if(BUILD_SHARED_LIBS)
 	set_property(TARGET ycore PROPERTY DEFINE_SYMBOL Y_CORE_EXPORT)
@@ -73,7 +73,6 @@ y_sources(ycore "include/memory"
 	include/yttrium/memory/buffer_appender.h
 	include/yttrium/memory/buffer.h
 	include/yttrium/memory/pool.h
-	include/yttrium/memory/smart_ptr.h
 	)
 
 y_sources(ycore "include/script"

@@ -67,14 +67,12 @@ namespace Yt
 
 		struct HIconDeleter
 		{
-			template <typename>
-			static constexpr HICON Sentinel = NULL;
 			static void free(HICON) noexcept;
 		};
 
 		WindowBackendCallbacks& _callbacks;
 		NativeApplication _application;
-		SmartPtrBase<std::remove_pointer_t<HICON>, HIconDeleter> _icon;
+		primal::Pointer<std::remove_pointer_t<HICON>, HIconDeleter> _icon;
 		NativeWindow _hwnd = _application.create_window(*this);
 		const WindowDC _hdc{ _hwnd };
 #if Y_RENDERER_OPENGL

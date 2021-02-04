@@ -50,7 +50,7 @@ namespace Yt
 		xcb_window_t xcb_window() const noexcept { return _window; }
 
 	private:
-		using P_Atom = SmartPtr<xcb_intern_atom_reply_t, ::free>;
+		using P_Atom = primal::CPtr<xcb_intern_atom_reply_t, ::free>;
 
 		P_Atom make_atom(std::string_view);
 
@@ -58,7 +58,7 @@ namespace Yt
 		class EmptyCursor;
 		class Keyboard;
 
-		using P_Event = SmartPtr<xcb_generic_event_t, ::free>;
+		using P_Event = primal::CPtr<xcb_generic_event_t, ::free>;
 
 		WindowBackendCallbacks& _callbacks;
 		NativeApplication _application;

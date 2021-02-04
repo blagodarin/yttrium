@@ -17,8 +17,9 @@
 
 #include <yttrium/storage/paths.h>
 
-#include <yttrium/memory/smart_ptr.h>
 #include "error.h"
+
+#include <primal/pointer.hpp>
 
 #include <shlobj.h>
 #include <versionhelpers.h>
@@ -27,7 +28,7 @@ namespace
 {
 	std::filesystem::path known_folder_path(const KNOWNFOLDERID& id)
 	{
-		Yt::SmartPtr<wchar_t, ::CoTaskMemFree> path;
+		primal::CPtr<wchar_t, ::CoTaskMemFree> path;
 		if (const auto hr = ::SHGetKnownFolderPath(id, KF_FLAG_CREATE, nullptr, path.out()); FAILED(hr))
 		{
 			Yt::log_error("SHGetKnownFolderPath", hr);

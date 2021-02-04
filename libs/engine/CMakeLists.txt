@@ -26,7 +26,7 @@ source_group("src" FILES ${_src})
 
 include_config(yengine ${PROJECT_BINARY_DIR}/config.h)
 target_include_directories(yengine PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-target_link_libraries(yengine PRIVATE yaudio ycore Threads::Threads)
+target_link_libraries(yengine PRIVATE yaudio ycore primal Threads::Threads)
 set_property(TARGET yengine PROPERTY FOLDER "libs")
 if(BUILD_SHARED_LIBS)
 	set_property(TARGET yengine PROPERTY DEFINE_SYMBOL Y_ENGINE_EXPORT)

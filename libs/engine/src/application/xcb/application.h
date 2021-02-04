@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <yttrium/memory/smart_ptr.h>
+#include <primal/pointer.hpp>
 
 #include <xcb/xcb.h>
 
@@ -32,7 +32,7 @@ namespace Yt
 		xcb_screen_t* screen() const noexcept { return _screen; }
 
 	private:
-		SmartPtr<xcb_connection_t, ::xcb_disconnect> _connection;
+		primal::CPtr<xcb_connection_t, ::xcb_disconnect> _connection;
 		xcb_screen_t* _screen = nullptr;
 	};
 }

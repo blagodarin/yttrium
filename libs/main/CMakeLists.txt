@@ -29,7 +29,7 @@ y_sources(ymain "include"
 	)
 
 target_include_directories(ymain PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-target_link_libraries(ymain PRIVATE ycore)
+target_link_libraries(ymain PRIVATE ycore primal)
 set_target_properties(ymain PROPERTIES FOLDER "libs")
 
 install(DIRECTORY include/yttrium DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})

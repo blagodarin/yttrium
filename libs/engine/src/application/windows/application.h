@@ -18,7 +18,8 @@
 #pragma once
 
 #include <yttrium/key.h>
-#include <yttrium/memory/smart_ptr.h>
+
+#include <primal/pointer.hpp>
 
 #include <string_view>
 #include <unordered_map>
@@ -42,12 +43,10 @@ namespace Yt
 
 	struct HWndDeleter
 	{
-		template <typename>
-		static constexpr HWND Sentinel = NULL;
 		static void free(HWND) noexcept;
 	};
 
-	using NativeWindow = SmartPtrBase<std::remove_pointer_t<HWND>, HWndDeleter>;
+	using NativeWindow = primal::Pointer<std::remove_pointer_t<HWND>, HWndDeleter>;
 
 	class NativeApplication
 	{

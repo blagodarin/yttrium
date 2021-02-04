@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <yttrium/memory/smart_ptr.h>
+#include <primal/pointer.hpp>
 
 #include <type_traits>
 
@@ -35,8 +35,8 @@ namespace Yt
 		int screen() const noexcept { return _screen; }
 
 	private:
-		SmartPtr<::Display, ::XCloseDisplay> _display;
+		primal::CPtr<::Display, ::XCloseDisplay> _display;
 		int _screen = 0;
-		SmartPtr<std::remove_pointer_t<XIM>, ::XCloseIM> _input_method;
+		primal::CPtr<std::remove_pointer_t<XIM>, ::XCloseIM> _input_method;
 	};
 }
