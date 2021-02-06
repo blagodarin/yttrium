@@ -64,7 +64,6 @@ int ymain(int, char**)
 
 	Game game{ resource_loader, gui };
 	script.define("debug", [&game](const Yt::ScriptCall&) { game.toggle_debug_text(); });
-	application.on_update([&window, &game](std::chrono::milliseconds advance) { game.update(window, advance); });
 	window.on_render([&gui, &game](Yt::RenderPass& pass, const Yt::Vector2& cursor, const Yt::RenderReport& report) {
 		gui.draw(pass, cursor);
 		game.draw_debug_graphics(pass, cursor, report);
@@ -73,6 +72,8 @@ int ymain(int, char**)
 	gui.start();
 	window.set_title(gui.title());
 	window.show();
-	application.run();
+	application.run([&window, &game](const std::chrono::milliseconds& advance) {
+		game.update(window, advance);
+	});
 	return 0;
 }

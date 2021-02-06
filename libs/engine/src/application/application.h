@@ -18,8 +18,6 @@
 #pragma once
 
 #include <atomic>
-#include <chrono>
-#include <functional>
 
 namespace Yt
 {
@@ -35,7 +33,6 @@ namespace Yt
 		static void add_window(Application&, WindowPrivate&);
 
 	private:
-		std::function<void(std::chrono::milliseconds)> _on_update;
 		std::atomic<WindowPrivate*> _window{ nullptr };
 
 		friend Application;

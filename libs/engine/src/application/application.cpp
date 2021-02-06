@@ -62,12 +62,7 @@ namespace Yt
 
 	Application::~Application() noexcept = default;
 
-	void Application::on_update(const std::function<void(std::chrono::milliseconds)>& callback)
-	{
-		_private->_on_update = callback;
-	}
-
-	void Application::run()
+	void Application::run(const std::function<void(const std::chrono::milliseconds&)>& idle_callback)
 	{
 		using namespace std::literals::chrono_literals;
 
@@ -81,8 +76,8 @@ namespace Yt
 		auto fps_time = 0ms;
 		while (_private->process_events())
 		{
-			if (_private->_on_update)
-				_private->_on_update(advance);
+			if (idle_callback)
+				idle_callback(advance);
 
 			_private->window()->render(next_report, last_report);
 

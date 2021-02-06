@@ -33,10 +33,7 @@ namespace Yt
 		~Application() noexcept;
 
 		///
-		void on_update(const std::function<void(std::chrono::milliseconds)>&);
-
-		///
-		void run();
+		void run(const std::function<void(const std::chrono::milliseconds&)>&);
 
 	private:
 		const std::unique_ptr<class ApplicationPrivate> _private;
