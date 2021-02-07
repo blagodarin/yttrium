@@ -15,6 +15,10 @@
 # limitations under the License.
 #
 
+find_package(SPIRV-Tools REQUIRED)
+find_package(SPIRV-Tools-opt REQUIRED)
+find_package(SPIRV-Tools-link REQUIRED)
+
 set(_src
 	src/main.cpp
 	)
@@ -23,13 +27,14 @@ add_executable(yglslc ${_src})
 source_group("src" FILES ${_src})
 
 find_library(_lib_glslang "glslang")
+find_library(_lib_hlsl "HLSL")
 find_library(_lib_oglcompiler "OGLCompiler")
 find_library(_lib_osdependent "OSDependent")
 find_library(_lib_spirv "SPIRV")
 find_path(_include_glslang "glslang/SPIRV/GlslangToSpv.h")
-mark_as_advanced(_include_glslang _lib_glslang _lib_oglcompiler _lib_osdependent _lib_spirv)
+mark_as_advanced(_include_glslang _lib_glslang _lib_hlsl _lib_oglcompiler _lib_osdependent _lib_spirv)
 target_include_directories(yglslc SYSTEM PRIVATE ${_include_glslang})
-target_link_libraries(yglslc PRIVATE ymain ${_lib_glslang} ${_lib_oglcompiler} ${_lib_osdependent} ${_lib_spirv} Threads::Threads)
+target_link_libraries(yglslc PRIVATE ymain ${_lib_spirv} ${_lib_glslang} ${_lib_oglcompiler} ${_lib_osdependent} ${_lib_hlsl} SPIRV-Tools SPIRV-Tools-link SPIRV-Tools-opt Threads::Threads)
 set_target_properties(yglslc PROPERTIES FOLDER "tools" MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
 install(TARGETS yglslc RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

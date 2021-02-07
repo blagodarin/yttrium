@@ -123,27 +123,6 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	if(ENABLE_COVERAGE)
 		add_compile_options(--coverage)
 		list(APPEND DYNAMIC_LINKER_FLAGS --coverage)
-
-		option(ENABLE_COVERAGE_LCOV "Enable coverage analysis using Lcov" OFF)
-		if(ENABLE_COVERAGE_LCOV)
-			find_package(Gcov REQUIRED)
-			find_package(Lcov REQUIRED)
-			add_custom_target(lcov
-				COMMAND ${LCOV_EXECUTABLE} --capture --no-external --quiet
-					--base-directory ${PROJECT_SOURCE_DIR}
-					--directory ${PROJECT_BINARY_DIR}
-					--gcov-tool ${GCOV_EXECUTABLE}
-					--output-file ${PROJECT_BINARY_DIR}/coverage.info
-				COMMAND ${LCOV_EXECUTABLE} --summary ${PROJECT_BINARY_DIR}/coverage.info
-				COMMAND ${GENHTML_EXECUTABLE} ${PROJECT_BINARY_DIR}/coverage.info --quiet
-					--output-directory ${PROJECT_BINARY_DIR}/coverage
-					--rc genhtml_hi_limit=67
-					--rc genhtml_med_limit=34
-				VERBATIM)
-			add_custom_target(lcov_clean
-				COMMAND ${LCOV_EXECUTABLE} --zerocounters --quiet --directory ${PROJECT_BINARY_DIR}
-				VERBATIM)
-		endif()
 	endif()
 
 	option(ENABLE_PROFILING "Build with profiling support" OFF)

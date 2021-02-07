@@ -9,54 +9,14 @@ matrix:
     - os: linux
       dist: focal
       compiler: clang
-      env: CLANG=11 CONFIG=Debug RENDERER=null Y3=cppcheck,jpeg,vorbis ANALYZE=1
+      env: CLANG=11 CONFIG=Debug RENDERER=null Y3=jpeg,vorbis ANALYZE=1
       addons:
         apt:
           packages:
             - clang-11
             - clang-format-11
             - clang-tidy-11
-            - libasound2-dev
-            - libstdc++-10-dev
-            - libvorbis-dev
-            - libxcb-image0-dev
-            - libxcb-xkb-dev
-            - libxkbcommon-dev
-            - libxkbcommon-x11-dev
-            - nasm
-            - ninja-build
-
-    - os: linux
-      dist: focal
-      compiler: gcc
-      env: GCC=10 CONFIG=Release RENDERER=null Y3=jpeg,vorbis
-      addons: &gcc_xcb
-        apt:
-          packages:
-            - g++-10
-            - libasound2-dev
-            - libvorbis-dev
-            - libxcb-image0-dev
-            - libxcb-xkb-dev
-            - libxkbcommon-dev
-            - libxkbcommon-x11-dev
-            - yasm
-            - ninja-build
-
-    - os: linux
-      dist: focal
-      compiler: gcc
-      env: GCC=10 CONFIG=Debug RENDERER=null Y3=jpeg,lcov,vorbis COVERAGE=1
-      addons: *gcc_xcb
-
-    - os: linux
-      dist: focal
-      compiler: clang
-      env: CLANG=11 CONFIG=Release RENDERER=null Y3=jpeg,vorbis
-      addons: &clang_xcb
-        apt:
-          packages:
-            - clang-11
+            - cppcheck
             - libasound2-dev
             - libstdc++-10-dev
             - libvorbis-dev
@@ -111,26 +71,72 @@ matrix:
     - os: linux
       dist: focal
       compiler: gcc
-      env: GCC=10 CONFIG=Release RENDERER=vulkan Y3=glslang,jpeg,vorbis,vulkan
-      addons: *gcc_xcb
+      env: GCC=10 CONFIG=Release RENDERER=vulkan Y3=jpeg,vorbis
+      addons: &gcc_xcb_vulkan
+        apt:
+          packages:
+            - g++-10
+            - libasound2-dev
+            - libvorbis-dev
+            - libvulkan-dev
+            - libxcb-image0-dev
+            - libxcb-xkb-dev
+            - libxkbcommon-dev
+            - libxkbcommon-x11-dev
+            - glslang-dev
+            - spirv-tools
+            - yasm
+            - ninja-build
 
     - os: linux
       dist: focal
       compiler: gcc
-      env: GCC=10 CONFIG=Debug RENDERER=vulkan Y3=glslang,jpeg,vorbis,vulkan
-      addons: *gcc_xcb
+      env: GCC=10 CONFIG=Debug RENDERER=vulkan Y3=jpeg,vorbis
+      addons: *gcc_xcb_vulkan
 
     - os: linux
       dist: focal
       compiler: clang
-      env: CLANG=11 CONFIG=Release RENDERER=vulkan Y3=glslang,jpeg,vorbis,vulkan
-      addons: *clang_xcb
+      env: CLANG=11 CONFIG=Release RENDERER=vulkan Y3=jpeg,vorbis
+      addons: &clang_xcb_vulkan
+        apt:
+          packages:
+            - clang-11
+            - libasound2-dev
+            - libstdc++-10-dev
+            - libvorbis-dev
+            - libvulkan-dev
+            - libxcb-image0-dev
+            - libxcb-xkb-dev
+            - libxkbcommon-dev
+            - libxkbcommon-x11-dev
+            - glslang-dev
+            - spirv-tools
+            - nasm
+            - ninja-build
 
     - os: linux
       dist: focal
       compiler: clang
-      env: CLANG=11 CONFIG=Debug RENDERER=vulkan Y3=glslang,jpeg,vorbis,vulkan
-      addons: *clang_xcb
+      env: CLANG=11 CONFIG=Debug RENDERER=vulkan Y3=jpeg,vorbis
+      addons: *clang_xcb_vulkan
+
+    - os: linux
+      dist: focal
+      compiler: gcc
+      env: GCC=10 CONFIG=Debug RENDERER=null Y3=jpeg,vorbis COVERAGE=1
+      addons:
+        apt:
+          packages:
+            - g++-10
+            - libasound2-dev
+            - libvorbis-dev
+            - libxcb-image0-dev
+            - libxcb-xkb-dev
+            - libxkbcommon-dev
+            - libxkbcommon-x11-dev
+            - yasm
+            - ninja-build
 
 before_install:
   - if [ -n "${CLANG}" ]; then export CC=clang-${CLANG} CXX=clang++-${CLANG}; fi
@@ -148,7 +154,7 @@ script:
   - if [ -z "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DBUILD_EXAMPLES=ON -DINSTALL_EXAMPLES=ON"; fi
   - if [ -z "${ANALYZE}" ] && [ -z "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DENABLE_SANITIZERS=ON"; fi
   - if [ -n "${ANALYZE}" ]; then CMAKE_OPTIONS+=" -DENABLE_CLANG_FORMAT=ON -DENABLE_CLANG_TIDY=ON -DENABLE_CPPCHECK=ON -DENABLE_DIFF=ON"; fi
-  - if [ -n "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DENABLE_COVERAGE=ON -DENABLE_COVERAGE_LCOV=ON"; fi
+  - if [ -n "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DENABLE_COVERAGE=ON"; fi
   - cmake -H. -B"${HOME}/yttrium.build" -G"Ninja" -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=${CONFIG} -DCMAKE_INSTALL_PREFIX="${HOME}/yttrium.install" -DCMAKE_PREFIX_PATH="${HOME}/y3.prefix" -DY_RENDERER=${RENDERER} ${CMAKE_OPTIONS}
   - pushd "${HOME}/yttrium.build"
   - if [ -n "${ANALYZE}" ]; then cmake --build . --target cppcheck; fi
@@ -158,8 +164,6 @@ script:
   - if [ -z "${ANALYZE}" ]; then TERM=dumb cmake --build .; fi
   - if [ -z "${ANALYZE}" ]; then ctest --output-on-failure; fi
   - if [ -z "${ANALYZE}" ] && [ -z "${COVERAGE}" ]; then cmake --build . --target install; fi
-  # lcov 1.14 doesn't work with GCC 9.x, see https://github.com/linux-test-project/lcov/issues/58
-  #- if [ -n "${COVERAGE}" ]; then cmake --build . --target lcov; fi
   - popd
 
 after_success:
