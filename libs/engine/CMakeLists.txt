@@ -21,17 +21,13 @@ set(_src
 	src/utf8.h
 	)
 
-add_library(yengine ${_src})
+add_library(yengine STATIC ${_src})
 source_group("src" FILES ${_src})
 
 include_config(yengine ${PROJECT_BINARY_DIR}/config.h)
 target_include_directories(yengine PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 target_link_libraries(yengine PRIVATE yaudio ycore primal Threads::Threads)
-set_property(TARGET yengine PROPERTY FOLDER "libs")
-if(BUILD_SHARED_LIBS)
-	set_property(TARGET yengine PROPERTY DEFINE_SYMBOL Y_ENGINE_EXPORT)
-	target_compile_definitions(yengine INTERFACE Y_ENGINE_IMPORT)
-endif()
+set_target_properties(yengine PROPERTIES FOLDER "libs" MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 if(WIN32)
 	find_package(Y3_freetype REQUIRED)
 	target_compile_definitions(yengine PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)

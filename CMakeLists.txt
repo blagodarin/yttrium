@@ -23,8 +23,9 @@ include(CMakePackageConfigHelpers)
 include(FetchContent)
 include(GNUInstallDirs)
 
-FetchContent_Declare(Primal GIT_REPOSITORY https://github.com/blagodarin/primal.git GIT_TAG 1c205877898c02749fc848f379ea5be24db6844d)
-FetchContent_Declare(Aulos GIT_REPOSITORY https://github.com/blagodarin/aulos.git GIT_TAG af9e625adc032451641361eb7f141be5d4c8e9b3)
+set(AULOS_STATIC_RUNTIME ON)
+FetchContent_Declare(Primal GIT_REPOSITORY https://github.com/blagodarin/primal.git GIT_TAG f58d794d7caef44939011e882b97c1eed5e4a1a2)
+FetchContent_Declare(Aulos GIT_REPOSITORY https://github.com/blagodarin/aulos.git GIT_TAG f9a719cda0ea6ac2df1f529b2f309f46a573701a)
 FetchContent_MakeAvailable(Primal Aulos)
 
 primal_set_defaults()
@@ -262,8 +263,6 @@ if(BUILD_TESTS)
 	add_subdirectory(libs/core/tests)
 	add_subdirectory(libs/core/tests/bootstrap)
 	add_subdirectory(libs/engine/tests)
-	add_custom_target(check DEPENDS check_audio check_core check_engine)
-	set_target_properties(check PROPERTIES FOLDER ".phony")
 endif()
 
 if(BUILD_EXAMPLES)
@@ -279,7 +278,6 @@ if(ENABLE_CLANG_FORMAT)
 		WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
 		COMMENT "Running ClangFormat"
 		VERBATIM)
-	set_target_properties(format PROPERTIES FOLDER ".phony")
 endif()
 
 if(ENABLE_CLANG_TIDY)
@@ -298,7 +296,6 @@ if(ENABLE_CLANG_TIDY)
 		COMMAND ${CLANG_TIDY_EXECUTABLE} -header-filter=.* -p=${PROJECT_BINARY_DIR} -quiet ${_cpps}
 		COMMENT "Running ClangTidy"
 		VERBATIM)
-	set_target_properties(tidy PROPERTIES FOLDER ".phony")
 endif()
 
 if(ENABLE_CPPCHECK)
@@ -316,7 +313,6 @@ if(ENABLE_CPPCHECK)
 			${PROJECT_SOURCE_DIR}
 		COMMENT "Running Cppcheck"
 		VERBATIM)
-	set_target_properties(cppcheck PROPERTIES FOLDER ".phony")
 endif()
 
 if(ENABLE_DIFF)

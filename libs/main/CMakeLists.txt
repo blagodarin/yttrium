@@ -30,7 +30,7 @@ y_sources(ymain "include"
 
 target_include_directories(ymain PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 target_link_libraries(ymain PRIVATE ycore primal)
-set_target_properties(ymain PROPERTIES FOLDER "libs")
+set_target_properties(ymain PROPERTIES FOLDER "libs" MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
 install(DIRECTORY include/yttrium DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 install(TARGETS ymain EXPORT YttriumTargets

@@ -23,17 +23,13 @@ set(_src
 	src/translation.cpp
 	)
 
-add_library(ycore ${_src})
+add_library(ycore STATIC ${_src})
 source_group("src" FILES ${_src})
 
 include_config(ycore ${PROJECT_BINARY_DIR}/config.h)
 target_include_directories(ycore PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 target_link_libraries(ycore PRIVATE primal Y3::jpeg Threads::Threads)
-set_property(TARGET ycore PROPERTY FOLDER "libs")
-if(BUILD_SHARED_LIBS)
-	set_property(TARGET ycore PROPERTY DEFINE_SYMBOL Y_CORE_EXPORT)
-	target_compile_definitions(ycore INTERFACE Y_CORE_IMPORT)
-endif()
+set_target_properties(ycore PROPERTIES FOLDER "libs" MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 if(WIN32)
 	target_compile_definitions(ycore PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
 endif()

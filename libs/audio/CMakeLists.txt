@@ -29,17 +29,13 @@ set(_src
 	src/wav.h
 	)
 
-add_library(yaudio ${_src})
+add_library(yaudio STATIC ${_src})
 source_group("src" FILES ${_src})
 
 include_config(yaudio ${PROJECT_BINARY_DIR}/config.h)
 target_include_directories(yaudio PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 target_link_libraries(yaudio PRIVATE ycore aulos aulosplay)
-set_property(TARGET yaudio PROPERTY FOLDER "libs")
-if(BUILD_SHARED_LIBS)
-	set_property(TARGET yaudio PROPERTY DEFINE_SYMBOL Y_AUDIO_EXPORT)
-	target_compile_definitions(yaudio INTERFACE Y_AUDIO_IMPORT)
-endif()
+set_target_properties(yaudio PROPERTIES FOLDER "libs" MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
 y_sources(yaudio "include"
 	include/yttrium/audio/api.h

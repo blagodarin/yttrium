@@ -29,16 +29,12 @@ endif()
 
 include_config(test_engine ${PROJECT_BINARY_DIR}/config.h)
 target_link_libraries(test_engine PRIVATE ycore yengine ytest)
-set_target_properties(test_engine PROPERTIES FOLDER "tests")
+set_target_properties(test_engine PROPERTIES FOLDER "tests" MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 	target_compile_options(test_engine PRIVATE
 		/wd5204 # class has virtual functions, but its trivial destructor is not virtual; instances of objects derived from this class may not be destructed correctly
 		)
+	target_link_options(test_engine PRIVATE "/NODEFAULTLIB:$<IF:$<CONFIG:Debug>,LIBCMT,LIBCMTD>")
 endif()
 
-add_test(NAME engine COMMAND test_engine --reporter compact)
-add_custom_target(check_engine
-	COMMAND test_engine --reporter compact
-	COMMENT "Running engine tests"
-	VERBATIM)
-set_target_properties(check_engine PROPERTIES FOLDER ".phony")
+add_test(NAME engine COMMAND test_engine)

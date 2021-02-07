@@ -23,6 +23,6 @@ add_executable(ytr ${_src})
 source_group("src" FILES ${_src})
 
 target_link_libraries(ytr PRIVATE ycore ymain)
-set_target_properties(ytr PROPERTIES FOLDER "tools")
+set_target_properties(ytr PROPERTIES FOLDER "tools" MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
 install(TARGETS ytr RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

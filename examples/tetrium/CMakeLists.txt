@@ -26,6 +26,10 @@ set(_src
 add_executable(tetrium WIN32 ${_src})
 source_group("src" FILES ${_src})
 target_link_libraries(tetrium PRIVATE yaudio ycore yengine ymain)
+set_target_properties(tetrium PROPERTIES FOLDER "examples" MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+	target_link_options(tetrium PRIVATE "/NODEFAULTLIB:$<IF:$<CONFIG:Debug>,LIBCMT,LIBCMTD>")
+endif()
 if(WIN32)
 	set_property(TARGET tetrium APPEND_STRING PROPERTY LINK_FLAGS_DEBUG /SUBSYSTEM:CONSOLE)
 	target_sources(tetrium PRIVATE tetrium.rc)
@@ -49,7 +53,7 @@ add_ypack_target(tetrium_package
 	DEPENDS tetrium_localization)
 add_dependencies(tetrium tetrium_package)
 
-set_target_properties(tetrium tetrium_localization tetrium_package PROPERTIES FOLDER "examples")
+set_target_properties(tetrium_localization tetrium_package PROPERTIES FOLDER "examples")
 
 if(INSTALL_EXAMPLES)
 	install(TARGETS tetrium RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

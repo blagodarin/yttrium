@@ -30,6 +30,6 @@ find_path(_include_glslang "glslang/SPIRV/GlslangToSpv.h")
 mark_as_advanced(_include_glslang _lib_glslang _lib_oglcompiler _lib_osdependent _lib_spirv)
 target_include_directories(yglslc SYSTEM PRIVATE ${_include_glslang})
 target_link_libraries(yglslc PRIVATE ymain ${_lib_glslang} ${_lib_oglcompiler} ${_lib_osdependent} ${_lib_spirv} Threads::Threads)
-set_target_properties(yglslc PROPERTIES FOLDER "tools")
+set_target_properties(yglslc PROPERTIES FOLDER "tools" MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
 install(TARGETS yglslc RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

@@ -9,7 +9,7 @@ matrix:
     - os: linux
       dist: focal
       compiler: clang
-      env: CLANG=11 CONFIG=Debug DLL=ON RENDERER=null Y3=cppcheck,jpeg ANALYZE=1
+      env: CLANG=11 CONFIG=Debug RENDERER=null Y3=cppcheck,jpeg,vorbis ANALYZE=1
       addons:
         apt:
           packages:
@@ -29,7 +29,7 @@ matrix:
     - os: linux
       dist: focal
       compiler: gcc
-      env: GCC=10 CONFIG=Release DLL=OFF RENDERER=null Y3=jpeg
+      env: GCC=10 CONFIG=Release RENDERER=null Y3=jpeg,vorbis
       addons: &gcc_xcb
         apt:
           packages:
@@ -46,45 +46,13 @@ matrix:
     - os: linux
       dist: focal
       compiler: gcc
-      env: GCC=10 CONFIG=Debug DLL=ON RENDERER=null Y3=jpeg,lcov COVERAGE=1
-      addons: *gcc_xcb
-
-    - os: linux
-      dist: focal
-      compiler: gcc
-      env: GCC=10 CONFIG=Release DLL=OFF RENDERER=opengl Y3=jpeg
-      addons: &gcc_x11
-        apt:
-          packages:
-            - g++-10
-            - libasound2-dev
-            - libgl-dev
-            - libvorbis-dev
-            - yasm
-            - ninja-build
-
-    - os: linux
-      dist: focal
-      compiler: gcc
-      env: GCC=10 CONFIG=Debug DLL=ON RENDERER=opengl Y3=jpeg
-      addons: *gcc_x11
-
-    - os: linux
-      dist: focal
-      compiler: gcc
-      env: GCC=10 CONFIG=Release DLL=OFF RENDERER=vulkan Y3=glslang,jpeg,vulkan
-      addons: *gcc_xcb
-
-    - os: linux
-      dist: focal
-      compiler: gcc
-      env: GCC=10 CONFIG=Debug DLL=ON RENDERER=vulkan Y3=glslang,jpeg,vulkan
+      env: GCC=10 CONFIG=Debug RENDERER=null Y3=jpeg,lcov,vorbis COVERAGE=1
       addons: *gcc_xcb
 
     - os: linux
       dist: focal
       compiler: clang
-      env: CLANG=11 CONFIG=Release DLL=OFF RENDERER=null Y3=jpeg
+      env: CLANG=11 CONFIG=Release RENDERER=null Y3=jpeg,vorbis
       addons: &clang_xcb
         apt:
           packages:
@@ -101,8 +69,28 @@ matrix:
 
     - os: linux
       dist: focal
+      compiler: gcc
+      env: GCC=10 CONFIG=Release RENDERER=opengl Y3=jpeg,vorbis
+      addons: &gcc_x11
+        apt:
+          packages:
+            - g++-10
+            - libasound2-dev
+            - libgl-dev
+            - libvorbis-dev
+            - yasm
+            - ninja-build
+
+    - os: linux
+      dist: focal
+      compiler: gcc
+      env: GCC=10 CONFIG=Debug RENDERER=opengl Y3=jpeg,vorbis
+      addons: *gcc_x11
+
+    - os: linux
+      dist: focal
       compiler: clang
-      env: CLANG=11 CONFIG=Release DLL=OFF RENDERER=opengl Y3=jpeg
+      env: CLANG=11 CONFIG=Release RENDERER=opengl Y3=jpeg,vorbis
       addons: &clang_x11
         apt:
           packages:
@@ -117,19 +105,31 @@ matrix:
     - os: linux
       dist: focal
       compiler: clang
-      env: CLANG=11 CONFIG=Debug DLL=ON RENDERER=opengl Y3=jpeg
+      env: CLANG=11 CONFIG=Debug RENDERER=opengl Y3=jpeg,vorbis
       addons: *clang_x11
 
     - os: linux
       dist: focal
+      compiler: gcc
+      env: GCC=10 CONFIG=Release RENDERER=vulkan Y3=glslang,jpeg,vorbis,vulkan
+      addons: *gcc_xcb
+
+    - os: linux
+      dist: focal
+      compiler: gcc
+      env: GCC=10 CONFIG=Debug RENDERER=vulkan Y3=glslang,jpeg,vorbis,vulkan
+      addons: *gcc_xcb
+
+    - os: linux
+      dist: focal
       compiler: clang
-      env: CLANG=11 CONFIG=Release DLL=OFF RENDERER=vulkan Y3=glslang,jpeg,vulkan
+      env: CLANG=11 CONFIG=Release RENDERER=vulkan Y3=glslang,jpeg,vorbis,vulkan
       addons: *clang_xcb
 
     - os: linux
       dist: focal
       compiler: clang
-      env: CLANG=11 CONFIG=Debug DLL=ON RENDERER=vulkan Y3=glslang,jpeg,vulkan
+      env: CLANG=11 CONFIG=Debug RENDERER=vulkan Y3=glslang,jpeg,vorbis,vulkan
       addons: *clang_xcb
 
 before_install:
@@ -140,7 +140,7 @@ before_install:
 
 install:
   - mkdir "${HOME}/y3.prefix" && pushd "${HOME}/y3.prefix"
-  - cmake -DBUILD=${Y3} -DCACHE="${HOME}/y3.cache" -DCONFIG=${CONFIG} -DPIC=${DLL} -P "${TRAVIS_BUILD_DIR}/cmake/y3/get.cmake"
+  - cmake -DBUILD=${Y3} -DCACHE="${HOME}/y3.cache" -DCONFIG=${CONFIG} -P "${TRAVIS_BUILD_DIR}/cmake/y3/get.cmake"
   - popd
   - if [ -n "${COVERAGE}" ]; then pip install --user codecov; fi
 
@@ -149,7 +149,7 @@ script:
   - if [ -z "${ANALYZE}" ] && [ -z "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DENABLE_SANITIZERS=ON"; fi
   - if [ -n "${ANALYZE}" ]; then CMAKE_OPTIONS+=" -DENABLE_CLANG_FORMAT=ON -DENABLE_CLANG_TIDY=ON -DENABLE_CPPCHECK=ON -DENABLE_DIFF=ON"; fi
   - if [ -n "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DENABLE_COVERAGE=ON -DENABLE_COVERAGE_LCOV=ON"; fi
-  - cmake -H. -B"${HOME}/yttrium.build" -G"Ninja" -DBUILD_SHARED_LIBS=${DLL} -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=${CONFIG} -DCMAKE_INSTALL_PREFIX="${HOME}/yttrium.install" -DCMAKE_PREFIX_PATH="${HOME}/y3.prefix" -DY_RENDERER=${RENDERER} -DY_USE_OGG_VORBIS=OFF ${CMAKE_OPTIONS}
+  - cmake -H. -B"${HOME}/yttrium.build" -G"Ninja" -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=${CONFIG} -DCMAKE_INSTALL_PREFIX="${HOME}/yttrium.install" -DCMAKE_PREFIX_PATH="${HOME}/y3.prefix" -DY_RENDERER=${RENDERER} ${CMAKE_OPTIONS}
   - pushd "${HOME}/yttrium.build"
   - if [ -n "${ANALYZE}" ]; then cmake --build . --target cppcheck; fi
   - if [ -n "${ANALYZE}" ]; then cmake --build . --target tidy; fi

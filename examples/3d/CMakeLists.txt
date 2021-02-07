@@ -26,6 +26,10 @@ set(_src
 add_executable(3d WIN32 ${_src})
 source_group("src" FILES ${_src})
 target_link_libraries(3d PRIVATE ycore yengine ymain)
+set_target_properties(3d PROPERTIES FOLDER "examples" MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+	target_link_options(3d PRIVATE "/NODEFAULTLIB:$<IF:$<CONFIG:Debug>,LIBCMT,LIBCMTD>")
+endif()
 if(WIN32)
 	set_property(TARGET 3d APPEND_STRING PROPERTY LINK_FLAGS_DEBUG /SUBSYSTEM:CONSOLE)
 endif()
@@ -34,8 +38,7 @@ add_ypack_target(3d_package
 	INDEX data.index
 	OUTPUT ${PROJECT_BINARY_DIR}/3d.ypq)
 add_dependencies(3d 3d_package)
-
-set_target_properties(3d 3d_package PROPERTIES FOLDER "examples")
+set_target_properties(3d_package PROPERTIES FOLDER "examples")
 
 if(INSTALL_EXAMPLES)
 	install(TARGETS 3d RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

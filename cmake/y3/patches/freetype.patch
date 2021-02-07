@@ -1,10 +1,11 @@
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -390,6 +390,7 @@
+@@ -390,6 +390,8 @@
  
  set_target_properties(
    freetype PROPERTIES
 +    COMPILE_PDB_NAME freetype
++    MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>"
      C_VISIBILITY_PRESET hidden)
  
  target_compile_definitions(

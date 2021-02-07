@@ -23,6 +23,6 @@ add_executable(ypack ${_src})
 source_group("src" FILES ${_src})
 
 target_link_libraries(ypack PRIVATE ycore ymain)
-set_target_properties(ypack PROPERTIES FOLDER "tools")
+set_target_properties(ypack PROPERTIES FOLDER "tools" MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
 install(TARGETS ypack RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
