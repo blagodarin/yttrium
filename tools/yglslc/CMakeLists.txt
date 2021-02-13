@@ -36,5 +36,8 @@ mark_as_advanced(_include_glslang _lib_glslang _lib_hlsl _lib_oglcompiler _lib_o
 target_include_directories(yglslc SYSTEM PRIVATE ${_include_glslang})
 target_link_libraries(yglslc PRIVATE ymain ${_lib_spirv} ${_lib_glslang} ${_lib_oglcompiler} ${_lib_osdependent} ${_lib_hlsl} SPIRV-Tools SPIRV-Tools-link SPIRV-Tools-opt Threads::Threads)
 set_target_properties(yglslc PROPERTIES FOLDER "tools" MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+	target_compile_options(yglslc PRIVATE -fno-rtti)
+endif()
 
 install(TARGETS yglslc RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
