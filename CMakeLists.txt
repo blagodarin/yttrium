@@ -46,8 +46,6 @@ option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 option(BUILD_TESTS "Build tests" OFF)
 option(ENABLE_CLANG_FORMAT "Enable running ClangFormat ('format' target)" OFF)
 option(ENABLE_CLANG_TIDY "Enable running ClangTidy ('tidy' target)" OFF)
-option(ENABLE_CPPCHECK "Enable running Cppcheck ('cppcheck' target)" OFF)
-option(ENABLE_DIFF "Enable checking for source changes ('diff' target)" OFF)
 option(ENABLE_SANITIZERS "Enable sanitizers" OFF)
 option(INSTALL_EXAMPLES "Install examples" OFF)
 
@@ -274,32 +272,6 @@ if(ENABLE_CLANG_TIDY)
 	add_custom_target(tidy
 		COMMAND ${CLANG_TIDY_EXECUTABLE} -header-filter=.* -p=${PROJECT_BINARY_DIR} -quiet ${_cpps}
 		COMMENT "Running ClangTidy"
-		VERBATIM)
-endif()
-
-if(ENABLE_CPPCHECK)
-	find_package(Cppcheck 1.88 REQUIRED)
-	add_custom_target(cppcheck
-		COMMAND ${CPPCHECK_EXECUTABLE} --enable=all --error-exitcode=1 --inline-suppr --quiet
-			-I ${PROJECT_SOURCE_DIR}/libs/audio/include
-			-I ${PROJECT_SOURCE_DIR}/libs/core/include
-			-I ${PROJECT_SOURCE_DIR}/libs/engine/include
-			-i ${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}
-			--include=${PROJECT_BINARY_DIR}/config.h
-			--relative-paths=${PROJECT_SOURCE_DIR}
-			--suppressions-list=${PROJECT_SOURCE_DIR}/.cppcheck-suppress
-			"--template=[{file}:{line}]: ({severity}/{id}) {message}"
-			${PROJECT_SOURCE_DIR}
-		COMMENT "Running Cppcheck"
-		VERBATIM)
-endif()
-
-if(ENABLE_DIFF)
-	find_package(Git REQUIRED)
-	add_custom_target(diff
-		COMMAND ${GIT_EXECUTABLE} diff --color=always --exit-code --histogram
-		WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-		COMMENT "Checking for changes"
 		VERBATIM)
 endif()
 

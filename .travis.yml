@@ -9,7 +9,7 @@ matrix:
     - os: linux
       dist: focal
       compiler: clang
-      env: CLANG=11 CONFIG=Debug RENDERER=null Y3=jpeg,vorbis ANALYZE=1
+      env: RENDERER=null CONFIG=Debug CLANG=11 Y3=jpeg,vorbis ANALYZE=1
       addons:
         apt:
           packages:
@@ -30,7 +30,7 @@ matrix:
     - os: linux
       dist: focal
       compiler: gcc
-      env: GCC=10 CONFIG=Release RENDERER=opengl Y3=jpeg,vorbis
+      env: RENDERER=opengl CONFIG=Release GCC=10 Y3=jpeg,vorbis
       addons: &gcc_x11
         apt:
           packages:
@@ -44,13 +44,13 @@ matrix:
     - os: linux
       dist: focal
       compiler: gcc
-      env: GCC=10 CONFIG=Debug RENDERER=opengl Y3=jpeg,vorbis
+      env: RENDERER=opengl CONFIG=Debug GCC=10 Y3=jpeg,vorbis
       addons: *gcc_x11
 
     - os: linux
       dist: focal
       compiler: clang
-      env: CLANG=11 CONFIG=Release RENDERER=opengl Y3=jpeg,vorbis
+      env: RENDERER=opengl CONFIG=Release CLANG=11 Y3=jpeg,vorbis
       addons: &clang_x11
         apt:
           packages:
@@ -65,13 +65,13 @@ matrix:
     - os: linux
       dist: focal
       compiler: clang
-      env: CLANG=11 CONFIG=Debug RENDERER=opengl Y3=jpeg,vorbis
+      env: RENDERER=opengl CONFIG=Debug CLANG=11 Y3=jpeg,vorbis
       addons: *clang_x11
 
     - os: linux
       dist: focal
       compiler: gcc
-      env: GCC=10 CONFIG=Release RENDERER=vulkan Y3=jpeg,vorbis
+      env: RENDERER=vulkan CONFIG=Release GCC=10 Y3=jpeg,vorbis
       addons: &gcc_xcb_vulkan
         apt:
           packages:
@@ -91,13 +91,13 @@ matrix:
     - os: linux
       dist: focal
       compiler: gcc
-      env: GCC=10 CONFIG=Debug RENDERER=vulkan Y3=jpeg,vorbis
+      env: RENDERER=vulkan CONFIG=Debug GCC=10 Y3=jpeg,vorbis
       addons: *gcc_xcb_vulkan
 
     - os: linux
       dist: focal
       compiler: clang
-      env: CLANG=11 CONFIG=Release RENDERER=vulkan Y3=jpeg,vorbis
+      env: RENDERER=vulkan CONFIG=Release CLANG=11 Y3=jpeg,vorbis
       addons: &clang_xcb_vulkan
         apt:
           packages:
@@ -118,13 +118,13 @@ matrix:
     - os: linux
       dist: focal
       compiler: clang
-      env: CLANG=11 CONFIG=Debug RENDERER=vulkan Y3=jpeg,vorbis
+      env: RENDERER=vulkan CONFIG=Debug CLANG=11 Y3=jpeg,vorbis
       addons: *clang_xcb_vulkan
 
     - os: linux
       dist: focal
       compiler: gcc
-      env: GCC=10 CONFIG=Debug RENDERER=null Y3=jpeg,vorbis COVERAGE=1
+      env: RENDERER=null CONFIG=Debug GCC=10 Y3=jpeg,vorbis COVERAGE=1
       addons:
         apt:
           packages:
@@ -156,11 +156,11 @@ script:
   - if [ -n "${ANALYZE}" ]; then CMAKE_OPTIONS+=" -DENABLE_CLANG_FORMAT=ON -DENABLE_CLANG_TIDY=ON -DENABLE_CPPCHECK=ON -DENABLE_DIFF=ON"; fi
   - if [ -n "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DENABLE_COVERAGE=ON"; fi
   - cmake -H. -B"${HOME}/yttrium.build" -G"Ninja" -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=${CONFIG} -DCMAKE_INSTALL_PREFIX="${HOME}/yttrium.install" -DCMAKE_PREFIX_PATH="${HOME}/y3.prefix" -DY_RENDERER=${RENDERER} ${CMAKE_OPTIONS}
+  - if [ -n "${ANALYZE}" ]; then cppcheck --enable=all --error-exitcode=1 --inline-suppr --quiet -I "${TRAVIS_BUILD_DIR}/libs/audio/include" -I "${TRAVIS_BUILD_DIR}/libs/core/include" -I "${TRAVIS_BUILD_DIR}/libs/engine/include" -i "${HOME}/yttrium.build/CMakeFiles" --include="${HOME}/yttrium.build/config.h" --relative-paths="${TRAVIS_BUILD_DIR}" --suppressions-list="${TRAVIS_BUILD_DIR}/.cppcheck-suppress" --template="({file},{line}) ({severity}/{id}) {message}" "${TRAVIS_BUILD_DIR}"; fi
+  - if [ -n "${ANALYZE}" ]; then cmake --build "${HOME}/yttrium.build" --target tidy; fi
+  - if [ -n "${ANALYZE}" ]; then cmake --build "${HOME}/yttrium.build" --target format; fi
+  - if [ -n "${ANALYZE}" ]; then git diff --color=always --exit-code --histogram; fi
   - pushd "${HOME}/yttrium.build"
-  - if [ -n "${ANALYZE}" ]; then cmake --build . --target cppcheck; fi
-  - if [ -n "${ANALYZE}" ]; then cmake --build . --target tidy; fi
-  - if [ -n "${ANALYZE}" ]; then cmake --build . --target format; fi
-  - if [ -n "${ANALYZE}" ]; then cmake --build . --target diff; fi
   - if [ -z "${ANALYZE}" ]; then TERM=dumb cmake --build .; fi
   - if [ -z "${ANALYZE}" ]; then ctest --output-on-failure; fi
   - if [ -z "${ANALYZE}" ] && [ -z "${COVERAGE}" ]; then cmake --build . --target install; fi
