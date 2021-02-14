@@ -280,8 +280,7 @@ namespace Yt
 			const auto* const event = _events[i].get();
 			switch (event->response_type)
 			{
-			case XCB_KEY_PRESS:
-			{
+			case XCB_KEY_PRESS: {
 				const auto e = reinterpret_cast<const xcb_key_press_event_t*>(event);
 				do_key_event(map_linux_key_code(e->detail), true, std::exchange(pending_autorepeat, false), e->state);
 				const auto text = _keyboard->keycode_to_text(e->detail);
@@ -290,8 +289,7 @@ namespace Yt
 			}
 			break;
 
-			case XCB_KEY_RELEASE:
-			{
+			case XCB_KEY_RELEASE: {
 				const auto e = reinterpret_cast<const xcb_key_release_event_t*>(event);
 				if (i + 1 < _events.size() && _events[i + 1]->response_type == XCB_KEY_PRESS)
 					if (const auto n = reinterpret_cast<const xcb_key_press_event_t*>(_events[i + 1].get()); n->detail == e->detail && n->time == e->time && n->event == e->event && n->state == e->state)
@@ -303,15 +301,13 @@ namespace Yt
 			}
 			break;
 
-			case XCB_BUTTON_PRESS:
-			{
+			case XCB_BUTTON_PRESS: {
 				const auto e = reinterpret_cast<const xcb_button_press_event_t*>(event);
 				do_key_event(::key_from_button(e->detail), true, false, e->state);
 			}
 			break;
 
-			case XCB_BUTTON_RELEASE:
-			{
+			case XCB_BUTTON_RELEASE: {
 				const auto e = reinterpret_cast<const xcb_button_release_event_t*>(event);
 				do_key_event(::key_from_button(e->detail), false, false, e->state);
 			}
@@ -322,8 +318,7 @@ namespace Yt
 				_callbacks.on_focus_event(event->response_type == XCB_FOCUS_IN);
 				break;
 
-			case XCB_CONFIGURE_NOTIFY:
-			{
+			case XCB_CONFIGURE_NOTIFY: {
 				const auto e = reinterpret_cast<const xcb_configure_notify_event_t*>(event);
 				_size.emplace(e->width, e->height);
 			}

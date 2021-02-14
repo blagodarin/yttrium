@@ -175,8 +175,7 @@ namespace Yt
 			case GuiCursor::Custom:
 				_gui.draw_custom_cursor(pass, *cursor);
 				break;
-			case GuiCursor::Texture:
-			{
+			case GuiCursor::Texture: {
 				PushTexture push_texture{ pass, _cursor_texture.get(), Texture2D::TrilinearFilter };
 				pass.set_texture_rect({ {}, SizeF{ _cursor_texture->size() } }, {});
 				pass.draw_rect({ *cursor, SizeF{ _cursor_texture->size() } });

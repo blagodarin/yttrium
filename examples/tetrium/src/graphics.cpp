@@ -80,9 +80,9 @@ namespace
 			if (y_ < Border)
 			{
 				if (x_ < Border)
-					return x_ > y_ ? Top : x_ < y_ ? Left : TopLeft;
+					return x_ > y_ ? Top : (x_ < y_ ? Left : TopLeft);
 				else if (rx < Border)
-					return rx > y_ ? Top : rx < y_ ? Right : TopRight;
+					return rx > y_ ? Top : (rx < y_ ? Right : TopRight);
 				else
 					return Top;
 			}
@@ -90,13 +90,13 @@ namespace
 			if (ry < Border)
 			{
 				if (x_ < Border)
-					return x_ > ry ? Bottom : x_ < ry ? Left : BottomLeft;
+					return x_ > ry ? Bottom : (x_ < ry ? Left : BottomLeft);
 				else if (rx < Border)
-					return rx > ry ? Bottom : rx < ry ? Right : BottomRight;
+					return rx > ry ? Bottom : (rx < ry ? Right : BottomRight);
 				else
 					return Bottom;
 			}
-			return x_ < Border ? Left : rx < Border ? Right : Center;
+			return x_ < Border ? Left : (rx < Border ? Right : Center);
 		};
 		const auto offset = 20 * pattern[pixel_type(x, y)];
 		const auto scale = [block, offset](size_t index) {

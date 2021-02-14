@@ -98,8 +98,7 @@ namespace Yt
 				while (*_cursor != '\n' && *_cursor != '\r' && _cursor != _end);
 				break;
 
-			case C::Id:
-			{
+			case C::Id: {
 				const auto begin = _cursor;
 				do
 					++_cursor;
@@ -115,8 +114,7 @@ namespace Yt
 				if (::kind_of[static_cast<unsigned char>(*_cursor)] != C::Digit)
 					throw DataError{ "[", _line, ":", _cursor - _line_origin, "] '+' or '-' must be followed by a digit" };
 				[[fallthrough]];
-			case C::Digit:
-			{
+			case C::Digit: {
 				const auto begin = has_sign ? _cursor - 1 : _cursor;
 				do
 					++_cursor;
@@ -148,8 +146,7 @@ namespace Yt
 				token.type = Token::Separator;
 				return token;
 
-			case C::Quote:
-			{
+			case C::Quote: {
 				const auto quote = *_cursor;
 				const auto begin = ++_cursor;
 				auto end = begin;

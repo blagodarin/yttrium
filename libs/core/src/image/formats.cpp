@@ -78,8 +78,7 @@ namespace Yt
 			if (!read_tga_header(reader, info))
 				return false;
 			break;
-		case ImageFormat::Jpeg:
-		{
+		case ImageFormat::Jpeg: {
 			auto input = source.to_buffer();
 			return read_jpeg(input.data(), input.size(), info, buffer);
 		}

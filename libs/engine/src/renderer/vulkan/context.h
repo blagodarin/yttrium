@@ -36,7 +36,7 @@ namespace Yt
 		explicit VulkanContext(const WindowBackend&);
 		~VulkanContext() noexcept = default;
 
-		const auto* operator-> () const noexcept { return &_data; }
+		const auto* operator->() const noexcept { return &_data; }
 
 		VK_CommandBuffer allocate_command_buffer() const;
 		VK_HDeviceMemory allocate_memory(const VkMemoryRequirements&, VkMemoryPropertyFlags) const;
