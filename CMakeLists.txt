@@ -19,7 +19,6 @@ cmake_minimum_required(VERSION 3.15)
 
 project(Yttrium VERSION 0.0.1 LANGUAGES CXX)
 
-include(CMakePackageConfigHelpers)
 include(FetchContent)
 include(GNUInstallDirs)
 
@@ -44,7 +43,6 @@ include(cmake/utils.cmake)
 option(BUILD_EXAMPLES "Build examples" OFF)
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 option(BUILD_TESTS "Build tests" OFF)
-option(ENABLE_CLANG_FORMAT "Enable running ClangFormat ('format' target)" OFF)
 option(ENABLE_CLANG_TIDY "Enable running ClangTidy ('tidy' target)" OFF)
 option(ENABLE_SANITIZERS "Enable sanitizers" OFF)
 option(INSTALL_EXAMPLES "Install examples" OFF)
@@ -247,16 +245,6 @@ if(BUILD_EXAMPLES)
 	add_subdirectory(examples/tetrium)
 endif()
 
-if(ENABLE_CLANG_FORMAT)
-	find_package(ClangFormat 7.0.0 REQUIRED)
-	file(GLOB_RECURSE _sources LIST_DIRECTORIES FALSE RELATIVE ${PROJECT_SOURCE_DIR} *.h *.cpp)
-	add_custom_target(format
-		COMMAND ${CLANG_FORMAT_EXECUTABLE} -i ${_sources}
-		WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-		COMMENT "Running ClangFormat"
-		VERBATIM)
-endif()
-
 if(ENABLE_CLANG_TIDY)
 	find_package(ClangTidy 7.0.0 REQUIRED)
 	set(_cpps)
@@ -275,18 +263,8 @@ if(ENABLE_CLANG_TIDY)
 		VERBATIM)
 endif()
 
-if(WIN32)
-	set(_cmake_config_dir ${CMAKE_INSTALL_PREFIX}/cmake)
-else()
-	set(_cmake_config_dir ${CMAKE_INSTALL_LIBDIR}/cmake/Yttrium)
-endif()
-
-configure_package_config_file(cmake/YttriumConfig.cmake.in
-	${CMAKE_CURRENT_BINARY_DIR}/YttriumConfig.cmake
-	INSTALL_DESTINATION ${_cmake_config_dir})
-
-write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/YttriumConfigVersion.cmake
-	COMPATIBILITY SameMinorVersion)
-
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/YttriumConfig.cmake ${CMAKE_CURRENT_BINARY_DIR}/YttriumConfigVersion.cmake DESTINATION ${_cmake_config_dir})
-install(EXPORT YttriumTargets NAMESPACE Yttrium:: DESTINATION ${_cmake_config_dir})
+include(CMakePackageConfigHelpers)
+configure_package_config_file(cmake/YttriumConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/YttriumConfig.cmake INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/Yttrium)
+write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/YttriumConfigVersion.cmake COMPATIBILITY SameMinorVersion)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/YttriumConfig.cmake ${CMAKE_CURRENT_BINARY_DIR}/YttriumConfigVersion.cmake DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/Yttrium)
+install(EXPORT YttriumTargets DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/Yttrium NAMESPACE Yttrium::)
