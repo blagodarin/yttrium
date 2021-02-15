@@ -133,34 +133,6 @@ function(y3_extract _name)
 		WORKING_DIRECTORY ${_target_dir})
 endfunction()
 
-function(y3_git_clone _url)
-	cmake_parse_arguments(_arg "" "DIR;COMMIT" "" ${ARGN})
-	if(NOT _arg_DIR)
-		message(FATAL_ERROR "y3_git_clone: DIR is required")
-	endif()
-	if(NOT Git_FOUND)
-		find_package(Git REQUIRED)
-	endif()
-	file(MAKE_DIRECTORY ${BUILD_DIR})
-	set(_dir ${BUILD_DIR}/${_arg_DIR})
-	if(EXISTS ${_dir})
-		message(STATUS "[Y3] Removing ${_arg_DIR}")
-		file(REMOVE_RECURSE ${_dir})
-	endif()
-	unset(_clone_options)
-	if(_arg_COMMIT)
-		list(APPEND _clone_options --no-checkout)
-	else()
-		list(APPEND _clone_options --depth 1)
-	endif()
-	y3_run(COMMAND ${GIT_EXECUTABLE} clone ${_clone_options} ${_url} ${_arg_DIR}
-		WORKING_DIRECTORY ${BUILD_DIR})
-	if(_arg_COMMIT)
-		y3_run(COMMAND ${GIT_EXECUTABLE} checkout ${_arg_COMMIT}
-			WORKING_DIRECTORY ${_dir})
-	endif()
-endfunction()
-
 function(y3_git_apply _dir _patch)
 	if(NOT Git_FOUND)
 		find_package(Git REQUIRED)
@@ -215,27 +187,11 @@ endfunction()
 
 y3_package(vorbis REQUIRES ogg)
 y3_package(jpeg REQUIRES nasm)
-y3_package(cppcheck)
 y3_package(freetype)
-y3_package(glslang)
 y3_package(ogg)
-y3_package(lcov)
 y3_package(nasm)
-y3_package(openal)
-y3_package(opengl)
-y3_package(vulkan)
 
 y3_bootstrap()
-
-if("cppcheck" IN_LIST _y3_packages)
-	set(_version "2.3")
-	set(_package "cppcheck-${_version}")
-	y3_download("https://github.com/danmar/cppcheck/archive/${_version}.tar.gz"
-		NAME "${_package}.tar.gz"
-		SHA1 "3c6ed1897bd671a58d372be325bbd42cb237ab49")
-	y3_extract("${_package}.tar.gz" DIR ${_package})
-	y3_cmake(${_package})
-endif()
 
 if("freetype" IN_LIST _y3_packages)
 	set(_version "2.10.4")
@@ -282,16 +238,6 @@ if("ogg" IN_LIST _y3_packages)
 		DESTINATION ${PREFIX_DIR}/include/ogg)
 endif()
 
-if("lcov" IN_LIST _y3_packages)
-	set(_version "1.14")
-	set(_package "lcov-${_version}")
-	y3_download("https://downloads.sourceforge.net/project/ltp/Coverage%20Analysis/LCOV-${_version}/${_package}.tar.gz"
-		SHA1 "5570beba61685b7eadf9351972e164dabaf24f9d")
-	y3_extract("${_package}.tar.gz" DIR ${_package})
-	y3_run(COMMAND make install PREFIX=${PREFIX_DIR} CFG_DIR=${CMAKE_BINARY_DIR}/.trash MAN_DIR=${CMAKE_BINARY_DIR}/.trash
-		WORKING_DIRECTORY ${BUILD_DIR}/${_package})
-endif()
-
 if("nasm" IN_LIST _y3_packages)
 	set(_version "2.15.05")
 	set(_package "nasm-${_version}")
@@ -302,51 +248,6 @@ if("nasm" IN_LIST _y3_packages)
 		y3_extract("${_package}.zip" DIR ${_package})
 		set(NASM_EXECUTABLE ${BUILD_DIR}/${_package}/nasm.exe)
 	endif()
-endif()
-
-if("opengl" IN_LIST _y3_packages)
-	y3_download("https://khronos.org/registry/OpenGL/api/GL/glext.h")
-	y3_download("https://khronos.org/registry/OpenGL/api/GL/wglext.h")
-	y3_download("https://khronos.org/registry/EGL/api/KHR/khrplatform.h")
-	file(INSTALL
-		${CACHE_DIR}/glext.h
-		${CACHE_DIR}/wglext.h
-		DESTINATION ${PREFIX_DIR}/include/GL)
-	file(INSTALL
-		${CACHE_DIR}/khrplatform.h
-		DESTINATION ${PREFIX_DIR}/include/KHR)
-endif()
-
-if("vulkan" IN_LIST _y3_packages)
-	set(_version "1.2.135.0")
-	set(_package "Vulkan-Headers-sdk-${_version}")
-	y3_download("https://github.com/KhronosGroup/Vulkan-Headers/archive/sdk-${_version}.tar.gz"
-		NAME "${_package}.tar.gz"
-		SHA1 "a40b7c099295151c3e8aa6e689631cbd33ded393")
-	y3_extract("${_package}.tar.gz" DIR ${_package})
-	y3_cmake(${_package} HEADER_ONLY)
-	set(_package "Vulkan-Loader-sdk-${_version}")
-	y3_download("https://github.com/KhronosGroup/Vulkan-Loader/archive/sdk-${_version}.tar.gz"
-		NAME "${_package}.tar.gz"
-		SHA1 "d3d274958883f9314b79263017e05df4f0aec4ed")
-	y3_extract("${_package}.tar.gz" DIR ${_package})
-	if(WIN32)
-		y3_cmake(${_package} TARGET "vulkan"
-			OPTIONS -DVULKAN_HEADERS_INSTALL_DIR=${PREFIX_DIR})
-		foreach(_config ${_y3_configs})
-			file(INSTALL
-				${BUILD_DIR}/${_package}/loader/${_config}/vulkan-1.dll
-				${BUILD_DIR}/${_package}/loader/${_config}/vulkan-1.pdb
-				DESTINATION ${PREFIX_DIR}/bin/${_config})
-			file(INSTALL
-				${BUILD_DIR}/${_package}/loader/${_config}/vulkan-1.lib
-				DESTINATION ${PREFIX_DIR}/lib/${_config})
-		endforeach()
-	else()
-		y3_cmake(${_package}
-			OPTIONS -DBUILD_WSI_WAYLAND_SUPPORT=OFF -DBUILD_WSI_XLIB_SUPPORT=OFF -DVULKAN_HEADERS_INSTALL_DIR=${PREFIX_DIR})
-	endif()
-	file(REMOVE_RECURSE ${PREFIX_DIR}/share)
 endif()
 
 if("jpeg" IN_LIST _y3_packages)

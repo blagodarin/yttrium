@@ -19,6 +19,8 @@
 
 #include "helpers.h"
 
+#include <array>
+
 namespace
 {
 	Yt::VK_RenderPass create_render_pass(VkDevice device, const Yt::VK_Swapchain& swapchain, const Yt::VulkanDepthBuffer& depth_buffer)
@@ -49,7 +51,7 @@ namespace
 		create_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
 		create_info.pNext = nullptr;
 		create_info.flags = 0;
-		create_info.attachmentCount = attachment_descriptions.size();
+		create_info.attachmentCount = static_cast<uint32_t>(attachment_descriptions.size());
 		create_info.pAttachments = attachment_descriptions.data();
 		create_info.subpassCount = 1;
 		create_info.pSubpasses = &subpass;
@@ -100,7 +102,7 @@ namespace Yt
 			begin_info.renderArea.offset.x = 0;
 			begin_info.renderArea.offset.y = 0;
 			begin_info.renderArea.extent = _context->_surface_capabilities.currentExtent; // TODO: Use actual current extent.
-			begin_info.clearValueCount = clear_values.size();
+			begin_info.clearValueCount = static_cast<uint32_t>(clear_values.size());
 			begin_info.pClearValues = clear_values.data();
 
 			vkCmdBeginRenderPass(_command_buffer.get(), &begin_info, VK_SUBPASS_CONTENTS_INLINE);

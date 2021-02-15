@@ -47,6 +47,9 @@ namespace Yt
 		std::optional<Size> size() const { return _size; }
 		void swap_buffers();
 
+		HINSTANCE windows_instance() const noexcept { return _application.instance(); }
+		HWND windows_window() const noexcept { return _hwnd; }
+
 	private:
 		void on_close() override;
 		void on_focus(bool) override;

@@ -28,6 +28,8 @@
 #include "swapchain.h"
 #include "texture.h"
 
+#include <array>
+
 // TODO: Finish Vulkan implementation.
 
 namespace
@@ -195,7 +197,7 @@ namespace Yt
 		writes[1].pBufferInfo = nullptr;
 		writes[1].pTexelBufferView = nullptr;
 
-		vkUpdateDescriptorSets(_context->_device, writes.size(), writes.data(), 0, nullptr);
+		vkUpdateDescriptorSets(_context->_device, static_cast<uint32_t>(writes.size()), writes.data(), 0, nullptr);
 	}
 
 	const VulkanVertexFormat& VulkanRenderer::vertex_format(const std::vector<VA>& vas)

@@ -22,6 +22,8 @@
 #include "handles.h"
 
 #include <algorithm>
+#include <array>
+#include <stdexcept>
 
 namespace
 {
@@ -109,6 +111,16 @@ namespace
 
 	VkSurfaceKHR create_vulkan_surface(VkInstance instance, const Yt::WindowBackend& window)
 	{
+#ifdef VK_USE_PLATFORM_WIN32_KHR
+		VkWin32SurfaceCreateInfoKHR info;
+		info.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+		info.hinstance = window.windows_instance();
+		info.hwnd = window.windows_window();
+
+		VkSurfaceKHR handle = VK_NULL_HANDLE;
+		Y_VK_CHECK(vkCreateWin32SurfaceKHR(instance, &info, nullptr, &handle));
+		return handle;
+#endif
 #ifdef VK_USE_PLATFORM_XCB_KHR
 		VkXcbSurfaceCreateInfoKHR info;
 		info.sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR;

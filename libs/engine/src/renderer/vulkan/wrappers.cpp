@@ -20,8 +20,10 @@
 #include "helpers.h"
 
 #include <algorithm>
+#include <array>
 #include <cassert>
 #include <cstring>
+#include <iterator>
 
 #define CHECK(call) Y_VK_CHECK(call)
 
@@ -161,7 +163,7 @@ namespace Yt
 		create_info.pNext = nullptr;
 		create_info.flags = 0;
 		create_info.renderPass = render_pass;
-		create_info.attachmentCount = attachments.size();
+		create_info.attachmentCount = static_cast<uint32_t>(attachments.size());
 		create_info.pAttachments = attachments.data();
 		create_info.width = _context->_surface_capabilities.currentExtent.width;
 		create_info.height = _context->_surface_capabilities.currentExtent.height;
@@ -259,14 +261,14 @@ namespace Yt
 	{
 		std::vector<VkPipelineShaderStageCreateInfo> stages;
 		stages.reserve(modules.size());
-		for (const auto module : modules)
+		for (const auto shader_module : modules)
 		{
 			auto& stage = stages.emplace_back();
 			stage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 			stage.pNext = nullptr;
 			stage.flags = 0;
-			stage.stage = module->_stage;
-			stage.module = module->_handle;
+			stage.stage = shader_module->_stage;
+			stage.module = shader_module->_handle;
 			stage.pName = "main";
 			stage.pSpecializationInfo = nullptr;
 		}
@@ -390,7 +392,7 @@ namespace Yt
 		dynamic_state.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
 		dynamic_state.pNext = nullptr;
 		dynamic_state.flags = 0;
-		dynamic_state.dynamicStateCount = dynamic_state_data.size();
+		dynamic_state.dynamicStateCount = static_cast<uint32_t>(dynamic_state_data.size());
 		dynamic_state.pDynamicStates = dynamic_state_data.data();
 
 		VkGraphicsPipelineCreateInfo create_info = {};

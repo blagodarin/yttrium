@@ -55,6 +55,7 @@ namespace Yt
 		~NativeApplication() noexcept;
 
 		NativeWindow create_window(NativeWindowCallbacks&);
+		HINSTANCE instance() const noexcept { return _hinstance; }
 		bool process_events();
 
 	private:

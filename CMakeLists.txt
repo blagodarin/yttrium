@@ -23,7 +23,7 @@ include(FetchContent)
 include(GNUInstallDirs)
 
 set(AULOS_STATIC_RUNTIME ON)
-FetchContent_Declare(Primal GIT_REPOSITORY https://github.com/blagodarin/primal.git GIT_TAG f58d794d7caef44939011e882b97c1eed5e4a1a2)
+FetchContent_Declare(Primal GIT_REPOSITORY https://github.com/blagodarin/primal.git GIT_TAG 190ad179972961b130c61cc69b801f1a66cd9161)
 FetchContent_Declare(Aulos GIT_REPOSITORY https://github.com/blagodarin/aulos.git GIT_TAG f9a719cda0ea6ac2df1f529b2f309f46a573701a)
 FetchContent_MakeAvailable(Primal Aulos)
 
@@ -221,7 +221,7 @@ add_subdirectory(libs/core)
 add_subdirectory(libs/audio)
 add_subdirectory(libs/main)
 
-if(Y_RENDERER_VULKAN)
+if(Y_RENDERER_VULKAN AND NOT WIN32)
 	add_subdirectory(tools/yglslc)
 endif()
 add_subdirectory(tools/yrc)
