@@ -5,6 +5,20 @@ shallow_clone: true
 environment:
   matrix:
 
+    - RENDERER: vulkan
+      CONFIG: Release
+      ARCH: amd64
+      TESTS: ON
+      Y3: freetype,jpeg,vorbis
+      PUBLISH: ON
+
+    - RENDERER: vulkan
+      CONFIG: Debug
+      ARCH: amd64
+      TESTS: ON
+      Y3: freetype,jpeg,vorbis
+      PUBLISH: OFF
+
     - RENDERER: opengl
       CONFIG: Release
       ARCH: amd64
@@ -40,6 +54,8 @@ install:
   - cmake -DBUILD=%Y3% -DCONFIG=%CONFIG% -P %APPVEYOR_BUILD_FOLDER%\cmake\y3\get.cmake
   - if exist .build rmdir /s /q .build
   - if exist .trash rmdir /s /q .trash
+  - if "%RENDERER%"=="vulkan" cinst vulkan-sdk
+  - ps: if ($env:RENDERER -eq "vulkan") { $Env:VULKAN_SDK = "C:\VulkanSDK\" + (Get-ChildItem "C:\VulkanSDK" -Name) }
   - if "%TESTS%"=="ON" cinst ninja
 
 build_script:
