@@ -30,6 +30,53 @@ matrix:
     - os: linux
       dist: focal
       compiler: gcc
+      env: RENDERER=vulkan CONFIG=Release GCC=10 Y3=jpeg,vorbis
+      addons: &gcc_xcb_vulkan
+        apt:
+          packages:
+            - g++-10
+            - libasound2-dev
+            - libvorbis-dev
+            - libxcb-image0-dev
+            - libxcb-xkb-dev
+            - libxkbcommon-dev
+            - libxkbcommon-x11-dev
+            - yasm
+            - ninja-build
+
+    - os: linux
+      dist: focal
+      compiler: gcc
+      env: RENDERER=vulkan CONFIG=Debug GCC=10 Y3=jpeg,vorbis
+      addons: *gcc_xcb_vulkan
+
+    - os: linux
+      dist: focal
+      compiler: clang
+      env: RENDERER=vulkan CONFIG=Release CLANG=11 Y3=jpeg,vorbis
+      addons: &clang_xcb_vulkan
+        apt:
+          packages:
+            - clang-11
+            - libasound2-dev
+            - libstdc++-10-dev
+            - libvorbis-dev
+            - libxcb-image0-dev
+            - libxcb-xkb-dev
+            - libxkbcommon-dev
+            - libxkbcommon-x11-dev
+            - nasm
+            - ninja-build
+
+    - os: linux
+      dist: focal
+      compiler: clang
+      env: RENDERER=vulkan CONFIG=Debug CLANG=11 Y3=jpeg,vorbis
+      addons: *clang_xcb_vulkan
+
+    - os: linux
+      dist: focal
+      compiler: gcc
       env: RENDERER=opengl CONFIG=Release GCC=10 Y3=jpeg,vorbis
       addons: &gcc_x11
         apt:
@@ -71,59 +118,6 @@ matrix:
     - os: linux
       dist: focal
       compiler: gcc
-      env: RENDERER=vulkan CONFIG=Release GCC=10 Y3=jpeg,vorbis
-      addons: &gcc_xcb_vulkan
-        apt:
-          packages:
-            - g++-10
-            - libasound2-dev
-            - libvorbis-dev
-            - libvulkan-dev
-            - libxcb-image0-dev
-            - libxcb-xkb-dev
-            - libxkbcommon-dev
-            - libxkbcommon-x11-dev
-            - glslang-dev
-            - spirv-tools
-            - yasm
-            - ninja-build
-
-    - os: linux
-      dist: focal
-      compiler: gcc
-      env: RENDERER=vulkan CONFIG=Debug GCC=10 Y3=jpeg,vorbis
-      addons: *gcc_xcb_vulkan
-
-    - os: linux
-      dist: focal
-      compiler: clang
-      env: RENDERER=vulkan CONFIG=Release CLANG=11 Y3=jpeg,vorbis
-      addons: &clang_xcb_vulkan
-        apt:
-          packages:
-            - clang-11
-            - libasound2-dev
-            - libstdc++-10-dev
-            - libvorbis-dev
-            - libvulkan-dev
-            - libxcb-image0-dev
-            - libxcb-xkb-dev
-            - libxkbcommon-dev
-            - libxkbcommon-x11-dev
-            - glslang-dev
-            - spirv-tools
-            - nasm
-            - ninja-build
-
-    - os: linux
-      dist: focal
-      compiler: clang
-      env: RENDERER=vulkan CONFIG=Debug CLANG=11 Y3=jpeg,vorbis
-      addons: *clang_xcb_vulkan
-
-    - os: linux
-      dist: focal
-      compiler: gcc
       env: RENDERER=null CONFIG=Debug GCC=10 Y3=jpeg,vorbis COVERAGE=1
       addons:
         apt:
@@ -145,6 +139,13 @@ before_install:
   - cmake --version
 
 install:
+  - |
+    if [[ "${RENDERER}" == "vulkan" ]]; then
+      wget -qO - http://packages.lunarg.com/lunarg-signing-key-pub.asc | sudo apt-key add -
+      sudo wget -qO /etc/apt/sources.list.d/lunarg-vulkan-focal.list http://packages.lunarg.com/vulkan/lunarg-vulkan-focal.list
+      sudo apt update
+      sudo apt install vulkan-sdk
+    fi
   - mkdir "${HOME}/y3.prefix" && pushd "${HOME}/y3.prefix"
   - cmake -DBUILD=${Y3} -DCACHE="${HOME}/y3.cache" -DCONFIG=${CONFIG} -P "${TRAVIS_BUILD_DIR}/cmake/y3/get.cmake"
   - popd

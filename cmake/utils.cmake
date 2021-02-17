@@ -27,34 +27,20 @@ function(add_yglslc_sources _target)
 	foreach(_source ${_arg_FRAGMENT})
 		get_filename_component(_source_name ${_source} NAME)
 		set(_output ${_source_name}.spirv.inc)
-		if(WIN32)
-			add_custom_command(OUTPUT ${_binary_dir}/${_output}
-				COMMAND Vulkan::glslc -fshader-stage=fragment -mfmt=num -O -o ${_output} ${_source_dir}/${_source}
-				MAIN_DEPENDENCY ${_source}
-				VERBATIM)
-		else()
-			add_custom_command(OUTPUT ${_binary_dir}/${_output}
-				COMMAND yglslc --fragment ${_source_dir}/${_source} ${_output}
-				MAIN_DEPENDENCY ${_source}
-				VERBATIM)
-		endif()
+		add_custom_command(OUTPUT ${_binary_dir}/${_output}
+			COMMAND Vulkan::glslc -fshader-stage=fragment -mfmt=num -O -o ${_output} ${_source_dir}/${_source}
+			MAIN_DEPENDENCY ${_source}
+			VERBATIM)
 		target_sources(${_target} PRIVATE ${_binary_dir}/${_output})
 		source_group("yglslc" FILES ${_binary_dir}/${_output})
 	endforeach()
 	foreach(_source ${_arg_VERTEX})
 		get_filename_component(_source_name ${_source} NAME)
 		set(_output ${_source_name}.spirv.inc)
-		if(WIN32)
-			add_custom_command(OUTPUT ${_binary_dir}/${_output}
-				COMMAND Vulkan::glslc -fshader-stage=vertex -mfmt=num -O -o ${_output} ${_source_dir}/${_source}
-				MAIN_DEPENDENCY ${_source}
-				VERBATIM)
-		else()
-			add_custom_command(OUTPUT ${_binary_dir}/${_output}
-				COMMAND yglslc --vertex ${_source_dir}/${_source} ${_output}
-				MAIN_DEPENDENCY ${_source}
-				VERBATIM)
-		endif()
+		add_custom_command(OUTPUT ${_binary_dir}/${_output}
+			COMMAND Vulkan::glslc -fshader-stage=vertex -mfmt=num -O -o ${_output} ${_source_dir}/${_source}
+			MAIN_DEPENDENCY ${_source}
+			VERBATIM)
 		target_sources(${_target} PRIVATE ${_binary_dir}/${_output})
 		source_group("yglslc" FILES ${_binary_dir}/${_output})
 	endforeach()
