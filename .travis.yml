@@ -136,9 +136,14 @@ before_install:
   - if [ -n "${CLANG}" ]; then export CC=clang-${CLANG} CXX=clang++-${CLANG}; fi
   - if [ -n "${GCC}" ]; then export ASM_NASM=$(which yasm) CC=gcc-${GCC} CXX=g++-${GCC} LDFLAGS=-fuse-ld=gold; fi
   - ${CXX} --version
-  - cmake --version
 
 install:
+  - cmake --version
+  - mkdir "${HOME}/cmake" && pushd "${HOME}/cmake"
+  - wget --output-document=- --quiet https://github.com/Kitware/CMake/releases/download/v3.19.5/cmake-3.19.5-Linux-x86_64.tar.gz | tar -x --gzip --strip-components 1
+  - export PATH="$(pwd)/bin:${PATH}"
+  - popd
+  - cmake --version
   - |
     if [[ "${RENDERER}" == "vulkan" ]]; then
       wget -qO - http://packages.lunarg.com/lunarg-signing-key-pub.asc | sudo apt-key add -

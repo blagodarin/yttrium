@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.19)
 
 project(Yttrium VERSION 0.0.1 LANGUAGES CXX)
 
@@ -41,7 +41,6 @@ set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
 include(cmake/utils.cmake)
 
 option(BUILD_EXAMPLES "Build examples" OFF)
-option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 option(BUILD_TESTS "Build tests" OFF)
 option(ENABLE_CLANG_TIDY "Enable running ClangTidy ('tidy' target)" OFF)
 option(ENABLE_SANITIZERS "Enable sanitizers" OFF)
@@ -49,32 +48,37 @@ option(INSTALL_EXAMPLES "Install examples" OFF)
 
 option(Y_USE_OGG_VORBIS "Include Ogg Vorbis support (requires libvorbisfile)" ON)
 
-set(Y_RENDERER "opengl" CACHE STRING "Renderer to use (opengl, vulkan)")
-if(Y_RENDERER STREQUAL "opengl")
-	find_package(OpenGL REQUIRED)
-	find_package(X11 REQUIRED)
-	set(Y_RENDERER_OPENGL ON)
-elseif(Y_RENDERER STREQUAL "vulkan")
-	find_package(Vulkan REQUIRED)
-	# TODO: Use find_package for XCB and libxkbcommon.
-	set(Y_RENDERER_VULKAN ON)
-else()
-	set(Y_RENDERER_NULL ON)
-endif()
-
-find_package(Threads REQUIRED)
-
-if(NOT TARGET_ARCH MATCHES "^amd64|x86$")
-	get_target_architecture(_target_arch)
-	set(TARGET_ARCH "${_target_arch}" CACHE STRING "Target architecture")
-endif()
-message(STATUS "Target architecture: ${TARGET_ARCH}")
+get_target_architecture(_target_arch)
+set(TARGET_ARCH "${_target_arch}" CACHE STRING "Target architecture")
+set_property(CACHE TARGET_ARCH PROPERTY STRINGS "amd64" "x86")
 if(TARGET_ARCH MATCHES "^amd64$")
 	set(Y_ARCH_AMD64 ON)
 endif()
 if(TARGET_ARCH MATCHES "^amd64|x86$")
 	set(Y_ARCH_X86 ON)
 endif()
+message(STATUS "Target architecture: ${TARGET_ARCH}")
+
+set(Y_RENDERER "opengl" CACHE STRING "Renderer backend")
+set_property(CACHE Y_RENDERER PROPERTY STRINGS "opengl" "vulkan" "none")
+if(Y_RENDERER STREQUAL "opengl")
+	find_package(OpenGL REQUIRED)
+	find_package(X11 REQUIRED)
+	set(Y_RENDERER_OPENGL ON)
+elseif(Y_RENDERER STREQUAL "vulkan")
+	find_package(Vulkan REQUIRED)
+	if(NOT TARGET Vulkan::glslc)
+		message(SEND_ERROR "Could not find glslc, please install Vulkan SDK")
+	endif()
+	# TODO: Use find_package for XCB and libxkbcommon.
+	set(Y_RENDERER_VULKAN ON)
+else()
+	set(Y_RENDERER "none")
+	set(Y_RENDERER_NULL ON)
+endif()
+message(STATUS "Renderer: ${Y_RENDERER}")
+
+find_package(Threads REQUIRED)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 	if(Y_ARCH_X86 AND NOT Y_ARCH_AMD64)
@@ -83,9 +87,6 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 
 	if(ENABLE_SANITIZERS)
 		add_compile_options(-fsanitize=address -fsanitize=undefined -fno-sanitize=nonnull-attribute)
-		if(BUILD_SHARED_LIBS)
-			add_compile_options(-fno-sanitize=vptr)
-		endif()
 		list(APPEND DYNAMIC_LINKER_FLAGS -fsanitize=address -fsanitize=undefined)
 	endif()
 
