@@ -46,7 +46,13 @@ option(ENABLE_CLANG_TIDY "Enable running ClangTidy ('tidy' target)" OFF)
 option(ENABLE_SANITIZERS "Enable sanitizers" OFF)
 option(INSTALL_EXAMPLES "Install examples" OFF)
 
-option(Y_USE_OGG_VORBIS "Include Ogg Vorbis support (requires libvorbisfile)" ON)
+option(YTTRIUM_WITH_JPEG "Enable JPEG support (requires libjpeg)" ON)
+option(YTTRIUM_WITH_OGGVORBIS "Enable Ogg Vorbis support (requires libvorbisfile)" ON)
+
+find_package(Threads REQUIRED)
+if(NOT WIN32)
+	find_package(PkgConfig REQUIRED)
+endif()
 
 get_target_architecture(_target_arch)
 set(TARGET_ARCH "${_target_arch}" CACHE STRING "Target architecture")
@@ -77,8 +83,6 @@ else()
 	set(Y_RENDERER_NULL ON)
 endif()
 message(STATUS "Renderer: ${Y_RENDERER}")
-
-find_package(Threads REQUIRED)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 	if(Y_ARCH_X86 AND NOT Y_ARCH_AMD64)

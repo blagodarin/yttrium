@@ -1,57 +1,36 @@
-#
 # This file is part of the Yttrium toolkit.
-# Copyright (C) 2019 Sergei Blagodarin.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
+# Copyright (C) Sergei Blagodarin.
+# SPDX-License-Identifier: Apache-2.0
 
-find_package(Y3_jpeg REQUIRED)
-
-set(_src
-	src/intrinsics.h
-	src/main.cpp
-	src/translation.cpp
-	)
-
-add_library(ycore STATIC ${_src})
-source_group("src" FILES ${_src})
-
-include_config(ycore ${PROJECT_BINARY_DIR}/config.h)
-target_include_directories(ycore PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-target_link_libraries(ycore PRIVATE primal Y3::jpeg Threads::Threads)
-set_target_properties(ycore PROPERTIES FOLDER "libs" MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-if(WIN32)
-	target_compile_definitions(ycore PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
-endif()
-
-y_sources(ycore "include"
+source_group("src" REGULAR_EXPRESSION ".*\\.(h|cpp)$")
+source_group("include" REGULAR_EXPRESSION "/include/yttrium/.*\\.(h|cpp)$")
+source_group("include\\image" REGULAR_EXPRESSION "/include/yttrium/image/.*\\.(h|cpp)$")
+source_group("include\\ion" REGULAR_EXPRESSION "/include/yttrium/ion/.*\\.(h|cpp)$")
+source_group("include\\math" REGULAR_EXPRESSION "/include/yttrium/math/.*\\.(h|cpp)$")
+source_group("include\\memory" REGULAR_EXPRESSION "/include/yttrium/memory/.*\\.(h|cpp)$")
+source_group("include\\script" REGULAR_EXPRESSION "/include/yttrium/script/.*\\.(h|cpp)$")
+source_group("include\\storage" REGULAR_EXPRESSION "/include/yttrium/storage/.*\\.(h|cpp)$")
+source_group("include\\utils" REGULAR_EXPRESSION "/include/yttrium/utils/.*\\.(h|cpp)$")
+source_group("src\\image" REGULAR_EXPRESSION "/src/image/.*\\.(h|cpp)$")
+source_group("src\\image\\formats" REGULAR_EXPRESSION "/src/image/formats/.*\\.(h|cpp)$")
+source_group("src\\ion" REGULAR_EXPRESSION "/src/ion/.*\\.(h|cpp)$")
+source_group("src\\logger" REGULAR_EXPRESSION "/src/logger/.*\\.(h|cpp)$")
+source_group("src\\memory" REGULAR_EXPRESSION "/src/memory/.*\\.(h|cpp)$")
+source_group("src\\platform" REGULAR_EXPRESSION "/src/platform/.*\\.(h|cpp)$")
+source_group("src\\platform\\posix" REGULAR_EXPRESSION "/src/platform/posix/.*\\.(h|cpp)$")
+source_group("src\\platform\\windows" REGULAR_EXPRESSION "/src/platform/windows/.*\\.(h|cpp)$")
+source_group("src\\script" REGULAR_EXPRESSION "/src/script/.*\\.(h|cpp)$")
+source_group("src\\storage" REGULAR_EXPRESSION "/src/storage/.*\\.(h|cpp)$")
+source_group("src\\storage\\formats" REGULAR_EXPRESSION "/src/storage/formats/.*\\.(h|cpp)$")
+source_group("src\\utils" REGULAR_EXPRESSION "/src/utils/.*\\.(h|cpp)$")
+add_library(ycore STATIC
 	include/yttrium/api.h
 	include/yttrium/exceptions.h
-	include/yttrium/logger.h
-	include/yttrium/translation.h
-	)
-
-y_sources(ycore "include/image"
 	include/yttrium/image/image.h
 	include/yttrium/image/utils.h
-	)
-
-y_sources(ycore "include/ion"
 	include/yttrium/ion/reader.h
 	include/yttrium/ion/writer.h
-	)
-
-y_sources(ycore "include/math"
+	include/yttrium/logger.h
 	include/yttrium/math/color.h
 	include/yttrium/math/euler.h
 	include/yttrium/math/line.h
@@ -63,22 +42,13 @@ y_sources(ycore "include/math"
 	include/yttrium/math/rect.h
 	include/yttrium/math/size.h
 	include/yttrium/math/vector.h
-	)
-
-y_sources(ycore "include/memory"
-	include/yttrium/memory/buffer_appender.h
 	include/yttrium/memory/buffer.h
+	include/yttrium/memory/buffer_appender.h
 	include/yttrium/memory/pool.h
-	)
-
-y_sources(ycore "include/script"
 	include/yttrium/script/args.h
 	include/yttrium/script/code.h
 	include/yttrium/script/context.h
 	include/yttrium/script/value.h
-	)
-
-y_sources(ycore "include/storage"
 	include/yttrium/storage/package.h
 	include/yttrium/storage/paths.h
 	include/yttrium/storage/reader.h
@@ -86,68 +56,89 @@ y_sources(ycore "include/storage"
 	include/yttrium/storage/storage.h
 	include/yttrium/storage/temporary_file.h
 	include/yttrium/storage/writer.h
-	)
-
-y_sources(ycore "include/utils"
+	include/yttrium/translation.h
 	include/yttrium/utils/flags.h
 	include/yttrium/utils/numeric.h
 	include/yttrium/utils/string.h
-	)
-
-y_sources(ycore "src/image"
-	src/image/image.cpp
 	src/image/formats.cpp
 	src/image/formats.h
-	src/image/utils.cpp
-	src/image/utils.h
-	)
-
-y_sources(ycore "src/image/formats"
 	src/image/formats/bmp.cpp
 	src/image/formats/bmp.h
 	src/image/formats/dds.cpp
 	src/image/formats/dds.h
 	src/image/formats/ico.cpp
 	src/image/formats/ico.h
-	src/image/formats/jpeg.cpp
 	src/image/formats/png.cpp
 	src/image/formats/tga.cpp
-	)
-if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-	set_property(SOURCE src/image/formats/jpeg.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-tautological-type-limit-compare)
-elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-	set_property(SOURCE src/image/formats/jpeg.cpp APPEND PROPERTY COMPILE_OPTIONS
-		/wd4324 # '`anonymous-namespace'::JpegErrorHandler': structure was padded due to alignment specifier
-		/wd4611 # interaction between '_setjmp' and C++ object destruction is non-portable
-		)
-endif()
-
-y_sources(ycore "src/ion"
+	src/image/image.cpp
+	src/image/utils.cpp
+	src/image/utils.h
 	src/ion/reader.cpp
 	src/ion/writer.cpp
-	)
-
-y_sources(ycore "src/logger"
 	src/logger/logger.cpp
 	src/logger/ring_log.cpp
 	src/logger/ring_log.h
-	)
-
-y_sources(ycore "src/memory"
+	src/main.cpp
+	src/memory/buffer.cpp
 	src/memory/buffer_memory.cpp
 	src/memory/buffer_memory.h
-	src/memory/buffer.cpp
 	src/memory/pool.cpp
 	src/memory/raw.h
-	)
-
-y_sources(ycore "src/platform"
 	src/platform/file.h
 	src/platform/virtual_memory.h
+	src/script/args.cpp
+	src/script/code.cpp
+	src/script/context.cpp
+	src/script/scanner.cpp
+	src/script/scanner.h
+	src/script/value.cpp
+	src/storage/formats/ypq.cpp
+	src/storage/formats/ypq.h
+	src/storage/package.cpp
+	src/storage/package.h
+	src/storage/reader.cpp
+	src/storage/source.cpp
+	src/storage/source.h
+	src/storage/storage.cpp
+	src/storage/writer.cpp
+	src/storage/writer.h
+	src/translation.cpp
+	src/utils/adler32.h
+	src/utils/algorithm.h
+	src/utils/atomic_counters.h
+	src/utils/crc32.h
+	src/utils/string.cpp
+	src/utils/string.h
 	)
-
+include_config(ycore ${PROJECT_BINARY_DIR}/config.h)
+target_include_directories(ycore PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+target_link_libraries(ycore PRIVATE primal Threads::Threads)
+set_target_properties(ycore PROPERTIES FOLDER "libs" MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+	set_property(SOURCE src/storage/writer.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-tautological-type-limit-compare)
+endif()
+if(YTTRIUM_WITH_JPEG)
+	if(WIN32)
+		find_package(Y3_jpeg REQUIRED)
+		target_link_libraries(ycore PRIVATE Y3::jpeg)
+	else()
+		find_package(JPEG REQUIRED)
+		target_link_libraries(ycore PRIVATE JPEG::JPEG)
+	endif()
+	target_sources(ycore PRIVATE
+		src/image/formats/jpeg.cpp
+		)
+	if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+		set_property(SOURCE src/image/formats/jpeg.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-tautological-type-limit-compare)
+	elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+		set_property(SOURCE src/image/formats/jpeg.cpp APPEND PROPERTY COMPILE_OPTIONS
+			/wd4324 # '`anonymous-namespace'::JpegErrorHandler': structure was padded due to alignment specifier
+			/wd4611 # interaction between '_setjmp' and C++ object destruction is non-portable
+			)
+	endif()
+endif()
 if(UNIX)
-	y_sources(ycore "src/platform/posix"
+	target_sources(ycore PRIVATE
 		src/platform/posix/error.cpp
 		src/platform/posix/error.h
 		src/platform/posix/file.cpp
@@ -158,7 +149,8 @@ if(UNIX)
 		)
 	set_property(SOURCE src/platform/posix/file.cpp APPEND PROPERTY COMPILE_DEFINITIONS _FILE_OFFSET_BITS=64)
 elseif(WIN32)
-	y_sources(ycore "src/platform/windows"
+	target_compile_definitions(ycore PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
+	target_sources(ycore PRIVATE
 		src/platform/windows/com.cpp
 		src/platform/windows/com.h
 		src/platform/windows/error.cpp
@@ -174,43 +166,5 @@ elseif(WIN32)
 			)
 	endif()
 endif()
-
-y_sources(ycore "src/script"
-	src/script/args.cpp
-	src/script/code.cpp
-	src/script/context.cpp
-	src/script/scanner.cpp
-	src/script/scanner.h
-	src/script/value.cpp
-	)
-
-y_sources(ycore "src/storage"
-	src/storage/package.cpp
-	src/storage/package.h
-	src/storage/reader.cpp
-	src/storage/source.cpp
-	src/storage/source.h
-	src/storage/storage.cpp
-	src/storage/writer.cpp
-	src/storage/writer.h
-	)
-if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-	set_property(SOURCE src/storage/writer.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-tautological-type-limit-compare)
-endif()
-
-y_sources(ycore "src/storage/formats"
-	src/storage/formats/ypq.cpp
-	src/storage/formats/ypq.h
-	)
-
-y_sources(ycore "src/utils"
-	src/utils/adler32.h
-	src/utils/algorithm.h
-	src/utils/atomic_counters.h
-	src/utils/crc32.h
-	src/utils/string.cpp
-	src/utils/string.h
-	)
-
 primal_install(ycore EXPORT YttriumTargets)
 install(DIRECTORY include/yttrium DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})

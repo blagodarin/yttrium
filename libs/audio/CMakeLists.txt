@@ -58,11 +58,8 @@ if(Y_USE_OGG_VORBIS)
 		find_package(Y3_vorbisfile REQUIRED)
 		target_link_libraries(yaudio PRIVATE Y3::vorbisfile)
 	else()
-		find_library(OGG_LIBRARY ogg)
-		find_library(VORBIS_LIBRARY vorbis)
-		find_library(VORBISFILE_LIBRARY vorbisfile)
-		mark_as_advanced(OGG_LIBRARY VORBIS_LIBRARY VORBISFILE_LIBRARY)
-		target_link_libraries(yaudio PRIVATE ${VORBISFILE_LIBRARY} ${VORBIS_LIBRARY} ${OGG_LIBRARY})
+		pkg_check_modules(vorbisfile REQUIRED IMPORTED_TARGET vorbisfile)
+		target_link_libraries(yaudio PRIVATE PkgConfig::vorbisfile)
 	endif()
 	y_sources(yaudio "src/formats"
 		src/formats/ogg_vorbis.cpp
