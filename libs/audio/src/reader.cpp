@@ -22,7 +22,7 @@
 #include "formats/aulos.h"
 #include "formats/wav.h"
 
-#if Y_USE_OGG_VORBIS
+#if YTTRIUM_WITH_OGGVORBIS
 #	include "formats/ogg_vorbis.h"
 #endif
 
@@ -41,8 +41,11 @@ namespace
 			switch (signature)
 			{
 			case Yt::make_cc('R', 'I', 'F', 'F'): return std::make_unique<Yt::WavDecoder>(std::move(source));
-#if Y_USE_OGG_VORBIS
-			case Yt::make_cc('O', 'g', 'g', 'S'): return std::make_unique<Yt::OggVorbisDecoder>(std::move(source));
+			case Yt::make_cc('O', 'g', 'g', 'S'):
+#if YTTRIUM_WITH_OGGVORBIS
+				return std::make_unique<Yt::OggVorbisDecoder>(std::move(source));
+#else
+				break;
 #endif
 			default: return std::make_unique<Yt::AulosDecoder>(std::move(source));
 			}

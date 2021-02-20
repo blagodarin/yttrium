@@ -10,4 +10,5 @@
 #cmakedefine01 Y_RENDERER_VULKAN
 
 // Components.
-#cmakedefine01 Y_USE_OGG_VORBIS
+#cmakedefine01 YTTRIUM_WITH_JPEG
+#cmakedefine01 YTTRIUM_WITH_OGGVORBIS

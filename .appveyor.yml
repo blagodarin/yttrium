@@ -39,7 +39,7 @@ environment:
       CONFIG: Debug,Release
       ARCH: x86
       TESTS: OFF
-      Y3: freetype,jpeg,vorbis
+      Y3: freetype
       PUBLISH: OFF
 
 cache:
@@ -65,7 +65,7 @@ build_script:
   - if "%TESTS%"=="ON" cmake -G Ninja %APPVEYOR_BUILD_FOLDER% -DBUILD_EXAMPLES=ON -DBUILD_TESTS=%TESTS% -DCMAKE_BUILD_TYPE=%CONFIG% -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% -DCMAKE_PREFIX_PATH=%PREFIX_DIR% -DINSTALL_EXAMPLES=%PUBLISH% -DY_RENDERER=%RENDERER%
   - if "%TESTS%"=="ON" cmake --build .
   - if "%TESTS%"=="ON" cmake --build . --target install
-  - if not "%TESTS%"=="ON" cmake -G "Visual Studio 16 2019" -A Win32 %APPVEYOR_BUILD_FOLDER% -DBUILD_EXAMPLES=ON -DBUILD_TESTS=%TESTS% -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% -DCMAKE_PREFIX_PATH=%PREFIX_DIR% -DINSTALL_EXAMPLES=%PUBLISH% -DY_RENDERER=%RENDERER%
+  - if not "%TESTS%"=="ON" cmake -G "Visual Studio 16 2019" -A Win32 %APPVEYOR_BUILD_FOLDER% -DBUILD_EXAMPLES=ON -DBUILD_TESTS=%TESTS% -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% -DCMAKE_PREFIX_PATH=%PREFIX_DIR% -DINSTALL_EXAMPLES=%PUBLISH% -DY_RENDERER=%RENDERER% -DYTTRIUM_WITH_JPEG=OFF -DYTTRIUM_WITH_OGGVORBIS=OFF
   - if not "%TESTS%"=="ON" cmake --build . --config Debug -- /nologo "/verbosity:minimal"
   - if not "%TESTS%"=="ON" cmake --build . --config Release -- /nologo "/verbosity:minimal"
   - if not "%TESTS%"=="ON" cmake --build . --config Release --target install -- /nologo "/verbosity:minimal"

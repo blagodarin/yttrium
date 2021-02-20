@@ -78,10 +78,12 @@ namespace Yt
 			if (!read_tga_header(reader, info))
 				return false;
 			break;
+#if YTTRIUM_WITH_JPEG
 		case ImageFormat::Jpeg: {
 			auto input = source.to_buffer();
 			return read_jpeg(input.data(), input.size(), info, buffer);
 		}
+#endif
 		case ImageFormat::Dds:
 			if (!read_dds_header(reader, info))
 				return false;
@@ -109,7 +111,9 @@ namespace Yt
 		switch (format)
 		{
 		case ImageFormat::Tga: return write_tga(writer, info, data);
+#if YTTRIUM_WITH_JPEG
 		case ImageFormat::Jpeg: return write_jpeg(writer, info, data, quality);
+#endif
 		case ImageFormat::Png: return write_png(writer, info, data);
 		default: return false;
 		}

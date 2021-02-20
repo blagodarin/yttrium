@@ -17,7 +17,7 @@
 
 #pragma once
 
-#if !Y_USE_OGG_VORBIS
+#if !YTTRIUM_WITH_OGGVORBIS
 #	error Ogg Vorbis support is disabled.
 #endif
 

@@ -53,7 +53,7 @@ y_sources(yaudio "src/formats"
 	src/formats/wav.h
 	)
 
-if(Y_USE_OGG_VORBIS)
+if(YTTRIUM_WITH_OGGVORBIS)
 	if(WIN32)
 		find_package(Y3_vorbisfile REQUIRED)
 		target_link_libraries(yaudio PRIVATE Y3::vorbisfile)
