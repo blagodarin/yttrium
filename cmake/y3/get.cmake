@@ -187,41 +187,10 @@ endfunction()
 
 y3_package(vorbis REQUIRES ogg)
 y3_package(jpeg REQUIRES nasm)
-y3_package(freetype)
 y3_package(ogg)
 y3_package(nasm)
 
 y3_bootstrap()
-
-if("freetype" IN_LIST _y3_packages)
-	set(_version "2.10.4")
-	set(_package "freetype-${_version}")
-	y3_download("https://downloads.sourceforge.net/project/freetype/freetype2/${_version}/${_package}.tar.gz"
-		SHA1 "040d6a4be23708132c85ef9df837eb3f8a04c4ab")
-	y3_extract("${_package}.tar.gz" DIR ${_package})
-	y3_git_apply(${_package} ${CMAKE_CURRENT_LIST_DIR}/patches/freetype.patch)
-	y3_cmake(${_package}
-		OPTIONS
-			-DCMAKE_DISABLE_FIND_PACKAGE_BrotliDec=ON
-			-DCMAKE_DISABLE_FIND_PACKAGE_BZip2=ON
-			-DCMAKE_DISABLE_FIND_PACKAGE_HarfBuzz=ON
-			-DCMAKE_DISABLE_FIND_PACKAGE_PNG=ON
-			-DCMAKE_DISABLE_FIND_PACKAGE_ZLIB=ON
-			-DDISABLE_FORCE_DEBUG_POSTFIX=ON
-			-DSKIP_INSTALL_LIBRARIES=ON
-		CL -wd4018 -wd4244 -wd4267 -wd4312)
-endif()
-
-if("glslang" IN_LIST _y3_packages)
-	set(_version "8.13.3743")
-	set(_package "glslang-${_version}")
-	y3_download("https://github.com/KhronosGroup/glslang/archive/${_version}.tar.gz"
-		NAME "${_package}.tar.gz"
-		SHA1 "1ff733e45b0dfea91278d263e409e37044a88cce")
-	y3_extract("${_package}.tar.gz" DIR ${_package})
-	y3_cmake(${_package}
-		OPTIONS -DBUILD_EXTERNAL=OFF -DENABLE_CTEST=OFF -DENABLE_GLSLANG_BINARIES=OFF -DENABLE_HLSL=OFF -DENABLE_RTTI=ON -DENABLE_SPVREMAPPER=OFF -DENABLE_OPT=OFF)
-endif()
 
 if("ogg" IN_LIST _y3_packages)
 	set(_version "1.3.4")

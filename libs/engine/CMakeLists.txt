@@ -98,7 +98,7 @@ add_library(yengine STATIC
 	)
 include_config(yengine ${PROJECT_BINARY_DIR}/config.h)
 target_include_directories(yengine PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-target_link_libraries(yengine PRIVATE yaudio ycore primal Threads::Threads)
+target_link_libraries(yengine PRIVATE yaudio ycore primal Freetype::Freetype Threads::Threads)
 set_target_properties(yengine PROPERTIES FOLDER "libs" MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 if(YTTRIUM_RENDERER STREQUAL "opengl")
 	target_sources(yengine PRIVATE
@@ -172,9 +172,7 @@ else()
 		)
 endif()
 if(WIN32)
-	find_package(Y3_freetype REQUIRED)
 	target_compile_definitions(yengine PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
-	target_link_libraries(yengine PRIVATE Y3::freetype)
 	target_sources(yengine PRIVATE
 		src/application/windows/application.cpp
 		src/application/windows/application.h
@@ -190,8 +188,6 @@ if(WIN32)
 		target_compile_definitions(yengine PRIVATE VK_USE_PLATFORM_WIN32_KHR)
 	endif()
 else()
-	find_package(Freetype REQUIRED)
-	target_link_libraries(yengine PRIVATE Freetype::Freetype)
 	if(YTTRIUM_RENDERER STREQUAL "opengl")
 		find_package(X11 REQUIRED)
 		y_sources(yengine "src/application/x11"

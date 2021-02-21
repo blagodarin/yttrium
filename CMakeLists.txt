@@ -23,8 +23,8 @@ include(FetchContent)
 include(GNUInstallDirs)
 
 set(AULOS_STATIC_RUNTIME ON)
-FetchContent_Declare(Primal GIT_REPOSITORY https://github.com/blagodarin/primal.git GIT_TAG 190ad179972961b130c61cc69b801f1a66cd9161)
-FetchContent_Declare(Aulos GIT_REPOSITORY https://github.com/blagodarin/aulos.git GIT_TAG f9a719cda0ea6ac2df1f529b2f309f46a573701a)
+FetchContent_Declare(Primal GIT_REPOSITORY https://github.com/blagodarin/primal.git GIT_TAG e51e653659b9b4276d483e436967c56c27df6006)
+FetchContent_Declare(Aulos GIT_REPOSITORY https://github.com/blagodarin/aulos.git GIT_TAG 14d2933316def00a2d405fa6ce06842cfef42854)
 FetchContent_MakeAvailable(Primal Aulos)
 
 primal_set_defaults()
@@ -40,6 +40,53 @@ set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
 
 include(cmake/utils.cmake)
 
+function(y_get_freetype)
+	set(_version "2.10.4")
+	set(_package "freetype-${_version}")
+	primal_download("https://downloads.sourceforge.net/project/freetype/freetype2/${_version}/${_package}.tar.gz"
+		SHA1 "040d6a4be23708132c85ef9df837eb3f8a04c4ab"
+		EXTRACT_DIR "${_package}"
+		PATCH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/y3/patches/freetype.patch"
+		RESULT _ok)
+	set(_install_dir ${CMAKE_BINARY_DIR}/${_package}-install)
+	if(_ok)
+		set(_build_dir ${CMAKE_BINARY_DIR}/${_package}-build)
+		file(REMOVE_RECURSE ${_build_dir})
+		file(MAKE_DIRECTORY ${_build_dir})
+		file(REMOVE_RECURSE ${_install_dir})
+		set(_cmake_args ${CMAKE_BINARY_DIR}/${_package} -G ${CMAKE_GENERATOR})
+		if(CMAKE_GENERATOR_PLATFORM)
+			list(APPEND _cmake_args -A ${CMAKE_GENERATOR_PLATFORM})
+		endif()
+		if(CMAKE_GENERATOR_TOOLSET)
+			list(APPEND _cmake_args -T ${CMAKE_GENERATOR_TOOLSET})
+		endif()
+		get_property(_is_multi_config GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+		if(NOT _is_multi_config AND CMAKE_BUILD_TYPE)
+			list(APPEND _cmake_args -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})
+		endif()
+		list(APPEND _cmake_args -DCMAKE_INSTALL_PREFIX=${_install_dir} -DCMAKE_POSITION_INDEPENDENT_CODE=OFF -DCMAKE_POLICY_DEFAULT_CMP0091=NEW)
+		execute_process(COMMAND ${CMAKE_COMMAND} -E env RCFLAGS=/nologo ${CMAKE_COMMAND} ${_cmake_args}
+			-DCMAKE_DISABLE_FIND_PACKAGE_BrotliDec=ON
+			-DCMAKE_DISABLE_FIND_PACKAGE_BZip2=ON
+			-DCMAKE_DISABLE_FIND_PACKAGE_HarfBuzz=ON
+			-DCMAKE_DISABLE_FIND_PACKAGE_PNG=ON
+			-DCMAKE_DISABLE_FIND_PACKAGE_ZLIB=ON
+			WORKING_DIRECTORY ${_build_dir}
+			COMMAND_ERROR_IS_FATAL ANY)
+		if(_is_multi_config)
+			execute_process(COMMAND ${CMAKE_COMMAND} --build ${_build_dir} --target install --config Debug
+				COMMAND_ERROR_IS_FATAL ANY)
+			execute_process(COMMAND ${CMAKE_COMMAND} --build ${_build_dir} --target install --config Release
+				COMMAND_ERROR_IS_FATAL ANY)
+		else()
+			execute_process(COMMAND ${CMAKE_COMMAND} --build ${_build_dir} --target install
+				COMMAND_ERROR_IS_FATAL ANY)
+		endif()
+	endif()
+	set(Freetype_ROOT ${_install_dir} PARENT_SCOPE)
+endfunction()
+
 option(BUILD_EXAMPLES "Build examples" OFF)
 option(BUILD_TESTS "Build tests" OFF)
 option(ENABLE_CLANG_TIDY "Enable running ClangTidy ('tidy' target)" OFF)
@@ -49,10 +96,13 @@ option(INSTALL_EXAMPLES "Install examples" OFF)
 option(YTTRIUM_WITH_JPEG "Enable JPEG support (requires libjpeg)" ON)
 option(YTTRIUM_WITH_OGGVORBIS "Enable Ogg Vorbis support (requires libvorbisfile)" ON)
 
-find_package(Threads REQUIRED)
-if(NOT WIN32)
+if(WIN32)
+	y_get_freetype()
+else()
 	find_package(PkgConfig REQUIRED)
 endif()
+find_package(Freetype REQUIRED)
+find_package(Threads REQUIRED)
 
 get_target_architecture(_target_arch)
 set(TARGET_ARCH "${_target_arch}" CACHE STRING "Target architecture")
