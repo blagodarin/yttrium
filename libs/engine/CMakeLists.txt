@@ -80,6 +80,7 @@ endif()
 
 if(UNIX)
 	if(Y_RENDERER_OPENGL)
+		find_package(X11 REQUIRED)
 		y_sources(yengine "src/application/x11"
 			src/application/x11/application.cpp
 			src/application/x11/application.h
@@ -88,20 +89,21 @@ if(UNIX)
 			src/application/x11/window.cpp
 			src/application/x11/window.h
 			)
-		target_include_directories(yengine SYSTEM PRIVATE ${X11_INCLUDE_DIR})
-		target_link_libraries(yengine PRIVATE ${X11_X11_LIB})
+		target_link_libraries(yengine PRIVATE X11::X11)
 		if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 			# Xlib macros (DefaultScreen, RootWindow) produce old-style-cast warnings.
 			set_property(SOURCE src/application/x11/application.cpp src/application/x11/window.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-old-style-cast)
 		endif()
 	else()
+		find_package(X11 REQUIRED COMPONENTS xcb_xkb xkbcommon_X11)
+		pkg_check_modules(xcb-image REQUIRED IMPORTED_TARGET xcb-image) # TODO: Remove this dependency.
 		y_sources(yengine "src/application/xcb"
 			src/application/xcb/application.cpp
 			src/application/xcb/application.h
 			src/application/xcb/window.cpp
 			src/application/xcb/window.h
 			)
-		target_link_libraries(yengine PRIVATE xcb xcb-image xcb-xkb xkbcommon xkbcommon-x11)
+		target_link_libraries(yengine PRIVATE X11::xcb_xkb X11::xkbcommon_X11 PkgConfig::xcb-image)
 		if(Y_RENDERER_VULKAN)
 			target_compile_definitions(yengine PRIVATE VK_USE_PLATFORM_XCB_KHR)
 		endif()

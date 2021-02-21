@@ -41,8 +41,8 @@ matrix:
             - libxcb-xkb-dev
             - libxkbcommon-dev
             - libxkbcommon-x11-dev
-            - yasm
             - ninja-build
+            - yasm
 
     - os: linux
       dist: focal
@@ -85,8 +85,8 @@ matrix:
             - libasound2-dev
             - libgl-dev
             - libvorbis-dev
-            - yasm
             - ninja-build
+            - yasm
 
     - os: linux
       dist: focal
@@ -129,8 +129,8 @@ matrix:
             - libxcb-xkb-dev
             - libxkbcommon-dev
             - libxkbcommon-x11-dev
-            - yasm
             - ninja-build
+            - yasm
 
 before_install:
   - if [ -n "${CLANG}" ]; then export CC=clang-${CLANG} CXX=clang++-${CLANG}; fi
