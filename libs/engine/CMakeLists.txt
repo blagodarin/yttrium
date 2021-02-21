@@ -1,57 +1,29 @@
-#
 # This file is part of the Yttrium toolkit.
-# Copyright (C) 2019 Sergei Blagodarin.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
+# Copyright (C) Sergei Blagodarin.
+# SPDX-License-Identifier: Apache-2.0
 
-set(_src
-	src/console.cpp
-	src/resource_loader.cpp
-	src/utf8.h
-	)
-
-add_library(yengine STATIC ${_src})
-source_group("src" FILES ${_src})
-
-include_config(yengine ${PROJECT_BINARY_DIR}/config.h)
-target_include_directories(yengine PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-target_link_libraries(yengine PRIVATE yaudio ycore primal Threads::Threads)
-set_target_properties(yengine PROPERTIES FOLDER "libs" MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-if(WIN32)
-	find_package(Y3_freetype REQUIRED)
-	target_compile_definitions(yengine PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
-	target_link_libraries(yengine PRIVATE Y3::freetype)
-else()
-	find_package(Freetype REQUIRED)
-	target_link_libraries(yengine PRIVATE Freetype::Freetype)
-endif()
-
-y_sources(yengine "include"
+source_group("src" REGULAR_EXPRESSION ".*\\.(h|cpp)$")
+source_group("src/application" REGULAR_EXPRESSION "/src/application/")
+source_group("src/gui" REGULAR_EXPRESSION "/src/gui/")
+source_group("src/gui/ion" REGULAR_EXPRESSION "/src/gui/ion/")
+source_group("src/gui/logic" REGULAR_EXPRESSION "/src/gui/logic/")
+source_group("src/gui/widgets" REGULAR_EXPRESSION "/src/gui/widgets/")
+source_group("src/model" REGULAR_EXPRESSION "/src/model/")
+source_group("src/model/formats" REGULAR_EXPRESSION "/src/model/formats/")
+source_group("src/renderer" REGULAR_EXPRESSION "/src/renderer/")
+source_group("src/renderer/null" REGULAR_EXPRESSION "/src/renderer/null/")
+source_group("src/renderer/opengl" REGULAR_EXPRESSION "/src/renderer/opengl/")
+source_group("src/renderer/vulkan" REGULAR_EXPRESSION "/src/renderer/vulkan/")
+source_group("include" REGULAR_EXPRESSION "/include/")
+source_group("include/gui" REGULAR_EXPRESSION "/include/yttrium/gui/")
+source_group("include/renderer" REGULAR_EXPRESSION "/include/yttrium/renderer/")
+add_library(yengine STATIC
 	include/yttrium/application.h
 	include/yttrium/console.h
-	include/yttrium/key.h
-	include/yttrium/resource_loader.h
-	include/yttrium/window.h
-	)
-
-y_sources(yengine "include/gui"
 	include/yttrium/gui/font.h
 	include/yttrium/gui/gui.h
 	include/yttrium/gui/text_capture.h
-	)
-
-y_sources(yengine "include/renderer"
+	include/yttrium/key.h
 	include/yttrium/renderer/manager.h
 	include/yttrium/renderer/material.h
 	include/yttrium/renderer/mesh.h
@@ -61,9 +33,8 @@ y_sources(yengine "include/renderer"
 	include/yttrium/renderer/report.h
 	include/yttrium/renderer/texture.h
 	include/yttrium/renderer/textured_rect.h
-	)
-
-y_sources(yengine "src/application"
+	include/yttrium/resource_loader.h
+	include/yttrium/window.h
 	src/application/application.cpp
 	src/application/application.h
 	src/application/key_codes.h
@@ -71,94 +42,27 @@ y_sources(yengine "src/application"
 	src/application/window.h
 	src/application/window_backend.h
 	src/application/window_callbacks.h
-	)
-if(Y_RENDERER_OPENGL)
-	y_sources(yengine "src/application"
-		src/application/opengl.h
-		)
-endif()
-
-if(UNIX)
-	if(Y_RENDERER_OPENGL)
-		find_package(X11 REQUIRED)
-		y_sources(yengine "src/application/x11"
-			src/application/x11/application.cpp
-			src/application/x11/application.h
-			src/application/x11/glx.cpp
-			src/application/x11/glx.h
-			src/application/x11/window.cpp
-			src/application/x11/window.h
-			)
-		target_link_libraries(yengine PRIVATE X11::X11)
-		if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-			# Xlib macros (DefaultScreen, RootWindow) produce old-style-cast warnings.
-			set_property(SOURCE src/application/x11/application.cpp src/application/x11/window.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-old-style-cast)
-		endif()
-	else()
-		find_package(X11 REQUIRED COMPONENTS xcb_xkb xkbcommon_X11)
-		pkg_check_modules(xcb-image REQUIRED IMPORTED_TARGET xcb-image) # TODO: Remove this dependency.
-		y_sources(yengine "src/application/xcb"
-			src/application/xcb/application.cpp
-			src/application/xcb/application.h
-			src/application/xcb/window.cpp
-			src/application/xcb/window.h
-			)
-		target_link_libraries(yengine PRIVATE X11::xcb_xkb X11::xkbcommon_X11 PkgConfig::xcb-image)
-		if(Y_RENDERER_VULKAN)
-			target_compile_definitions(yengine PRIVATE VK_USE_PLATFORM_XCB_KHR)
-		endif()
-		if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-			# https://bugs.freedesktop.org/show_bug.cgi?id=74080
-			set_property(SOURCE src/application/xcb/window.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-keyword-macro)
-		endif()
-	endif()
-elseif(WIN32)
-	y_sources(yengine "src/application/windows"
-		src/application/windows/application.cpp
-		src/application/windows/application.h
-		src/application/windows/window.cpp
-		src/application/windows/window.h
-		)
-	if(Y_RENDERER_OPENGL)
-		y_sources(yengine "src/application/windows"
-			src/application/windows/wgl.cpp
-			src/application/windows/wgl.h
-			)
-	elseif(Y_RENDERER_VULKAN)
-		target_compile_definitions(yengine PRIVATE VK_USE_PLATFORM_WIN32_KHR)
-	endif()
-endif()
-
-y_sources(yengine "src/gui"
+	src/console.cpp
 	src/gui/actions.cpp
 	src/gui/actions.h
 	src/gui/cursor.h
 	src/gui/font.cpp
 	src/gui/gui.cpp
 	src/gui/gui.h
+	src/gui/ion/loader.cpp
+	src/gui/ion/loader.h
 	src/gui/key_lookup.cpp
 	src/gui/key_lookup.h
 	src/gui/layout.cpp
 	src/gui/layout.h
-	src/gui/screen.cpp
-	src/gui/screen.h
-	src/gui/widget_data.cpp
-	src/gui/widget_data.h
-	src/gui/widget.cpp
-	src/gui/widget.h
-	)
-
-y_sources(yengine "src/gui/ion"
-	src/gui/ion/loader.cpp
-	src/gui/ion/loader.h
-	)
-
-y_sources(yengine "src/gui/logic"
 	src/gui/logic/line_editor.cpp
 	src/gui/logic/line_editor.h
-	)
-
-y_sources(yengine "src/gui/widgets"
+	src/gui/screen.cpp
+	src/gui/screen.h
+	src/gui/widget.cpp
+	src/gui/widget.h
+	src/gui/widget_data.cpp
+	src/gui/widget_data.h
 	src/gui/widgets/button.cpp
 	src/gui/widgets/button.h
 	src/gui/widgets/canvas.cpp
@@ -169,19 +73,10 @@ y_sources(yengine "src/gui/widgets"
 	src/gui/widgets/input.h
 	src/gui/widgets/label.cpp
 	src/gui/widgets/label.h
-	)
-
-y_sources(yengine "src/model"
-	src/model/mesh_data.cpp
-	src/model/mesh_data.h
-	)
-
-y_sources(yengine "src/model/formats"
 	src/model/formats/obj.cpp
 	src/model/formats/obj.h
-	)
-
-y_sources(yengine "src/renderer"
+	src/model/mesh_data.cpp
+	src/model/mesh_data.h
 	src/renderer/backend.h
 	src/renderer/builtin.cpp
 	src/renderer/builtin.h
@@ -198,10 +93,16 @@ y_sources(yengine "src/renderer"
 	src/renderer/renderer.h
 	src/renderer/texture.cpp
 	src/renderer/texture.h
+	src/resource_loader.cpp
+	src/utf8.h
 	)
-
-if(Y_RENDERER_OPENGL)
-	y_sources(yengine "src/renderer/opengl"
+include_config(yengine ${PROJECT_BINARY_DIR}/config.h)
+target_include_directories(yengine PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+target_link_libraries(yengine PRIVATE yaudio ycore primal Threads::Threads)
+set_target_properties(yengine PROPERTIES FOLDER "libs" MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+if(YTTRIUM_RENDERER STREQUAL "opengl")
+	target_sources(yengine PRIVATE
+		src/application/opengl.h
 		src/renderer/opengl/api.h
 		src/renderer/opengl/gl.cpp
 		src/renderer/opengl/gl.h
@@ -220,10 +121,6 @@ if(Y_RENDERER_OPENGL)
 		src/renderer/opengl/2d_fs.glsl
 		src/renderer/opengl/2d_vs.glsl
 		)
-	source_group("src\\renderer\\opengl" FILES
-		src/renderer/opengl/2d_fs.glsl
-		src/renderer/opengl/2d_vs.glsl
-		)
 	target_link_libraries(yengine PRIVATE OpenGL::GL)
 	if(WIN32)
 		primal_download("https://www.khronos.org/registry/OpenGL/api/GL/glext.h" NAME GL/glext.h)
@@ -234,7 +131,7 @@ if(Y_RENDERER_OPENGL)
 	if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 		set_property(SOURCE src/renderer/opengl/gl.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-useless-cast)
 	endif()
-elseif(Y_RENDERER_VULKAN)
+elseif(YTTRIUM_RENDERER STREQUAL "vulkan")
 	y_sources(yengine "src/renderer/vulkan"
 		src/renderer/vulkan/buffer.cpp
 		src/renderer/vulkan/buffer.h
@@ -263,21 +160,71 @@ elseif(Y_RENDERER_VULKAN)
 		FRAGMENT src/renderer/vulkan/2d_fs.glsl
 		VERTEX src/renderer/vulkan/2d_vs.glsl
 		)
-	source_group("src\\renderer\\vulkan" FILES
-		src/renderer/vulkan/2d_fs.glsl
-		src/renderer/vulkan/2d_vs.glsl
-		)
 	target_link_libraries(yengine PRIVATE Vulkan::Vulkan)
 	if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 		# VK_NULL_HANDLE is defined to be 0 and is used for both pointers and integers.
 		target_compile_options(yengine PRIVATE -Wno-zero-as-null-pointer-constant)
 	endif()
 else()
-	y_sources(yengine "src/renderer/null"
+	target_sources(yengine PRIVATE
 		src/renderer/null/renderer.cpp
 		src/renderer/null/renderer.h
 		)
 endif()
-
+if(WIN32)
+	find_package(Y3_freetype REQUIRED)
+	target_compile_definitions(yengine PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
+	target_link_libraries(yengine PRIVATE Y3::freetype)
+	target_sources(yengine PRIVATE
+		src/application/windows/application.cpp
+		src/application/windows/application.h
+		src/application/windows/window.cpp
+		src/application/windows/window.h
+		)
+	if(YTTRIUM_RENDERER STREQUAL "opengl")
+		y_sources(yengine "src/application/windows"
+			src/application/windows/wgl.cpp
+			src/application/windows/wgl.h
+			)
+	elseif(YTTRIUM_RENDERER STREQUAL "vulkan")
+		target_compile_definitions(yengine PRIVATE VK_USE_PLATFORM_WIN32_KHR)
+	endif()
+else()
+	find_package(Freetype REQUIRED)
+	target_link_libraries(yengine PRIVATE Freetype::Freetype)
+	if(YTTRIUM_RENDERER STREQUAL "opengl")
+		find_package(X11 REQUIRED)
+		y_sources(yengine "src/application/x11"
+			src/application/x11/application.cpp
+			src/application/x11/application.h
+			src/application/x11/glx.cpp
+			src/application/x11/glx.h
+			src/application/x11/window.cpp
+			src/application/x11/window.h
+			)
+		target_link_libraries(yengine PRIVATE X11::X11)
+		if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+			# Xlib macros (DefaultScreen, RootWindow) produce old-style-cast warnings.
+			set_property(SOURCE src/application/x11/application.cpp src/application/x11/window.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-old-style-cast)
+		endif()
+	else()
+		find_package(X11 REQUIRED COMPONENTS xcb_xkb xkbcommon_X11)
+		pkg_check_modules(xcb-image REQUIRED IMPORTED_TARGET xcb-image) # TODO: Remove this dependency.
+		y_sources(yengine "src/application/xcb"
+			src/application/xcb/application.cpp
+			src/application/xcb/application.h
+			src/application/xcb/window.cpp
+			src/application/xcb/window.h
+			)
+		target_link_libraries(yengine PRIVATE X11::xcb_xkb X11::xkbcommon_X11 PkgConfig::xcb-image)
+		if(YTTRIUM_RENDERER STREQUAL "vulkan")
+			target_compile_definitions(yengine PRIVATE VK_USE_PLATFORM_XCB_KHR)
+		endif()
+		if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+			# https://bugs.freedesktop.org/show_bug.cgi?id=74080
+			set_property(SOURCE src/application/xcb/window.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-keyword-macro)
+		endif()
+	endif()
+endif()
 primal_install(yengine EXPORT YttriumTargets)
 install(DIRECTORY include/yttrium DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})

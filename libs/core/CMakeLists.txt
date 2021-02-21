@@ -3,26 +3,26 @@
 # SPDX-License-Identifier: Apache-2.0
 
 source_group("src" REGULAR_EXPRESSION ".*\\.(h|cpp)$")
-source_group("include" REGULAR_EXPRESSION "/include/yttrium/.*\\.(h|cpp)$")
-source_group("include\\image" REGULAR_EXPRESSION "/include/yttrium/image/.*\\.(h|cpp)$")
-source_group("include\\ion" REGULAR_EXPRESSION "/include/yttrium/ion/.*\\.(h|cpp)$")
-source_group("include\\math" REGULAR_EXPRESSION "/include/yttrium/math/.*\\.(h|cpp)$")
-source_group("include\\memory" REGULAR_EXPRESSION "/include/yttrium/memory/.*\\.(h|cpp)$")
-source_group("include\\script" REGULAR_EXPRESSION "/include/yttrium/script/.*\\.(h|cpp)$")
-source_group("include\\storage" REGULAR_EXPRESSION "/include/yttrium/storage/.*\\.(h|cpp)$")
-source_group("include\\utils" REGULAR_EXPRESSION "/include/yttrium/utils/.*\\.(h|cpp)$")
-source_group("src\\image" REGULAR_EXPRESSION "/src/image/.*\\.(h|cpp)$")
-source_group("src\\image\\formats" REGULAR_EXPRESSION "/src/image/formats/.*\\.(h|cpp)$")
-source_group("src\\ion" REGULAR_EXPRESSION "/src/ion/.*\\.(h|cpp)$")
-source_group("src\\logger" REGULAR_EXPRESSION "/src/logger/.*\\.(h|cpp)$")
-source_group("src\\memory" REGULAR_EXPRESSION "/src/memory/.*\\.(h|cpp)$")
-source_group("src\\platform" REGULAR_EXPRESSION "/src/platform/.*\\.(h|cpp)$")
-source_group("src\\platform\\posix" REGULAR_EXPRESSION "/src/platform/posix/.*\\.(h|cpp)$")
-source_group("src\\platform\\windows" REGULAR_EXPRESSION "/src/platform/windows/.*\\.(h|cpp)$")
-source_group("src\\script" REGULAR_EXPRESSION "/src/script/.*\\.(h|cpp)$")
-source_group("src\\storage" REGULAR_EXPRESSION "/src/storage/.*\\.(h|cpp)$")
-source_group("src\\storage\\formats" REGULAR_EXPRESSION "/src/storage/formats/.*\\.(h|cpp)$")
-source_group("src\\utils" REGULAR_EXPRESSION "/src/utils/.*\\.(h|cpp)$")
+source_group("include" REGULAR_EXPRESSION "/include/")
+source_group("include/image" REGULAR_EXPRESSION "/include/yttrium/image/")
+source_group("include/ion" REGULAR_EXPRESSION "/include/yttrium/ion/")
+source_group("include/math" REGULAR_EXPRESSION "/include/yttrium/math/")
+source_group("include/memory" REGULAR_EXPRESSION "/include/yttrium/memory/")
+source_group("include/script" REGULAR_EXPRESSION "/include/yttrium/script/")
+source_group("include/storage" REGULAR_EXPRESSION "/include/yttrium/storage/")
+source_group("include/utils" REGULAR_EXPRESSION "/include/yttrium/utils/")
+source_group("src/image" REGULAR_EXPRESSION "/src/image/")
+source_group("src/image/formats" REGULAR_EXPRESSION "/src/image/formats/")
+source_group("src/ion" REGULAR_EXPRESSION "/src/ion/")
+source_group("src/logger" REGULAR_EXPRESSION "/src/logger/")
+source_group("src/memory" REGULAR_EXPRESSION "/src/memory/")
+source_group("src/platform" REGULAR_EXPRESSION "/src/platform/")
+source_group("src/platform/posix" REGULAR_EXPRESSION "/src/platform/posix/")
+source_group("src/platform/windows" REGULAR_EXPRESSION "/src/platform/windows/")
+source_group("src/script" REGULAR_EXPRESSION "/src/script/")
+source_group("src/storage" REGULAR_EXPRESSION "/src/storage/")
+source_group("src/storage/formats" REGULAR_EXPRESSION "/src/storage/formats/")
+source_group("src/utils" REGULAR_EXPRESSION "/src/utils/")
 add_library(ycore STATIC
 	include/yttrium/api.h
 	include/yttrium/exceptions.h
@@ -137,18 +137,7 @@ if(YTTRIUM_WITH_JPEG)
 			)
 	endif()
 endif()
-if(UNIX)
-	target_sources(ycore PRIVATE
-		src/platform/posix/error.cpp
-		src/platform/posix/error.h
-		src/platform/posix/file.cpp
-		src/platform/posix/paths.cpp
-		src/platform/posix/temporary_file.cpp
-		src/platform/posix/temporary_file.h
-		src/platform/posix/virtual_memory.cpp
-		)
-	set_property(SOURCE src/platform/posix/file.cpp APPEND PROPERTY COMPILE_DEFINITIONS _FILE_OFFSET_BITS=64)
-elseif(WIN32)
+if(WIN32)
 	target_compile_definitions(ycore PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
 	target_sources(ycore PRIVATE
 		src/platform/windows/com.cpp
@@ -165,6 +154,17 @@ elseif(WIN32)
 			/wd5204 # class has virtual functions, but its trivial destructor is not virtual; instances of objects derived from this class may not be destructed correctly
 			)
 	endif()
+else()
+	target_sources(ycore PRIVATE
+		src/platform/posix/error.cpp
+		src/platform/posix/error.h
+		src/platform/posix/file.cpp
+		src/platform/posix/paths.cpp
+		src/platform/posix/temporary_file.cpp
+		src/platform/posix/temporary_file.h
+		src/platform/posix/virtual_memory.cpp
+		)
+	set_property(SOURCE src/platform/posix/file.cpp APPEND PROPERTY COMPILE_DEFINITIONS _FILE_OFFSET_BITS=64)
 endif()
 primal_install(ycore EXPORT YttriumTargets)
 install(DIRECTORY include/yttrium DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
