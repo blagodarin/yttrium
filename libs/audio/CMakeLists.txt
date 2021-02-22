@@ -33,13 +33,7 @@ target_include_directories(yaudio PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURC
 target_link_libraries(yaudio PRIVATE ycore aulos aulosplay)
 set_target_properties(yaudio PROPERTIES FOLDER "libs" MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 if(YTTRIUM_WITH_OGGVORBIS)
-	if(WIN32)
-		find_package(Y3_vorbisfile REQUIRED)
-		target_link_libraries(yaudio PRIVATE Y3::vorbisfile)
-	else()
-		pkg_check_modules(vorbisfile REQUIRED IMPORTED_TARGET vorbisfile)
-		target_link_libraries(yaudio PRIVATE PkgConfig::vorbisfile)
-	endif()
+	target_link_libraries(yaudio PRIVATE Vorbis::vorbisfile)
 	target_sources(yaudio PRIVATE
 		src/formats/ogg_vorbis.cpp
 		src/formats/ogg_vorbis.h
