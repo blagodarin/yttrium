@@ -4,7 +4,7 @@
  if(ENABLE_STATIC)
    add_library(jpeg-static STATIC ${JPEG_SOURCES} $<TARGET_OBJECTS:simd>
      ${SIMD_OBJS})
-+  set_target_properties(jpeg-static PROPERTIES COMPILE_PDB_NAME jpeg-static MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
++  set_target_properties(jpeg-static PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
    if(NOT MSVC)
      set_target_properties(jpeg-static PROPERTIES OUTPUT_NAME jpeg)
    endif()
@@ -14,4 +14,4 @@
  simd_fail("SIMD extensions not available for this CPU (${CMAKE_SYSTEM_PROCESSOR})")
  
  endif() # CPU_TYPE
-+set_target_properties(simd PROPERTIES COMPILE_PDB_NAME jpeg-static MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
++set_target_properties(simd PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")

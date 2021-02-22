@@ -186,9 +186,7 @@ function(y3_package _package)
 endfunction()
 
 y3_package(vorbis REQUIRES ogg)
-y3_package(jpeg REQUIRES nasm)
 y3_package(ogg)
-y3_package(nasm)
 
 y3_bootstrap()
 
@@ -205,39 +203,6 @@ if("ogg" IN_LIST _y3_packages)
 		${BUILD_DIR}/${_package}/include/ogg/ogg.h
 		${BUILD_DIR}/${_package}/include/ogg/os_types.h
 		DESTINATION ${PREFIX_DIR}/include/ogg)
-endif()
-
-if("nasm" IN_LIST _y3_packages)
-	set(_version "2.15.05")
-	set(_package "nasm-${_version}")
-	if(WIN32)
-		y3_download("https://www.nasm.us/pub/nasm/releasebuilds/${_version}/win64/${_package}-win64.zip"
-			NAME "${_package}.zip"
-			SHA1 "f3d25401783109ec999508af4dc967facf64971a")
-		y3_extract("${_package}.zip" DIR ${_package})
-		set(NASM_EXECUTABLE ${BUILD_DIR}/${_package}/nasm.exe)
-	endif()
-endif()
-
-if("jpeg" IN_LIST _y3_packages)
-	set(_version "2.0.6")
-	set(_package "libjpeg-turbo-${_version}")
-	y3_download("https://downloads.sourceforge.net/project/libjpeg-turbo/${_version}/${_package}.tar.gz"
-		SHA1 "5406c7676d7df89fb4da791ad5af51202910fb25")
-	y3_extract("${_package}.tar.gz" DIR ${_package})
-	y3_git_apply(${_package} ${CMAKE_CURRENT_LIST_DIR}/patches/jpeg.patch)
-	set(_options -DENABLE_SHARED=OFF -DREQUIRE_SIMD=ON -DWITH_ARITH_DEC=OFF -DWITH_ARITH_ENC=OFF -DWITH_TURBOJPEG=OFF)
-	if(WIN32)
-		list(APPEND _options -DCMAKE_ASM_NASM_COMPILER=${NASM_EXECUTABLE} -DWITH_CRT_DLL=ON)
-	endif()
-	y3_cmake(${_package} TARGET "jpeg-static"
-		OPTIONS ${_options})
-	file(INSTALL
-		${BUILD_DIR}/${_package}-${_y3_config}/jconfig.h
-		${BUILD_DIR}/${_package}/jerror.h
-		${BUILD_DIR}/${_package}/jmorecfg.h
-		${BUILD_DIR}/${_package}/jpeglib.h
-		DESTINATION ${PREFIX_DIR}/include)
 endif()
 
 if("vorbis" IN_LIST _y3_packages)

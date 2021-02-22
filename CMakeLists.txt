@@ -40,7 +40,91 @@ set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
 
 include(cmake/utils.cmake)
 
-function(y_get_freetype)
+function(_y_cmake _source_dir _build_dir _install_dir)
+	cmake_parse_arguments(_arg "" "TARGET" "OPTIONS" ${ARGN})
+	file(REMOVE_RECURSE ${_build_dir})
+	file(MAKE_DIRECTORY ${_build_dir})
+	file(REMOVE_RECURSE ${_install_dir})
+	set(_cmake_args ${_source_dir} -G ${CMAKE_GENERATOR})
+	if(CMAKE_GENERATOR_PLATFORM)
+		list(APPEND _cmake_args -A ${CMAKE_GENERATOR_PLATFORM})
+	endif()
+	if(CMAKE_GENERATOR_TOOLSET)
+		list(APPEND _cmake_args -T ${CMAKE_GENERATOR_TOOLSET})
+	endif()
+	get_property(_is_multi_config GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+	if(NOT _is_multi_config AND CMAKE_BUILD_TYPE)
+		list(APPEND _cmake_args -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})
+	endif()
+	list(APPEND _cmake_args -DCMAKE_INSTALL_PREFIX=${_install_dir} -DCMAKE_POSITION_INDEPENDENT_CODE=OFF -DCMAKE_POLICY_DEFAULT_CMP0091=NEW)
+	if(_arg_TARGET)
+		set(_target ${_arg_TARGET})
+		if(_is_multi_config)
+			list(APPEND _cmake_args -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG=${_install_dir}/lib -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE=${_install_dir}/lib)
+		else()
+			list(APPEND _cmake_args -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY=${_install_dir}/lib)
+		endif()
+	else()
+		set(_target "install")
+	endif()
+	execute_process(COMMAND ${CMAKE_COMMAND} -E env RCFLAGS=/nologo ${CMAKE_COMMAND} ${_cmake_args} ${_arg_OPTIONS} WORKING_DIRECTORY ${_build_dir} COMMAND_ERROR_IS_FATAL ANY)
+	if(_is_multi_config)
+		execute_process(COMMAND ${CMAKE_COMMAND} --build ${_build_dir} --target ${_target} --config Debug COMMAND_ERROR_IS_FATAL ANY)
+		execute_process(COMMAND ${CMAKE_COMMAND} --build ${_build_dir} --target ${_target} --config Release COMMAND_ERROR_IS_FATAL ANY)
+	else()
+		execute_process(COMMAND ${CMAKE_COMMAND} --build ${_build_dir} --target ${_target} COMMAND_ERROR_IS_FATAL ANY)
+	endif()
+endfunction()
+
+function(y_provide_nasm _output)
+	set(_version "2.15.05")
+	set(_package "nasm-${_version}")
+	if(WIN32)
+		primal_download("https://www.nasm.us/pub/nasm/releasebuilds/${_version}/win64/${_package}-win64.zip"
+			SHA1 "f3d25401783109ec999508af4dc967facf64971a"
+			NAME "${_package}.zip"
+			EXTRACT_DIR "${_package}"
+			RESULT _ok)
+		set(${_output} ${CMAKE_BINARY_DIR}/${_package}/nasm.exe PARENT_SCOPE)
+	else()
+		message(FATAL_ERROR "'nasm' is only available on Windows")
+	endif()
+endfunction()
+
+function(y_provide_jpeg _output)
+	y_provide_nasm(NASM_EXECUTABLE)
+	set(_version "2.0.6")
+	set(_package "libjpeg-turbo-${_version}")
+	primal_download("https://downloads.sourceforge.net/project/libjpeg-turbo/${_version}/${_package}.tar.gz"
+		SHA1 "5406c7676d7df89fb4da791ad5af51202910fb25"
+		EXTRACT_DIR "${_package}"
+		PATCH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/y3/patches/jpeg.patch"
+		RESULT _ok)
+	set(_install_dir ${CMAKE_BINARY_DIR}/${_package}-install)
+	if(_ok)
+		set(_source_dir ${CMAKE_BINARY_DIR}/${_package})
+		set(_build_dir ${CMAKE_BINARY_DIR}/${_package}-build)
+		_y_cmake(${_source_dir} ${_build_dir} ${_install_dir} TARGET jpeg-static OPTIONS
+			-DCMAKE_ASM_NASM_COMPILER=${NASM_EXECUTABLE}
+			-DCMAKE_DEBUG_POSTFIX=d
+			-DENABLE_SHARED=OFF
+			-DREQUIRE_SIMD=ON
+			-DWITH_ARITH_DEC=OFF
+			-DWITH_ARITH_ENC=OFF
+			-DWITH_CRT_DLL=ON # Doesn't work, set to ON to prevent manual flag manipulation.
+			-DWITH_TURBOJPEG=OFF
+			)
+		file(INSTALL
+			${_build_dir}/jconfig.h
+			${_source_dir}/jerror.h
+			${_source_dir}/jmorecfg.h
+			${_source_dir}/jpeglib.h
+			DESTINATION ${_install_dir}/include)
+	endif()
+	set(${_output} ${_install_dir} PARENT_SCOPE)
+endfunction()
+
+function(y_provide_freetype _output)
 	set(_version "2.10.4")
 	set(_package "freetype-${_version}")
 	primal_download("https://downloads.sourceforge.net/project/freetype/freetype2/${_version}/${_package}.tar.gz"
@@ -51,40 +135,15 @@ function(y_get_freetype)
 	set(_install_dir ${CMAKE_BINARY_DIR}/${_package}-install)
 	if(_ok)
 		set(_build_dir ${CMAKE_BINARY_DIR}/${_package}-build)
-		file(REMOVE_RECURSE ${_build_dir})
-		file(MAKE_DIRECTORY ${_build_dir})
-		file(REMOVE_RECURSE ${_install_dir})
-		set(_cmake_args ${CMAKE_BINARY_DIR}/${_package} -G ${CMAKE_GENERATOR})
-		if(CMAKE_GENERATOR_PLATFORM)
-			list(APPEND _cmake_args -A ${CMAKE_GENERATOR_PLATFORM})
-		endif()
-		if(CMAKE_GENERATOR_TOOLSET)
-			list(APPEND _cmake_args -T ${CMAKE_GENERATOR_TOOLSET})
-		endif()
-		get_property(_is_multi_config GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
-		if(NOT _is_multi_config AND CMAKE_BUILD_TYPE)
-			list(APPEND _cmake_args -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})
-		endif()
-		list(APPEND _cmake_args -DCMAKE_INSTALL_PREFIX=${_install_dir} -DCMAKE_POSITION_INDEPENDENT_CODE=OFF -DCMAKE_POLICY_DEFAULT_CMP0091=NEW)
-		execute_process(COMMAND ${CMAKE_COMMAND} -E env RCFLAGS=/nologo ${CMAKE_COMMAND} ${_cmake_args}
+		_y_cmake(${CMAKE_BINARY_DIR}/${_package} ${CMAKE_BINARY_DIR}/${_package}-build ${_install_dir} OPTIONS
 			-DCMAKE_DISABLE_FIND_PACKAGE_BrotliDec=ON
 			-DCMAKE_DISABLE_FIND_PACKAGE_BZip2=ON
 			-DCMAKE_DISABLE_FIND_PACKAGE_HarfBuzz=ON
 			-DCMAKE_DISABLE_FIND_PACKAGE_PNG=ON
 			-DCMAKE_DISABLE_FIND_PACKAGE_ZLIB=ON
-			WORKING_DIRECTORY ${_build_dir}
-			COMMAND_ERROR_IS_FATAL ANY)
-		if(_is_multi_config)
-			execute_process(COMMAND ${CMAKE_COMMAND} --build ${_build_dir} --target install --config Debug
-				COMMAND_ERROR_IS_FATAL ANY)
-			execute_process(COMMAND ${CMAKE_COMMAND} --build ${_build_dir} --target install --config Release
-				COMMAND_ERROR_IS_FATAL ANY)
-		else()
-			execute_process(COMMAND ${CMAKE_COMMAND} --build ${_build_dir} --target install
-				COMMAND_ERROR_IS_FATAL ANY)
-		endif()
+			)
 	endif()
-	set(Freetype_ROOT ${_install_dir} PARENT_SCOPE)
+	set(${_output} ${_install_dir} PARENT_SCOPE)
 endfunction()
 
 option(BUILD_EXAMPLES "Build examples" OFF)
@@ -97,12 +156,18 @@ option(YTTRIUM_WITH_JPEG "Enable JPEG support (requires libjpeg)" ON)
 option(YTTRIUM_WITH_OGGVORBIS "Enable Ogg Vorbis support (requires libvorbisfile)" ON)
 
 if(WIN32)
-	y_get_freetype()
+	if(YTTRIUM_WITH_JPEG)
+		y_provide_jpeg(JPEG_ROOT)
+	endif()
+	y_provide_freetype(Freetype_ROOT)
 else()
 	find_package(PkgConfig REQUIRED)
 endif()
 find_package(Freetype REQUIRED)
 find_package(Threads REQUIRED)
+if(YTTRIUM_WITH_JPEG)
+	find_package(JPEG REQUIRED)
+endif()
 
 get_target_architecture(_target_arch)
 set(TARGET_ARCH "${_target_arch}" CACHE STRING "Target architecture")
