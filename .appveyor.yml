@@ -37,6 +37,9 @@ environment:
       TESTS: OFF
       PUBLISH: OFF
 
+cache:
+  - _build\_PrimalDownloads
+
 install:
   - cmake --version
   - call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat" %ARCH%

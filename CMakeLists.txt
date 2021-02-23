@@ -23,194 +23,23 @@ include(FetchContent)
 include(GNUInstallDirs)
 
 set(AULOS_STATIC_RUNTIME ON)
-FetchContent_Declare(Primal GIT_REPOSITORY https://github.com/blagodarin/primal.git GIT_TAG e51e653659b9b4276d483e436967c56c27df6006)
-FetchContent_Declare(Aulos GIT_REPOSITORY https://github.com/blagodarin/aulos.git GIT_TAG 14d2933316def00a2d405fa6ce06842cfef42854)
+FetchContent_Declare(Primal GIT_REPOSITORY https://github.com/blagodarin/primal.git GIT_TAG f016b660599ca538e24ee0995c0434039ab651aa)
+FetchContent_Declare(Aulos GIT_REPOSITORY https://github.com/blagodarin/aulos.git GIT_TAG adcc4c341bde0389fbb8098ae5bda04e444d473b)
 FetchContent_MakeAvailable(Primal Aulos)
 
 primal_set_defaults()
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(CMAKE_DEBUG_POSTFIX d)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
-set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/y3/modules ${PROJECT_SOURCE_DIR}/cmake/modules)
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
 set(CMAKE_THREAD_PREFER_PTHREAD ON)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
 
 include(cmake/utils.cmake)
-
-function(_primal_cmake _source_dir _build_dir _install_dir)
-	cmake_parse_arguments(_arg "" "TARGET" "MSVC_WARNINGS;OPTIONS" ${ARGN})
-	file(REMOVE_RECURSE ${_build_dir})
-	file(MAKE_DIRECTORY ${_build_dir})
-	file(REMOVE_RECURSE ${_install_dir})
-	set(_options ${_source_dir} -G ${CMAKE_GENERATOR})
-	if(CMAKE_GENERATOR_PLATFORM)
-		list(APPEND _options -A ${CMAKE_GENERATOR_PLATFORM})
-	endif()
-	if(CMAKE_GENERATOR_TOOLSET)
-		list(APPEND _options -T ${CMAKE_GENERATOR_TOOLSET})
-	endif()
-	list(APPEND _options
-		-DCMAKE_INSTALL_PREFIX=${_install_dir}
-		-DCMAKE_POSITION_INDEPENDENT_CODE=OFF
-		-DCMAKE_POLICY_DEFAULT_CMP0074=NEW # find_package() uses <PackageName>_ROOT variables.
-		-DCMAKE_POLICY_DEFAULT_CMP0091=NEW # MSVC runtime library flags are selected by an abstraction.
-		)
-	get_property(_is_multi_config GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
-	if(_is_multi_config)
-		list(APPEND _options -DCMAKE_DEBUG_POSTFIX=d)
-	elseif(CMAKE_BUILD_TYPE)
-		list(APPEND _options -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})
-	endif()
-	if(_arg_TARGET)
-		set(_target ${_arg_TARGET})
-		if(_is_multi_config)
-			list(APPEND _options -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG=${_install_dir}/lib -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE=${_install_dir}/lib)
-		else()
-			list(APPEND _options -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY=${_install_dir}/lib)
-		endif()
-	else()
-		set(_target "install")
-	endif()
-	if(MSVC AND _arg_MSVC_WARNINGS)
-		set(_msvc_warnings)
-		foreach(_warning ${_arg_MSVC_WARNINGS})
-			set(_msvc_warnings "${_msvc_warnings} /wd${_warning}")
-		endforeach()
-		set(_env "CFLAGS=$ENV{CFLAGS}${_msvc_warnings}")
-	endif()
-	execute_process(COMMAND ${CMAKE_COMMAND} -E env RCFLAGS=/nologo ${_env} ${CMAKE_COMMAND} ${_options} ${_arg_OPTIONS} WORKING_DIRECTORY ${_build_dir} COMMAND_ERROR_IS_FATAL ANY)
-	if(_is_multi_config)
-		execute_process(COMMAND ${CMAKE_COMMAND} --build ${_build_dir} --target ${_target} --config Debug COMMAND_ERROR_IS_FATAL ANY)
-		execute_process(COMMAND ${CMAKE_COMMAND} --build ${_build_dir} --target ${_target} --config Release COMMAND_ERROR_IS_FATAL ANY)
-	else()
-		execute_process(COMMAND ${CMAKE_COMMAND} --build ${_build_dir} --target ${_target} COMMAND_ERROR_IS_FATAL ANY)
-	endif()
-endfunction()
-
-function(primal_provide_nasm _output)
-	set(_version "2.15.05")
-	set(_package "nasm-${_version}")
-	if(WIN32)
-		primal_download("https://www.nasm.us/pub/nasm/releasebuilds/${_version}/win64/${_package}-win64.zip"
-			SHA1 "f3d25401783109ec999508af4dc967facf64971a"
-			NAME "${_package}.zip"
-			EXTRACT_DIR "${_package}"
-			RESULT _downloaded)
-		set(_path ${CMAKE_BINARY_DIR}/${_package}/nasm.exe)
-		if(_downloaded)
-			message(STATUS "[PRIMAL] Provided nasm at ${_path}")
-		endif()
-		set(${_output} ${_path} PARENT_SCOPE)
-	else()
-		message(FATAL_ERROR "'nasm' is only available on Windows")
-	endif()
-endfunction()
-
-function(primal_provide_jpeg _output)
-	primal_provide_nasm(NASM_EXECUTABLE)
-	set(_version "2.0.6")
-	set(_package "libjpeg-turbo-${_version}")
-	primal_download("https://downloads.sourceforge.net/project/libjpeg-turbo/${_version}/${_package}.tar.gz"
-		SHA1 "5406c7676d7df89fb4da791ad5af51202910fb25"
-		EXTRACT_DIR "${_package}"
-		PATCH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/y3/patches/jpeg.patch"
-		RESULT _downloaded)
-	set(_install_dir ${CMAKE_BINARY_DIR}/${_package}-install)
-	if(_downloaded OR NOT EXISTS ${_install_dir})
-		set(_source_dir ${CMAKE_BINARY_DIR}/${_package})
-		message(STATUS "[PRIMAL] Building JPEG from ${_source_dir}")
-		set(_build_dir ${CMAKE_BINARY_DIR}/${_package}-build)
-		_primal_cmake(${_source_dir} ${_build_dir} ${_install_dir} TARGET jpeg-static OPTIONS
-			-DCMAKE_ASM_NASM_COMPILER=${NASM_EXECUTABLE}
-			-DENABLE_SHARED=OFF
-			-DREQUIRE_SIMD=ON
-			-DWITH_ARITH_DEC=OFF
-			-DWITH_ARITH_ENC=OFF
-			-DWITH_CRT_DLL=ON # Doesn't work, set to ON to prevent manual flag manipulation.
-			-DWITH_TURBOJPEG=OFF
-			)
-		file(INSTALL
-			${_build_dir}/jconfig.h
-			${_source_dir}/jerror.h
-			${_source_dir}/jmorecfg.h
-			${_source_dir}/jpeglib.h
-			DESTINATION ${_install_dir}/include)
-		message(STATUS "[PRIMAL] Provided JPEG at ${_install_dir}")
-	endif()
-	set(${_output} ${_install_dir} PARENT_SCOPE)
-endfunction()
-
-function(primal_provide_freetype _output)
-	set(_version "2.10.4")
-	set(_package "freetype-${_version}")
-	primal_download("https://downloads.sourceforge.net/project/freetype/freetype2/${_version}/${_package}.tar.gz"
-		SHA1 "040d6a4be23708132c85ef9df837eb3f8a04c4ab"
-		EXTRACT_DIR "${_package}"
-		PATCH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/y3/patches/freetype.patch"
-		RESULT _downloaded)
-	set(_install_dir ${CMAKE_BINARY_DIR}/${_package}-install)
-	if(_downloaded OR NOT EXISTS ${_install_dir})
-		set(_source_dir ${CMAKE_BINARY_DIR}/${_package})
-		message(STATUS "[PRIMAL] Building Freetype from ${_source_dir}")
-		_primal_cmake(${_source_dir} ${_source_dir}-build ${_install_dir} OPTIONS
-			-DCMAKE_DISABLE_FIND_PACKAGE_BrotliDec=ON
-			-DCMAKE_DISABLE_FIND_PACKAGE_BZip2=ON
-			-DCMAKE_DISABLE_FIND_PACKAGE_HarfBuzz=ON
-			-DCMAKE_DISABLE_FIND_PACKAGE_PNG=ON
-			-DCMAKE_DISABLE_FIND_PACKAGE_ZLIB=ON
-			MSVC_WARNINGS 4244 4267 4312
-			)
-		message(STATUS "[PRIMAL] Provided Freetype at ${_install_dir}")
-	endif()
-	set(${_output} ${_install_dir} PARENT_SCOPE)
-endfunction()
-
-function(primal_provide_ogg _output)
-	set(_version "1.3.4")
-	set(_package "libogg-${_version}")
-	primal_download("http://downloads.xiph.org/releases/ogg/${_package}.tar.xz"
-		SHA1 "f07499a35566aa62affb5ca989f62eed5b8092c3"
-		EXTRACT_DIR "${_package}"
-		PATCH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/y3/patches/ogg.patch"
-		RESULT _downloaded)
-	set(_install_dir ${CMAKE_BINARY_DIR}/${_package}-install)
-	if(_downloaded OR NOT EXISTS ${_install_dir})
-		set(_source_dir ${CMAKE_BINARY_DIR}/${_package})
-		message(STATUS "[PRIMAL] Building Ogg from ${_source_dir}")
-		_primal_cmake(${_source_dir} ${_source_dir}-build ${_install_dir} OPTIONS
-			-DINSTALL_DOCS=OFF
-			-DINSTALL_PKG_CONFIG_MODULE=OFF
-			MSVC_WARNINGS 4244
-			)
-		message(STATUS "[PRIMAL] Provided Ogg at ${_install_dir}")
-	endif()
-	set(${_output} ${_install_dir} PARENT_SCOPE)
-endfunction()
-
-function(primal_provide_vorbis _output)
-	primal_provide_ogg(Ogg_ROOT)
-	set(_version "1.3.7")
-	set(_package "libvorbis-${_version}")
-	primal_download("http://downloads.xiph.org/releases/vorbis/${_package}.tar.xz"
-		SHA1 "0a2dd71a999656b8091506839e8007a61a8fda1f"
-		EXTRACT_DIR "${_package}"
-		PATCH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/y3/patches/vorbis.patch"
-		RESULT _downloaded)
-	set(_install_dir ${CMAKE_BINARY_DIR}/${_package}-install)
-	if(_downloaded OR NOT EXISTS ${_install_dir})
-		set(_source_dir ${CMAKE_BINARY_DIR}/${_package})
-		message(STATUS "[PRIMAL] Building Vorbis from ${_source_dir}")
-		_primal_cmake(${_source_dir} ${_source_dir}-build ${_install_dir} OPTIONS
-			-DOgg_ROOT=${Ogg_ROOT}
-			MSVC_WARNINGS 4244 4267 4305
-			)
-		message(STATUS "[PRIMAL] Provided Vorbis at ${_install_dir}")
-	endif()
-	set(${_output} ${_install_dir} PARENT_SCOPE)
-endfunction()
 
 option(BUILD_EXAMPLES "Build examples" OFF)
 option(BUILD_TESTS "Build tests" OFF)
@@ -222,7 +51,7 @@ option(YTTRIUM_WITH_JPEG "Enable JPEG support (requires libjpeg)" ON)
 option(YTTRIUM_WITH_OGGVORBIS "Enable Ogg Vorbis support (requires libvorbisfile)" ON)
 
 if(WIN32)
-	primal_provide_freetype(Freetype_ROOT)
+	primal_provide_freetype(Freetype_ROOT STATIC_RUNTIME ON)
 else()
 	find_package(PkgConfig REQUIRED)
 endif()
@@ -230,14 +59,14 @@ find_package(Freetype REQUIRED)
 find_package(Threads REQUIRED)
 if(YTTRIUM_WITH_JPEG)
 	if(WIN32)
-		primal_provide_jpeg(JPEG_ROOT)
+		primal_provide_jpeg(JPEG_ROOT STATIC_RUNTIME ON)
 	endif()
 	find_package(JPEG REQUIRED)
 endif()
 if(YTTRIUM_WITH_OGGVORBIS)
 	if(WIN32)
-		primal_provide_ogg(Ogg_ROOT)
-		primal_provide_vorbis(Vorbis_ROOT)
+		primal_provide_ogg(Ogg_ROOT STATIC_RUNTIME ON)
+		primal_provide_vorbis(Vorbis_ROOT STATIC_RUNTIME ON)
 		find_package(Vorbis REQUIRED)
 	else()
 		pkg_check_modules(vorbisfile REQUIRED IMPORTED_TARGET vorbisfile)

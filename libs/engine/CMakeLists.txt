@@ -2,6 +2,7 @@
 # Copyright (C) Sergei Blagodarin.
 # SPDX-License-Identifier: Apache-2.0
 
+primal_set_folder(libs)
 source_group("src" REGULAR_EXPRESSION ".*\\.(h|cpp)$")
 source_group("src/application" REGULAR_EXPRESSION "/src/application/")
 source_group("src/gui" REGULAR_EXPRESSION "/src/gui/")
@@ -99,7 +100,7 @@ add_library(yengine STATIC
 include_config(yengine ${PROJECT_BINARY_DIR}/config.h)
 target_include_directories(yengine PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 target_link_libraries(yengine PRIVATE yaudio ycore primal Freetype::Freetype Threads::Threads)
-set_target_properties(yengine PROPERTIES FOLDER "libs" MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+set_target_properties(yengine PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 if(YTTRIUM_RENDERER STREQUAL "opengl")
 	target_sources(yengine PRIVATE
 		src/application/opengl.h
@@ -126,7 +127,7 @@ if(YTTRIUM_RENDERER STREQUAL "opengl")
 		primal_download("https://www.khronos.org/registry/OpenGL/api/GL/glext.h" NAME GL/glext.h)
 		primal_download("https://www.khronos.org/registry/OpenGL/api/GL/wglext.h" NAME GL/wglext.h)
 		primal_download("https://www.khronos.org/registry/EGL/api/KHR/khrplatform.h" NAME KHR/khrplatform.h)
-		target_include_directories(yengine PRIVATE ${CMAKE_BINARY_DIR})
+		target_include_directories(yengine PRIVATE ${PRIMAL_DOWNLOAD_DIR})
 	endif()
 	if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 		set_property(SOURCE src/renderer/opengl/gl.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-useless-cast)

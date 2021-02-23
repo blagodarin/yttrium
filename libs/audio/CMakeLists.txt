@@ -2,6 +2,7 @@
 # Copyright (C) Sergei Blagodarin.
 # SPDX-License-Identifier: Apache-2.0
 
+primal_set_folder(libs)
 source_group("src" REGULAR_EXPRESSION ".*\\.(h|cpp)$")
 source_group("src/formats" REGULAR_EXPRESSION "/src/formats/")
 source_group("include" REGULAR_EXPRESSION "/include/")
@@ -31,7 +32,7 @@ add_library(yaudio STATIC
 include_config(yaudio ${PROJECT_BINARY_DIR}/config.h)
 target_include_directories(yaudio PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 target_link_libraries(yaudio PRIVATE ycore aulos aulosplay)
-set_target_properties(yaudio PROPERTIES FOLDER "libs" MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+set_target_properties(yaudio PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 if(YTTRIUM_WITH_OGGVORBIS)
 	target_link_libraries(yaudio PRIVATE Vorbis::vorbisfile)
 	target_sources(yaudio PRIVATE

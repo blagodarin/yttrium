@@ -1,32 +1,19 @@
-#
 # This file is part of the Yttrium toolkit.
-# Copyright (C) 2019 Sergei Blagodarin.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
+# Copyright (C) Sergei Blagodarin.
+# SPDX-License-Identifier: Apache-2.0
 
-set(_src
+primal_set_folder(examples)
+source_group("src" REGULAR_EXPRESSION ".*\\.(h|cpp)$")
+
+add_executable(tetrium WIN32
 	src/graphics.cpp
 	src/graphics.h
 	src/logic.cpp
 	src/logic.h
 	src/main.cpp
 	)
-
-add_executable(tetrium WIN32 ${_src})
-source_group("src" FILES ${_src})
 target_link_libraries(tetrium PRIVATE yaudio ycore yengine ymain)
-set_target_properties(tetrium PROPERTIES FOLDER "examples" MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+set_target_properties(tetrium PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 	target_link_options(tetrium PRIVATE "/NODEFAULTLIB:$<IF:$<CONFIG:Debug>,LIBCMT,LIBCMTD>")
 endif()
@@ -53,9 +40,7 @@ add_ypack_target(tetrium_package
 	DEPENDS tetrium_localization)
 add_dependencies(tetrium tetrium_package)
 
-set_target_properties(tetrium_localization tetrium_package PROPERTIES FOLDER "examples")
-
 if(INSTALL_EXAMPLES)
-	install(TARGETS tetrium RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+	primal_install(tetrium)
 	install(FILES ${PROJECT_BINARY_DIR}/tetrium.ypq DESTINATION ${CMAKE_INSTALL_DATADIR})
 endif()

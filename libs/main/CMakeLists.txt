@@ -2,12 +2,13 @@
 # Copyright (C) Sergei Blagodarin.
 # SPDX-License-Identifier: Apache-2.0
 
+primal_set_folder(libs)
 source_group("src" REGULAR_EXPRESSION ".*\\.(h|cpp)$")
 source_group("include" REGULAR_EXPRESSION "/include/")
 add_library(ymain STATIC include/yttrium/main.h)
 target_include_directories(ymain PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 target_link_libraries(ymain PRIVATE primal)
-set_target_properties(ymain PROPERTIES FOLDER "libs" MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+set_target_properties(ymain PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 if(WIN32)
 	target_sources(ymain PRIVATE src/main_windows.cpp)
 else()
