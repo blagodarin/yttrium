@@ -40,7 +40,5 @@ add_ypack_target(tetrium_package
 	DEPENDS tetrium_localization)
 add_dependencies(tetrium tetrium_package)
 
-if(INSTALL_EXAMPLES)
-	primal_install(tetrium)
-	install(FILES ${PROJECT_BINARY_DIR}/tetrium.ypq DESTINATION ${CMAKE_INSTALL_DATADIR})
-endif()
+primal_install(tetrium)
+install(FILES ${PROJECT_BINARY_DIR}/tetrium.ypq DESTINATION ${CMAKE_INSTALL_DATADIR})

@@ -50,14 +50,13 @@ install:
 build_script:
   - set BUILD_DIR=%APPVEYOR_BUILD_FOLDER%\_build
   - set INSTALL_DIR=%APPVEYOR_BUILD_FOLDER%\_install
-  - mkdir %BUILD_DIR% && cd %BUILD_DIR%
-  - if "%TESTS%"=="ON" cmake -G Ninja %APPVEYOR_BUILD_FOLDER% -DBUILD_EXAMPLES=ON -DBUILD_TESTS=%TESTS% -DCMAKE_BUILD_TYPE=%CONFIG% -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% -DINSTALL_EXAMPLES=%PUBLISH% -DYTTRIUM_RENDERER=%RENDERER%
-  - if "%TESTS%"=="ON" cmake --build .
-  - if "%TESTS%"=="ON" cmake --build . --target install
-  - if not "%TESTS%"=="ON" cmake -G "Visual Studio 16 2019" -A Win32 %APPVEYOR_BUILD_FOLDER% -DBUILD_EXAMPLES=ON -DBUILD_TESTS=%TESTS% -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% -DINSTALL_EXAMPLES=%PUBLISH% -DYTTRIUM_RENDERER=%RENDERER% -DYTTRIUM_WITH_JPEG=OFF -DYTTRIUM_WITH_OGGVORBIS=OFF
-  - if not "%TESTS%"=="ON" cmake --build . --config Debug -- /nologo "/verbosity:minimal"
-  - if not "%TESTS%"=="ON" cmake --build . --config Release -- /nologo "/verbosity:minimal"
-  - if not "%TESTS%"=="ON" cmake --build . --config Release --target install -- /nologo "/verbosity:minimal"
+  - if "%TESTS%"=="ON" cmake -S %APPVEYOR_BUILD_FOLDER% -B %BUILD_DIR% -G Ninja %APPVEYOR_BUILD_FOLDER% -DCMAKE_BUILD_TYPE=%CONFIG% -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% -DYTTRIUM_EXAMPLES=ON -DYTTRIUM_RENDERER=%RENDERER% -DYTTRIUM_TESTS=%TESTS%
+  - if "%TESTS%"=="ON" cmake --build %BUILD_DIR%
+  - if "%TESTS%"=="ON" cmake --build %BUILD_DIR% --target install
+  - if not "%TESTS%"=="ON" cmake -S %APPVEYOR_BUILD_FOLDER% -B %BUILD_DIR% -G "Visual Studio 16 2019" -A Win32 %APPVEYOR_BUILD_FOLDER% -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% -DYTTRIUM_EXAMPLES=ON -DYTTRIUM_RENDERER=%RENDERER% -DYTTRIUM_TESTS=%TESTS% -DYTTRIUM_WITH_JPEG=OFF -DYTTRIUM_WITH_OGGVORBIS=OFF
+  - if not "%TESTS%"=="ON" cmake --build %BUILD_DIR% --config Debug -- /nologo "/verbosity:minimal"
+  - if not "%TESTS%"=="ON" cmake --build %BUILD_DIR% --config Release -- /nologo "/verbosity:minimal"
+  - if not "%TESTS%"=="ON" cmake --build %BUILD_DIR% --config Release --target install -- /nologo "/verbosity:minimal"
   - cd %APPVEYOR_BUILD_FOLDER%
   - set BUILD_NAME=yttrium-%RENDERER%-%ARCH%
   - if "%PUBLISH%"=="ON" move %INSTALL_DIR% %BUILD_NAME%

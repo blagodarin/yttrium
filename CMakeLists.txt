@@ -1,19 +1,6 @@
-#
 # This file is part of the Yttrium toolkit.
-# Copyright (C) 2019 Sergei Blagodarin.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
+# Copyright (C) Sergei Blagodarin.
+# SPDX-License-Identifier: Apache-2.0
 
 cmake_minimum_required(VERSION 3.19)
 
@@ -22,9 +9,10 @@ project(Yttrium VERSION 0.0.1 LANGUAGES CXX)
 include(FetchContent)
 include(GNUInstallDirs)
 
+set(AULOS_AULOSPLAY ON)
 set(AULOS_STATIC_RUNTIME ON)
-FetchContent_Declare(Primal GIT_REPOSITORY https://github.com/blagodarin/primal.git GIT_TAG f016b660599ca538e24ee0995c0434039ab651aa)
-FetchContent_Declare(Aulos GIT_REPOSITORY https://github.com/blagodarin/aulos.git GIT_TAG adcc4c341bde0389fbb8098ae5bda04e444d473b)
+FetchContent_Declare(Primal GIT_REPOSITORY https://github.com/blagodarin/primal.git GIT_TAG c34f30807bd360880f62d7b08ef3019ceb34878e)
+FetchContent_Declare(Aulos GIT_REPOSITORY https://github.com/blagodarin/aulos.git GIT_TAG 2df320287e5b9969c73bdf70320bd044605b1f1a)
 FetchContent_MakeAvailable(Primal Aulos)
 
 primal_set_defaults()
@@ -41,14 +29,15 @@ set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
 
 include(cmake/utils.cmake)
 
-option(BUILD_EXAMPLES "Build examples" OFF)
-option(BUILD_TESTS "Build tests" OFF)
-option(ENABLE_CLANG_TIDY "Enable running ClangTidy ('tidy' target)" OFF)
-option(ENABLE_SANITIZERS "Enable sanitizers" OFF)
-option(INSTALL_EXAMPLES "Install examples" OFF)
-
 option(YTTRIUM_WITH_JPEG "Enable JPEG support (requires libjpeg)" ON)
 option(YTTRIUM_WITH_OGGVORBIS "Enable Ogg Vorbis support (requires libvorbisfile)" ON)
+if(NOT YTTRIUM_SUBPROJECT)
+	option(YTTRIUM_CLANG_TIDY "Enable running ClangTidy ('tidy' target)" OFF)
+	option(YTTRIUM_EXAMPLES "Build examples" OFF)
+	option(YTTRIUM_SANITIZERS "Enable sanitizers" OFF)
+	option(YTTRIUM_TESTS "Build tests" OFF)
+	mark_as_advanced(YTTRIUM_CLANG_TIDY YTTRIUM_SANITIZERS)
+endif()
 
 if(WIN32)
 	primal_provide_freetype(Freetype_ROOT STATIC_RUNTIME ON)
@@ -75,15 +64,13 @@ if(YTTRIUM_WITH_OGGVORBIS)
 endif()
 
 get_target_architecture(_target_arch)
-set(TARGET_ARCH "${_target_arch}" CACHE STRING "Target architecture")
-set_property(CACHE TARGET_ARCH PROPERTY STRINGS "amd64" "x86")
-if(TARGET_ARCH MATCHES "^amd64$")
+if(_target_arch MATCHES "^amd64$")
 	set(Y_ARCH_AMD64 ON)
 endif()
-if(TARGET_ARCH MATCHES "^amd64|x86$")
+if(_target_arch MATCHES "^amd64|x86$")
 	set(Y_ARCH_X86 ON)
 endif()
-message(STATUS "Target architecture: ${TARGET_ARCH}")
+message(STATUS "Target architecture: ${_target_arch}")
 
 set(YTTRIUM_RENDERER "opengl" CACHE STRING "Renderer backend")
 set_property(CACHE YTTRIUM_RENDERER PROPERTY STRINGS "opengl" "vulkan" "none")
@@ -107,7 +94,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 		add_compile_options(-msse2)
 	endif()
 
-	if(ENABLE_SANITIZERS)
+	if(YTTRIUM_SANITIZERS)
 		add_compile_options(-fsanitize=address -fsanitize=undefined -fno-sanitize=nonnull-attribute)
 		list(APPEND DYNAMIC_LINKER_FLAGS -fsanitize=address -fsanitize=undefined)
 	endif()
@@ -138,19 +125,21 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 		add_compile_options(-msse2)
 	endif()
 
-	option(ENABLE_COVERAGE "Build with coverage analysis support" OFF)
-	if(ENABLE_COVERAGE)
+	option(YTTRIUM_COVERAGE "Build with coverage analysis support" OFF)
+	if(YTTRIUM_COVERAGE)
 		add_compile_options(--coverage)
 		list(APPEND DYNAMIC_LINKER_FLAGS --coverage)
 	endif()
 
-	option(ENABLE_PROFILING "Build with profiling support" OFF)
-	if(ENABLE_PROFILING)
+	option(YTTRIUM_PROFILING "Build with profiling support" OFF)
+	if(YTTRIUM_PROFILING)
 		add_compile_options(-pg)
 		list(APPEND DYNAMIC_LINKER_FLAGS -pg)
 	endif()
 
-	if(ENABLE_SANITIZERS)
+	mark_as_advanced(YTTRIUM_COVERAGE YTTRIUM_PROFILING)
+
+	if(YTTRIUM_SANITIZERS)
 		add_compile_options(-fsanitize=address -fsanitize=undefined -fno-sanitize=nonnull-attribute)
 		if(BUILD_SHARED_LIBS)
 			add_compile_options(-fno-sanitize=vptr)
@@ -250,7 +239,7 @@ add_subdirectory(tools/ytr)
 
 add_subdirectory(libs/engine)
 
-if(BUILD_TESTS)
+if(YTTRIUM_TESTS)
 	enable_testing()
 	primal_download("https://raw.githubusercontent.com/onqtam/doctest/2.4.4/doctest/doctest.h" SHA1 "7c25b870f3e0cde6d6c8596c60f3592fe557989a")
 	add_subdirectory(libs/test)
@@ -260,12 +249,12 @@ if(BUILD_TESTS)
 	add_subdirectory(libs/engine/tests)
 endif()
 
-if(BUILD_EXAMPLES)
+if(YTTRIUM_EXAMPLES)
 	add_subdirectory(examples/3d)
 	add_subdirectory(examples/tetrium)
 endif()
 
-if(ENABLE_CLANG_TIDY)
+if(YTTRIUM_CLANG_TIDY)
 	find_package(ClangTidy 7.0.0 REQUIRED)
 	set(_cpps)
 	foreach(_target ycore yengine)
