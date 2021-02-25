@@ -54,9 +54,9 @@ build_script:
   - if "%TESTS%"=="ON" cmake --build %BUILD_DIR%
   - if "%TESTS%"=="ON" cmake --build %BUILD_DIR% --target install
   - if not "%TESTS%"=="ON" cmake -S %APPVEYOR_BUILD_FOLDER% -B %BUILD_DIR% -G "Visual Studio 16 2019" -A Win32 %APPVEYOR_BUILD_FOLDER% -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR% -DYTTRIUM_EXAMPLES=ON -DYTTRIUM_RENDERER=%RENDERER% -DYTTRIUM_TESTS=%TESTS% -DYTTRIUM_WITH_JPEG=OFF -DYTTRIUM_WITH_OGGVORBIS=OFF
-  - if not "%TESTS%"=="ON" cmake --build %BUILD_DIR% --config Debug -- /nologo "/verbosity:minimal"
-  - if not "%TESTS%"=="ON" cmake --build %BUILD_DIR% --config Release -- /nologo "/verbosity:minimal"
-  - if not "%TESTS%"=="ON" cmake --build %BUILD_DIR% --config Release --target install -- /nologo "/verbosity:minimal"
+  - if not "%TESTS%"=="ON" cmake --build %BUILD_DIR% --parallel --config Debug -- /nologo
+  - if not "%TESTS%"=="ON" cmake --build %BUILD_DIR% --parallel --config Release -- /nologo
+  - if not "%TESTS%"=="ON" cmake --build %BUILD_DIR% --parallel --config Release --target install -- /nologo
   - cd %APPVEYOR_BUILD_FOLDER%
   - set BUILD_NAME=yttrium-%RENDERER%-%ARCH%
   - if "%PUBLISH%"=="ON" move %INSTALL_DIR% %BUILD_NAME%

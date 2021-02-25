@@ -9,10 +9,16 @@ project(Yttrium VERSION 0.0.1 LANGUAGES CXX)
 include(FetchContent)
 include(GNUInstallDirs)
 
+if(NOT PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+	set(CMAKE_FOLDER "Yttrium")
+	set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER ".cmake")
+	set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+endif()
+
 set(AULOS_AULOSPLAY ON)
 set(AULOS_STATIC_RUNTIME ON)
-FetchContent_Declare(Primal GIT_REPOSITORY https://github.com/blagodarin/primal.git GIT_TAG c34f30807bd360880f62d7b08ef3019ceb34878e)
-FetchContent_Declare(Aulos GIT_REPOSITORY https://github.com/blagodarin/aulos.git GIT_TAG 2df320287e5b9969c73bdf70320bd044605b1f1a)
+FetchContent_Declare(Primal GIT_REPOSITORY https://github.com/blagodarin/primal.git GIT_TAG 517b3c13a341c9672d49711da1cdc416ff0b1094)
+FetchContent_Declare(Aulos GIT_REPOSITORY https://github.com/blagodarin/aulos.git GIT_TAG ac2ce48b5cd6f8a5aa6acc1e022d7b97866377fb)
 FetchContent_MakeAvailable(Primal Aulos)
 
 primal_set_defaults()
@@ -116,8 +122,6 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 		-Wno-weak-vtables # '___' has no out-of-line virtual method definitions; its vtable will be emitted in every translation unit
 		-Wno-zero-as-null-pointer-constant # False positives.
 		)
-
-	link_libraries(stdc++fs) # Required for GCC 8 standard library which is used by Clang.
 endif()
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
@@ -182,7 +186,6 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 	if(Y_ARCH_X86 AND NOT Y_ARCH_AMD64)
 		add_compile_options(/arch:SSE2)
 	endif()
-	add_compile_options(/std:c++latest)
 	add_compile_definitions(_SILENCE_CXX20_U8PATH_DEPRECATION_WARNING _USE_MATH_DEFINES)
 	list(APPEND RC_FLAGS /nologo)
 
