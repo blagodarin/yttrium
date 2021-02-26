@@ -34,11 +34,10 @@ add_custom_target(tetrium_localization
 		${CMAKE_CURRENT_SOURCE_DIR}/data/i18n/ru.ion
 	)
 
-add_ypack_target(tetrium_package
+yttrium_target_package(tetrium
+	OUTPUT tetrium.ypq
 	INDEX data.index
-	OUTPUT ${PROJECT_BINARY_DIR}/tetrium.ypq
 	DEPENDS tetrium_localization)
-add_dependencies(tetrium tetrium_package)
 
 primal_install(tetrium)
 install(FILES ${PROJECT_BINARY_DIR}/tetrium.ypq DESTINATION ${CMAKE_INSTALL_DATADIR})

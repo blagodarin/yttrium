@@ -47,21 +47,31 @@ function(add_yglslc_sources _target)
 	target_include_directories(${_target} PRIVATE ${_binary_dir})
 endfunction()
 
-function(add_ypack_target _target)
-	set(_one_value_args OUTPUT INDEX)
-	set(_multi_value_args DEPENDS)
-	cmake_parse_arguments(_arg "" "${_one_value_args}" "${_multi_value_args}" ${ARGN})
-	file(RELATIVE_PATH _output ${CMAKE_CURRENT_BINARY_DIR} ${_arg_OUTPUT})
-	add_custom_target(${_target}
-		ypack ${CMAKE_CURRENT_SOURCE_DIR}/${_arg_INDEX} ${_arg_OUTPUT}
-		DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${_arg_INDEX}
-		BYPRODUCTS ${_arg_OUTPUT}
-		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-		COMMENT "Generating ${_output}"
-		VERBATIM)
-	if(_arg_DEPENDS)
-		add_dependencies(${_target} ${_arg_DEPENDS})
+function(yttrium_target_package _target)
+	if(NOT TARGET ${_target})
+		message(SEND_ERROR "'${_target}' is not a target")
+		return()
 	endif()
+	cmake_parse_arguments(_arg "" "INDEX;OUTPUT" "DEPENDS" ${ARGN})
+	if(NOT _arg_INDEX)
+		message(SEND_ERROR "Missing package index")
+		return()
+	endif()
+	if(NOT _arg_OUTPUT)
+		message(SEND_ERROR "Missing package output")
+		return()
+	endif()
+	file(REAL_PATH ${_arg_OUTPUT} _absolute_output BASE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+	file(RELATIVE_PATH _relative_output ${CMAKE_CURRENT_BINARY_DIR} ${_absolute_output})
+	add_custom_command(OUTPUT ${_absolute_output}
+		COMMAND ypack ${_arg_INDEX} ${_absolute_output}
+		MAIN_DEPENDENCY ${_arg_INDEX}
+		DEPENDS ${_arg_DEPENDS}
+		COMMENT "Generating ${_relative_output}"
+		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+		VERBATIM)
+	target_sources(${_target} PRIVATE ${_arg_INDEX} ${_absolute_output})
+	source_group("Yttrium Files" FILES ${_arg_INDEX} ${_absolute_output})
 endfunction()
 
 function(add_yrc_sources _target)

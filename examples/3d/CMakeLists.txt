@@ -21,10 +21,9 @@ if(WIN32)
 	set_property(TARGET 3d APPEND_STRING PROPERTY LINK_FLAGS_DEBUG /SUBSYSTEM:CONSOLE)
 endif()
 
-add_ypack_target(3d_package
-	INDEX data.index
-	OUTPUT ${PROJECT_BINARY_DIR}/3d.ypq)
-add_dependencies(3d 3d_package)
+yttrium_target_package(3d
+	OUTPUT 3d.ypq
+	INDEX data.index)
 
 primal_install(3d)
 install(FILES ${PROJECT_BINARY_DIR}/3d.ypq DESTINATION ${CMAKE_INSTALL_DATADIR})
