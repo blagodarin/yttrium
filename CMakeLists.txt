@@ -254,7 +254,6 @@ endif()
 
 if(YTTRIUM_EXAMPLES)
 	add_subdirectory(examples/3d)
-	add_subdirectory(examples/tetrium)
 endif()
 
 if(YTTRIUM_CLANG_TIDY)

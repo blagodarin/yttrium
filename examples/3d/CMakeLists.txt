@@ -26,4 +26,4 @@ yttrium_target_package(3d
 	INDEX data.index)
 
 primal_install(3d)
-install(FILES ${PROJECT_BINARY_DIR}/3d.ypq DESTINATION ${CMAKE_INSTALL_DATADIR})
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/3d.ypq DESTINATION ${CMAKE_INSTALL_DATADIR})
