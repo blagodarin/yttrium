@@ -35,10 +35,13 @@ namespace Yt
 		/// May throw DataError.
 		static std::unique_ptr<Translation> load(const Source&);
 
-		virtual ~Translation() = default;
+		virtual ~Translation() noexcept = default;
 
 		///
 		virtual void add(std::string_view source) = 0;
+
+		///
+		virtual bool changed() const noexcept = 0;
 
 		///
 		virtual void remove_obsolete() = 0;

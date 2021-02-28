@@ -34,6 +34,7 @@ namespace Yt
 		explicit TranslationImpl(const Source&);
 
 		void add(std::string_view) override;
+		bool changed() const noexcept override { return _changed; }
 		void remove_obsolete() override;
 		void save(Writer&&) const override;
 		std::string translate(std::string_view) const override;
@@ -50,6 +51,7 @@ namespace Yt
 		};
 
 		std::map<std::string, Entry, std::less<>> _translations;
+		bool _changed = false;
 	};
 
 	TranslationImpl::TranslationImpl(const Source& source)
@@ -68,16 +70,22 @@ namespace Yt
 
 	void TranslationImpl::add(std::string_view text)
 	{
-		_translations[std::string{ text }]._added = true;
+		const auto [i, inserted] = _translations.try_emplace(std::string{ text });
+		i->second._added = true;
+		if (inserted)
+			_changed = true;
 	}
 
 	void TranslationImpl::remove_obsolete()
 	{
 		for (auto i = _translations.begin(); i != _translations.end();)
-			if (i->second._added)
-				++i;
-			else
+			if (!i->second._added)
+			{
 				i = _translations.erase(i);
+				_changed = true;
+			}
+			else
+				++i;
 	}
 
 	void TranslationImpl::save(Writer&& writer) const

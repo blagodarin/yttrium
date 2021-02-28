@@ -1,19 +1,6 @@
-//
 // This file is part of the Yttrium toolkit.
-// Copyright (C) 2019 Sergei Blagodarin.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+// Copyright (C) Sergei Blagodarin.
+// SPDX-License-Identifier: Apache-2.0
 
 #include <yttrium/exceptions.h>
 #include <yttrium/ion/reader.h>
@@ -36,73 +23,79 @@ namespace
 		if (!condition)
 			throw Yt::DataError{ std::forward<Args>(args)... };
 	}
+
+	std::vector<std::string> read_index(const std::filesystem::path& path)
+	{
+		auto source = Yt::Source::from(path);
+		check(static_cast<bool>(source), "Bad index file");
+		Yt::IonReader ion{ *source };
+		ion.read().check_name("package");
+		ion.read().check_list_begin();
+		std::vector<std::string> paths;
+		for (auto token = ion.read(); token.type() != Yt::IonToken::Type::ListEnd; token = ion.read())
+			paths.emplace_back(std::string{ token.to_value() });
+		ion.read().check_end();
+		return paths;
+	}
+
+	int usage()
+	{
+		std::cerr
+			<< "Usage:\n"
+			<< "  ypack INDEX PACKAGE\n"
+			<< "  ypack --touch INDEX\n";
+		return 1;
+	}
 }
 
 int ymain(int argc, char** argv)
 {
 	Yt::Logger logger;
-
-	if (argc != 3)
-	{
-		std::cerr
-			<< "Usage:\n"
-			<< "  ypack INDEX PACKAGE\n"
-			<< "  ypack (--dependencies|-d) INDEX\n";
-		return 1;
-	}
-
-	std::filesystem::path index_path;
-	std::filesystem::path package_path;
-	if (!std::strcmp(argv[1], "-d") || !std::strcmp(argv[1], "--dependencies"))
-		index_path = std::filesystem::u8path(argv[2]);
-	else
-	{
-		index_path = std::filesystem::u8path(argv[1]);
-		package_path = std::filesystem::u8path(argv[2]);
-	}
-
-	std::vector<std::string> paths;
+	if (argc < 2)
+		return usage();
 	try
 	{
-		auto source = Yt::Source::from(index_path);
-		check(static_cast<bool>(source), "Bad index file");
-		Yt::IonReader ion{ *source };
-		ion.read().check_name("package");
-		ion.read().check_list_begin();
-		for (auto token = ion.read(); token.type() != Yt::IonToken::Type::ListEnd; token = ion.read())
-			paths.emplace_back(std::string{ token.to_value() });
-		ion.read().check_end();
+		if (!std::strcmp(argv[1], "--touch"))
+		{
+			if (argc != 3)
+				return usage();
+			const auto index_path = std::filesystem::u8path(argv[2]);
+			auto data_timestamp = std::filesystem::file_time_type::min();
+			for (const auto& path : read_index(index_path))
+				data_timestamp = std::max(data_timestamp, std::filesystem::last_write_time(std::filesystem::u8path(path)));
+			std::error_code ec;
+			if (data_timestamp > std::filesystem::last_write_time(index_path))
+				std::filesystem::last_write_time(index_path, data_timestamp);
+		}
+		else
+		{
+			if (argc != 3)
+				return usage();
+			const auto package_path = std::filesystem::u8path(argv[2]);
+			const auto paths = read_index(std::filesystem::u8path(argv[1]));
+			if (auto package = Yt::PackageWriter::create(package_path, Yt::PackageType::Ypq))
+			{
+				for (const auto& path : paths)
+					package->add(path);
+				if (!package->commit())
+				{
+					std::cerr << "ERROR: Unable to write " << package_path << '\n';
+					package.reset();
+					std::filesystem::remove(package_path);
+					return 1;
+				}
+			}
+			else
+			{
+				std::cerr << "ERROR: Unable to open " << package_path << " for writing\n";
+				return 1;
+			}
+		}
 	}
 	catch (const std::runtime_error& e)
 	{
-		std::cerr << "ERROR: Unable to read " << index_path << ": " << e.what() << '\n';
+		std::cerr << e.what() << '\n';
 		return 1;
 	}
-
-	if (package_path.empty())
-	{
-		for (const auto& path : paths)
-			std::cout << path << '\n';
-		return 0;
-	}
-
-	auto package = Yt::PackageWriter::create(package_path, Yt::PackageType::Ypq);
-	if (!package)
-	{
-		std::cerr << "ERROR: Unable to open " << package_path << " for writing\n";
-		return 1;
-	}
-
-	for (const auto& path : paths)
-		package->add(path);
-
-	if (!package->commit())
-	{
-		std::cerr << "ERROR: Unable to write " << package_path << '\n';
-		package.reset();
-		std::filesystem::remove(package_path);
-		return 1;
-	}
-
 	return 0;
 }

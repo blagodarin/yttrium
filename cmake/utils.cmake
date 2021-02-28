@@ -54,24 +54,34 @@ function(yttrium_target_package _target)
 	endif()
 	cmake_parse_arguments(_arg "" "INDEX;OUTPUT" "DEPENDS" ${ARGN})
 	if(NOT _arg_INDEX)
-		message(SEND_ERROR "Missing package index")
+		message(FATAL_ERROR "Missing INDEX")
 		return()
 	endif()
 	if(NOT _arg_OUTPUT)
-		message(SEND_ERROR "Missing package output")
+		message(FATAL_ERROR "Missing OUTPUT")
 		return()
 	endif()
+	file(REAL_PATH ${_arg_INDEX} _absolute_index BASE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+	file(RELATIVE_PATH _relative_index ${CMAKE_CURRENT_SOURCE_DIR} ${_absolute_index})
 	file(REAL_PATH ${_arg_OUTPUT} _absolute_output BASE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 	file(RELATIVE_PATH _relative_output ${CMAKE_CURRENT_BINARY_DIR} ${_absolute_output})
-	add_custom_command(OUTPUT ${_absolute_output}
-		COMMAND ypack ${_arg_INDEX} ${_absolute_output}
-		MAIN_DEPENDENCY ${_arg_INDEX}
+	string(MAKE_C_IDENTIFIER ${_relative_output} _output_identifier)
+	add_custom_target(ypack_${_output_identifier}
+		COMMAND ypack --touch ${_relative_index}
+		COMMENT "Checking ${_relative_output} dependencies"
 		DEPENDS ${_arg_DEPENDS}
+		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+		VERBATIM)
+	add_dependencies(${_target} ypack_${_output_identifier})
+	set_target_properties(ypack_${_output_identifier} PROPERTIES FOLDER "Yttrium")
+	add_custom_command(OUTPUT ${_absolute_output}
+		COMMAND ypack ${_relative_index} ${_absolute_output}
+		MAIN_DEPENDENCY ${_absolute_index}
 		COMMENT "Generating ${_relative_output}"
 		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 		VERBATIM)
-	target_sources(${_target} PRIVATE ${_arg_INDEX} ${_absolute_output})
-	source_group("Yttrium Files" FILES ${_arg_INDEX} ${_absolute_output})
+	target_sources(${_target} PRIVATE ${_absolute_index} ${_absolute_output})
+	source_group("Yttrium Files" FILES ${_absolute_index} ${_absolute_output})
 endfunction()
 
 function(add_yrc_sources _target)
