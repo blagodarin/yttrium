@@ -26,7 +26,8 @@
 #include <yttrium/renderer/textured_rect.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/storage/source.h>
-#include "../utf8.h"
+
+#include <primal/utf8.hpp>
 
 #include <cassert>
 #include <cstring>
@@ -156,7 +157,7 @@ namespace Yt
 			for (size_t i = 0; i < text.size();)
 			{
 				const auto offset = i;
-				const auto current = _chars.find(Utf8::next_codepoint(text, i));
+				const auto current = _chars.find(primal::readUtf8(text, i));
 				if (current == _chars.end())
 					continue;
 				if (_has_kerning && previous != _chars.end())
@@ -179,7 +180,7 @@ namespace Yt
 			auto previous = _chars.end();
 			for (size_t i = 0; i < text.size();)
 			{
-				const auto current = _chars.find(Utf8::next_codepoint(text, i));
+				const auto current = _chars.find(primal::readUtf8(text, i));
 				if (current == _chars.end())
 					continue;
 				if (_has_kerning && previous != _chars.end())

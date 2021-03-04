@@ -95,7 +95,6 @@ add_library(yengine STATIC
 	src/renderer/texture.cpp
 	src/renderer/texture.h
 	src/resource_loader.cpp
-	src/utf8.h
 	)
 include_config(yengine ${PROJECT_BINARY_DIR}/config.h)
 target_include_directories(yengine PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)

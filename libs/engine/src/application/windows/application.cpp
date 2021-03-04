@@ -21,7 +21,8 @@
 #include <yttrium/math/size.h>
 #include <yttrium/utils/numeric.h>
 #include "../../../../core/src/platform/windows/error.h"
-#include "../../utf8.h"
+
+#include <primal/utf8.hpp>
 
 #include <array>
 #include <cassert>
@@ -230,7 +231,7 @@ namespace Yt
 			if (const auto callbacks = find_callbacks(hwnd))
 			{
 				std::array<char, 4> buffer;
-				if (const auto bytes = Utf8::from_utf32(static_cast<char32_t>(wparam), buffer))
+				if (const auto bytes = primal::writeUtf8(buffer, static_cast<char32_t>(wparam)))
 					if (const auto c = static_cast<unsigned char>(buffer[0]); c >= 0x20 && c != 0x7f)
 						callbacks->on_text({ buffer.data(), bytes });
 			}
