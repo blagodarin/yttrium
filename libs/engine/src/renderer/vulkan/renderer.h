@@ -33,7 +33,7 @@ namespace Yt
 	class VulkanRenderer final : public RenderBackend
 	{
 	public:
-		explicit VulkanRenderer(const WindowBackend&);
+		explicit VulkanRenderer(const WindowID&);
 		~VulkanRenderer() noexcept override;
 
 		void clear() override;

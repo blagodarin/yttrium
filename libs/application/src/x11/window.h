@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <yttrium/application/id.h>
 #include <yttrium/math/size.h>
 #include "application.h"
 #include "glx.h"
@@ -24,6 +25,7 @@ namespace Yt
 
 		void close() noexcept;
 		bool get_cursor(Point&);
+		WindowID id() const noexcept { return { reinterpret_cast<intptr_t>(_application.display()), static_cast<intptr_t>(_window.get()) }; }
 		bool process_events();
 		bool set_cursor(const Point&);
 		void set_icon(const Image&);

@@ -10,5 +10,5 @@
 
 namespace Yt
 {
-	Y_ENGINE_API Key lookup_key(std::string_view name);
+	Key lookup_key(std::string_view name);
 }

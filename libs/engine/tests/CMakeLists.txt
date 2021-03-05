@@ -13,7 +13,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	set_property(SOURCE src/gui_loading.cpp src/key.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-disabled-optimization)
 endif()
 include_config(test_engine ${PROJECT_BINARY_DIR}/config.h)
-target_link_libraries(test_engine PRIVATE ycore yengine ytest)
+target_link_libraries(test_engine PRIVATE yapplication ycore yengine ytest)
 set_target_properties(test_engine PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 	target_compile_options(test_engine PRIVATE

@@ -7,7 +7,7 @@
 #include <yttrium/application/key.h>
 #include <yttrium/math/size.h>
 #include <yttrium/utils/numeric.h>
-#include "../../../../core/src/platform/windows/error.h"
+#include "../../../core/src/platform/windows/error.h"
 
 #include <primal/utf8.hpp>
 

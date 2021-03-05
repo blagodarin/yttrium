@@ -27,12 +27,12 @@ namespace Yt
 	class RectF;
 	class RenderBackend;
 	class Size;
-	class WindowBackend;
+	struct WindowID;
 
 	class RendererImpl final : public RenderManager
 	{
 	public:
-		explicit RendererImpl(WindowBackend&);
+		explicit RendererImpl(const WindowID&);
 		~RendererImpl() override;
 
 		std::unique_ptr<RenderProgram> create_program(const std::string& vertex_shader, const std::string& fragment_shader) override;

@@ -22,12 +22,12 @@
 
 namespace Yt
 {
-	class WindowBackend;
+	struct WindowID;
 
 	class GlRenderer final : public RenderBackend
 	{
 	public:
-		explicit GlRenderer(WindowBackend&);
+		explicit GlRenderer(const WindowID&);
 		~GlRenderer() noexcept override;
 
 		void clear() override;

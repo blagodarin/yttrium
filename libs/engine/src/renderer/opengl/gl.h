@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../application/opengl.h"
+#include "../../../../application/src/opengl.h"
 
 #include <string_view>
 #include <vector>

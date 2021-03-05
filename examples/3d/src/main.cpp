@@ -10,6 +10,8 @@
 #include <yttrium/logger.h>
 #include <yttrium/main.h>
 #include <yttrium/math/color.h>
+#include <yttrium/renderer/report.h>
+#include <yttrium/renderer/viewport.h>
 #include <yttrium/resource_loader.h>
 #include <yttrium/script/context.h>
 #include <yttrium/storage/paths.h>
@@ -40,10 +42,11 @@ int ymain(int, char**)
 	Yt::Application application;
 
 	Yt::Window window{ application };
-	script.define("screenshot", [&window](const Yt::ScriptCall&) { window.take_screenshot(); });
-	window.on_screenshot([](Yt::Image&& image) { image.save_as_screenshot(Yt::ImageFormat::Jpeg, 90); });
+	Yt::Viewport viewport{ window };
+	script.define("screenshot", [&viewport](const Yt::ScriptCall&) { viewport.take_screenshot(); });
+	viewport.on_screenshot([](Yt::Image&& image) { image.save_as_screenshot(Yt::ImageFormat::Jpeg, 90); });
 
-	Yt::ResourceLoader resource_loader{ storage, &window.render_manager() };
+	Yt::ResourceLoader resource_loader{ storage, &viewport.render_manager() };
 
 	Yt::Gui gui{ "data/gui.ion", resource_loader, script };
 	window.on_key_event([&gui](const Yt::KeyEvent& event) { gui.process_key_event(event); });
@@ -51,7 +54,7 @@ int ymain(int, char**)
 
 	Game game{ resource_loader, gui };
 	script.define("debug", [&game](const Yt::ScriptCall&) { game.toggle_debug_text(); });
-	window.on_render([&gui, &game](Yt::RenderPass& pass, const Yt::Vector2& cursor, const Yt::RenderReport& report) {
+	viewport.on_render([&gui, &game](Yt::RenderPass& pass, const Yt::Vector2& cursor, const Yt::RenderReport& report) {
 		gui.draw(pass, cursor);
 		game.draw_debug_graphics(pass, cursor, report);
 	});
@@ -59,8 +62,10 @@ int ymain(int, char**)
 	gui.start();
 	window.set_title(gui.title());
 	window.show();
-	application.run([&window, &game](const std::chrono::milliseconds& advance) {
-		game.update(window, advance);
-	});
+	for (Yt::RenderStatistics statistics; application.process_events(); statistics.add_frame())
+	{
+		game.update(window, statistics.last_frame_duration());
+		viewport.render(statistics.current_report(), statistics.previous_report());
+	}
 	return 0;
 }

@@ -12,7 +12,7 @@ add_executable(3d WIN32
 	src/model.cpp
 	src/model.h
 	)
-target_link_libraries(3d PRIVATE ycore yengine ymain)
+target_link_libraries(3d PRIVATE yapplication ycore yengine ymain)
 set_target_properties(3d PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 	target_link_options(3d PRIVATE "/NODEFAULTLIB:$<IF:$<CONFIG:Debug>,LIBCMT,LIBCMTD>")

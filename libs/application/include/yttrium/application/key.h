@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <yttrium/api.h>
 #include <yttrium/utils/flags.h>
 
 namespace Yt
@@ -185,7 +184,7 @@ namespace Yt
 	};
 
 	/// %Key event.
-	class Y_ENGINE_API KeyEvent
+	class KeyEvent
 	{
 	public:
 		enum class Modifier

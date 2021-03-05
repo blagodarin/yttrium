@@ -17,8 +17,8 @@
 
 #include "context.h"
 
+#include <yttrium/application/id.h>
 #include <yttrium/logger.h>
-#include "../../application/window_backend.h"
 #include "handles.h"
 
 #include <algorithm>
@@ -109,13 +109,13 @@ namespace
 	}
 #endif
 
-	VkSurfaceKHR create_vulkan_surface(VkInstance instance, const Yt::WindowBackend& window)
+	VkSurfaceKHR create_vulkan_surface(VkInstance instance, const Yt::WindowID& window_id)
 	{
 #ifdef VK_USE_PLATFORM_WIN32_KHR
 		VkWin32SurfaceCreateInfoKHR info;
 		info.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
-		info.hinstance = window.windows_instance();
-		info.hwnd = window.windows_window();
+		info.hinstance = reinterpret_cast<HINSTANCE>(window_id._application);
+		info.hwnd = reinterpret_cast<HWND>(window_id._window);
 
 		VkSurfaceKHR handle = VK_NULL_HANDLE;
 		Y_VK_CHECK(vkCreateWin32SurfaceKHR(instance, &info, nullptr, &handle));
@@ -124,8 +124,8 @@ namespace
 #ifdef VK_USE_PLATFORM_XCB_KHR
 		VkXcbSurfaceCreateInfoKHR info;
 		info.sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR;
-		info.connection = window.xcb_connection();
-		info.window = window.xcb_window();
+		info.connection = reinterpret_cast<xcb_connection_t*>(window_id._application);
+		info.window = static_cast<xcb_window_t>(window_id._window);
 
 		VkSurfaceKHR handle = VK_NULL_HANDLE;
 		Y_VK_CHECK(vkCreateXcbSurfaceKHR(instance, &info, nullptr, &handle));
@@ -238,9 +238,9 @@ namespace
 
 namespace Yt
 {
-	VulkanContext::VulkanContext(const WindowBackend& window)
+	VulkanContext::VulkanContext(const WindowID& window_id)
 	{
-		_data.create(window);
+		_data.create(window_id);
 	}
 
 	VK_CommandBuffer VulkanContext::allocate_command_buffer() const
@@ -409,14 +409,14 @@ namespace Yt
 			vkDestroyInstance(_instance, nullptr);
 	}
 
-	void VulkanContext::Data::create(const WindowBackend& window)
+	void VulkanContext::Data::create(const WindowID& window_id)
 	{
 		::print_vulkan_layers_available();
 		_instance = ::create_vulkan_instance();
 #ifndef NDEBUG
 		std::tie(_debug_report_callback, _destroy_debug_report_callback) = ::create_vulkan_debug_report_callback(_instance);
 #endif
-		_surface = ::create_vulkan_surface(_instance, window);
+		_surface = ::create_vulkan_surface(_instance, window_id);
 		std::tie(_physical_device, _queue_family_index) = ::select_vulkan_physical_device(_instance, _surface);
 		::print_vulkan_texture_formats(_physical_device);
 		vkGetPhysicalDeviceFeatures(_physical_device, &_physical_device_features);

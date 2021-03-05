@@ -28,12 +28,12 @@ namespace Yt
 	class VK_HImage;
 	class VK_HImageView;
 	class VK_HSampler;
-	class WindowBackend;
+	struct WindowID;
 
 	class VulkanContext
 	{
 	public:
-		explicit VulkanContext(const WindowBackend&);
+		explicit VulkanContext(const WindowID&);
 		~VulkanContext() noexcept = default;
 
 		const auto* operator->() const noexcept { return &_data; }
@@ -73,7 +73,7 @@ namespace Yt
 			Data() noexcept = default;
 			~Data() noexcept;
 
-			void create(const WindowBackend&);
+			void create(const WindowID&);
 		};
 
 		Data _data;

@@ -45,7 +45,7 @@ namespace
 
 namespace Yt
 {
-	GlRenderer::GlRenderer(WindowBackend&)
+	GlRenderer::GlRenderer(const WindowID&)
 	{
 #ifndef NDEBUG
 		if (_gl.KHR_debug)

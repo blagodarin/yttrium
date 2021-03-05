@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <yttrium/application/id.h>
 #include <yttrium/math/size.h>
 #include "application.h"
 
@@ -25,6 +26,7 @@ namespace Yt
 
 		void close() noexcept;
 		bool get_cursor(Point&);
+		WindowID id() const noexcept { return { reinterpret_cast<intptr_t>(_application.connection()), static_cast<intptr_t>(_window) }; }
 		bool process_events();
 		bool set_cursor(const Point&);
 		void set_icon(const Image&);
@@ -32,9 +34,6 @@ namespace Yt
 		void show();
 		std::optional<Size> size() const noexcept { return _size; }
 		void swap_buffers();
-
-		xcb_connection_t* xcb_connection() const noexcept { return _application.connection(); }
-		xcb_window_t xcb_window() const noexcept { return _window; }
 
 	private:
 		using P_Atom = primal::CPtr<xcb_intern_atom_reply_t, ::free>;

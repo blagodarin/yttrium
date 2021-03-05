@@ -47,8 +47,8 @@ namespace Yt
 	using RenderBackendImpl = NullRenderer;
 #endif
 
-	RendererImpl::RendererImpl(WindowBackend& window)
-		: _backend{ std::make_unique<RenderBackendImpl>(window) }
+	RendererImpl::RendererImpl(const WindowID& window_id)
+		: _backend{ std::make_unique<RenderBackendImpl>(window_id) }
 	{
 	}
 

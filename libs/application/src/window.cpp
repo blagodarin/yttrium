@@ -6,8 +6,7 @@
 #include "window.h"
 
 #include <yttrium/application/application.h>
-#include <yttrium/image/image.h>
-#include <yttrium/renderer/modifiers.h>
+#include <yttrium/math/rect.h>
 
 // TODO: Windowed mode.
 
@@ -19,25 +18,6 @@ namespace Yt
 		const auto size = _backend.size();
 		if (size)
 			on_resize_event(*size);
-	}
-
-	void WindowPrivate::render(RenderReport& next_report, const RenderReport& last_report)
-	{
-		{
-			RenderPassImpl pass{ *_renderer._backend, _renderer_builtin, _render_pass_data, _size, next_report };
-			PushProgram program{ pass, _renderer_builtin._program_2d.get() };
-			Push2D projection{ pass };
-			if (_on_render)
-				_on_render(pass, Vector2{ _cursor }, last_report);
-			pass.draw_debug_text();
-		}
-		_backend.swap_buffers();
-		if (_take_screenshot)
-		{
-			_take_screenshot = false;
-			if (_on_screenshot)
-				_on_screenshot(_renderer.take_screenshot(_size));
-		}
 	}
 
 	void WindowPrivate::update()
@@ -78,7 +58,6 @@ namespace Yt
 	void WindowPrivate::on_resize_event(const Size& size)
 	{
 		_size = size;
-		_renderer.set_window_size(_size);
 		if (!_is_cursor_locked)
 		{
 			auto cursor = Rect(_size).center();
@@ -128,6 +107,11 @@ namespace Yt
 		return _private->_cursor;
 	}
 
+	WindowID Window::id() const noexcept
+	{
+		return _private->_backend.id();
+	}
+
 	void Window::lock_cursor(bool lock)
 	{
 		_private->lock_cursor(lock);
@@ -143,24 +127,9 @@ namespace Yt
 		_private->_on_key_event = callback;
 	}
 
-	void Window::on_render(const std::function<void(RenderPass&, const Vector2&, const RenderReport&)>& callback)
-	{
-		_private->_on_render = callback;
-	}
-
-	void Window::on_screenshot(const std::function<void(Image&&)>& callback)
-	{
-		_private->_on_screenshot = callback;
-	}
-
 	void Window::on_text_input(const std::function<void(std::string_view)>& callback)
 	{
 		_private->_on_text_input = callback;
-	}
-
-	RenderManager& Window::render_manager()
-	{
-		return _private->_renderer;
 	}
 
 	bool Window::set_cursor(const Point& cursor)
@@ -192,8 +161,8 @@ namespace Yt
 		return _private->_size;
 	}
 
-	void Window::take_screenshot()
+	void Window::swap_buffers()
 	{
-		_private->_take_screenshot = true;
+		_private->_backend.swap_buffers();
 	}
 }

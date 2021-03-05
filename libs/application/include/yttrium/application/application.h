@@ -4,23 +4,19 @@
 
 #pragma once
 
-#include <yttrium/api.h>
-
-#include <chrono>
-#include <functional>
 #include <memory>
 
 namespace Yt
 {
 	///
-	class Y_ENGINE_API Application
+	class Application
 	{
 	public:
 		Application();
 		~Application() noexcept;
 
 		///
-		void run(const std::function<void(const std::chrono::milliseconds&)>&);
+		bool process_events();
 
 	private:
 		const std::unique_ptr<class ApplicationPrivate> _private;

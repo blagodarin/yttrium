@@ -45,8 +45,8 @@ namespace
 
 namespace Yt
 {
-	VulkanRenderer::VulkanRenderer(const WindowBackend& window)
-		: _context{ window }
+	VulkanRenderer::VulkanRenderer(const WindowID& window_id)
+		: _context{ window_id }
 		, _uniform_buffer{ _context, sizeof(Matrix4), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT }
 		, _descriptor_set_layout{ _context, { { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT }, { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT } } }
 		, _descriptor_pool{ _context, 1, { { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1 }, { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1 } } }
