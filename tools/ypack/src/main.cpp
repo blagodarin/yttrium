@@ -63,7 +63,6 @@ int ymain(int argc, char** argv)
 			auto data_timestamp = std::filesystem::file_time_type::min();
 			for (const auto& path : read_index(index_path))
 				data_timestamp = std::max(data_timestamp, std::filesystem::last_write_time(std::filesystem::u8path(path)));
-			std::error_code ec;
 			if (data_timestamp > std::filesystem::last_write_time(index_path))
 				std::filesystem::last_write_time(index_path, data_timestamp);
 		}

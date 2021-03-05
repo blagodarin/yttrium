@@ -1,19 +1,6 @@
-//
 // This file is part of the Yttrium toolkit.
-// Copyright (C) 2019 Sergei Blagodarin.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+// Copyright (C) Sergei Blagodarin.
+// SPDX-License-Identifier: Apache-2.0
 
 #include <yttrium/resource_loader.h>
 
@@ -28,13 +15,41 @@
 #include <yttrium/storage/storage.h>
 #include <yttrium/translation.h>
 #include "../../core/src/utils/string.h"
-#include "gui/ion/loader.h"
 #include "renderer/material.h"
 
 #include <cassert>
 #include <map>
 #include <mutex>
 #include <functional>
+
+namespace
+{
+	bool read_texture_filter(Yt::IonReader& ion, Yt::IonToken& token, Yt::Texture2D::Filter& filter)
+	{
+		static const std::unordered_map<std::string_view, Yt::Texture2D::Filter> filters{
+			{ "nearest", Yt::Texture2D::NearestFilter },
+			{ "linear", Yt::Texture2D::LinearFilter },
+			{ "bilinear", Yt::Texture2D::BilinearFilter },
+			{ "trilinear", Yt::Texture2D::TrilinearFilter },
+		};
+
+		if (token.type() != Yt::IonToken::Type::ObjectBegin)
+			return true;
+		// cppcheck-suppress stlIfFind
+		if (const auto i = filters.find(token.next(ion).to_name()); i != filters.end())
+			filter = i->second;
+		else
+			return false;
+		if (token.next(ion).type() == Yt::IonToken::Type::Name && token.text() == "anisotropic")
+		{
+			filter = static_cast<Yt::Texture2D::Filter>(filter | Yt::Texture2D::AnisotropicFilter);
+			token.next(ion);
+		}
+		token.check_object_end();
+		token.next(ion);
+		return true;
+	}
+}
 
 namespace Yt
 {
@@ -160,7 +175,7 @@ namespace Yt
 					const auto texture_name = ion.read().to_value();
 					if (texture_name.empty())
 						throw DataError{ make_location(), "Bad 'texture'" };
-					if (!read_ion_texture_filter(ion, token.next(ion), texture_filter))
+					if (!::read_texture_filter(ion, token.next(ion), texture_filter))
 						throw DataError{ make_location(), "Bad texture property" };
 					texture = load_texture_2d(texture_name);
 				}

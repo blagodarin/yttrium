@@ -5,6 +5,9 @@
 primal_set_folder(libs)
 source_group("src" REGULAR_EXPRESSION ".*\\.(h|cpp)$")
 source_group("src/application" REGULAR_EXPRESSION "/src/application/")
+source_group("src/application/windows" REGULAR_EXPRESSION "/src/application/windows/")
+source_group("src/application/x11" REGULAR_EXPRESSION "/src/application/x11/")
+source_group("src/application/xcb" REGULAR_EXPRESSION "/src/application/xcb/")
 source_group("src/gui" REGULAR_EXPRESSION "/src/gui/")
 source_group("src/gui/ion" REGULAR_EXPRESSION "/src/gui/ion/")
 source_group("src/gui/logic" REGULAR_EXPRESSION "/src/gui/logic/")
@@ -16,15 +19,16 @@ source_group("src/renderer/null" REGULAR_EXPRESSION "/src/renderer/null/")
 source_group("src/renderer/opengl" REGULAR_EXPRESSION "/src/renderer/opengl/")
 source_group("src/renderer/vulkan" REGULAR_EXPRESSION "/src/renderer/vulkan/")
 source_group("include" REGULAR_EXPRESSION "/include/")
+source_group("include/application" REGULAR_EXPRESSION "/include/yttrium/application/")
 source_group("include/gui" REGULAR_EXPRESSION "/include/yttrium/gui/")
 source_group("include/renderer" REGULAR_EXPRESSION "/include/yttrium/renderer/")
 add_library(yengine STATIC
-	include/yttrium/application.h
-	include/yttrium/console.h
+	include/yttrium/application/application.h
+	include/yttrium/application/key.h
+	include/yttrium/application/window.h
 	include/yttrium/gui/font.h
 	include/yttrium/gui/gui.h
 	include/yttrium/gui/text_capture.h
-	include/yttrium/key.h
 	include/yttrium/renderer/manager.h
 	include/yttrium/renderer/material.h
 	include/yttrium/renderer/mesh.h
@@ -35,7 +39,6 @@ add_library(yengine STATIC
 	include/yttrium/renderer/texture.h
 	include/yttrium/renderer/textured_rect.h
 	include/yttrium/resource_loader.h
-	include/yttrium/window.h
 	src/application/application.cpp
 	src/application/application.h
 	src/application/key_codes.h
@@ -43,7 +46,6 @@ add_library(yengine STATIC
 	src/application/window.h
 	src/application/window_backend.h
 	src/application/window_callbacks.h
-	src/console.cpp
 	src/gui/actions.cpp
 	src/gui/actions.h
 	src/gui/cursor.h
@@ -180,7 +182,7 @@ if(WIN32)
 		src/application/windows/window.h
 		)
 	if(YTTRIUM_RENDERER STREQUAL "opengl")
-		y_sources(yengine "src/application/windows"
+		target_sources(yengine PRIVATE
 			src/application/windows/wgl.cpp
 			src/application/windows/wgl.h
 			)
@@ -190,7 +192,7 @@ if(WIN32)
 else()
 	if(YTTRIUM_RENDERER STREQUAL "opengl")
 		find_package(X11 REQUIRED)
-		y_sources(yengine "src/application/x11"
+		target_sources(yengine PRIVATE
 			src/application/x11/application.cpp
 			src/application/x11/application.h
 			src/application/x11/glx.cpp
@@ -206,7 +208,7 @@ else()
 	else()
 		find_package(X11 REQUIRED COMPONENTS xcb_xkb xkbcommon_X11)
 		pkg_check_modules(xcb-image REQUIRED IMPORTED_TARGET xcb-image) # TODO: Remove this dependency.
-		y_sources(yengine "src/application/xcb"
+		target_sources(yengine PRIVATE
 			src/application/xcb/application.cpp
 			src/application/xcb/application.h
 			src/application/xcb/window.cpp
