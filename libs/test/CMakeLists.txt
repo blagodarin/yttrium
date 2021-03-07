@@ -11,11 +11,7 @@ add_library(ytest STATIC
 	src/utils.cpp
 	)
 include_config(ytest ${PROJECT_BINARY_DIR}/config.h)
+primal_download("https://raw.githubusercontent.com/onqtam/doctest/2.4.4/doctest/doctest.h" SHA1 "7c25b870f3e0cde6d6c8596c60f3592fe557989a")
 target_include_directories(ytest PUBLIC include ${PRIMAL_DOWNLOAD_DIR})
 target_link_libraries(ytest PRIVATE ycore)
 set_target_properties(ytest PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-	target_compile_options(ytest PRIVATE
-		/wd5204 # class has virtual functions, but its trivial destructor is not virtual; instances of objects derived from this class may not be destructed correctly
-		)
-endif()

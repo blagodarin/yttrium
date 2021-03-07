@@ -15,7 +15,7 @@
 // limitations under the License.
 //
 
-#include "../../src/gui/key_lookup.h"
+#include "../../src/key_lookup.h"
 
 #include <doctest.h>
 

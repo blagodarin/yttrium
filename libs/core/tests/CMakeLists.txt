@@ -36,10 +36,4 @@ add_executable(test_core
 include_config(test_core ${PROJECT_BINARY_DIR}/config.h)
 target_link_libraries(test_core PRIVATE ycore ytest)
 set_target_properties(test_core PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-	target_compile_options(test_core PRIVATE
-		/wd5204 # class has virtual functions, but its trivial destructor is not virtual; instances of objects derived from this class may not be destructed correctly
-		)
-	target_link_options(test_core PRIVATE "/NODEFAULTLIB:$<IF:$<CONFIG:Debug>,LIBCMT,LIBCMTD>")
-endif()
 add_test(NAME core COMMAND test_core WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data)

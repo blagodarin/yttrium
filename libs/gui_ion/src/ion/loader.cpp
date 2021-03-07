@@ -12,7 +12,6 @@
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/storage.h>
 #include <yttrium/translation.h>
-#include "../../../../core/src/utils/string.h"
 #include "../gui.h"
 #include "../screen.h"
 #include "../widgets/button.h"
@@ -20,6 +19,7 @@
 #include "../widgets/image.h"
 #include "../widgets/input.h"
 #include "../widgets/label.h"
+#include "utils.h"
 
 namespace
 {

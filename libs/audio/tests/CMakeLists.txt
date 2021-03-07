@@ -10,9 +10,4 @@ add_executable(test_audio
 include_config(test_audio ${PROJECT_BINARY_DIR}/config.h)
 target_link_libraries(test_audio PRIVATE yaudio ycore ytest)
 set_target_properties(test_audio PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-	target_compile_options(test_audio PRIVATE
-		/wd5204 # class has virtual functions, but its trivial destructor is not virtual; instances of objects derived from this class may not be destructed correctly
-		)
-endif()
 add_test(NAME audio COMMAND test_audio)

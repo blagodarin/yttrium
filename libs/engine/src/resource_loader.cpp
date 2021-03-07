@@ -14,7 +14,6 @@
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/storage.h>
 #include <yttrium/translation.h>
-#include "../../core/src/utils/string.h"
 #include "renderer/material.h"
 
 #include <cassert>
