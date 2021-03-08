@@ -24,7 +24,6 @@
 #include <yttrium/utils/string.h>
 #include "model.h"
 
-#include <cmath>
 #include <optional>
 
 namespace
@@ -276,7 +275,7 @@ void Game::update(const Yt::Window& window, std::chrono::milliseconds advance)
 	{
 		constexpr auto speed = 16.f; // Units per second.
 		const auto distance = static_cast<float>(advance.count()) * speed / 1000;
-		const auto offset = (move_forward || move_backward) && (move_left || move_right) ? distance * static_cast<float>(M_SQRT1_2) : distance;
+		const auto offset = (move_forward || move_backward) && (move_left || move_right) ? distance / std::numbers::sqrt2_v<float> : distance;
 		const auto x_movement = move_left ? -offset : (move_right ? offset : 0);
 		const auto y_movement = move_forward ? offset : (move_backward ? -offset : 0);
 		_state->set_position({ _state->_position.x + x_movement, _state->_position.y + y_movement });

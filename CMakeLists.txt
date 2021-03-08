@@ -186,7 +186,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 	if(Y_ARCH_X86 AND NOT Y_ARCH_AMD64)
 		add_compile_options(/arch:SSE2)
 	endif()
-	add_compile_definitions(_SILENCE_CXX20_U8PATH_DEPRECATION_WARNING _USE_MATH_DEFINES)
+	add_compile_definitions(_SILENCE_CXX20_U8PATH_DEPRECATION_WARNING)
 	list(APPEND RC_FLAGS /nologo)
 
 	# Warnings.

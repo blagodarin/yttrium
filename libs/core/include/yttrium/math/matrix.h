@@ -21,6 +21,8 @@
 #include <yttrium/math/size.h>
 #include <yttrium/math/vector.h>
 
+#include <numbers>
+
 namespace Yt
 {
 	class Matrix4
@@ -40,9 +42,9 @@ namespace Yt
 
 		explicit Matrix4(const Euler& e) noexcept
 		{
-			const auto yaw = e._yaw / 180 * static_cast<float>(M_PI);
-			const auto pitch = e._pitch / 180 * static_cast<float>(M_PI);
-			const auto roll = e._roll / 180 * static_cast<float>(M_PI);
+			const auto yaw = e._yaw / 180 * std::numbers::pi_v<float>;
+			const auto pitch = e._pitch / 180 * std::numbers::pi_v<float>;
+			const auto roll = e._roll / 180 * std::numbers::pi_v<float>;
 			const auto cy = std::cos(yaw);
 			const auto sy = std::sin(yaw);
 			const auto cp = std::cos(pitch);
@@ -83,7 +85,7 @@ namespace Yt
 		static Matrix4 perspective(const SizeF& size, float vertical_fov, float near_plane, float far_plane) noexcept
 		{
 			const auto aspect = size._width / size._height;
-			const auto f = 1 / std::tan(vertical_fov / 360 * static_cast<float>(M_PI));
+			const auto f = 1 / std::tan(vertical_fov / 360 * std::numbers::pi_v<float>);
 			const auto xx = f / aspect;
 			const auto yy = f;
 			const auto zz = (near_plane + far_plane) / (near_plane - far_plane);
@@ -120,7 +122,7 @@ namespace Yt
 		static Matrix4 rotation(float degrees, const Vector3& axis) noexcept
 		{
 			const auto v = normalize(axis);
-			const auto radians = degrees / 180 * static_cast<float>(M_PI);
+			const auto radians = degrees / 180 * std::numbers::pi_v<float>;
 			const auto c = std::cos(radians);
 			const auto s = std::sin(radians);
 			return {
