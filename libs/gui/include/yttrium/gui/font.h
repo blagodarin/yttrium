@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <yttrium/api.h>
-
 #include <memory>
 #include <string_view>
 #include <vector>
@@ -21,7 +19,7 @@ namespace Yt
 	class TexturedRect;
 	class Vector2;
 
-	class Y_ENGINE_API Font
+	class Font
 	{
 	public:
 		struct Graphics

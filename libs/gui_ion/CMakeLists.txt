@@ -9,13 +9,10 @@ source_group("src/logic" REGULAR_EXPRESSION "/src/logic/")
 source_group("src/widgets" REGULAR_EXPRESSION "/src/widgets/")
 source_group("include" REGULAR_EXPRESSION "/include/yttrium/gui/")
 add_library(ygui_ion STATIC
-	include/yttrium/gui/font.h
 	include/yttrium/gui/gui.h
-	include/yttrium/gui/text_capture.h
 	src/actions.cpp
 	src/actions.h
 	src/cursor.h
-	src/font.cpp
 	src/gui.cpp
 	src/gui.h
 	src/ion/loader.cpp
@@ -47,7 +44,7 @@ add_library(ygui_ion STATIC
 	)
 include_config(ygui_ion ${PROJECT_BINARY_DIR}/config.h)
 target_include_directories(ygui_ion PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-target_link_libraries(ygui_ion PRIVATE yapplication yaudio ycore yengine primal Freetype::Freetype)
+target_link_libraries(ygui_ion PRIVATE yapplication yaudio ycore ygui yengine primal)
 set_target_properties(ygui_ion PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 primal_install(ygui_ion EXPORT YttriumTargets)
 install(DIRECTORY include/yttrium DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})

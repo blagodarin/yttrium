@@ -235,6 +235,7 @@ configure_file(cmake/config.h.in ${PROJECT_BINARY_DIR}/config.h)
 add_subdirectory(libs/core)
 add_subdirectory(libs/application)
 add_subdirectory(libs/audio)
+add_subdirectory(libs/gui)
 add_subdirectory(libs/gui_ion)
 add_subdirectory(libs/main)
 
