@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <yttrium/api.h>
-
 #include <chrono>
 #include <functional>
 #include <memory>
@@ -22,22 +20,22 @@ namespace Yt
 	class ScriptContext;
 	class Vector2;
 
-	class Y_ENGINE_API Canvas
+	class IonGuiCanvas
 	{
 	public:
-		virtual ~Canvas() = default;
+		virtual ~IonGuiCanvas() = default;
 		virtual void on_draw(RenderPass&, const RectF&, std::chrono::milliseconds) {}
 		virtual void on_mouse_move(const RectF&, const Vector2&) {}
 		virtual bool on_mouse_press(const RectF&, Key, const Vector2&) { return false; }
 	};
 
-	class Y_ENGINE_API Gui
+	class IonGui
 	{
 	public:
-		Gui(std::string_view name, ResourceLoader&, ScriptContext&, const std::shared_ptr<AudioManager>& = {});
-		~Gui();
+		IonGui(std::string_view name, ResourceLoader&, ScriptContext&, const std::shared_ptr<AudioManager>& = {});
+		~IonGui();
 
-		void bind_canvas(const std::string& name, Canvas&);
+		void bind_canvas(const std::string& name, IonGuiCanvas&);
 		void draw(RenderPass&, const Vector2& cursor) const;
 		const std::string& icon_path() const;
 		void notify(const std::string& event);
@@ -49,6 +47,6 @@ namespace Yt
 		const std::string& title() const;
 
 	private:
-		const std::unique_ptr<class GuiPrivate> _private;
+		const std::unique_ptr<class IonGuiPrivate> _private;
 	};
 }

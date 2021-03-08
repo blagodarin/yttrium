@@ -1,19 +1,6 @@
-//
 // This file is part of the Yttrium toolkit.
-// Copyright (C) 2019 Sergei Blagodarin.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+// Copyright (C) Sergei Blagodarin.
+// SPDX-License-Identifier: Apache-2.0
 
 #pragma once
 
@@ -29,9 +16,9 @@
 
 namespace Yt
 {
-	class Canvas;
-	class Gui;
 	class GuiScreen;
+	class IonGuiCanvas;
+	class IonGui;
 	class RectF;
 	class RenderPass;
 	class ResourceLoader;
@@ -40,11 +27,11 @@ namespace Yt
 	class Texture2D;
 	class Vector2;
 
-	class GuiPrivate
+	class IonGuiPrivate
 	{
 	public:
-		explicit GuiPrivate(ScriptContext&, const std::shared_ptr<AudioManager>&) noexcept;
-		~GuiPrivate();
+		explicit IonGuiPrivate(ScriptContext&, const std::shared_ptr<AudioManager>&) noexcept;
+		~IonGuiPrivate();
 
 		GuiScreen& add_screen(std::string_view name, bool is_root);
 		void add_startup_command(std::string_view, std::vector<std::string>&&);
@@ -94,12 +81,12 @@ namespace Yt
 		std::map<Key, std::pair<GuiActions, GuiActions>> _on_key;
 		GuiCursor _default_cursor = GuiCursor::None;
 		std::shared_ptr<const Texture2D> _default_cursor_texture;
-		std::unordered_map<std::string, Canvas*> _canvases;
+		std::unordered_map<std::string, IonGuiCanvas*> _canvases;
 		std::function<void(RenderPass&, const Vector2&)> _on_custom_cursor;
 		std::function<void()> _on_quit;
 		std::size_t _screen_recursion = 0;
 		std::vector<std::pair<std::string, std::vector<std::string>>> _startup_commands;
 
-		friend Gui;
+		friend IonGui;
 	};
 }

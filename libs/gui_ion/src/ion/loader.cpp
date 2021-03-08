@@ -112,7 +112,7 @@ namespace Yt
 	class GuiIonLoader
 	{
 	public:
-		GuiIonLoader(GuiPrivate&, ResourceLoader&);
+		GuiIonLoader(IonGuiPrivate&, ResourceLoader&);
 		~GuiIonLoader() noexcept;
 
 		void load(std::string_view source_name);
@@ -165,7 +165,7 @@ namespace Yt
 		void load_style_texture_rect(WidgetData::StyleData&, IonReader&, IonToken&) const;
 
 	private:
-		GuiPrivate& _gui;
+		IonGuiPrivate& _gui;
 		ResourceLoader& _resource_loader;
 		std::shared_ptr<const Font> _default_font;
 		std::unordered_map<std::string, std::unique_ptr<WidgetData>> _prototypes;
@@ -174,7 +174,7 @@ namespace Yt
 		std::shared_ptr<const Translation> _translation;
 	};
 
-	GuiIonLoader::GuiIonLoader(GuiPrivate& gui, ResourceLoader& resource_loader)
+	GuiIonLoader::GuiIonLoader(IonGuiPrivate& gui, ResourceLoader& resource_loader)
 		: _gui{ gui }
 		, _resource_loader{ resource_loader }
 	{
@@ -414,25 +414,25 @@ namespace Yt
 
 	void GuiIonLoader::load_screen_layout(GuiScreen& screen, IonReader& ion, IonToken& token, int extra) const
 	{
-		static const std::unordered_map<std::string_view, std::unique_ptr<Widget> (*)(GuiPrivate&, std::unique_ptr<WidgetData>&&, std::string_view)> handlers{
+		static const std::unordered_map<std::string_view, std::unique_ptr<Widget> (*)(IonGuiPrivate&, std::unique_ptr<WidgetData>&&, std::string_view)> handlers{
 			{ "button",
-				[](GuiPrivate& gui, std::unique_ptr<WidgetData>&& data, std::string_view) -> std::unique_ptr<Widget> {
+				[](IonGuiPrivate& gui, std::unique_ptr<WidgetData>&& data, std::string_view) -> std::unique_ptr<Widget> {
 					return std::make_unique<ButtonWidget>(gui, std::move(data));
 				} },
 			{ "canvas",
-				[](GuiPrivate& gui, std::unique_ptr<WidgetData>&& data, std::string_view name) -> std::unique_ptr<Widget> {
+				[](IonGuiPrivate& gui, std::unique_ptr<WidgetData>&& data, std::string_view name) -> std::unique_ptr<Widget> {
 					return std::make_unique<CanvasWidget>(gui, std::move(data), name);
 				} },
 			{ "image",
-				[](GuiPrivate& gui, std::unique_ptr<WidgetData>&& data, std::string_view) -> std::unique_ptr<Widget> {
+				[](IonGuiPrivate& gui, std::unique_ptr<WidgetData>&& data, std::string_view) -> std::unique_ptr<Widget> {
 					return std::make_unique<ImageWidget>(gui, std::move(data));
 				} },
 			{ "input",
-				[](GuiPrivate& gui, std::unique_ptr<WidgetData>&& data, std::string_view) -> std::unique_ptr<Widget> {
+				[](IonGuiPrivate& gui, std::unique_ptr<WidgetData>&& data, std::string_view) -> std::unique_ptr<Widget> {
 					return std::make_unique<InputWidget>(gui, std::move(data));
 				} },
 			{ "label",
-				[](GuiPrivate& gui, std::unique_ptr<WidgetData>&& data, std::string_view) -> std::unique_ptr<Widget> {
+				[](IonGuiPrivate& gui, std::unique_ptr<WidgetData>&& data, std::string_view) -> std::unique_ptr<Widget> {
 					return std::make_unique<LabelWidget>(gui, std::move(data));
 				} },
 		};
@@ -740,7 +740,7 @@ namespace Yt
 			throw GuiDataError{ "Bad 'texture_rect'" };
 	}
 
-	void load_ion_gui(GuiPrivate& gui, ResourceLoader& resource_loader, std::string_view path)
+	void load_ion_gui(IonGuiPrivate& gui, ResourceLoader& resource_loader, std::string_view path)
 	{
 		GuiIonLoader{ gui, resource_loader }.load(path);
 	}

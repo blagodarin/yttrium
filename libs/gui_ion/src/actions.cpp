@@ -1,19 +1,6 @@
-//
 // This file is part of the Yttrium toolkit.
-// Copyright (C) 2019 Sergei Blagodarin.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+// Copyright (C) Sergei Blagodarin.
+// SPDX-License-Identifier: Apache-2.0
 
 #include "actions.h"
 
@@ -25,7 +12,7 @@ namespace
 	class GuiActionVisitor
 	{
 	public:
-		explicit GuiActionVisitor(Yt::GuiPrivate& gui)
+		explicit GuiActionVisitor(Yt::IonGuiPrivate& gui)
 			: _gui{ gui } {}
 
 		void operator()(const Yt::GuiAction_Call& action) const { action._script.execute(_gui.script_context()); }
@@ -35,13 +22,13 @@ namespace
 		void operator()(const Yt::GuiAction_ReturnTo& action) const { _gui.pop_screens_until(action._screen); }
 
 	private:
-		Yt::GuiPrivate& _gui;
+		Yt::IonGuiPrivate& _gui;
 	};
 }
 
 namespace Yt
 {
-	void GuiActions::run(GuiPrivate& gui) const
+	void GuiActions::run(IonGuiPrivate& gui) const
 	{
 		const GuiActionVisitor visitor(gui);
 		for (const auto& action : _actions)

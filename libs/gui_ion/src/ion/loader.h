@@ -10,11 +10,11 @@
 
 namespace Yt
 {
-	class GuiPrivate;
+	class IonGuiPrivate;
 	class IonReader;
 	class IonToken;
 	class ResourceLoader;
 
-	void load_ion_gui(GuiPrivate&, ResourceLoader&, std::string_view path);
+	void load_ion_gui(IonGuiPrivate&, ResourceLoader&, std::string_view path);
 	bool read_ion_texture_filter(IonReader&, IonToken&, Texture2D::Filter&);
 }

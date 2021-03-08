@@ -1,21 +1,8 @@
-//
 // This file is part of the Yttrium toolkit.
-// Copyright (C) 2019 Sergei Blagodarin.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+// Copyright (C) Sergei Blagodarin.
+// SPDX-License-Identifier: Apache-2.0
 
-#include <yttrium/gui/gui.h>
+#include <yttrium/gui/ion_gui.h>
 
 #include <yttrium/exceptions.h>
 #include <yttrium/renderer/texture.h>
@@ -63,15 +50,15 @@ namespace
 
 namespace Yt
 {
-	GuiPrivate::GuiPrivate(ScriptContext& script_context, const std::shared_ptr<AudioManager>& audio_manager) noexcept
+	IonGuiPrivate::IonGuiPrivate(ScriptContext& script_context, const std::shared_ptr<AudioManager>& audio_manager) noexcept
 		: _script_context{ script_context }
 		, _audio_manager{ audio_manager }
 	{
 	}
 
-	GuiPrivate::~GuiPrivate() = default;
+	IonGuiPrivate::~IonGuiPrivate() = default;
 
-	GuiScreen& GuiPrivate::add_screen(std::string_view name, bool is_root)
+	GuiScreen& IonGuiPrivate::add_screen(std::string_view name, bool is_root)
 	{
 		if (!is_root && name.empty())
 			throw GuiDataError{ "Non-root screen must have a name" };
@@ -89,12 +76,12 @@ namespace Yt
 		return result;
 	}
 
-	void GuiPrivate::add_startup_command(std::string_view name, std::vector<std::string>&& args)
+	void IonGuiPrivate::add_startup_command(std::string_view name, std::vector<std::string>&& args)
 	{
 		_startup_commands.emplace_back(name, std::move(args));
 	}
 
-	std::shared_ptr<Sound> GuiPrivate::load_sound(ResourceLoader& loader, std::string_view name)
+	std::shared_ptr<Sound> IonGuiPrivate::load_sound(ResourceLoader& loader, std::string_view name)
 	{
 		if (!_audio_manager)
 			return {};
@@ -104,27 +91,27 @@ namespace Yt
 		return _sounds.emplace(name, _audio_manager->create_sound(loader.open(name))).first->second;
 	}
 
-	void GuiPrivate::on_canvas_draw(RenderPass& pass, const std::string& name, const RectF& rect) const
+	void IonGuiPrivate::on_canvas_draw(RenderPass& pass, const std::string& name, const RectF& rect) const
 	{
 		const auto i = _canvases.find(name);
 		if (i != _canvases.end())
 			i->second->on_draw(pass, rect, _screen_stack.back()->time_since_enter());
 	}
 
-	void GuiPrivate::on_canvas_mouse_move(const std::string& name, const RectF& rect, const Vector2& cursor)
+	void IonGuiPrivate::on_canvas_mouse_move(const std::string& name, const RectF& rect, const Vector2& cursor)
 	{
 		const auto i = _canvases.find(name);
 		if (i != _canvases.end())
 			i->second->on_mouse_move(rect, cursor);
 	}
 
-	bool GuiPrivate::on_canvas_mouse_press(const std::string& name, const RectF& rect, Key key, const Vector2& cursor)
+	bool IonGuiPrivate::on_canvas_mouse_press(const std::string& name, const RectF& rect, Key key, const Vector2& cursor)
 	{
 		const auto i = _canvases.find(name);
 		return i != _canvases.end() && i->second->on_mouse_press(rect, key, cursor);
 	}
 
-	bool GuiPrivate::pop_screen()
+	bool IonGuiPrivate::pop_screen()
 	{
 		if (_screen_stack.size() <= 1)
 			return false;
@@ -132,7 +119,7 @@ namespace Yt
 		return true;
 	}
 
-	bool GuiPrivate::pop_screens_until(const std::string& name)
+	bool IonGuiPrivate::pop_screens_until(const std::string& name)
 	{
 		const auto end = std::find_if(_screen_stack.rbegin(), _screen_stack.rend(), [&name](GuiScreen* screen) { return screen->name() == name; });
 		if (end == _screen_stack.rend())
@@ -142,7 +129,7 @@ namespace Yt
 		return true;
 	}
 
-	bool GuiPrivate::push_screen(const std::string& name)
+	bool IonGuiPrivate::push_screen(const std::string& name)
 	{
 		const auto i = _screens.find(name);
 		if (i == _screens.end())
@@ -151,13 +138,13 @@ namespace Yt
 		return true;
 	}
 
-	void GuiPrivate::set_default_cursor(GuiCursor cursor, const std::shared_ptr<const Texture2D>& texture)
+	void IonGuiPrivate::set_default_cursor(GuiCursor cursor, const std::shared_ptr<const Texture2D>& texture)
 	{
 		_default_cursor = cursor;
 		_default_cursor_texture = texture;
 	}
 
-	void GuiPrivate::enter_screen(GuiScreen& screen)
+	void IonGuiPrivate::enter_screen(GuiScreen& screen)
 	{
 		Increment recursion{ _screen_recursion };
 		_screen_stack.emplace_back(&screen);
@@ -166,7 +153,7 @@ namespace Yt
 			update_music();
 	}
 
-	void GuiPrivate::leave_screen()
+	void IonGuiPrivate::leave_screen()
 	{
 		Increment recursion{ _screen_recursion };
 		const auto screen = _screen_stack.back();
@@ -176,7 +163,7 @@ namespace Yt
 			update_music();
 	}
 
-	void GuiPrivate::update_music()
+	void IonGuiPrivate::update_music()
 	{
 		if (!_audio_manager)
 			return;
@@ -188,22 +175,22 @@ namespace Yt
 		_audio_manager->play_music(_current_music);
 	}
 
-	Gui::Gui(std::string_view name, ResourceLoader& resource_loader, ScriptContext& script_context, const std::shared_ptr<AudioManager>& audio_manager)
-		: _private(std::make_unique<GuiPrivate>(script_context, audio_manager))
+	IonGui::IonGui(std::string_view name, ResourceLoader& resource_loader, ScriptContext& script_context, const std::shared_ptr<AudioManager>& audio_manager)
+		: _private{ std::make_unique<IonGuiPrivate>(script_context, audio_manager) }
 	{
 		load_ion_gui(*_private, resource_loader, name);
 		if (!_private->_root_screen)
 			throw GuiDataError{ "(gui) No root screen has been added" };
 	}
 
-	Gui::~Gui() = default;
+	IonGui::~IonGui() = default;
 
-	void Gui::bind_canvas(const std::string& name, Canvas& canvas)
+	void IonGui::bind_canvas(const std::string& name, IonGuiCanvas& canvas)
 	{
 		_private->_canvases[name] = &canvas;
 	}
 
-	void Gui::draw(RenderPass& pass, const Vector2& cursor) const
+	void IonGui::draw(RenderPass& pass, const Vector2& cursor) const
 	{
 		if (_private->_screen_stack.empty())
 			return;
@@ -218,28 +205,28 @@ namespace Yt
 		(*top_screen)->draw(pass, &cursor);
 	}
 
-	const std::string& Gui::icon_path() const
+	const std::string& IonGui::icon_path() const
 	{
 		return _private->_icon_path;
 	}
 
-	void Gui::notify(const std::string& event)
+	void IonGui::notify(const std::string& event)
 	{
 		if (!_private->_screen_stack.empty())
 			_private->_screen_stack.back()->handle_event(event);
 	}
 
-	void Gui::on_custom_cursor(const std::function<void(RenderPass&, const Vector2&)>& callback)
+	void IonGui::on_custom_cursor(const std::function<void(RenderPass&, const Vector2&)>& callback)
 	{
 		_private->_on_custom_cursor = callback;
 	}
 
-	void Gui::on_quit(const std::function<void()>& callback)
+	void IonGui::on_quit(const std::function<void()>& callback)
 	{
 		_private->_on_quit = callback;
 	}
 
-	bool Gui::process_key_event(const KeyEvent& event)
+	bool IonGui::process_key_event(const KeyEvent& event)
 	{
 		if (!_private->_screen_stack.empty() && _private->_screen_stack.back()->handle_key(event))
 			return true;
@@ -255,12 +242,12 @@ namespace Yt
 		return false;
 	}
 
-	bool Gui::process_text_input(std::string_view text)
+	bool IonGui::process_text_input(std::string_view text)
 	{
 		return !_private->_screen_stack.empty() && _private->_screen_stack.back()->handle_text(text);
 	}
 
-	void Gui::start()
+	void IonGui::start()
 	{
 		for (const auto& command : _private->_startup_commands)
 			_private->_script_context.call(command.first, command.second);
@@ -268,7 +255,7 @@ namespace Yt
 		_private->enter_screen(*_private->_root_screen); // TODO: Move it into startup commands.
 	}
 
-	const std::string& Gui::title() const
+	const std::string& IonGui::title() const
 	{
 		return _private->_title;
 	}

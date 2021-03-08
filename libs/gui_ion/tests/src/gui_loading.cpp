@@ -1,22 +1,9 @@
-//
 // This file is part of the Yttrium toolkit.
-// Copyright (C) 2019 Sergei Blagodarin.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+// Copyright (C) Sergei Blagodarin.
+// SPDX-License-Identifier: Apache-2.0
 
 #include <yttrium/exceptions.h>
-#include <yttrium/gui/gui.h>
+#include <yttrium/gui/ion_gui.h>
 #include <yttrium/ion/reader.h>
 #include <yttrium/memory/buffer.h>
 #include <yttrium/resource_loader.h>
@@ -47,7 +34,7 @@ TEST_CASE("gui.load")
 			storage.attach_buffer(extra_name, ::make_buffer(extra_data));
 		Yt::ResourceLoader resource_loader{ storage };
 		Yt::ScriptContext script_context;
-		Yt::Gui{ "main.ion", resource_loader, script_context };
+		Yt::IonGui{ "main.ion", resource_loader, script_context };
 	};
 
 	const auto fragment = [&source](const std::string& data) {

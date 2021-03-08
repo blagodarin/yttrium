@@ -9,7 +9,7 @@ source_group("src/logic" REGULAR_EXPRESSION "/src/logic/")
 source_group("src/widgets" REGULAR_EXPRESSION "/src/widgets/")
 source_group("include" REGULAR_EXPRESSION "/include/yttrium/gui/")
 add_library(ygui_ion STATIC
-	include/yttrium/gui/gui.h
+	include/yttrium/gui/ion_gui.h
 	src/actions.cpp
 	src/actions.h
 	src/cursor.h

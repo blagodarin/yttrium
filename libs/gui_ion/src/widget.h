@@ -11,8 +11,8 @@
 
 namespace Yt
 {
-	class GuiPrivate;
 	class GuiPropertyLoader;
+	class IonGuiPrivate;
 	class RenderPass;
 
 	class Widget
@@ -42,12 +42,12 @@ namespace Yt
 		virtual void process_mouse_release() {}
 
 	protected:
-		Widget(GuiPrivate&, std::unique_ptr<WidgetData>&&, Flags<Flag> = {});
+		Widget(IonGuiPrivate&, std::unique_ptr<WidgetData>&&, Flags<Flag> = {});
 
 		virtual void draw(RenderPass&, const RectF&, WidgetData::StyleData&) const = 0;
 
 	protected:
-		GuiPrivate& _gui;
+		IonGuiPrivate& _gui;
 		const std::unique_ptr<WidgetData> _data;
 
 	private:
