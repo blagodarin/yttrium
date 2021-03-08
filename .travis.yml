@@ -154,7 +154,6 @@ install:
   - if [ -n "${COVERAGE}" ]; then pip install --user codecov; fi
 
 script:
-  - if [ -z "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DYTTRIUM_EXAMPLES=ON"; fi
   - if [ -z "${ANALYZE}" ] && [ -z "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DYTTRIUM_SANITIZERS=ON"; fi
   - if [ -n "${ANALYZE}" ]; then CMAKE_OPTIONS+=" -DYTTRIUM_CLANG_TIDY=ON"; fi
   - if [ -n "${COVERAGE}" ]; then CMAKE_OPTIONS+=" -DYTTRIUM_COVERAGE=ON"; fi

@@ -1,3 +1,0 @@
-vertex_shader "data/checkerboard_vs.glsl"
-fragment_shader "data/checkerboard_fs.glsl"
-texture "data/checkerboard.tga" { nearest anisotropic }
