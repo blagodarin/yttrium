@@ -22,9 +22,6 @@ namespace Yt
 		RendererImpl _renderer{ _window.id() };
 		RenderBuiltin _renderer_builtin{ *_renderer._backend };
 		RenderPassData _render_pass_data;
-		bool _take_screenshot = false;
-		std::function<void(RenderPass&, const Vector2&, const RenderReport&)> _on_render;
-		std::function<void(Image&&)> _on_screenshot;
 
 		explicit ViewportPrivate(Window& window)
 			: _window{ window } {}
@@ -37,17 +34,7 @@ namespace Yt
 
 	Viewport::~Viewport() noexcept = default;
 
-	void Viewport::on_render(const std::function<void(RenderPass&, const Vector2&, const RenderReport&)>& callback)
-	{
-		_private->_on_render = callback;
-	}
-
-	void Viewport::on_screenshot(const std::function<void(Image&&)>& callback)
-	{
-		_private->_on_screenshot = callback;
-	}
-
-	void Viewport::render(RenderReport& current, const RenderReport& previous)
+	void Viewport::render(RenderReport& report, const std::function<void(RenderPass&)>& callback)
 	{
 		const auto window_size = _private->_window.size();
 		if (window_size != _private->_window_size)
@@ -56,20 +43,13 @@ namespace Yt
 			_private->_window_size = window_size;
 		}
 		{
-			RenderPassImpl pass{ *_private->_renderer._backend, _private->_renderer_builtin, _private->_render_pass_data, window_size, current };
+			RenderPassImpl pass{ *_private->_renderer._backend, _private->_renderer_builtin, _private->_render_pass_data, window_size, report };
 			PushProgram program{ pass, _private->_renderer_builtin._program_2d.get() };
 			Push2D projection{ pass };
-			if (_private->_on_render)
-				_private->_on_render(pass, Vector2{ _private->_window.cursor() }, previous);
+			callback(pass);
 			pass.draw_debug_text();
 		}
 		_private->_window.swap_buffers();
-		if (_private->_take_screenshot)
-		{
-			_private->_take_screenshot = false;
-			if (_private->_on_screenshot)
-				_private->_on_screenshot(_private->_renderer.take_screenshot(window_size));
-		}
 	}
 
 	RenderManager& Viewport::render_manager()
@@ -77,8 +57,8 @@ namespace Yt
 		return _private->_renderer;
 	}
 
-	void Viewport::take_screenshot()
+	Image Viewport::take_screenshot()
 	{
-		_private->_take_screenshot = true;
+		return _private->_renderer.take_screenshot(_private->_window_size);
 	}
 }

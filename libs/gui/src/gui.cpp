@@ -5,6 +5,9 @@
 #include <yttrium/gui/gui.h>
 
 #include <yttrium/application/key.h>
+#include <yttrium/application/window.h>
+#include <yttrium/math/point.h>
+#include <yttrium/math/rect.h>
 
 #include <algorithm>
 #include <vector>
@@ -20,11 +23,17 @@ namespace Yt
 		static constexpr uint16_t kTextFlag = 0x4000;
 		static constexpr uint16_t kProcessedFlag = 0x8000;
 		static constexpr uint16_t kKeySearchMask = kPayloadMask | kTextFlag | kProcessedFlag;
+
+		Window& _window;
+		std::optional<Point> _cursor;
 		std::vector<uint16_t> _inputEvents;
+
+		GuiStateData(Window& window) noexcept
+			: _window{ window } {}
 	};
 
-	GuiState::GuiState()
-		: _data{ std::make_unique<GuiStateData>() }
+	GuiState::GuiState(Window& window)
+		: _data{ std::make_unique<GuiStateData>(window) }
 	{
 	}
 
@@ -43,8 +52,9 @@ namespace Yt
 	}
 
 	GuiFrame::GuiFrame(GuiState& state)
-		: _state{*state._data}
+		: _state{ *state._data }
 	{
+		_state._cursor.emplace(_state._window.cursor());
 	}
 
 	GuiFrame::~GuiFrame() noexcept
@@ -68,5 +78,10 @@ namespace Yt
 					*j = GuiStateData::kProcessedFlag;
 		}
 		return pressed;
+	}
+
+	std::optional<Point> GuiFrame::mouseArea(const Rect& rect) noexcept
+	{
+		return _state._cursor && rect.contains_fast(*_state._cursor) ? std::move(_state._cursor) : std::nullopt;
 	}
 }

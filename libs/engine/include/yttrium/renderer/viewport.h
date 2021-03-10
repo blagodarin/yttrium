@@ -24,19 +24,13 @@ namespace Yt
 		~Viewport() noexcept;
 
 		///
-		void on_render(const std::function<void(RenderPass&, const Vector2& cursor, const RenderReport&)>&);
-
-		///
-		void on_screenshot(const std::function<void(Image&&)>&);
-
-		///
-		void render(RenderReport& current, const RenderReport& previous);
+		void render(RenderReport&, const std::function<void(RenderPass&)>&);
 
 		///
 		RenderManager& render_manager();
 
 		///
-		void take_screenshot();
+		Image take_screenshot();
 
 	private:
 		const std::unique_ptr<class ViewportPrivate> _private;

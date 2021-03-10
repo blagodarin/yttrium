@@ -90,9 +90,10 @@ namespace Yt
 		lock_cursor(_is_cursor_locked);
 	}
 
-	Window::Window(Application& application)
+	Window::Window(Application& application, const std::string& title)
 		: _private{ std::make_unique<WindowPrivate>(application) }
 	{
+		set_title(title);
 	}
 
 	Window::~Window() = default;

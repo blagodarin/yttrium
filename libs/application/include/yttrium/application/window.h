@@ -22,7 +22,7 @@ namespace Yt
 	{
 	public:
 		///
-		explicit Window(Application&);
+		explicit Window(Application&, const std::string& title = {});
 
 		///
 		~Window();
