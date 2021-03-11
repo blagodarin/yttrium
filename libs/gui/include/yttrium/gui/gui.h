@@ -11,8 +11,8 @@ namespace Yt
 {
 	enum class Key;
 	class KeyEvent;
-	class Point;
-	class Rect;
+	class RectF;
+	class Vector2;
 	class Window;
 
 	class GuiState
@@ -34,8 +34,9 @@ namespace Yt
 		GuiFrame(GuiState&);
 		~GuiFrame() noexcept;
 
-		bool keyPressed(Key) noexcept;
-		std::optional<Point> mouseArea(const Rect&) noexcept;
+		std::optional<Vector2> captureCursor(const RectF&) noexcept;
+		bool captureKeyDown(Key, bool autorepeat = false) noexcept;
+		Vector2 cursor() const noexcept;
 
 	private:
 		GuiStateData& _state;

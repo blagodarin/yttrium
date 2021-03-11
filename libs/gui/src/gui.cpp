@@ -25,7 +25,7 @@ namespace Yt
 		static constexpr uint16_t kKeySearchMask = kPayloadMask | kTextFlag | kProcessedFlag;
 
 		Window& _window;
-		std::optional<Point> _cursor;
+		std::optional<Vector2> _cursor;
 		std::vector<uint16_t> _inputEvents;
 
 		GuiStateData(Window& window) noexcept
@@ -62,26 +62,34 @@ namespace Yt
 		_state._inputEvents.clear();
 	}
 
-	bool GuiFrame::keyPressed(Key key) noexcept
+	std::optional<Vector2> GuiFrame::captureCursor(const RectF& rect) noexcept
 	{
-		bool pressed = false;
+		std::optional<Vector2> captured;
+		if (_state._cursor && rect.contains(*_state._cursor))
+			captured.swap(_state._cursor);
+		return captured;
+	}
+
+	bool GuiFrame::captureKeyDown(Key key, bool autorepeat) noexcept
+	{
+		bool captured = false;
 		const auto i = std::find_if(_state._inputEvents.begin(), _state._inputEvents.end(), [key](const auto event) {
 			return (event & GuiStateData::kKeySearchMask) == static_cast<uint8_t>(key);
 		});
 		if (i != _state._inputEvents.end())
 		{
 			*i |= GuiStateData::kProcessedFlag;
-			if ((*i & (GuiStateData::kPressedFlag | GuiStateData::kAutorepeatFlag)) == GuiStateData::kPressedFlag)
-				pressed = true;
+			if ((*i & (GuiStateData::kPressedFlag | (autorepeat ? 0 : GuiStateData::kAutorepeatFlag))) == GuiStateData::kPressedFlag)
+				captured = true;
 			for (auto j = std::next(i); j != _state._inputEvents.end(); ++j)
 				if ((*j & GuiStateData::kKeySearchMask) == static_cast<uint8_t>(key))
 					*j = GuiStateData::kProcessedFlag;
 		}
-		return pressed;
+		return captured;
 	}
 
-	std::optional<Point> GuiFrame::mouseArea(const Rect& rect) noexcept
+	Vector2 GuiFrame::cursor() const noexcept
 	{
-		return _state._cursor && rect.contains_fast(*_state._cursor) ? std::move(_state._cursor) : std::nullopt;
+		return Vector2{ _state._window.cursor() };
 	}
 }
