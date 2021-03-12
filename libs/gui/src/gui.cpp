@@ -10,6 +10,8 @@
 #include <yttrium/math/rect.h>
 
 #include <algorithm>
+#include <cassert>
+#include <string>
 #include <vector>
 
 namespace Yt
@@ -27,9 +29,36 @@ namespace Yt
 		Window& _window;
 		std::optional<Vector2> _cursor;
 		std::vector<uint16_t> _inputEvents;
+		std::string _cursorItem;
+		Key _cursorItemKey = Key::Null;
 
-		GuiStateData(Window& window) noexcept
+		explicit GuiStateData(Window& window) noexcept
 			: _window{ window } {}
+
+		std::pair<unsigned, bool> captureClick(Key key, bool autorepeat) noexcept
+		{
+			const auto i = std::find_if(_inputEvents.begin(), _inputEvents.end(), [key](const auto event) {
+				return (event & kKeySearchMask) == static_cast<uint8_t>(key);
+			});
+			if (i == _inputEvents.end())
+				return { 0u, false };
+			*i |= kProcessedFlag;
+			if (!(*i & kPressedFlag))
+				return { 0u, true };
+			auto count = static_cast<unsigned>(!(*i & kAutorepeatFlag) || autorepeat);
+			for (auto j = std::next(i); j != _inputEvents.end(); ++j)
+			{
+				if ((*j & kKeySearchMask) != static_cast<uint8_t>(key))
+					continue;
+				*j |= kProcessedFlag;
+				if (!(*j & kPressedFlag))
+					return { count, true };
+				assert(*j & kAutorepeatFlag); // Either it is autorepeat, or we've missed some events.
+				if (autorepeat)
+					++count;
+			}
+			return { count, false };
+		}
 	};
 
 	GuiState::GuiState(Window& window)
@@ -48,6 +77,11 @@ namespace Yt
 			if (event._autorepeat)
 				encodedEvent |= GuiStateData::kAutorepeatFlag;
 		}
+		else if (!_data->_cursorItem.empty() && _data->_cursorItemKey == event._key)
+		{
+			_data->_cursorItem.clear();
+			_data->_cursorItemKey = Key::Null;
+		}
 		_data->_inputEvents.emplace_back(encodedEvent);
 	}
 
@@ -62,34 +96,40 @@ namespace Yt
 		_state._inputEvents.clear();
 	}
 
-	std::optional<Vector2> GuiFrame::captureCursor(const RectF& rect) noexcept
+	bool GuiFrame::captureKeyDown(Key key) noexcept
+	{
+		return _state.captureClick(key, false).first > 0;
+	}
+
+	std::optional<Vector2> GuiFrame::dragArea(std::string_view id, const RectF& rect, Key key)
+	{
+		assert(!id.empty());
+		if (_state._cursorItem == id)
+		{
+			assert(_state._cursor);
+			auto captured = rect.bound(*_state._cursor);
+			_state._cursor.reset();
+			return captured;
+		}
+		if (_state._cursorItem.empty())
+			if (auto maybeCaptured = hoverArea(rect))
+				if (const auto [down, up] = _state.captureClick(key, false); down > 0)
+				{
+					if (!up)
+					{
+						_state._cursorItem = id; // May throw std::bad_alloc.
+						_state._cursorItemKey = key;
+					}
+					return maybeCaptured;
+				}
+		return {};
+	}
+
+	std::optional<Vector2> GuiFrame::hoverArea(const RectF& rect) noexcept
 	{
 		std::optional<Vector2> captured;
 		if (_state._cursor && rect.contains(*_state._cursor))
 			captured.swap(_state._cursor);
 		return captured;
-	}
-
-	bool GuiFrame::captureKeyDown(Key key, bool autorepeat) noexcept
-	{
-		bool captured = false;
-		const auto i = std::find_if(_state._inputEvents.begin(), _state._inputEvents.end(), [key](const auto event) {
-			return (event & GuiStateData::kKeySearchMask) == static_cast<uint8_t>(key);
-		});
-		if (i != _state._inputEvents.end())
-		{
-			*i |= GuiStateData::kProcessedFlag;
-			if ((*i & (GuiStateData::kPressedFlag | (autorepeat ? 0 : GuiStateData::kAutorepeatFlag))) == GuiStateData::kPressedFlag)
-				captured = true;
-			for (auto j = std::next(i); j != _state._inputEvents.end(); ++j)
-				if ((*j & GuiStateData::kKeySearchMask) == static_cast<uint8_t>(key))
-					*j = GuiStateData::kProcessedFlag;
-		}
-		return captured;
-	}
-
-	Vector2 GuiFrame::cursor() const noexcept
-	{
-		return Vector2{ _state._window.cursor() };
 	}
 }

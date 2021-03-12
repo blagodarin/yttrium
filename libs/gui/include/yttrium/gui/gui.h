@@ -6,6 +6,7 @@
 
 #include <memory>
 #include <optional>
+#include <string_view>
 
 namespace Yt
 {
@@ -18,7 +19,7 @@ namespace Yt
 	class GuiState
 	{
 	public:
-		GuiState(Window&);
+		explicit GuiState(Window&);
 		~GuiState() noexcept;
 
 		void processKeyEvent(const KeyEvent&);
@@ -31,12 +32,12 @@ namespace Yt
 	class GuiFrame
 	{
 	public:
-		GuiFrame(GuiState&);
+		explicit GuiFrame(GuiState&);
 		~GuiFrame() noexcept;
 
-		std::optional<Vector2> captureCursor(const RectF&) noexcept;
-		bool captureKeyDown(Key, bool autorepeat = false) noexcept;
-		Vector2 cursor() const noexcept;
+		bool captureKeyDown(Key) noexcept;
+		std::optional<Vector2> dragArea(std::string_view id, const RectF&, Key);
+		std::optional<Vector2> hoverArea(const RectF&) noexcept;
 
 	private:
 		GuiStateData& _state;

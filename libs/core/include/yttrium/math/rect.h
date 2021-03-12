@@ -189,6 +189,22 @@ namespace Yt
 		///
 		constexpr bool contains(const Vector2& v) const noexcept { return _left <= v.x && v.x < _right && _top <= v.y && v.y < _bottom; }
 
+		///
+		Vector2 bound(const Vector2& p) const noexcept
+		{
+			auto x = p.x;
+			if (x < _left)
+				x = _left;
+			else if (x > _right - 1)
+				x = _right - 1;
+			auto y = p.y;
+			if (y < _top)
+				y = _top;
+			else if (y >= _bottom - 1)
+				y = _bottom - 1;
+			return { x, y };
+		}
+
 	private:
 		float _left = 0;
 		float _top = 0;
@@ -199,11 +215,6 @@ namespace Yt
 	constexpr bool operator==(const RectF& a, const RectF& b) noexcept
 	{
 		return a.left() == b.left() && a.top() == b.top() && a.right() == b.right() && a.bottom() == b.bottom();
-	}
-
-	constexpr bool operator!=(const RectF& a, const RectF& b) noexcept
-	{
-		return !(a == b);
 	}
 
 	constexpr RectF operator/(const RectF& rect, float s) noexcept { return { rect.top_left() / s, rect.bottom_right() / s }; }
