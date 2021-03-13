@@ -13,7 +13,6 @@ namespace Yt
 	class RenderManager;
 	class RenderPass;
 	struct RenderReport;
-	class Vector2;
 	class Window;
 
 	///
@@ -33,7 +32,7 @@ namespace Yt
 		Image take_screenshot();
 
 	private:
-		const std::unique_ptr<class ViewportPrivate> _private;
-		friend ViewportPrivate;
+		const std::unique_ptr<struct ViewportData> _data;
+		friend class Renderer2D;
 	};
 }

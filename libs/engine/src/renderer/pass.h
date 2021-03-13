@@ -39,8 +39,6 @@ namespace Yt
 		~RenderPassData() noexcept;
 
 	private:
-		Buffer _vertices_2d;
-		Buffer _indices_2d;
 		std::vector<std::pair<Matrix4, RenderMatrixType>> _matrix_stack;
 		std::vector<std::pair<const Texture2D*, int>> _texture_stack{ { nullptr, 1 } };
 #ifndef NDEBUG
@@ -50,7 +48,6 @@ namespace Yt
 #ifndef NDEBUG
 		std::vector<const RenderProgram*> _seen_programs; // For redundancy statistics.
 #endif
-		std::string _debug_text;
 		friend class RenderPassImpl;
 	};
 
@@ -60,21 +57,15 @@ namespace Yt
 		RenderPassImpl(RenderBackend&, RenderBuiltin&, RenderPassData&, const Size& window_size, RenderReport&);
 		~RenderPassImpl() noexcept override;
 
-		void add_debug_text(std::string_view) override;
 		void draw_mesh(const Mesh&) override;
-		void draw_quad(const Quad&, Bgra32) override;
-		void draw_rect(const RectF&, Bgra32) override;
-		void draw_rects(const std::vector<TexturedRect>&, Bgra32) override;
 		Matrix4 full_matrix() const override;
 		Matrix4 model_matrix() const override;
 		Line3 pixel_ray(const Vector2&) const override;
-		void set_texture_rect(const RectF&, const MarginsF&) override;
 		SizeF window_size() const override;
 
 	public:
 		RenderBuiltin& builtin() const noexcept { return _builtin; }
-		void draw_debug_text();
-		void draw_rect(const RectF& position, const RectF& texture, Bgra32);
+		void flush_2d(const Buffer& vertices, const Buffer& indices) noexcept;
 		void pop_program() noexcept;
 		void pop_projection() noexcept;
 		void pop_texture(Flags<Texture2D::Filter>) noexcept;
@@ -86,13 +77,7 @@ namespace Yt
 		void push_transformation(const Matrix4&);
 
 	private:
-		struct Batch2D;
-
 		const BackendTexture2D* current_texture_2d() const;
-		void draw_rect(const RectF& position, const RectF& texture, const MarginsF& borders, Bgra32);
-		void flush_2d() noexcept;
-		Batch2D prepare_batch_2d(size_t vertex_count, size_t index_count);
-		void reset_texture_state();
 		void update_state();
 
 	private:
@@ -104,8 +89,6 @@ namespace Yt
 
 		const Texture2D* _current_texture = nullptr;
 		Flags<Texture2D::Filter> _current_texture_filter = Texture2D::NearestFilter;
-		RectF _texture_rect;
-		MarginsF _texture_borders;
 		bool _reset_texture = false;
 
 		const RenderProgram* _current_program = nullptr;

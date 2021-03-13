@@ -22,7 +22,7 @@ namespace Yt
 		Size size() const noexcept override { return _size; }
 
 		RectF full_rectangle() const;
-		ImageOrientation orientation() const { return _orientation; }
+		ImageOrientation orientation() const noexcept { return _orientation; }
 
 	protected:
 		RenderBackend& _backend;

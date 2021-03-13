@@ -15,8 +15,8 @@ namespace Yt
 	class RenderBuiltin
 	{
 	public:
-		const std::unique_ptr<const Texture2D> _white_texture;
-		const std::unique_ptr<const Texture2D> _debug_texture;
+		const std::shared_ptr<const Texture2D> _white_texture;
+		const std::shared_ptr<const Texture2D> _debug_texture;
 		const std::unique_ptr<RenderProgram> _program_2d;
 
 		explicit RenderBuiltin(RenderBackend&);

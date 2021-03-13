@@ -13,6 +13,7 @@ source_group("src/renderer/vulkan" REGULAR_EXPRESSION "/src/renderer/vulkan/")
 source_group("include" REGULAR_EXPRESSION "/include/")
 source_group("include/renderer" REGULAR_EXPRESSION "/include/yttrium/renderer/")
 add_library(yengine STATIC
+	include/yttrium/renderer/2d.h
 	include/yttrium/renderer/manager.h
 	include/yttrium/renderer/material.h
 	include/yttrium/renderer/mesh.h
@@ -28,11 +29,10 @@ add_library(yengine STATIC
 	src/model/formats/obj.h
 	src/model/mesh_data.cpp
 	src/model/mesh_data.h
+	src/renderer/2d.cpp
 	src/renderer/backend.h
 	src/renderer/builtin.cpp
 	src/renderer/builtin.h
-	src/renderer/debug_renderer.cpp
-	src/renderer/debug_renderer.h
 	src/renderer/debug_texture.cpp
 	src/renderer/debug_texture.h
 	src/renderer/material.cpp
@@ -45,6 +45,7 @@ add_library(yengine STATIC
 	src/renderer/texture.cpp
 	src/renderer/texture.h
 	src/renderer/viewport.cpp
+	src/renderer/viewport.h
 	src/resource_loader.cpp
 	)
 include_config(yengine ${PROJECT_BINARY_DIR}/config.h)

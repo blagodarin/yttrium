@@ -14,7 +14,6 @@
 #include <yttrium/utils/string.h>
 #include "backend.h"
 #include "builtin.h"
-#include "debug_renderer.h"
 #include "texture.h"
 
 #include <cassert>
@@ -32,13 +31,6 @@ namespace
 
 namespace Yt
 {
-	struct RenderPassImpl::Batch2D
-	{
-		RenderBackend::Vertex2D* _vertices = nullptr;
-		uint16_t* _indices = nullptr;
-		size_t _base_index = 0;
-	};
-
 	RenderPassData::RenderPassData() = default;
 
 	RenderPassData::~RenderPassData() noexcept = default;
@@ -50,7 +42,6 @@ namespace Yt
 		, _window_size{ window_size }
 		, _report{ report }
 	{
-		_data._debug_text.clear();
 		_backend.clear();
 	}
 
@@ -62,46 +53,11 @@ namespace Yt
 #endif
 	}
 
-	void RenderPassImpl::add_debug_text(std::string_view text)
-	{
-		append_to(_data._debug_text, text, '\n');
-	}
-
 	void RenderPassImpl::draw_mesh(const Mesh& mesh)
 	{
 		update_state();
 		_report._triangles += _backend.draw_mesh(mesh);
 		++_report._draw_calls;
-	}
-
-	void RenderPassImpl::draw_quad(const Quad& quad, Bgra32 color)
-	{
-		const auto batch = prepare_batch_2d(4, 4);
-
-		batch._vertices[0] = { quad._a, _texture_rect.top_left(), color };
-		batch._vertices[1] = { quad._d, _texture_rect.bottom_left(), color };
-		batch._vertices[2] = { quad._b, _texture_rect.top_right(), color };
-		// cppcheck-suppress unreadVariable
-		batch._vertices[3] = { quad._c, _texture_rect.bottom_right(), color };
-
-		batch._indices[0] = static_cast<uint16_t>(batch._base_index);
-		batch._indices[1] = static_cast<uint16_t>(batch._base_index + 1);
-		batch._indices[2] = static_cast<uint16_t>(batch._base_index + 2);
-		// cppcheck-suppress unreadVariable
-		batch._indices[3] = static_cast<uint16_t>(batch._base_index + 3);
-	}
-
-	void RenderPassImpl::draw_rect(const RectF& rect, Bgra32 color)
-	{
-		draw_rect(rect, _texture_rect, _texture_borders, color);
-	}
-
-	void RenderPassImpl::draw_rects(const std::vector<TexturedRect>& rects, Bgra32 color)
-	{
-		const SizeF texture_size{ current_texture_2d()->size() };
-		const Vector2 texture_scale{ texture_size._width, texture_size._height };
-		for (const auto& rect : rects)
-			draw_rect(rect.geometry, _backend.map_rect(rect.texture / texture_scale, current_texture_2d()->orientation()), color);
 	}
 
 	Matrix4 RenderPassImpl::full_matrix() const
@@ -130,69 +86,9 @@ namespace Yt
 		return { m * Vector3{ xn, yn, 0 }, m * Vector3{ xn, yn, 1 } };
 	}
 
-	void RenderPassImpl::set_texture_rect(const RectF& rect, const MarginsF& borders)
-	{
-		const auto current_texture = current_texture_2d();
-		if (!current_texture)
-			return;
-
-		const SizeF texture_size{ current_texture->size() };
-		const Vector2 texture_scale{ texture_size._width, texture_size._height };
-		const auto texture_rect_size = _texture_rect.size();
-		const auto minimum = SizeF{ borders._left + 1 + borders._right, borders._top + 1 + borders._bottom } / texture_scale;
-		if (texture_rect_size._width < minimum._width || texture_rect_size._height < minimum._height)
-			return;
-
-		_texture_rect = _backend.map_rect(rect / texture_scale, current_texture->orientation());
-		_texture_borders = {
-			borders._top / texture_size._height,
-			borders._right / texture_size._width,
-			borders._bottom / texture_size._height,
-			borders._left / texture_size._width,
-		};
-	}
-
 	SizeF RenderPassImpl::window_size() const
 	{
 		return SizeF{ _window_size };
-	}
-
-	void RenderPassImpl::draw_debug_text()
-	{
-		if (_data._debug_text.empty())
-			return;
-		{
-			DebugRenderer debug{ *this };
-			debug.set_color(Bgra32::white());
-			size_t top = 0;
-			size_t line_begin = 0;
-			auto line_end = _data._debug_text.find('\n', line_begin);
-			while (line_end != std::string::npos)
-			{
-				debug.draw_text(0, top++, { _data._debug_text.data() + line_begin, line_end - line_begin });
-				line_begin = line_end + 1;
-				line_end = _data._debug_text.find('\n', line_begin);
-			}
-			debug.draw_text(0, top, { _data._debug_text.data() + line_begin, _data._debug_text.size() - line_begin });
-		}
-		flush_2d();
-	}
-
-	void RenderPassImpl::draw_rect(const RectF& position, const RectF& texture, Bgra32 color)
-	{
-		auto batch = prepare_batch_2d(4, 4);
-
-		batch._vertices[0] = { position.top_left(), texture.top_left(), color };
-		batch._vertices[1] = { position.bottom_left(), texture.bottom_left(), color };
-		batch._vertices[2] = { position.top_right(), texture.top_right(), color };
-		// cppcheck-suppress unreadVariable
-		batch._vertices[3] = { position.bottom_right(), texture.bottom_right(), color };
-
-		batch._indices[0] = static_cast<uint16_t>(batch._base_index);
-		batch._indices[1] = static_cast<uint16_t>(batch._base_index + 1);
-		batch._indices[2] = static_cast<uint16_t>(batch._base_index + 2);
-		// cppcheck-suppress unreadVariable
-		batch._indices[3] = static_cast<uint16_t>(batch._base_index + 3);
 	}
 
 	void RenderPassImpl::pop_program() noexcept
@@ -203,14 +99,12 @@ namespace Yt
 			--_data._program_stack.back().second;
 			return;
 		}
-		flush_2d();
 		_data._program_stack.pop_back();
 		_reset_program = true;
 	}
 
 	void RenderPassImpl::pop_projection() noexcept
 	{
-		flush_2d();
 		assert(_data._matrix_stack.size() >= 3);
 		assert(_data._matrix_stack.back().second == RenderMatrixType::Model);
 		_data._matrix_stack.pop_back();
@@ -235,10 +129,8 @@ namespace Yt
 		assert(_data._texture_stack.size() > 1 || (_data._texture_stack.size() == 1 && _data._texture_stack.back().second > 1));
 		if (_data._texture_stack.back().second == 1)
 		{
-			flush_2d();
 			_data._texture_stack.pop_back();
 			_reset_texture = true;
-			reset_texture_state();
 		}
 		else
 			--_data._texture_stack.back().second;
@@ -247,7 +139,6 @@ namespace Yt
 
 	void RenderPassImpl::pop_transformation() noexcept
 	{
-		flush_2d();
 		assert(_data._matrix_stack.size() > 3);
 		assert(_data._matrix_stack.back().second == RenderMatrixType::Model);
 		_data._matrix_stack.pop_back();
@@ -262,14 +153,12 @@ namespace Yt
 			++_data._program_stack.back().second;
 			return;
 		}
-		flush_2d();
 		_data._program_stack.emplace_back(program, 1);
 		_reset_program = true;
 	}
 
 	void RenderPassImpl::push_projection_2d(const Matrix4& matrix)
 	{
-		flush_2d();
 		_data._matrix_stack.emplace_back(matrix, RenderMatrixType::Projection);
 		_data._matrix_stack.emplace_back(Matrix4::identity(), RenderMatrixType::View);
 		_data._matrix_stack.emplace_back(Matrix4::identity(), RenderMatrixType::Model);
@@ -277,7 +166,6 @@ namespace Yt
 
 	void RenderPassImpl::push_projection_3d(const Matrix4& projection, const Matrix4& view)
 	{
-		flush_2d();
 		_data._matrix_stack.emplace_back(projection, RenderMatrixType::Projection);
 		_data._matrix_stack.emplace_back(::_3d_directions * view, RenderMatrixType::View);
 		_data._matrix_stack.emplace_back(Matrix4::identity(), RenderMatrixType::Model);
@@ -293,10 +181,8 @@ namespace Yt
 		assert(!_data._texture_stack.empty());
 		if (_data._texture_stack.back().first != texture)
 		{
-			flush_2d();
 			_data._texture_stack.emplace_back(texture, 1);
 			_reset_texture = true;
-			reset_texture_state();
 		}
 		else
 			++_data._texture_stack.back().second;
@@ -315,131 +201,12 @@ namespace Yt
 		return static_cast<const BackendTexture2D*>(_data._texture_stack.back().first);
 	}
 
-	void RenderPassImpl::draw_rect(const RectF& position, const RectF& texture, const MarginsF& borders, Bgra32 color)
+	void RenderPassImpl::flush_2d(const Buffer& vertices, const Buffer& indices) noexcept
 	{
-		const auto px0 = position.left();
-		const auto px1 = position.left() + borders._left * static_cast<float>(current_texture_2d()->size()._width);
-		const auto px2 = position.right() - borders._right * static_cast<float>(current_texture_2d()->size()._width);
-		const auto px3 = position.right();
-
-		const auto py0 = position.top();
-		const auto py1 = position.top() + borders._top * static_cast<float>(current_texture_2d()->size()._height);
-		const auto py2 = position.bottom() - borders._bottom * static_cast<float>(current_texture_2d()->size()._height);
-		const auto py3 = position.bottom();
-
-		const bool has_left_border = px0 != px1;
-		const bool has_right_border = px2 != px3;
-		const bool has_top_border = py0 != py1;
-		const bool has_bottom_border = py2 != py3;
-
-		const auto row_vertices = 2 + static_cast<size_t>(has_left_border) + static_cast<size_t>(has_right_border);
-		const auto stripe_count = 1 + static_cast<size_t>(has_top_border) + static_cast<size_t>(has_bottom_border);
-		const auto vertex_count = row_vertices * (stripe_count + 1);
-		const auto index_count = 2 * (stripe_count * row_vertices + stripe_count - 1);
-
-		auto batch = prepare_batch_2d(vertex_count, index_count);
-
-		const auto tx0 = texture.left();
-		const auto tx1 = texture.left() + borders._left;
-		const auto tx2 = texture.right() - borders._right;
-		const auto tx3 = texture.right();
-
-		const auto ty0 = texture.top();
-		const auto ty3 = texture.bottom();
-
-		*batch._vertices++ = { { px0, py0 }, { tx0, ty0 }, color };
-		if (has_left_border)
-			*batch._vertices++ = { { px1, py0 }, { tx1, ty0 }, color };
-		if (has_right_border)
-			*batch._vertices++ = { { px2, py0 }, { tx2, ty0 }, color };
-		*batch._vertices++ = { { px3, py0 }, { tx3, ty0 }, color };
-		if (has_top_border)
-		{
-			const auto ty1 = texture.top() + borders._top;
-			*batch._vertices++ = { { px0, py1 }, { tx0, ty1 }, color };
-			if (has_left_border)
-				*batch._vertices++ = { { px1, py1 }, { tx1, ty1 }, color };
-			if (has_right_border)
-				*batch._vertices++ = { { px2, py1 }, { tx2, ty1 }, color };
-			*batch._vertices++ = { { px3, py1 }, { tx3, ty1 }, color };
-		}
-		if (has_bottom_border)
-		{
-			const auto ty2 = texture.bottom() - borders._bottom;
-			*batch._vertices++ = { { px0, py2 }, { tx0, ty2 }, color };
-			if (has_left_border)
-				*batch._vertices++ = { { px1, py2 }, { tx1, ty2 }, color };
-			if (has_right_border)
-				*batch._vertices++ = { { px2, py2 }, { tx2, ty2 }, color };
-			*batch._vertices++ = { { px3, py2 }, { tx3, ty2 }, color };
-		}
-		*batch._vertices++ = { { px0, py3 }, { tx0, ty3 }, color };
-		if (has_left_border)
-			*batch._vertices++ = { { px1, py3 }, { tx1, ty3 }, color };
-		if (has_right_border)
-			*batch._vertices++ = { { px2, py3 }, { tx2, ty3 }, color };
-		*batch._vertices = { { px3, py3 }, { tx3, ty3 }, color };
-
-		for (size_t i = 0; i < stripe_count; ++i)
-		{
-			if (i > 0)
-			{
-				*batch._indices++ = static_cast<uint16_t>(batch._base_index + row_vertices - 1);
-				*batch._indices++ = static_cast<uint16_t>(batch._base_index);
-			}
-			for (size_t j = 0; j < row_vertices; ++j)
-			{
-				*batch._indices++ = static_cast<uint16_t>(batch._base_index + j);
-				*batch._indices++ = static_cast<uint16_t>(batch._base_index + j + row_vertices);
-			}
-			batch._base_index += row_vertices;
-		}
-	}
-
-	void RenderPassImpl::flush_2d() noexcept
-	{
-		assert(_data._vertices_2d.size() / sizeof(RenderBackend::Vertex2D) <= size_t{ std::numeric_limits<uint16_t>::max() } + 1);
-		if (_data._vertices_2d.size() == 0)
-			return;
-
-		_builtin._program_2d->set_uniform("mvp", full_matrix());
 		update_state();
-		_backend.flush_2d(_data._vertices_2d, _data._indices_2d);
-		_report._triangles += _data._indices_2d.size() / sizeof(uint16_t) - 2;
+		_backend.flush_2d(vertices, indices);
+		_report._triangles += indices.size() / sizeof(uint16_t) - 2;
 		++_report._draw_calls;
-		_data._vertices_2d.clear();
-		_data._indices_2d.clear();
-	}
-
-	void RenderPassImpl::reset_texture_state()
-	{
-		const auto* texture = current_texture_2d();
-		_texture_rect = texture ? texture->full_rectangle() : RectF{};
-		_texture_borders = {};
-	}
-
-	RenderPassImpl::Batch2D RenderPassImpl::prepare_batch_2d(size_t vertex_count, size_t index_count)
-	{
-		auto next_index = _data._vertices_2d.size() / sizeof(RenderBackend::Vertex2D);
-		if (next_index > std::numeric_limits<uint16_t>::max() - vertex_count)
-		{
-			flush_2d();
-			next_index = 0;
-		}
-		const auto vertex_buffer_size = _data._vertices_2d.size() + sizeof(RenderBackend::Vertex2D) * vertex_count;
-		const auto index_buffer_size = _data._indices_2d.size() + sizeof(uint16_t) * (index_count + (next_index > 0 ? 2 : 0));
-		_data._vertices_2d.reserve(vertex_buffer_size);
-		_data._indices_2d.reserve(index_buffer_size);
-		auto* const vertices = reinterpret_cast<RenderBackend::Vertex2D*>(_data._vertices_2d.end());
-		auto* indices = reinterpret_cast<uint16_t*>(_data._indices_2d.end());
-		_data._vertices_2d.resize(vertex_buffer_size);
-		_data._indices_2d.resize(index_buffer_size);
-		if (next_index > 0)
-		{
-			*indices++ = static_cast<uint16_t>(next_index - 1);
-			*indices++ = static_cast<uint16_t>(next_index);
-		}
-		return { vertices, indices, next_index };
 	}
 
 	void RenderPassImpl::update_state()

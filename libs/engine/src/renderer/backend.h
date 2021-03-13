@@ -19,13 +19,6 @@ namespace Yt
 	class RenderBackend
 	{
 	public:
-		struct Vertex2D
-		{
-			Vector2 _position;
-			Vector2 _texture;
-			Bgra32 _color;
-		};
-
 		virtual ~RenderBackend() noexcept = default;
 
 		virtual void clear() = 0;
