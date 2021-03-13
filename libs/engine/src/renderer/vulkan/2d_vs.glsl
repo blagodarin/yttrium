@@ -4,8 +4,8 @@
 #extension GL_ARB_shading_language_420pack : enable
 
 layout(location=0) in vec2 i_position;
-layout(location=1) in vec4 i_color;
-layout(location=2) in vec2 i_texcoord;
+layout(location=1) in vec2 i_texcoord;
+layout(location=2) in vec4 i_color;
 
 layout(std140,binding=0) uniform buffer
 {

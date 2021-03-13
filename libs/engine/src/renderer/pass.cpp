@@ -1,19 +1,6 @@
-//
 // This file is part of the Yttrium toolkit.
-// Copyright (C) 2019 Sergei Blagodarin.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+// Copyright (C) Sergei Blagodarin.
+// SPDX-License-Identifier: Apache-2.0
 
 #include "pass.h"
 
@@ -87,15 +74,15 @@ namespace Yt
 		++_report._draw_calls;
 	}
 
-	void RenderPassImpl::draw_quad(const Quad& quad, const Color4f& color)
+	void RenderPassImpl::draw_quad(const Quad& quad, Bgra32 color)
 	{
 		const auto batch = prepare_batch_2d(4, 4);
 
-		batch._vertices[0] = { quad._a, color, _texture_rect.top_left() };
-		batch._vertices[1] = { quad._d, color, _texture_rect.bottom_left() };
-		batch._vertices[2] = { quad._b, color, _texture_rect.top_right() };
+		batch._vertices[0] = { quad._a, _texture_rect.top_left(), color };
+		batch._vertices[1] = { quad._d, _texture_rect.bottom_left(), color };
+		batch._vertices[2] = { quad._b, _texture_rect.top_right(), color };
 		// cppcheck-suppress unreadVariable
-		batch._vertices[3] = { quad._c, color, _texture_rect.bottom_right() };
+		batch._vertices[3] = { quad._c, _texture_rect.bottom_right(), color };
 
 		batch._indices[0] = static_cast<uint16_t>(batch._base_index);
 		batch._indices[1] = static_cast<uint16_t>(batch._base_index + 1);
@@ -104,17 +91,17 @@ namespace Yt
 		batch._indices[3] = static_cast<uint16_t>(batch._base_index + 3);
 	}
 
-	void RenderPassImpl::draw_rect(const RectF& rect, const Color4f& color)
+	void RenderPassImpl::draw_rect(const RectF& rect, Bgra32 color)
 	{
-		draw_rect(rect, color, _texture_rect, _texture_borders);
+		draw_rect(rect, _texture_rect, _texture_borders, color);
 	}
 
-	void RenderPassImpl::draw_rects(const std::vector<TexturedRect>& rects, const Color4f& color)
+	void RenderPassImpl::draw_rects(const std::vector<TexturedRect>& rects, Bgra32 color)
 	{
 		const SizeF texture_size{ current_texture_2d()->size() };
 		const Vector2 texture_scale{ texture_size._width, texture_size._height };
 		for (const auto& rect : rects)
-			draw_rect(rect.geometry, color, _backend.map_rect(rect.texture / texture_scale, current_texture_2d()->orientation()));
+			draw_rect(rect.geometry, _backend.map_rect(rect.texture / texture_scale, current_texture_2d()->orientation()), color);
 	}
 
 	Matrix4 RenderPassImpl::full_matrix() const
@@ -176,7 +163,7 @@ namespace Yt
 			return;
 		{
 			DebugRenderer debug{ *this };
-			debug.set_color(1, 1, 1);
+			debug.set_color(Bgra32::white());
 			size_t top = 0;
 			size_t line_begin = 0;
 			auto line_end = _data._debug_text.find('\n', line_begin);
@@ -191,15 +178,15 @@ namespace Yt
 		flush_2d();
 	}
 
-	void RenderPassImpl::draw_rect(const RectF& position, const Color4f& color, const RectF& texture)
+	void RenderPassImpl::draw_rect(const RectF& position, const RectF& texture, Bgra32 color)
 	{
 		auto batch = prepare_batch_2d(4, 4);
 
-		batch._vertices[0] = { position.top_left(), color, texture.top_left() };
-		batch._vertices[1] = { position.bottom_left(), color, texture.bottom_left() };
-		batch._vertices[2] = { position.top_right(), color, texture.top_right() };
+		batch._vertices[0] = { position.top_left(), texture.top_left(), color };
+		batch._vertices[1] = { position.bottom_left(), texture.bottom_left(), color };
+		batch._vertices[2] = { position.top_right(), texture.top_right(), color };
 		// cppcheck-suppress unreadVariable
-		batch._vertices[3] = { position.bottom_right(), color, texture.bottom_right() };
+		batch._vertices[3] = { position.bottom_right(), texture.bottom_right(), color };
 
 		batch._indices[0] = static_cast<uint16_t>(batch._base_index);
 		batch._indices[1] = static_cast<uint16_t>(batch._base_index + 1);
@@ -328,7 +315,7 @@ namespace Yt
 		return static_cast<const BackendTexture2D*>(_data._texture_stack.back().first);
 	}
 
-	void RenderPassImpl::draw_rect(const RectF& position, const Color4f& color, const RectF& texture, const MarginsF& borders)
+	void RenderPassImpl::draw_rect(const RectF& position, const RectF& texture, const MarginsF& borders, Bgra32 color)
 	{
 		const auto px0 = position.left();
 		const auto px1 = position.left() + borders._left * static_cast<float>(current_texture_2d()->size()._width);
@@ -360,38 +347,38 @@ namespace Yt
 		const auto ty0 = texture.top();
 		const auto ty3 = texture.bottom();
 
-		*batch._vertices++ = { { px0, py0 }, color, { tx0, ty0 } };
+		*batch._vertices++ = { { px0, py0 }, { tx0, ty0 }, color };
 		if (has_left_border)
-			*batch._vertices++ = { { px1, py0 }, color, { tx1, ty0 } };
+			*batch._vertices++ = { { px1, py0 }, { tx1, ty0 }, color };
 		if (has_right_border)
-			*batch._vertices++ = { { px2, py0 }, color, { tx2, ty0 } };
-		*batch._vertices++ = { { px3, py0 }, color, { tx3, ty0 } };
+			*batch._vertices++ = { { px2, py0 }, { tx2, ty0 }, color };
+		*batch._vertices++ = { { px3, py0 }, { tx3, ty0 }, color };
 		if (has_top_border)
 		{
 			const auto ty1 = texture.top() + borders._top;
-			*batch._vertices++ = { { px0, py1 }, color, { tx0, ty1 } };
+			*batch._vertices++ = { { px0, py1 }, { tx0, ty1 }, color };
 			if (has_left_border)
-				*batch._vertices++ = { { px1, py1 }, color, { tx1, ty1 } };
+				*batch._vertices++ = { { px1, py1 }, { tx1, ty1 }, color };
 			if (has_right_border)
-				*batch._vertices++ = { { px2, py1 }, color, { tx2, ty1 } };
-			*batch._vertices++ = { { px3, py1 }, color, { tx3, ty1 } };
+				*batch._vertices++ = { { px2, py1 }, { tx2, ty1 }, color };
+			*batch._vertices++ = { { px3, py1 }, { tx3, ty1 }, color };
 		}
 		if (has_bottom_border)
 		{
 			const auto ty2 = texture.bottom() - borders._bottom;
-			*batch._vertices++ = { { px0, py2 }, color, { tx0, ty2 } };
+			*batch._vertices++ = { { px0, py2 }, { tx0, ty2 }, color };
 			if (has_left_border)
-				*batch._vertices++ = { { px1, py2 }, color, { tx1, ty2 } };
+				*batch._vertices++ = { { px1, py2 }, { tx1, ty2 }, color };
 			if (has_right_border)
-				*batch._vertices++ = { { px2, py2 }, color, { tx2, ty2 } };
-			*batch._vertices++ = { { px3, py2 }, color, { tx3, ty2 } };
+				*batch._vertices++ = { { px2, py2 }, { tx2, ty2 }, color };
+			*batch._vertices++ = { { px3, py2 }, { tx3, ty2 }, color };
 		}
-		*batch._vertices++ = { { px0, py3 }, color, { tx0, ty3 } };
+		*batch._vertices++ = { { px0, py3 }, { tx0, ty3 }, color };
 		if (has_left_border)
-			*batch._vertices++ = { { px1, py3 }, color, { tx1, ty3 } };
+			*batch._vertices++ = { { px1, py3 }, { tx1, ty3 }, color };
 		if (has_right_border)
-			*batch._vertices++ = { { px2, py3 }, color, { tx2, ty3 } };
-		*batch._vertices = { { px3, py3 }, color, { tx3, ty3 } };
+			*batch._vertices++ = { { px2, py3 }, { tx2, ty3 }, color };
+		*batch._vertices = { { px3, py3 }, { tx3, ty3 }, color };
 
 		for (size_t i = 0; i < stripe_count; ++i)
 		{

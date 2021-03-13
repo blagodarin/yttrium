@@ -129,22 +129,27 @@ namespace Yt
 		return *this = ion.read();
 	}
 
-	Color4f IonToken::to_color() const
+	Bgra32 IonToken::to_color() const
 	{
 		if (_type != Type::ColorValue)
 			throw IonError{ _line, _column, "ION color expected" };
 
 		const auto d = [this](std::size_t i) {
 			const auto c = _text[i];
-			return static_cast<float>(c < 'a' ? c - '0' : c - 'a' + 10);
+			return c < 'a' ? c - '0' : c - 'a' + 10;
+		};
+
+		const auto dd = [&d](std::size_t i) {
+			const auto value = d(i);
+			return value * 16 + value;
 		};
 
 		switch (_text.size())
 		{
-		case 4: return { d(1) / 15.f, d(2) / 15.f, d(3) / 15.f };
-		case 5: return { d(1) / 15.f, d(2) / 15.f, d(3) / 15.f, d(4) / 15.f };
-		case 7: return { (d(1) * 16 + d(2)) / 255.f, (d(3) * 16 + d(4)) / 255.f, (d(5) * 16 + d(6)) / 255.f };
-		case 9: return { (d(1) * 16 + d(2)) / 255.f, (d(3) * 16 + d(4)) / 255.f, (d(5) * 16 + d(6)) / 255.f, (d(7) * 16 + d(8)) / 255.f };
+		case 4: return Bgra32{ dd(3), dd(2), dd(1) };
+		case 5: return Bgra32{ dd(3), dd(2), dd(1), dd(4) };
+		case 7: return Bgra32{ d(5) * 16 + d(6), d(3) * 16 + d(4), d(1) * 16 + d(2) };
+		case 9: return Bgra32{ d(5) * 16 + d(6), d(3) * 16 + d(4), d(1) * 16 + d(2), d(7) * 16 + d(8) };
 		default: throw IonError{ _line, _column, "Bad ION color" };
 		}
 	}

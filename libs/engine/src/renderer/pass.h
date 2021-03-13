@@ -1,19 +1,6 @@
-//
 // This file is part of the Yttrium toolkit.
-// Copyright (C) 2019 Sergei Blagodarin.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+// Copyright (C) Sergei Blagodarin.
+// SPDX-License-Identifier: Apache-2.0
 
 #pragma once
 
@@ -75,9 +62,9 @@ namespace Yt
 
 		void add_debug_text(std::string_view) override;
 		void draw_mesh(const Mesh&) override;
-		void draw_quad(const Quad&, const Color4f&) override;
-		void draw_rect(const RectF&, const Color4f&) override;
-		void draw_rects(const std::vector<TexturedRect>&, const Color4f&) override;
+		void draw_quad(const Quad&, Bgra32) override;
+		void draw_rect(const RectF&, Bgra32) override;
+		void draw_rects(const std::vector<TexturedRect>&, Bgra32) override;
 		Matrix4 full_matrix() const override;
 		Matrix4 model_matrix() const override;
 		Line3 pixel_ray(const Vector2&) const override;
@@ -87,7 +74,7 @@ namespace Yt
 	public:
 		RenderBuiltin& builtin() const noexcept { return _builtin; }
 		void draw_debug_text();
-		void draw_rect(const RectF& position, const Color4f&, const RectF& texture);
+		void draw_rect(const RectF& position, const RectF& texture, Bgra32);
 		void pop_program() noexcept;
 		void pop_projection() noexcept;
 		void pop_texture(Flags<Texture2D::Filter>) noexcept;
@@ -102,7 +89,7 @@ namespace Yt
 		struct Batch2D;
 
 		const BackendTexture2D* current_texture_2d() const;
-		void draw_rect(const RectF& position, const Color4f&, const RectF& texture, const MarginsF& borders);
+		void draw_rect(const RectF& position, const RectF& texture, const MarginsF& borders, Bgra32);
 		void flush_2d() noexcept;
 		Batch2D prepare_batch_2d(size_t vertex_count, size_t index_count);
 		void reset_texture_state();

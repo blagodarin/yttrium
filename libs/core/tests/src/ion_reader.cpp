@@ -98,10 +98,10 @@ TEST_CASE("ion.reader.token.to_color")
 		return IonToken{ 1, 1, IonToken::Type::ColorValue, text }.to_color();
 	};
 
-	CHECK(color("#00f") == Yt::Color4f(0.f, 0.f, 1.f, 1.f));
-	CHECK(color("#f0f0") == Yt::Color4f(1.f, 0.f, 1.f, 0.f));
-	CHECK(color("#0000ff") == Yt::Color4f(0.f, 0.f, 1.f, 1.f));
-	CHECK(color("#ff00ff00") == Yt::Color4f(1.f, 0.f, 1.f, 0.f));
+	CHECK(color("#00f") == Yt::Bgra32::blue());
+	CHECK(color("#f0f0") == Yt::Bgra32::magenta(0));
+	CHECK(color("#0000ff") == Yt::Bgra32::blue());
+	CHECK(color("#ff00ff00") == Yt::Bgra32::magenta(0));
 
 	CHECK_THROWS_AS(color("#"), IonError);
 	CHECK_THROWS_AS(color("#1"), IonError);

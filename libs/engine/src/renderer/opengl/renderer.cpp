@@ -1,19 +1,6 @@
-//
 // This file is part of the Yttrium toolkit.
-// Copyright (C) 2019 Sergei Blagodarin.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+// Copyright (C) Sergei Blagodarin.
+// SPDX-License-Identifier: Apache-2.0
 
 #include "renderer.h"
 
@@ -66,11 +53,11 @@ namespace Yt
 		_2d_vbo.initialize(GL_DYNAMIC_DRAW, 0, nullptr); // The next line fails without this.
 		_2d_vao.bind_vertex_buffer(0, _2d_vbo.get(), 0, sizeof(Vertex2D));
 		_2d_vao.vertex_attrib_binding(0, 0);
-		_2d_vao.vertex_attrib_format(0, 4, GL_FLOAT, GL_FALSE, offsetof(Vertex2D, position));
+		_2d_vao.vertex_attrib_format(0, 2, GL_FLOAT, GL_FALSE, offsetof(Vertex2D, _position));
 		_2d_vao.vertex_attrib_binding(1, 0);
-		_2d_vao.vertex_attrib_format(1, 4, GL_FLOAT, GL_FALSE, offsetof(Vertex2D, color));
+		_2d_vao.vertex_attrib_format(1, 2, GL_FLOAT, GL_FALSE, offsetof(Vertex2D, _texture));
 		_2d_vao.vertex_attrib_binding(2, 0);
-		_2d_vao.vertex_attrib_format(2, 2, GL_FLOAT, GL_FALSE, offsetof(Vertex2D, texture));
+		_2d_vao.vertex_attrib_format(2, GL_BGRA, GL_UNSIGNED_BYTE, GL_TRUE, offsetof(Vertex2D, _color));
 	}
 
 	GlRenderer::~GlRenderer() noexcept = default;

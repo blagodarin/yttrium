@@ -35,7 +35,7 @@ namespace Yt
 		if (capture._has_selection)
 		{
 			auto selection_color = style_data._foreground._color;
-			selection_color._a *= .25f;
+			selection_color._a /= 4;
 			PushTexture push_texture{ pass, nullptr };
 			pass.draw_rect(capture._selection_rect, selection_color);
 		}

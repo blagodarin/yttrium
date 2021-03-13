@@ -42,7 +42,7 @@ namespace Yt
 
 	struct BackgroundProperty
 	{
-		Color4f color{ 1, 1, 1 };
+		Bgra32 color = Bgra32::white();
 		std::shared_ptr<const Texture2D> texture;
 		Texture2D::Filter texture_filter = Texture2D::TrilinearFilter;
 		RectF texture_rect;
@@ -58,7 +58,7 @@ namespace Yt
 	public:
 		std::shared_ptr<const Font> _font;
 		float _size = .75f;
-		Color4f _color{ 1, 1, 1 };
+		Bgra32 _color = Bgra32::white();
 		unsigned _alignment = 0;
 
 		ForegroundProperty();

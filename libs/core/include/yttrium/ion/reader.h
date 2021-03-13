@@ -24,7 +24,7 @@
 
 namespace Yt
 {
-	class Color4f;
+	class Bgra32;
 	class Source;
 
 	class Y_CORE_API IonToken
@@ -58,7 +58,7 @@ namespace Yt
 		void check_object_begin() const;
 		void check_object_end() const;
 		IonToken& next(class IonReader&);
-		Color4f to_color() const;
+		Bgra32 to_color() const;
 		std::string_view to_name() const;
 		std::string_view to_value() const;
 

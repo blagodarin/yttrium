@@ -1,19 +1,6 @@
-//
 // This file is part of the Yttrium toolkit.
-// Copyright (C) 2019 Sergei Blagodarin.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+// Copyright (C) Sergei Blagodarin.
+// SPDX-License-Identifier: Apache-2.0
 
 #include "debug_renderer.h"
 
@@ -25,14 +12,14 @@
 
 namespace
 {
-	void draw_debug_char(Yt::RenderPassImpl& pass, size_t x, size_t y, size_t width, size_t height, const Yt::Color4f& color, uint8_t value)
+	void draw_debug_char(Yt::RenderPassImpl& pass, size_t x, size_t y, size_t width, size_t height, Yt::Bgra32 color, uint8_t value)
 	{
 		pass.draw_rect(
 			{ { static_cast<float>(x * Yt::DebugTexture::char_width), static_cast<float>(y * Yt::DebugTexture::char_height) },
 				Yt::SizeF{ static_cast<float>(width * Yt::DebugTexture::char_width), static_cast<float>(height * Yt::DebugTexture::char_height) } },
-			color,
 			{ { Yt::DebugTexture::coords[value][0][0], Yt::DebugTexture::coords[value][0][1] },
-				Yt::Vector2{ Yt::DebugTexture::coords[value][1][0], Yt::DebugTexture::coords[value][1][1] } });
+				Yt::Vector2{ Yt::DebugTexture::coords[value][1][0], Yt::DebugTexture::coords[value][1][1] } },
+			color);
 	}
 }
 
@@ -70,8 +57,8 @@ namespace Yt
 		return static_cast<size_t>(_pass.window_size()._width) / DebugTexture::char_width;
 	}
 
-	void DebugRenderer::set_color(float r, float g, float b, float a)
+	void DebugRenderer::set_color(Bgra32 color)
 	{
-		_color = { r, g, b, a };
+		_color = color;
 	}
 }

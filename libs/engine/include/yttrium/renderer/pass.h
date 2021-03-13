@@ -34,13 +34,13 @@ namespace Yt
 		virtual void draw_mesh(const Mesh&) = 0;
 
 		///
-		virtual void draw_quad(const Quad&, const Color4f& = { 1, 1, 1 }) = 0;
+		virtual void draw_quad(const Quad&, Bgra32 = Bgra32::white()) = 0;
 
 		///
-		virtual void draw_rect(const RectF&, const Color4f& = { 1, 1, 1 }) = 0;
+		virtual void draw_rect(const RectF&, Bgra32 = Bgra32::white()) = 0;
 
 		///
-		virtual void draw_rects(const std::vector<TexturedRect>&, const Color4f& = { 1, 1, 1 }) = 0;
+		virtual void draw_rects(const std::vector<TexturedRect>&, Bgra32 = Bgra32::white()) = 0;
 
 		///
 		virtual Matrix4 full_matrix() const = 0;
