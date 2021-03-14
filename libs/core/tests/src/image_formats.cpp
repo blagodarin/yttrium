@@ -1,19 +1,6 @@
-//
 // This file is part of the Yttrium toolkit.
-// Copyright (C) 2019 Sergei Blagodarin.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+// Copyright (C) Sergei Blagodarin.
+// SPDX-License-Identifier: Apache-2.0
 
 #include "image_formats.h"
 
@@ -82,17 +69,31 @@ TEST_CASE("image.load_tga32")
 	CHECK(*image == ::make_test_image(true));
 }
 
-TEST_CASE("image.save_jpg24")
+TEST_CASE("image.save_jpg24.right_down")
 {
 	Yt::TemporaryFile file;
-	REQUIRE(::make_test_image(false).save(Yt::Writer{ file }, Yt::ImageFormat::Jpeg));
+	REQUIRE(::make_test_image(false, Yt::ImageOrientation::XRightYDown).save(Yt::Writer{ file }, Yt::ImageFormat::Jpeg));
 	CHECK(Yt::Source::from(file)->to_buffer() == Yt::Source::from("gradient24.jpg")->to_buffer());
 }
 
-TEST_CASE("image.save_png24")
+TEST_CASE("image.save_jpg24.right_up")
 {
 	Yt::TemporaryFile file;
-	REQUIRE(::make_test_image(false).save(Yt::Writer{ file }, Yt::ImageFormat::Png));
+	REQUIRE(::make_test_image(false, Yt::ImageOrientation::XRightYUp).save(Yt::Writer{ file }, Yt::ImageFormat::Jpeg));
+	CHECK(Yt::Source::from(file)->to_buffer() == Yt::Source::from("gradient24.jpg")->to_buffer());
+}
+
+TEST_CASE("image.save_png24.right_down")
+{
+	Yt::TemporaryFile file;
+	REQUIRE(::make_test_image(false, Yt::ImageOrientation::XRightYDown).save(Yt::Writer{ file }, Yt::ImageFormat::Png));
+	CHECK(Yt::Source::from(file)->to_buffer() == Yt::Source::from("gradient24.png")->to_buffer());
+}
+
+TEST_CASE("image.save_png24.right_up")
+{
+	Yt::TemporaryFile file;
+	REQUIRE(::make_test_image(false, Yt::ImageOrientation::XRightYUp).save(Yt::Writer{ file }, Yt::ImageFormat::Png));
 	CHECK(Yt::Source::from(file)->to_buffer() == Yt::Source::from("gradient24.png")->to_buffer());
 }
 
