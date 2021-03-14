@@ -6,6 +6,7 @@
 
 #include <yttrium/application/key.h>
 #include <yttrium/application/window.h>
+#include <yttrium/gui/font.h>
 #include <yttrium/math/rect.h>
 #include <yttrium/renderer/2d.h>
 
@@ -32,6 +33,7 @@ namespace Yt
 		std::string _cursorItem;
 		Key _cursorItemKey = Key::Null;
 		GuiButtonStyle _buttonStyle;
+		std::shared_ptr<const Font> _defaultFont;
 
 		explicit GuiStateData(Window& window) noexcept
 			: _window{ window } {}
@@ -88,12 +90,17 @@ namespace Yt
 		_data->_inputEvents.emplace_back(encodedEvent);
 	}
 
+	void GuiState::setDefaultFont(const std::shared_ptr<const Font>& font) noexcept
+	{
+		_data->_defaultFont = font;
+	}
+
 	GuiFrame::GuiFrame(GuiState& state, Renderer2D& renderer)
 		: _state{ *state._data }
 		, _renderer{ renderer }
 	{
 		_state._cursor.emplace(_state._window.cursor());
-		_state._buttonStyle = {};
+		setButtonStyle({});
 	}
 
 	GuiFrame::~GuiFrame() noexcept
@@ -106,7 +113,7 @@ namespace Yt
 		_state._inputEvents.clear();
 	}
 
-	bool GuiFrame::button(std::string_view id, const RectF& rect)
+	bool GuiFrame::button(std::string_view id, std::string_view text, const RectF& rect)
 	{
 		assert(!id.empty());
 		bool clicked = false;
@@ -150,6 +157,12 @@ namespace Yt
 		}
 		_renderer.setTexture({});
 		_renderer.addRect(rect, styleState->_backgroundColor);
+		if (_state._buttonStyle._font)
+		{
+			const auto fontSize = rect.height() * _state._buttonStyle._fontSize;
+			const auto textSize = _state._buttonStyle._font->text_size(text, { 1, fontSize });
+			_state._buttonStyle._font->render(_renderer, styleState->_textColor, rect.top_left() + Vector2{ rect.width() - textSize._width, rect.height() - textSize._height } / 2, fontSize, text);
+		}
 		return clicked;
 	}
 
@@ -190,8 +203,10 @@ namespace Yt
 		return captured;
 	}
 
-	void GuiFrame::setButtonStyle(const GuiButtonStyle& style)
+	void GuiFrame::setButtonStyle(const GuiButtonStyle& style) noexcept
 	{
 		_state._buttonStyle = style;
+		if (!_state._buttonStyle._font)
+			_state._buttonStyle._font = _state._defaultFont;
 	}
 }

@@ -8,6 +8,7 @@
 #include <yttrium/gui/text_capture.h>
 #include <yttrium/image/image.h>
 #include <yttrium/math/size.h>
+#include <yttrium/renderer/2d.h>
 #include <yttrium/renderer/manager.h>
 #include <yttrium/renderer/texture.h>
 #include <yttrium/renderer/textured_rect.h>
@@ -161,6 +162,30 @@ namespace Yt
 			do_capture(text.size());
 		}
 
+		void render(Renderer2D& renderer, Bgra32 color, const Vector2& topLeft, float fontSize, std::string_view text) const override
+		{
+			renderer.setTexture(_texture);
+			auto x = topLeft.x;
+			const auto y = topLeft.y;
+			const auto scaling = fontSize / static_cast<float>(_size);
+			auto previous = _chars.end();
+			for (size_t i = 0; i < text.size();)
+			{
+				const auto offset = i;
+				const auto current = _chars.find(primal::readUtf8(text, i));
+				if (current == _chars.end())
+					continue;
+				if (_has_kerning && previous != _chars.end())
+					x += static_cast<float>(kerning(previous->second.glyph_index, current->second.glyph_index)) * scaling;
+				renderer.setTextureRect(Yt::RectF{ current->second.rect });
+				renderer.addRect({ { x + static_cast<float>(current->second.offset._x) * scaling, y + static_cast<float>(current->second.offset._y) * scaling },
+									 SizeF(current->second.rect.size()) * scaling },
+					color);
+				x += static_cast<float>(current->second.advance) * scaling;
+				previous = current;
+			}
+		}
+
 		Size text_size(std::string_view text) const override
 		{
 			int width = 0;
@@ -208,8 +233,8 @@ namespace Yt
 		std::shared_ptr<const Texture2D> _texture;
 	};
 
-	std::unique_ptr<Font> Font::load(const Source& source, RenderManager& render_manager)
+	std::shared_ptr<const Font> Font::load(const Source& source, RenderManager& render_manager)
 	{
-		return std::make_unique<FontImpl>(source, render_manager, 64);
+		return std::make_shared<FontImpl>(source, render_manager, 64);
 	}
 }
