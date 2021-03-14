@@ -106,7 +106,7 @@ namespace Yt
 			_texture = render_manager.create_texture_2d(_image);
 		}
 
-		void render(Renderer2D& renderer, Bgra32 color, const Vector2& topLeft, float fontSize, std::string_view text, TextCapture* capture) const override
+		void render(Renderer2D& renderer, const Vector2& topLeft, float fontSize, std::string_view text, TextCapture* capture) const override
 		{
 			auto x = topLeft.x;
 			const auto y = topLeft.y;
@@ -146,8 +146,7 @@ namespace Yt
 					x += static_cast<float>(kerning(previous->second.glyph_index, current->second.glyph_index)) * scaling;
 				renderer.setTextureRect(Yt::RectF{ current->second.rect });
 				renderer.addRect({ { x + static_cast<float>(current->second.offset._x) * scaling, y + static_cast<float>(current->second.offset._y) * scaling },
-									 SizeF(current->second.rect.size()) * scaling },
-					color);
+					SizeF(current->second.rect.size()) * scaling });
 				do_capture(offset);
 				x += static_cast<float>(current->second.advance) * scaling;
 				previous = current;

@@ -156,12 +156,14 @@ namespace Yt
 			}
 		}
 		_renderer.setTexture({});
-		_renderer.addRect(rect, styleState->_backgroundColor);
+		_renderer.setColor(styleState->_backgroundColor);
+		_renderer.addRect(rect);
 		if (_state._buttonStyle._font)
 		{
 			const auto fontSize = rect.height() * _state._buttonStyle._fontSize;
 			const auto textSize = _state._buttonStyle._font->text_size(text, { 1, fontSize });
-			_state._buttonStyle._font->render(_renderer, styleState->_textColor, rect.top_left() + Vector2{ rect.width() - textSize._width, rect.height() - textSize._height } / 2, fontSize, text);
+			_renderer.setColor(styleState->_textColor);
+			_state._buttonStyle._font->render(_renderer, rect.top_left() + Vector2{ rect.width() - textSize._width, rect.height() - textSize._height } / 2, fontSize, text);
 		}
 		return clicked;
 	}

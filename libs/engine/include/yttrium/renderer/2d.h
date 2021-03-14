@@ -25,9 +25,10 @@ namespace Yt
 		explicit Renderer2D(Viewport&);
 		~Renderer2D() noexcept;
 
-		void addQuad(const Quad&, Bgra32 = Bgra32::white());
-		void addRect(const RectF&, Bgra32 = Bgra32::white());
+		void addQuad(const Quad&);
+		void addRect(const RectF&);
 		void draw(RenderPass&);
+		void setColor(Bgra32);
 		void setTexture(const std::shared_ptr<const Texture2D>&);
 		void setTextureRect(const RectF&, const MarginsF& = {});
 

@@ -35,6 +35,7 @@ namespace Yt
 		const ViewportData& _viewportData;
 		std::vector<Part> _parts;
 		Part* _currentPart = nullptr;
+		Bgra32 _color = Bgra32::white();
 		RectF _textureRect;
 		MarginsF _textureBorders;
 
@@ -49,6 +50,7 @@ namespace Yt
 			: _viewportData{ viewportData }
 			, _currentPart{ &_parts.emplace_back(_viewportData._renderer_builtin._white_texture) }
 		{
+			_textureRect = static_cast<const BackendTexture2D*>(_currentPart->_texture.get())->full_rectangle();
 		}
 
 		void addRect(const RectF& position, const RectF& texture, Bgra32 color)
@@ -205,14 +207,14 @@ namespace Yt
 
 	Renderer2D::~Renderer2D() noexcept = default;
 
-	void Renderer2D::addQuad(const Quad& quad, Bgra32 color)
+	void Renderer2D::addQuad(const Quad& quad)
 	{
 		const auto batch = _data->prepareBatch(4, 4);
 
-		batch._vertices[0] = { quad._a, _data->_textureRect.top_left(), color };
-		batch._vertices[1] = { quad._d, _data->_textureRect.bottom_left(), color };
-		batch._vertices[2] = { quad._b, _data->_textureRect.top_right(), color };
-		batch._vertices[3] = { quad._c, _data->_textureRect.bottom_right(), color };
+		batch._vertices[0] = { quad._a, _data->_textureRect.top_left(), _data->_color };
+		batch._vertices[1] = { quad._d, _data->_textureRect.bottom_left(), _data->_color };
+		batch._vertices[2] = { quad._b, _data->_textureRect.top_right(), _data->_color };
+		batch._vertices[3] = { quad._c, _data->_textureRect.bottom_right(), _data->_color };
 
 		batch._indices[0] = static_cast<uint16_t>(batch._baseIndex);
 		batch._indices[1] = static_cast<uint16_t>(batch._baseIndex + 1);
@@ -220,9 +222,9 @@ namespace Yt
 		batch._indices[3] = static_cast<uint16_t>(batch._baseIndex + 3);
 	}
 
-	void Renderer2D::addRect(const RectF& rect, Bgra32 color)
+	void Renderer2D::addRect(const RectF& rect)
 	{
-		_data->addRect(rect, _data->_textureRect, _data->_textureBorders, color);
+		_data->addRect(rect, _data->_textureRect, _data->_textureBorders, _data->_color);
 	}
 
 	void Renderer2D::draw(RenderPass& pass)
@@ -247,8 +249,14 @@ namespace Yt
 			part._texture = _data->_viewportData._renderer_builtin._white_texture;
 		}
 		_data->_currentPart = &_data->_parts.front();
+		_data->_color = Bgra32::white();
 		_data->_textureRect = static_cast<const BackendTexture2D*>(_data->_currentPart->_texture.get())->full_rectangle();
 		_data->_textureBorders = {};
+	}
+
+	void Renderer2D::setColor(Bgra32 color)
+	{
+		_data->_color = color;
 	}
 
 	void Renderer2D::setTexture(const std::shared_ptr<const Texture2D>& texture)
