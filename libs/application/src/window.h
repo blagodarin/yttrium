@@ -13,7 +13,6 @@
 namespace Yt
 {
 	class RenderPass;
-	struct RenderReport;
 	class Window;
 
 	class WindowPrivate final : private WindowBackendCallbacks
@@ -22,7 +21,6 @@ namespace Yt
 		explicit WindowPrivate(Application&);
 
 		bool process_events() { return _backend.process_events(); }
-		void render(RenderReport& next_report, const RenderReport& last_report);
 		void update();
 
 	private:

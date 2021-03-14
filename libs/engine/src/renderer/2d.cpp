@@ -155,14 +155,7 @@ namespace Yt
 			auto nextIndex = _currentPart->_vertices.size() / sizeof(Vertex2D);
 			if (nextIndex > std::numeric_limits<uint16_t>::max() - vertexCount)
 			{
-				const auto& currentTexture = _currentPart->_texture;
-				if (_currentPart == &_parts.back())
-					_currentPart = &_parts.emplace_back(currentTexture);
-				else
-				{
-					++_currentPart;
-					_currentPart->_texture = currentTexture;
-				}
+				advancePart(_currentPart->_texture);
 				nextIndex = 0;
 			}
 			const auto vertexBufferSize = _currentPart->_vertices.size() + sizeof(Vertex2D) * vertexCount;
@@ -186,11 +179,23 @@ namespace Yt
 			assert(texture);
 			if (_currentPart->_texture != texture)
 				if (_currentPart->_vertices.size() > 0)
-					_currentPart = &_parts.emplace_back(texture);
+					advancePart(texture);
 				else
 					_currentPart->_texture = texture;
 			_textureRect = static_cast<const BackendTexture2D*>(texture.get())->full_rectangle();
 			_textureBorders = {};
+		}
+
+	private:
+		void advancePart(const std::shared_ptr<const Texture2D>& texture)
+		{
+			if (_currentPart != &_parts.back())
+			{
+				++_currentPart;
+				_currentPart->_texture = texture;
+			}
+			else
+				_currentPart = &_parts.emplace_back(texture);
 		}
 	};
 
@@ -263,14 +268,20 @@ namespace Yt
 		_data->_viewportData._renderer_builtin._program_2d->set_uniform("mvp", Matrix4::projection_2d(pass.window_size()));
 		for (auto& part : _data->_parts)
 		{
-			assert(part._vertices.size() / sizeof(Vertex2D) <= size_t{ std::numeric_limits<uint16_t>::max() } + 1);
+			if (part._vertices.size() > 0)
 			{
-				PushTexture texture{ pass, part._texture.get(), Texture2D::TrilinearFilter };
-				static_cast<RenderPassImpl&>(pass).flush_2d(part._vertices, part._indices);
+				assert(part._indices.size() > 0);
+				assert(part._vertices.size() / sizeof(Vertex2D) <= size_t{ std::numeric_limits<uint16_t>::max() } + 1);
+				{
+					PushTexture texture{ pass, part._texture.get(), Texture2D::TrilinearFilter };
+					static_cast<RenderPassImpl&>(pass).flush_2d(part._vertices, part._indices);
+				}
+				part._vertices.clear();
+				part._indices.clear();
 			}
+			else
+				assert(part._indices.size() == 0);
 			part._texture = _data->_viewportData._renderer_builtin._white_texture;
-			part._vertices.clear();
-			part._indices.clear();
 		}
 		_data->_currentPart = &_data->_parts.front();
 		_data->_textureRect = static_cast<const BackendTexture2D*>(_data->_currentPart->_texture.get())->full_rectangle();

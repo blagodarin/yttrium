@@ -22,32 +22,30 @@ namespace Yt
 		uint_fast32_t _extra_shader_switches = 0;       // Switches to shaders already used for the frame (debug only).
 	};
 
-	class RenderStatistics
+	class RenderClock
 	{
 	public:
-		RenderReport& current_report() noexcept { return _next_report; }
+		RenderReport& next_report() noexcept { return _next_report; }
 		auto last_frame_duration() noexcept { return _advance; }
-		const RenderReport& previous_report() const noexcept { return _last_report; }
+		const RenderReport& last_report() const noexcept { return _last_report; }
 
-		void add_frame() noexcept
+		void advance() noexcept
 		{
-			using namespace std::chrono_literals;
-			_advance = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - _clock);
+			_advance = Clock::now() - _clock;
 			_clock += _advance;
 			++_frames;
-			_fps_time += _advance;
-			if (_max_frame_time < _advance)
-				_max_frame_time = _advance;
-			if (_fps_time >= 1s)
+			_period += _advance;
+			if (_max_advance < _advance)
+				_max_advance = _advance;
+			if (_period >= std::chrono::seconds{ 1 })
 			{
-				const auto milliseconds = static_cast<unsigned>(_fps_time.count());
-				_last_report._fps = (_frames * 1000 + milliseconds - 1) / milliseconds;
-				_last_report._max_frame_time = _max_frame_time;
+				_last_report._fps = static_cast<unsigned>((_frames * Clock::period::den + _period.count() - 1) / _period.count());
+				_last_report._max_frame_time = std::chrono::duration_cast<std::chrono::milliseconds>(_max_advance);
 				update_report(_last_report, _next_report, _frames);
 				_next_report = {};
-				_fps_time = 0ms;
 				_frames = 0;
-				_max_frame_time = 0ms;
+				_max_advance = Clock::duration::zero();
+				_period = Clock::duration::zero();
 			}
 		}
 
@@ -63,12 +61,13 @@ namespace Yt
 		}
 
 	private:
+		using Clock = std::chrono::high_resolution_clock;
 		RenderReport _last_report;
 		RenderReport _next_report;
 		unsigned _frames = 0;
-		std::chrono::milliseconds _max_frame_time{ 0 };
-		std::chrono::milliseconds _fps_time{ 0 };
-		std::chrono::milliseconds _advance{ 0 };
-		std::chrono::high_resolution_clock::time_point _clock = std::chrono::high_resolution_clock::now();
+		Clock::duration _max_advance{ 0 };
+		Clock::duration _period{ 0 };
+		Clock::duration _advance{ 0 };
+		Clock::time_point _clock = Clock::now();
 	};
 }
