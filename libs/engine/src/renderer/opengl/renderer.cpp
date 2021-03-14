@@ -7,9 +7,9 @@
 #include <yttrium/logger.h>
 #include <yttrium/math/matrix.h>
 #include <yttrium/math/rect.h>
-#include <yttrium/renderer/2d.h>
 #include <yttrium/utils/numeric.h>
 #include "../../model/mesh_data.h"
+#include "../2d.h"
 #include "mesh.h"
 #include "program.h"
 #include "texture.h"

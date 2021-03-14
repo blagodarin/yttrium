@@ -22,7 +22,6 @@ add_library(yengine STATIC
 	include/yttrium/renderer/program.h
 	include/yttrium/renderer/report.h
 	include/yttrium/renderer/texture.h
-	include/yttrium/renderer/textured_rect.h
 	include/yttrium/renderer/viewport.h
 	include/yttrium/resource_loader.h
 	src/model/formats/obj.cpp
@@ -30,11 +29,10 @@ add_library(yengine STATIC
 	src/model/mesh_data.cpp
 	src/model/mesh_data.h
 	src/renderer/2d.cpp
+	src/renderer/2d.h
 	src/renderer/backend.h
 	src/renderer/builtin.cpp
 	src/renderer/builtin.h
-	src/renderer/debug_texture.cpp
-	src/renderer/debug_texture.h
 	src/renderer/material.cpp
 	src/renderer/material.h
 	src/renderer/modifiers.cpp

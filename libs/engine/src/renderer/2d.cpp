@@ -11,9 +11,8 @@
 #include <yttrium/memory/buffer.h>
 #include <yttrium/renderer/modifiers.h>
 #include <yttrium/renderer/program.h>
-#include <yttrium/renderer/textured_rect.h>
 #include <yttrium/renderer/viewport.h>
-#include "debug_texture.h"
+#include "2d.h"
 #include "texture.h"
 #include "viewport.h"
 
@@ -206,34 +205,6 @@ namespace Yt
 
 	Renderer2D::~Renderer2D() noexcept = default;
 
-	void Renderer2D::addDebugText(std::string_view text)
-	{
-		const auto addTextLine = [this](size_t x, size_t y, std::string_view line) {
-			for (size_t i = 0; i < line.size(); ++i)
-			{
-				const auto symbol = static_cast<uint8_t>(line[i]);
-				if (symbol >= DebugTexture::first_char && symbol <= DebugTexture::last_char)
-					_data->addRect(
-						{ { static_cast<float>((x + i) * Yt::DebugTexture::char_width), static_cast<float>(y * Yt::DebugTexture::char_height) },
-							Yt::SizeF{ static_cast<float>(Yt::DebugTexture::char_width), static_cast<float>(Yt::DebugTexture::char_height) } },
-						{ { Yt::DebugTexture::coords[symbol][0][0], Yt::DebugTexture::coords[symbol][0][1] },
-							Yt::Vector2{ Yt::DebugTexture::coords[symbol][1][0], Yt::DebugTexture::coords[symbol][1][1] } },
-						Bgra32::white());
-			}
-		};
-		setTexture(_data->_viewportData._renderer_builtin._debug_texture);
-		size_t y = 0;
-		size_t lineBegin = 0;
-		auto lineEnd = text.find('\n', lineBegin);
-		while (lineEnd != std::string::npos)
-		{
-			addTextLine(0, y++, { text.data() + lineBegin, lineEnd - lineBegin });
-			lineBegin = lineEnd + 1;
-			lineEnd = text.find('\n', lineBegin);
-		}
-		addTextLine(0, y, { text.data() + lineBegin, text.size() - lineBegin });
-	}
-
 	void Renderer2D::addQuad(const Quad& quad, Bgra32 color)
 	{
 		const auto batch = _data->prepareBatch(4, 4);
@@ -252,14 +223,6 @@ namespace Yt
 	void Renderer2D::addRect(const RectF& rect, Bgra32 color)
 	{
 		_data->addRect(rect, _data->_textureRect, _data->_textureBorders, color);
-	}
-
-	void Renderer2D::addRects(const std::vector<TexturedRect>& rects, Bgra32 color)
-	{
-		const SizeF textureSize{ _data->_currentPart->_texture->size() };
-		const Vector2 textureScale{ textureSize._width, textureSize._height };
-		for (const auto& rect : rects)
-			_data->addRect(rect.geometry, _data->_viewportData._renderer.map_rect(rect.texture / textureScale, static_cast<const BackendTexture2D*>(_data->_currentPart->_texture.get())->orientation()), color);
 	}
 
 	void Renderer2D::draw(RenderPass& pass)

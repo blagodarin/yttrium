@@ -11,7 +11,6 @@
 #include <yttrium/renderer/2d.h>
 #include <yttrium/renderer/manager.h>
 #include <yttrium/renderer/texture.h>
-#include <yttrium/renderer/textured_rect.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/storage/source.h>
 
@@ -107,66 +106,34 @@ namespace Yt
 			_texture = render_manager.create_texture_2d(_image);
 		}
 
-		void build(Graphics& graphics, const Vector2& top_left, float font_size, std::string_view text, TextCapture* capture) const override
+		void render(Renderer2D& renderer, Bgra32 color, const Vector2& topLeft, float fontSize, std::string_view text, TextCapture* capture) const override
 		{
-			graphics._texture = _texture;
-			graphics._glyphs.clear();
-
-			auto current_x = top_left.x;
-			const auto current_y = top_left.y;
-			const auto scaling = font_size / static_cast<float>(_size);
-
+			auto x = topLeft.x;
+			const auto y = topLeft.y;
 			float selection_left = 0;
-			const auto do_capture = [font_size, capture, &current_x, current_y, &selection_left](size_t offset) {
+			const auto do_capture = [fontSize, capture, x, y, &selection_left](size_t offset) {
 				if (!capture)
 					return;
-
 				if (capture->_cursor_pos == offset)
 				{
-					capture->_cursor_rect = { { current_x, current_y }, SizeF{ 2, font_size } };
+					capture->_cursor_rect = { { x, y }, SizeF{ 2, fontSize } };
 					capture->_has_cursor = true;
 				}
-
 				if (capture->_selection_begin < capture->_selection_end)
 				{
 					if (offset == capture->_selection_begin)
 					{
-						selection_left = current_x;
+						selection_left = x;
 					}
 					else if (offset == capture->_selection_end)
 					{
-						capture->_selection_rect = { { selection_left, current_y }, Vector2{ current_x, current_y + font_size } };
+						capture->_selection_rect = { { selection_left, y }, Vector2{ x, y + fontSize } };
 						capture->_has_selection = true;
 					}
 				}
 			};
 
-			auto previous = _chars.end();
-			for (size_t i = 0; i < text.size();)
-			{
-				const auto offset = i;
-				const auto current = _chars.find(primal::readUtf8(text, i));
-				if (current == _chars.end())
-					continue;
-				if (_has_kerning && previous != _chars.end())
-					current_x += static_cast<float>(kerning(previous->second.glyph_index, current->second.glyph_index)) * scaling;
-				graphics._glyphs.emplace_back(
-					RectF(
-						{ current_x + static_cast<float>(current->second.offset._x) * scaling, current_y + static_cast<float>(current->second.offset._y) * scaling },
-						SizeF(current->second.rect.size()) * scaling),
-					RectF(current->second.rect));
-				do_capture(offset);
-				current_x += static_cast<float>(current->second.advance) * scaling;
-				previous = current;
-			}
-			do_capture(text.size());
-		}
-
-		void render(Renderer2D& renderer, Bgra32 color, const Vector2& topLeft, float fontSize, std::string_view text) const override
-		{
 			renderer.setTexture(_texture);
-			auto x = topLeft.x;
-			const auto y = topLeft.y;
 			const auto scaling = fontSize / static_cast<float>(_size);
 			auto previous = _chars.end();
 			for (size_t i = 0; i < text.size();)
@@ -181,9 +148,11 @@ namespace Yt
 				renderer.addRect({ { x + static_cast<float>(current->second.offset._x) * scaling, y + static_cast<float>(current->second.offset._y) * scaling },
 									 SizeF(current->second.rect.size()) * scaling },
 					color);
+				do_capture(offset);
 				x += static_cast<float>(current->second.advance) * scaling;
 				previous = current;
 			}
+			do_capture(text.size());
 		}
 
 		Size text_size(std::string_view text) const override

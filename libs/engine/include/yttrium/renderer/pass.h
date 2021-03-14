@@ -4,21 +4,15 @@
 
 #pragma once
 
-#include <yttrium/math/color.h>
-
 #include <string_view>
 #include <vector>
 
 namespace Yt
 {
 	class Line3;
-	class MarginsF;
 	class Matrix4;
 	class Mesh;
-	class Quad;
-	class RectF;
 	class SizeF;
-	class TexturedRect;
 	class Vector2;
 
 	///
