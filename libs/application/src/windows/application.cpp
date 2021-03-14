@@ -139,12 +139,9 @@ namespace Yt
 			return modifiers;
 		};
 
-		const auto call_mouse_keys = [wparam](NativeWindowCallbacks& callbacks, Flags<KeyEvent::Modifier> modifiers) {
-			callbacks.on_key(Key::Mouse1, wparam & MK_LBUTTON, false, modifiers);
-			callbacks.on_key(Key::Mouse2, wparam & MK_RBUTTON, false, modifiers);
-			callbacks.on_key(Key::Mouse3, wparam & MK_MBUTTON, false, modifiers);
-			callbacks.on_key(Key::Mouse4, wparam & MK_XBUTTON1, false, modifiers);
-			callbacks.on_key(Key::Mouse5, wparam & MK_XBUTTON2, false, modifiers);
+		const auto call_mouse_key = [this, hwnd, &get_modifiers](Key key, bool pressed) {
+			if (const auto callbacks = find_callbacks(hwnd))
+				callbacks->on_key(key, pressed, false, get_modifiers());
 		};
 
 		switch (msg)
@@ -176,29 +173,25 @@ namespace Yt
 				callbacks->on_key(key_from_wparam(wparam), false, false, get_modifiers());
 			break;
 
-		case WM_MOUSEWHEEL:
-		case WM_MOUSEHWHEEL:
-			if (const auto callbacks = find_callbacks(hwnd))
-			{
-				const auto modifiers = get_modifiers();
-				call_mouse_keys(*callbacks, modifiers);
-				const auto wheel = GET_WHEEL_DELTA_WPARAM(wparam) / WHEEL_DELTA;
-				(void)wheel; // TODO: Handle mouse wheel.
-			}
-			break;
-
-		case WM_MOUSEMOVE:
 		case WM_LBUTTONDOWN:
 		case WM_LBUTTONUP:
+			call_mouse_key(Key::Mouse1, msg == WM_LBUTTONDOWN);
+			break;
+
 		case WM_RBUTTONDOWN:
 		case WM_RBUTTONUP:
+			call_mouse_key(Key::Mouse2, msg == WM_RBUTTONDOWN);
+			break;
+
 		case WM_MBUTTONDOWN:
 		case WM_MBUTTONUP:
+			call_mouse_key(Key::Mouse3, msg == WM_MBUTTONDOWN);
+			break;
+
 		case WM_XBUTTONDOWN:
 		case WM_XBUTTONUP:
-			if (const auto callbacks = find_callbacks(hwnd))
-				call_mouse_keys(*callbacks, get_modifiers());
-			break;
+			call_mouse_key(GET_XBUTTON_WPARAM(wparam) == XBUTTON1 ? Key::Mouse4 : Key::Mouse5, msg == WM_XBUTTONDOWN);
+			return TRUE;
 
 		case WM_ACTIVATE:
 			if (const auto callbacks = find_callbacks(hwnd))

@@ -7,6 +7,7 @@
 #include <yttrium/application/key.h>
 #include <yttrium/application/window.h>
 #include <yttrium/math/rect.h>
+#include <yttrium/renderer/2d.h>
 
 #include <algorithm>
 #include <cassert>
@@ -30,17 +31,20 @@ namespace Yt
 		std::vector<uint16_t> _inputEvents;
 		std::string _cursorItem;
 		Key _cursorItemKey = Key::Null;
+		GuiButtonStyle _buttonStyle;
 
 		explicit GuiStateData(Window& window) noexcept
 			: _window{ window } {}
 
-		std::pair<unsigned, bool> captureClick(Key key, bool autorepeat) noexcept
+		std::pair<unsigned, bool> captureClick(Key key, bool autorepeat, bool release = false) noexcept
 		{
 			const auto i = std::find_if(_inputEvents.begin(), _inputEvents.end(), [key](const auto event) {
 				return (event & kKeySearchMask) == static_cast<uint8_t>(key);
 			});
 			if (i == _inputEvents.end())
 				return { 0u, false };
+			if (release && (*i & kPressedFlag))
+				return { 0u, true };
 			*i |= kProcessedFlag;
 			if (!(*i & kPressedFlag))
 				return { 0u, true };
@@ -81,23 +85,72 @@ namespace Yt
 			if (event._autorepeat)
 				encodedEvent |= GuiStateData::kAutorepeatFlag;
 		}
-		else if (!_data->_cursorItem.empty() && _data->_cursorItemKey == event._key)
-		{
-			_data->_cursorItem.clear();
-			_data->_cursorItemKey = Key::Null;
-		}
 		_data->_inputEvents.emplace_back(encodedEvent);
 	}
 
-	GuiFrame::GuiFrame(GuiState& state)
+	GuiFrame::GuiFrame(GuiState& state, Renderer2D& renderer)
 		: _state{ *state._data }
+		, _renderer{ renderer }
 	{
 		_state._cursor.emplace(_state._window.cursor());
+		_state._buttonStyle = {};
 	}
 
 	GuiFrame::~GuiFrame() noexcept
 	{
+		if (_state._cursorItemKey != Key::Null && _state.captureClick(_state._cursorItemKey, false, true).second)
+		{
+			_state._cursorItem.clear();
+			_state._cursorItemKey = Key::Null;
+		}
 		_state._inputEvents.clear();
+	}
+
+	bool GuiFrame::button(std::string_view id, const RectF& rect)
+	{
+		assert(!id.empty());
+		bool clicked = false;
+		const auto* styleState = &_state._buttonStyle._normal;
+		if (_state._cursorItem == id)
+		{
+			assert(_state._cursor);
+			const auto hovered = rect.contains(*_state._cursor);
+			const auto released = _state.captureClick(_state._cursorItemKey, false, true).second;
+			if (released)
+			{
+				_state._cursorItem.clear();
+				_state._cursorItemKey = Key::Null;
+				if (hovered)
+				{
+					clicked = true;
+					styleState = &_state._buttonStyle._hovered;
+					_state._cursor.reset();
+				}
+			}
+			else
+			{
+				styleState = &_state._buttonStyle._pressed;
+				_state._cursor.reset();
+			}
+		}
+		else if (_state._cursorItem.empty() && hoverArea(rect))
+		{
+			styleState = &_state._buttonStyle._hovered;
+			if (const auto [pressed, released] = _state.captureClick(Key::Mouse1, false); pressed)
+			{
+				if (!released)
+				{
+					_state._cursorItem = id; // May throw std::bad_alloc.
+					_state._cursorItemKey = Key::Mouse1;
+					styleState = &_state._buttonStyle._pressed;
+				}
+				else
+					clicked = true;
+			}
+		}
+		_renderer.setTexture({});
+		_renderer.addRect(rect, styleState->_backgroundColor);
+		return clicked;
 	}
 
 	bool GuiFrame::captureKeyDown(Key key) noexcept
@@ -135,5 +188,10 @@ namespace Yt
 		if (_state._cursor && rect.contains(*_state._cursor))
 			captured.swap(_state._cursor);
 		return captured;
+	}
+
+	void GuiFrame::setButtonStyle(const GuiButtonStyle& style)
+	{
+		_state._buttonStyle = style;
 	}
 }
