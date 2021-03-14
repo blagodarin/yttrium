@@ -6,7 +6,6 @@
 
 #include <yttrium/application/key.h>
 #include <yttrium/application/window.h>
-#include <yttrium/math/point.h>
 #include <yttrium/math/rect.h>
 
 #include <algorithm>
@@ -48,14 +47,19 @@ namespace Yt
 			auto count = static_cast<unsigned>(!(*i & kAutorepeatFlag) || autorepeat);
 			for (auto j = std::next(i); j != _inputEvents.end(); ++j)
 			{
-				if ((*j & kKeySearchMask) != static_cast<uint8_t>(key))
-					continue;
-				*j |= kProcessedFlag;
-				if (!(*j & kPressedFlag))
-					return { count, true };
-				assert(*j & kAutorepeatFlag); // Either it is autorepeat, or we've missed some events.
-				if (autorepeat)
-					++count;
+				if ((*j & kKeySearchMask) == static_cast<uint8_t>(key))
+				{
+					if (!(*j & kAutorepeatFlag))
+					{
+						if (!(*j & kPressedFlag))
+							*j |= kProcessedFlag;
+						return { count, true };
+					}
+					assert(*j & kPressedFlag);
+					*j |= kProcessedFlag;
+					if (autorepeat)
+						++count;
+				}
 			}
 			return { count, false };
 		}
@@ -113,9 +117,9 @@ namespace Yt
 		}
 		if (_state._cursorItem.empty())
 			if (auto maybeCaptured = hoverArea(rect))
-				if (const auto [down, up] = _state.captureClick(key, false); down > 0)
+				if (const auto [pressed, released] = _state.captureClick(key, false); pressed)
 				{
-					if (!up)
+					if (!released)
 					{
 						_state._cursorItem = id; // May throw std::bad_alloc.
 						_state._cursorItemKey = key;
