@@ -79,7 +79,7 @@ if(YTTRIUM_RENDERER STREQUAL "opengl")
 		set_property(SOURCE src/renderer/opengl/gl.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-useless-cast)
 	endif()
 elseif(YTTRIUM_RENDERER STREQUAL "vulkan")
-	y_sources(yengine "src/renderer/vulkan"
+	target_sources(yengine PRIVATE
 		src/renderer/vulkan/buffer.cpp
 		src/renderer/vulkan/buffer.h
 		src/renderer/vulkan/context.cpp
