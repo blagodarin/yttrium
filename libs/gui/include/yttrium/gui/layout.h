@@ -23,7 +23,7 @@ namespace Yt
 
 		explicit GuiLayout(const RectF& rect) noexcept;
 
-		RectF add(float width, float height) noexcept;
+		RectF add(const SizeF& = {}) noexcept;
 		void fromBottomLeft(Axis axis, float padding = 0) noexcept { fromPoint(_rect.bottom_left(), { 1, -1 }, axis, padding); }
 		void fromBottomRight(Axis axis, float padding = 0) noexcept { fromPoint(_rect.bottom_right(), { -1, -1 }, axis, padding); }
 		void fromPoint(const Vector2& point, const Vector2& direction, Axis, float padding = 0) noexcept;
@@ -31,14 +31,16 @@ namespace Yt
 		void fromTopRight(Axis axis, float padding = 0) noexcept { fromPoint(_rect.top_right(), { -1, 1 }, axis, padding); }
 		constexpr void scaleForHeight(float height) noexcept { _scaling = _rect.height() / height; }
 		constexpr void scaleForWidth(float width) noexcept { _scaling = _rect.width() / width; }
+		constexpr void setSize(const SizeF& size) noexcept { _defaultSize = size; }
 		constexpr void setSpacing(float spacing) noexcept { _spacing = spacing; }
 
 	private:
-		const RectF _rect;
+		RectF _rect;
 		float _scaling = 1;
 		Vector2 _direction{ 1, 1 };
 		Vector2 _position{ 0, 0 };
 		Axis _axis = Axis::X;
 		float _spacing = 0;
+		SizeF _defaultSize;
 	};
 }

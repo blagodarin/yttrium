@@ -11,11 +11,12 @@ namespace Yt
 	{
 	}
 
-	RectF GuiLayout::add(float width, float height) noexcept
+	RectF GuiLayout::add(const SizeF& size) noexcept
 	{
-		const auto x = _position.x + width * _direction.x;
-		const auto y = _position.y + height * _direction.y;
-		const RectF rect{ { _direction.x > 0 ? _position.x : x, _direction.y > 0 ? _position.y : y }, SizeF{ width, height } * _scaling };
+		const auto usedSize = size == SizeF{} ? _defaultSize : size;
+		const auto x = _position.x + usedSize._width * _direction.x;
+		const auto y = _position.y + usedSize._height * _direction.y;
+		const RectF rect{ { _direction.x > 0 ? _position.x : x, _direction.y > 0 ? _position.y : y }, usedSize * _scaling };
 		if (_axis == Axis::X)
 			_position.x = x + _spacing * _direction.x;
 		else

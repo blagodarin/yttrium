@@ -7,6 +7,7 @@
 #include <yttrium/application/key.h>
 #include <yttrium/application/window.h>
 #include <yttrium/gui/font.h>
+#include <yttrium/gui/layout.h>
 #include <yttrium/gui/style.h>
 #include <yttrium/math/rect.h>
 #include <yttrium/renderer/2d.h>
@@ -36,6 +37,7 @@ namespace Yt
 		GuiButtonStyle _buttonStyle;
 		GuiLabelStyle _labelStyle;
 		std::shared_ptr<const Font> _defaultFont;
+		GuiLayout _layout{ {} };
 
 		explicit GuiStateData(Window& window) noexcept
 			: _window{ window } {}
@@ -102,6 +104,7 @@ namespace Yt
 		, _renderer{ renderer }
 	{
 		_state._cursor.emplace(_state._window.cursor());
+		_state._layout = GuiLayout{ RectF{ Rect{ _state._window.size() } } };
 		setButtonStyle({});
 		setLabelStyle({});
 	}
@@ -119,6 +122,9 @@ namespace Yt
 	bool GuiFrame::button(std::string_view id, std::string_view text, const RectF& rect)
 	{
 		assert(!id.empty());
+		const auto usedRect = rect == RectF{} ? _state._layout.add() : rect;
+		if (usedRect.left() == usedRect.right() || usedRect.top() == usedRect.bottom())
+			return false;
 		bool clicked = false;
 		const auto* styleState = &_state._buttonStyle._normal;
 		if (_state._cursorItem == id)
@@ -212,10 +218,18 @@ namespace Yt
 	{
 		if (!_state._labelStyle._font)
 			return;
-		const auto fontSize = rect.height() * _state._buttonStyle._fontSize;
-		const auto padding = (rect.height() - _state._buttonStyle._font->text_size(text, { 1, fontSize })._height) / 2;
+		const auto usedRect = rect == RectF{} ? _state._layout.add() : rect;
+		if (usedRect.top() == usedRect.bottom())
+			return;
+		const auto fontSize = usedRect.height() * _state._buttonStyle._fontSize;
+		const auto padding = (usedRect.height() - _state._buttonStyle._font->text_size(text, { 1, fontSize })._height) / 2;
 		_renderer.setColor(_state._labelStyle._textColor);
-		_state._labelStyle._font->render(_renderer, rect.top_left() + Vector2{ padding, padding }, fontSize, text);
+		_state._labelStyle._font->render(_renderer, usedRect.top_left() + Vector2{ padding, padding }, fontSize, text);
+	}
+
+	GuiLayout& GuiFrame::layout() noexcept
+	{
+		return _state._layout;
 	}
 
 	void GuiFrame::setButtonStyle(const GuiButtonStyle& style) noexcept

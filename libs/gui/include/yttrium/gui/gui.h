@@ -5,6 +5,7 @@
 #pragma once
 
 #include <yttrium/math/color.h>
+#include <yttrium/math/rect.h>
 
 #include <memory>
 #include <optional>
@@ -15,6 +16,7 @@ namespace Yt
 	class Font;
 	struct GuiButtonStyle;
 	struct GuiLabelStyle;
+	class GuiLayout;
 	enum class Key;
 	class KeyEvent;
 	class RectF;
@@ -42,11 +44,12 @@ namespace Yt
 		explicit GuiFrame(GuiState&, Renderer2D&);
 		~GuiFrame() noexcept;
 
-		bool button(std::string_view id, std::string_view text, const RectF&);
+		bool button(std::string_view id, std::string_view text, const RectF& = {});
 		bool captureKeyDown(Key) noexcept;
 		std::optional<Vector2> dragArea(std::string_view id, const RectF&, Key);
 		std::optional<Vector2> hoverArea(const RectF&) noexcept;
-		void label(std::string_view, const RectF&);
+		void label(std::string_view, const RectF& = {});
+		GuiLayout& layout() noexcept;
 		Renderer2D& renderer() noexcept { return _renderer; }
 		void setButtonStyle(const GuiButtonStyle&) noexcept;
 		void setLabelStyle(const GuiLabelStyle&) noexcept;

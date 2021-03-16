@@ -50,7 +50,7 @@ namespace Yt
 	};
 
 	constexpr bool operator==(const Size& a, const Size& b) noexcept { return a._width == b._width && a._height == b._height; }
-	constexpr bool operator!=(const Size& a, const Size& b) noexcept { return !(a == b); }
+	constexpr bool operator==(const SizeF& a, const SizeF& b) noexcept { return a._width == b._width && a._height == b._height; }
 
 	constexpr SizeF operator*(const SizeF& size, float s) noexcept { return { size._width * s, size._height * s }; }
 	constexpr SizeF operator*(const SizeF& size, const Vector2& v) noexcept { return { size._width * v.x, size._height * v.y }; }
