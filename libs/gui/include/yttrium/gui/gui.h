@@ -15,6 +15,7 @@ namespace Yt
 {
 	class Font;
 	struct GuiButtonStyle;
+	struct GuiEditStyle;
 	struct GuiLabelStyle;
 	class GuiLayout;
 	enum class Key;
@@ -48,11 +49,13 @@ namespace Yt
 		bool captureKeyDown(Key) noexcept;
 		std::optional<Vector2> dragArea(std::string_view id, const RectF&, Key);
 		std::optional<Vector2> hoverArea(const RectF&) noexcept;
-		void label(std::string_view, const RectF& = {});
+		void label(std::string_view text, const RectF& = {});
 		GuiLayout& layout() noexcept;
 		Renderer2D& renderer() noexcept { return _renderer; }
 		void setButtonStyle(const GuiButtonStyle&) noexcept;
+		void setEditStyle(const GuiEditStyle&) noexcept;
 		void setLabelStyle(const GuiLabelStyle&) noexcept;
+		bool stringEdit(std::string_view id, std::string& text, const RectF& = {});
 
 	private:
 		GuiStateData& _state;

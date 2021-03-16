@@ -35,6 +35,7 @@ namespace Yt
 		std::string _cursorItem;
 		Key _cursorItemKey = Key::Null;
 		GuiButtonStyle _buttonStyle;
+		GuiEditStyle _editStyle;
 		GuiLabelStyle _labelStyle;
 		std::shared_ptr<const Font> _defaultFont;
 		GuiLayout _layout{ {} };
@@ -156,7 +157,7 @@ namespace Yt
 			{
 				if (!released)
 				{
-					_state._cursorItem = id; // May throw std::bad_alloc.
+					_state._cursorItem = id;
 					_state._cursorItemKey = Key::Mouse1;
 					styleState = &_state._buttonStyle._pressed;
 				}
@@ -198,7 +199,7 @@ namespace Yt
 				{
 					if (!released)
 					{
-						_state._cursorItem = id; // May throw std::bad_alloc.
+						_state._cursorItem = id;
 						_state._cursorItemKey = key;
 					}
 					return maybeCaptured;
@@ -239,10 +240,71 @@ namespace Yt
 			_state._buttonStyle._font = _state._defaultFont;
 	}
 
+	void GuiFrame::setEditStyle(const GuiEditStyle& style) noexcept
+	{
+		_state._editStyle = style;
+		if (!_state._editStyle._font)
+			_state._editStyle._font = _state._defaultFont;
+	}
+
 	void GuiFrame::setLabelStyle(const GuiLabelStyle& style) noexcept
 	{
 		_state._labelStyle = style;
 		if (!_state._labelStyle._font)
 			_state._labelStyle._font = _state._defaultFont;
+	}
+
+	bool GuiFrame::stringEdit(std::string_view id, std::string& text, const RectF& rect)
+	{
+		assert(!id.empty());
+		const auto usedRect = rect == RectF{} ? _state._layout.add() : rect;
+		if (usedRect.left() == usedRect.right() || usedRect.top() == usedRect.bottom())
+			return false;
+		const auto* styleState = &_state._editStyle._normal;
+		if (_state._cursorItem == id)
+		{
+			assert(_state._cursor);
+			const auto hovered = rect.contains(*_state._cursor);
+			const auto released = _state.captureClick(_state._cursorItemKey, false, true).second;
+			if (released)
+			{
+				_state._cursorItem.clear();
+				_state._cursorItemKey = Key::Null;
+				if (hovered)
+				{
+					styleState = &_state._editStyle._hovered;
+					_state._cursor.reset();
+				}
+			}
+			else
+			{
+				styleState = &_state._editStyle._active;
+				_state._cursor.reset();
+			}
+		}
+		else if (_state._cursorItem.empty() && hoverArea(rect))
+		{
+			styleState = &_state._editStyle._hovered;
+			if (const auto [pressed, released] = _state.captureClick(Key::Mouse1, false); pressed)
+			{
+				if (!released)
+				{
+					_state._cursorItem = id;
+					_state._cursorItemKey = Key::Mouse1;
+					styleState = &_state._editStyle._active;
+				}
+			}
+		}
+		_renderer.setTexture({});
+		_renderer.setColor(styleState->_backgroundColor);
+		_renderer.addRect(rect);
+		if (_state._buttonStyle._font)
+		{
+			const auto fontSize = rect.height() * _state._buttonStyle._fontSize;
+			const auto textPadding = (rect.height() - fontSize) / 2;
+			_renderer.setColor(styleState->_textColor);
+			_state._buttonStyle._font->render(_renderer, rect.top_left() + Vector2{ textPadding, textPadding }, fontSize, text);
+		}
+		return false;
 	}
 }

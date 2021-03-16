@@ -29,6 +29,23 @@ namespace Yt
 		GuiButtonStyle() noexcept;
 	};
 
+	struct GuiEditStyle
+	{
+		struct State
+		{
+			Bgra32 _backgroundColor;
+			Bgra32 _textColor;
+			constexpr State(Bgra32 backgroundColor, Bgra32 textColor) noexcept
+				: _backgroundColor{ backgroundColor }, _textColor{ textColor } {}
+		};
+		std::shared_ptr<const Font> _font;
+		float _fontSize;
+		State _normal;
+		State _hovered;
+		State _active;
+		GuiEditStyle() noexcept;
+	};
+
 	struct GuiLabelStyle
 	{
 		std::shared_ptr<const Font> _font;
