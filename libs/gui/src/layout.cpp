@@ -6,6 +6,11 @@
 
 namespace Yt
 {
+	GuiLayout::GuiLayout(const RectF& rect) noexcept
+		: _rect{ rect }
+	{
+	}
+
 	RectF GuiLayout::add(float width, float height) noexcept
 	{
 		const auto x = _position.x + width * _direction.x;
@@ -18,17 +23,10 @@ namespace Yt
 		return rect;
 	}
 
-	void GuiLayout::fromBottomLeft(Axis axis, float padding) noexcept
+	void GuiLayout::fromPoint(const Vector2& point, const Vector2& direction, Axis axis, float padding) noexcept
 	{
-		_direction = { _scaling, -_scaling };
-		_position = _rect.bottom_left() + padding * _direction;
-		_axis = axis;
-	}
-
-	void GuiLayout::fromBottomRight(Axis axis, float padding) noexcept
-	{
-		_direction = { -_scaling, -_scaling };
-		_position = _rect.bottom_right() + padding * _direction;
+		_direction = direction * _scaling;
+		_position = point + padding * _direction;
 		_axis = axis;
 	}
 }

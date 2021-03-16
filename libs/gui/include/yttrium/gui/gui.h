@@ -13,6 +13,8 @@
 namespace Yt
 {
 	class Font;
+	struct GuiButtonStyle;
+	struct GuiLabelStyle;
 	enum class Key;
 	class KeyEvent;
 	class RectF;
@@ -34,22 +36,6 @@ namespace Yt
 		friend class GuiFrame;
 	};
 
-	struct GuiButtonStyle
-	{
-		struct State
-		{
-			Bgra32 _backgroundColor;
-			Bgra32 _textColor;
-			constexpr State(Bgra32 backgroundColor, Bgra32 textColor) noexcept
-				: _backgroundColor{ backgroundColor }, _textColor{ textColor } {}
-		};
-		std::shared_ptr<const Font> _font;
-		float _fontSize = .75f;
-		State _normal{ Bgra32::grayscale(0x88, 224), Bgra32::black() };
-		State _hovered{ Bgra32::grayscale(0xdd, 224), Bgra32::grayscale(0x11) };
-		State _pressed{ Bgra32::white(224), Bgra32::grayscale(0x22) };
-	};
-
 	class GuiFrame
 	{
 	public:
@@ -60,8 +46,10 @@ namespace Yt
 		bool captureKeyDown(Key) noexcept;
 		std::optional<Vector2> dragArea(std::string_view id, const RectF&, Key);
 		std::optional<Vector2> hoverArea(const RectF&) noexcept;
+		void label(std::string_view, const RectF&);
 		Renderer2D& renderer() noexcept { return _renderer; }
 		void setButtonStyle(const GuiButtonStyle&) noexcept;
+		void setLabelStyle(const GuiLabelStyle&) noexcept;
 
 	private:
 		GuiStateData& _state;

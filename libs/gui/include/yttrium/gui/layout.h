@@ -21,14 +21,14 @@ namespace Yt
 			Y,
 		};
 
-		constexpr explicit GuiLayout(const RectF& rect) noexcept
-			: _rect{ rect } {}
-		constexpr explicit GuiLayout(const SizeF& size) noexcept
-			: _rect{ size } {}
+		explicit GuiLayout(const RectF& rect) noexcept;
 
 		RectF add(float width, float height) noexcept;
-		void fromBottomLeft(Axis, float padding = 0) noexcept;
-		void fromBottomRight(Axis, float padding = 0) noexcept;
+		void fromBottomLeft(Axis axis, float padding = 0) noexcept { fromPoint(_rect.bottom_left(), { 1, -1 }, axis, padding); }
+		void fromBottomRight(Axis axis, float padding = 0) noexcept { fromPoint(_rect.bottom_right(), { -1, -1 }, axis, padding); }
+		void fromPoint(const Vector2& point, const Vector2& direction, Axis, float padding = 0) noexcept;
+		void fromTopLeft(Axis axis, float padding = 0) noexcept { fromPoint(_rect.top_left(), { 1, 1 }, axis, padding); }
+		void fromTopRight(Axis axis, float padding = 0) noexcept { fromPoint(_rect.top_right(), { -1, 1 }, axis, padding); }
 		constexpr void scaleForHeight(float height) noexcept { _scaling = _rect.height() / height; }
 		constexpr void scaleForWidth(float width) noexcept { _scaling = _rect.width() / width; }
 		constexpr void setSpacing(float spacing) noexcept { _spacing = spacing; }

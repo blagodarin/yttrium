@@ -7,6 +7,7 @@
 #include <yttrium/application/key.h>
 #include <yttrium/application/window.h>
 #include <yttrium/gui/font.h>
+#include <yttrium/gui/style.h>
 #include <yttrium/math/rect.h>
 #include <yttrium/renderer/2d.h>
 
@@ -33,6 +34,7 @@ namespace Yt
 		std::string _cursorItem;
 		Key _cursorItemKey = Key::Null;
 		GuiButtonStyle _buttonStyle;
+		GuiLabelStyle _labelStyle;
 		std::shared_ptr<const Font> _defaultFont;
 
 		explicit GuiStateData(Window& window) noexcept
@@ -101,6 +103,7 @@ namespace Yt
 	{
 		_state._cursor.emplace(_state._window.cursor());
 		setButtonStyle({});
+		setLabelStyle({});
 	}
 
 	GuiFrame::~GuiFrame() noexcept
@@ -205,10 +208,27 @@ namespace Yt
 		return captured;
 	}
 
+	void GuiFrame::label(std::string_view text, const RectF& rect)
+	{
+		if (!_state._labelStyle._font)
+			return;
+		const auto fontSize = rect.height() * _state._buttonStyle._fontSize;
+		const auto padding = (rect.height() - _state._buttonStyle._font->text_size(text, { 1, fontSize })._height) / 2;
+		_renderer.setColor(_state._labelStyle._textColor);
+		_state._labelStyle._font->render(_renderer, rect.top_left() + Vector2{ padding, padding }, fontSize, text);
+	}
+
 	void GuiFrame::setButtonStyle(const GuiButtonStyle& style) noexcept
 	{
 		_state._buttonStyle = style;
 		if (!_state._buttonStyle._font)
 			_state._buttonStyle._font = _state._defaultFont;
+	}
+
+	void GuiFrame::setLabelStyle(const GuiLabelStyle& style) noexcept
+	{
+		_state._labelStyle = style;
+		if (!_state._labelStyle._font)
+			_state._labelStyle._font = _state._defaultFont;
 	}
 }
