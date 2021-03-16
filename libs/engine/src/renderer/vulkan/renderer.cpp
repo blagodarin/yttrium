@@ -160,13 +160,13 @@ namespace Yt
 		_update_descriptors = true;
 	}
 
-	void VulkanRenderer::set_window_size(const Size&)
+	void VulkanRenderer::set_viewport_size(const Size&)
 	{
 	}
 
-	Image VulkanRenderer::take_screenshot(const Size& window_size) const
+	Image VulkanRenderer::take_screenshot(const Size& viewport_size) const
 	{
-		return Image{ { static_cast<std::size_t>(window_size._width), static_cast<std::size_t>(window_size._height), PixelFormat::Rgb24, 4, ImageOrientation::XRightYDown } };
+		return Image{ { static_cast<std::size_t>(viewport_size._width), static_cast<std::size_t>(viewport_size._height), PixelFormat::Rgb24, 4, ImageOrientation::XRightYDown } };
 	}
 
 	void VulkanRenderer::update_descriptors()

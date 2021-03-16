@@ -34,11 +34,11 @@ namespace Yt
 
 	RenderPassData::~RenderPassData() noexcept = default;
 
-	RenderPassImpl::RenderPassImpl(RenderBackend& backend, RenderBuiltin& builtin, RenderPassData& data, const Size& window_size, RenderReport& report)
+	RenderPassImpl::RenderPassImpl(RenderBackend& backend, RenderBuiltin& builtin, RenderPassData& data, const Size& viewport_size, RenderReport& report)
 		: _backend{ backend }
 		, _builtin{ builtin }
 		, _data{ data }
-		, _window_size{ window_size }
+		, _viewport_size{ viewport_size }
 		, _report{ report }
 	{
 		_backend.clear();
@@ -79,15 +79,15 @@ namespace Yt
 	Line3 RenderPassImpl::pixel_ray(const Vector2& v) const
 	{
 		// Move each coordinate to the center of the pixel (by adding 0.5), then normalize from [0, D] to [-1, 1].
-		const auto xn = (2 * v.x + 1) / static_cast<float>(_window_size._width) - 1;
-		const auto yn = 1 - (2 * v.y + 1) / static_cast<float>(_window_size._height);
+		const auto xn = (2 * v.x + 1) / static_cast<float>(_viewport_size._width) - 1;
+		const auto yn = 1 - (2 * v.y + 1) / static_cast<float>(_viewport_size._height);
 		const auto m = inverse(full_matrix());
 		return { m * Vector3{ xn, yn, 0 }, m * Vector3{ xn, yn, 1 } };
 	}
 
-	SizeF RenderPassImpl::window_size() const
+	RectF RenderPassImpl::viewport_rect() const
 	{
-		return SizeF{ _window_size };
+		return RectF{ _viewport_size };
 	}
 
 	void RenderPassImpl::pop_program() noexcept

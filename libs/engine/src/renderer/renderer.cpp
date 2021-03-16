@@ -65,9 +65,9 @@ namespace Yt
 		return _backend->map_rect(rect, orientation);
 	}
 
-	void RendererImpl::set_window_size(const Size& size)
+	void RendererImpl::set_viewport_size(const Size& size)
 	{
-		_backend->set_window_size(size);
+		_backend->set_viewport_size(size);
 	}
 
 	Image RendererImpl::take_screenshot(const Size& size) const

@@ -8,9 +8,11 @@ source_group("include" REGULAR_EXPRESSION "/include/yttrium/gui/")
 add_library(ygui STATIC
 	include/yttrium/gui/font.h
 	include/yttrium/gui/gui.h
+	include/yttrium/gui/layout.h
 	include/yttrium/gui/text_capture.h
 	src/font.cpp
 	src/gui.cpp
+	src/layout.cpp
 	)
 include_config(ygui ${PROJECT_BINARY_DIR}/config.h)
 target_include_directories(ygui PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)

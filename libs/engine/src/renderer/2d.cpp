@@ -230,7 +230,7 @@ namespace Yt
 	void Renderer2D::draw(RenderPass& pass)
 	{
 		PushProgram program{ pass, _data->_viewportData._renderer_builtin._program_2d.get() };
-		_data->_viewportData._renderer_builtin._program_2d->set_uniform("mvp", Matrix4::projection_2d(pass.window_size()));
+		_data->_viewportData._renderer_builtin._program_2d->set_uniform("mvp", Matrix4::projection_2d(pass.viewport_rect().size()));
 		for (auto& part : _data->_parts)
 		{
 			if (part._vertices.size() > 0)

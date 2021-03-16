@@ -31,7 +31,7 @@ namespace Yt
 		virtual RectF map_rect(const RectF&, ImageOrientation) const = 0;
 		virtual void set_program(const RenderProgram*) = 0;
 		virtual void set_texture(const Texture2D&, Flags<Texture2D::Filter>) = 0;
-		virtual void set_window_size(const Size&) = 0;
+		virtual void set_viewport_size(const Size&) = 0;
 		virtual Image take_screenshot(const Size&) const = 0;
 	};
 }

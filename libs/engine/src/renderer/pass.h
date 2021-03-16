@@ -61,7 +61,7 @@ namespace Yt
 		Matrix4 full_matrix() const override;
 		Matrix4 model_matrix() const override;
 		Line3 pixel_ray(const Vector2&) const override;
-		SizeF window_size() const override;
+		RectF viewport_rect() const override;
 
 	public:
 		RenderBuiltin& builtin() const noexcept { return _builtin; }
@@ -84,7 +84,7 @@ namespace Yt
 		RenderBackend& _backend;
 		RenderBuiltin& _builtin;
 		RenderPassData& _data;
-		const SizeF _window_size;
+		const SizeF _viewport_size;
 		RenderReport& _report;
 
 		const Texture2D* _current_texture = nullptr;

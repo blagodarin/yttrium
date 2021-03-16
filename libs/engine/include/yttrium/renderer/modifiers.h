@@ -32,17 +32,6 @@ namespace Yt
 	};
 
 	///
-	class Y_ENGINE_API Push2D : public RenderModifier
-	{
-	public:
-		///
-		explicit Push2D(RenderPass&);
-
-		///
-		~Push2D() noexcept;
-	};
-
-	///
 	class Y_ENGINE_API Push3D : public RenderModifier
 	{
 	public:

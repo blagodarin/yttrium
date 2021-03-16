@@ -21,7 +21,7 @@ namespace Yt
 		const auto window_size = _data->_window.size();
 		if (window_size != _data->_window_size)
 		{
-			_data->_renderer.set_window_size(window_size);
+			_data->_renderer.set_viewport_size(window_size);
 			_data->_window_size = window_size;
 		}
 		{

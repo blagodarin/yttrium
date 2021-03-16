@@ -27,7 +27,7 @@ namespace Yt
 		RectF map_rect(const RectF& rect, ImageOrientation) const override { return rect; }
 		void set_program(const RenderProgram*) override {}
 		void set_texture(const Texture2D&, Flags<Texture2D::Filter>) override {}
-		void set_window_size(const Size&) override {}
+		void set_viewport_size(const Size&) override {}
 		Image take_screenshot(const Size&) const override;
 	};
 }

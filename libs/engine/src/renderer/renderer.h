@@ -28,7 +28,7 @@ namespace Yt
 
 	public:
 		RectF map_rect(const RectF&, ImageOrientation) const;
-		void set_window_size(const Size&);
+		void set_viewport_size(const Size&);
 		Image take_screenshot(const Size&) const;
 
 	public:

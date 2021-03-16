@@ -12,7 +12,7 @@ namespace Yt
 	class Line3;
 	class Matrix4;
 	class Mesh;
-	class SizeF;
+	class RectF;
 	class Vector2;
 
 	///
@@ -34,6 +34,6 @@ namespace Yt
 		virtual Line3 pixel_ray(const Vector2&) const = 0;
 
 		///
-		virtual SizeF window_size() const = 0;
+		virtual RectF viewport_rect() const = 0;
 	};
 }

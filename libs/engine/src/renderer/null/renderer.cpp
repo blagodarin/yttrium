@@ -24,8 +24,8 @@ namespace Yt
 		return std::make_unique<BackendTexture2D>(*this, image.info(), has_mipmaps);
 	}
 
-	Image NullRenderer::take_screenshot(const Size& window_size) const
+	Image NullRenderer::take_screenshot(const Size& viewport_size) const
 	{
-		return Image{ { static_cast<std::size_t>(window_size._width), static_cast<std::size_t>(window_size._height), PixelFormat::Rgb24, 4, ImageOrientation::XRightYDown } };
+		return Image{ { static_cast<std::size_t>(viewport_size._width), static_cast<std::size_t>(viewport_size._height), PixelFormat::Rgb24, 4, ImageOrientation::XRightYDown } };
 	}
 }

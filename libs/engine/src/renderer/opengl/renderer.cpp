@@ -223,22 +223,22 @@ namespace Yt
 		static_cast<const GlTexture2D&>(texture).bind(filter);
 	}
 
-	void GlRenderer::set_window_size(const Size& size)
+	void GlRenderer::set_viewport_size(const Size& size)
 	{
 		_gl.Viewport(0, 0, size._width, size._height);
 	}
 
-	Image GlRenderer::take_screenshot(const Size& window_size) const
+	Image GlRenderer::take_screenshot(const Size& viewport_size) const
 	{
 		GLint alignment = 0;
 		_gl.GetIntegerv(GL_UNPACK_ALIGNMENT, &alignment);
 
-		Image image{ { static_cast<std::size_t>(window_size._width), static_cast<std::size_t>(window_size._height), PixelFormat::Rgb24, static_cast<std::size_t>(alignment), ImageOrientation::XRightYUp } };
+		Image image{ { static_cast<std::size_t>(viewport_size._width), static_cast<std::size_t>(viewport_size._height), PixelFormat::Rgb24, static_cast<std::size_t>(alignment), ImageOrientation::XRightYUp } };
 
 		GLint read_buffer = GL_BACK;
 		_gl.GetIntegerv(GL_READ_BUFFER, &read_buffer);
 		_gl.ReadBuffer(GL_FRONT);
-		_gl.ReadPixels(0, 0, window_size._width, window_size._height, GL_RGB, GL_UNSIGNED_BYTE, image.data());
+		_gl.ReadPixels(0, 0, viewport_size._width, viewport_size._height, GL_RGB, GL_UNSIGNED_BYTE, image.data());
 		_gl.ReadBuffer(static_cast<GLenum>(read_buffer));
 
 		return image;

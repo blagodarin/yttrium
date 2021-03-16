@@ -12,17 +12,6 @@
 
 namespace Yt
 {
-	Push2D::Push2D(RenderPass& pass)
-		: RenderModifier{ pass }
-	{
-		static_cast<RenderPassImpl&>(_pass).push_projection_2d(Matrix4::projection_2d(pass.window_size()));
-	}
-
-	Push2D::~Push2D() noexcept
-	{
-		static_cast<RenderPassImpl&>(_pass).pop_projection();
-	}
-
 	Push3D::Push3D(RenderPass& pass, const Matrix4& projection, const Matrix4& view)
 		: RenderModifier{ pass }
 	{
