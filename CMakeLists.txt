@@ -17,7 +17,7 @@ endif()
 
 set(AULOS_AULOSPLAY ON)
 set(AULOS_STATIC_RUNTIME ON)
-FetchContent_Declare(Primal GIT_REPOSITORY https://github.com/blagodarin/primal.git GIT_TAG e1f7e252d9f4a404b165dbfb19b7534bac309390)
+FetchContent_Declare(Primal GIT_REPOSITORY https://github.com/blagodarin/primal.git GIT_TAG b640a92600eee1701e83db71f5c06ce351a213d7)
 FetchContent_Declare(Aulos GIT_REPOSITORY https://github.com/blagodarin/aulos.git GIT_TAG ac2ce48b5cd6f8a5aa6acc1e022d7b97866377fb)
 FetchContent_MakeAvailable(Primal Aulos)
 
@@ -44,6 +44,8 @@ if(NOT YTTRIUM_SUBPROJECT)
 	mark_as_advanced(YTTRIUM_CLANG_TIDY YTTRIUM_SANITIZERS)
 endif()
 
+primal_provide_fmt(fmt_ROOT STATIC_RUNTIME ON)
+find_package(fmt REQUIRED)
 if(WIN32)
 	primal_provide_freetype(Freetype_ROOT STATIC_RUNTIME ON)
 else()

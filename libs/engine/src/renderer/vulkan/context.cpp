@@ -1,19 +1,6 @@
-//
 // This file is part of the Yttrium toolkit.
-// Copyright (C) 2019 Sergei Blagodarin.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+// Copyright (C) Sergei Blagodarin.
+// SPDX-License-Identifier: Apache-2.0
 
 #include "context.h"
 
@@ -25,6 +12,8 @@
 #include <array>
 #include <stdexcept>
 
+#include <fmt/format.h>
+
 namespace
 {
 	void print_vulkan_layers_available()
@@ -33,10 +22,10 @@ namespace
 		Y_VK_CHECK(vkEnumerateInstanceLayerProperties(&count, nullptr));
 		std::vector<VkLayerProperties> layers(count);
 		Y_VK_CHECK(vkEnumerateInstanceLayerProperties(&count, layers.data()));
-		Yt::Logger::log("Vulkan layers available:");
+		Yt::Logger::write("Vulkan layers available:");
 		for (const auto& layer : layers)
-			Yt::Logger::log("  ", layer.layerName, " - ", layer.description);
-		Yt::Logger::log("");
+			Yt::Logger::write(fmt::format("  {} - {}", layer.layerName, layer.description));
+		Yt::Logger::write("");
 	}
 
 	VkInstance create_vulkan_instance()
@@ -85,7 +74,7 @@ namespace
 #ifndef NDEBUG
 	VKAPI_ATTR VkBool32 VKAPI_CALL print_vulkan_debug_report(VkDebugReportFlagsEXT, VkDebugReportObjectTypeEXT, uint64_t, size_t, int32_t, const char* layer_prefix, const char* message, void*)
 	{
-		Yt::Logger::log('[', layer_prefix, "] ", message);
+		Yt::Logger::write(fmt::format("[{}] {}", layer_prefix, message));
 		return VK_FALSE;
 	}
 
@@ -179,14 +168,14 @@ namespace
 			{ VK_FORMAT_R16G16B16A16_UNORM, "VK_FORMAT_R16G16B16A16_UNORM" },
 		};
 
-		Yt::Logger::log("Vulkan texture formats supported:");
+		Yt::Logger::write("Vulkan texture formats supported:");
 		for (const auto& [format_id, format_name] : formats)
 		{
 			VkFormatProperties properties;
 			vkGetPhysicalDeviceFormatProperties(device, format_id, &properties);
-			Yt::Logger::log("  ", ((properties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT) ? '+' : '-'), ' ', format_name, " (", format_id, ')');
+			Yt::Logger::write(fmt::format("  {} {} ({})", properties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT ? '+' : '-', format_name, format_id));
 		}
-		Yt::Logger::log("");
+		Yt::Logger::write("");
 	}
 
 	VkDevice create_vulkan_device(VkPhysicalDevice physical_device, uint32_t queue_family_index)

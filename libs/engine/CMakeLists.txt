@@ -48,7 +48,7 @@ add_library(yengine STATIC
 	)
 include_config(yengine ${PROJECT_BINARY_DIR}/config.h)
 target_include_directories(yengine PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-target_link_libraries(yengine PRIVATE yapplication yaudio ycore primal Threads::Threads)
+target_link_libraries(yengine PRIVATE yapplication yaudio ycore primal fmt::fmt Threads::Threads)
 set_target_properties(yengine PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 if(YTTRIUM_RENDERER STREQUAL "opengl")
 	target_sources(yengine PRIVATE

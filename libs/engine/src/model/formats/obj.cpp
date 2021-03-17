@@ -15,6 +15,8 @@
 #include <regex>
 #include <tuple>
 
+#include <fmt/format.h>
+
 namespace
 {
 	const std::string _float = R"(\s+([+-]?\d+(?:\.\d+)))";
@@ -199,10 +201,10 @@ namespace Yt
 				continue;
 			::trim(line);
 			if (!state.process_line(line, result))
-				throw DataError("OBJ processing error (", source_name, ":", line_number, ")");
+				throw DataError{ fmt::format("OBJ processing error ({}:{})", source_name, line_number) };
 		}
 		if (!state.finalize(result))
-			throw DataError("Bad OBJ");
+			throw DataError{ "Bad OBJ" };
 		return result;
 	}
 }

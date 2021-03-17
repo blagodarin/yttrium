@@ -1,19 +1,6 @@
-//
 // This file is part of the Yttrium toolkit.
-// Copyright (C) 2019 Sergei Blagodarin.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+// Copyright (C) Sergei Blagodarin.
+// SPDX-License-Identifier: Apache-2.0
 
 #include <yttrium/script/code.h>
 
@@ -25,6 +12,8 @@
 #include "scanner.h"
 
 #include <cassert>
+
+#include <fmt/format.h>
 
 namespace Yt
 {
@@ -57,10 +46,11 @@ namespace Yt
 			for (ScriptCommand* command = nullptr;;)
 			{
 				const auto token = scanner.read();
+				const auto unexpected_token = [&token] { throw DataError{ fmt::format("[{}:{}] Unexpected token", token.line, token.column) }; };
 				if (token.type == ScriptScanner::Token::End)
 				{
 					if (command && command->_name == "=" && command->_args.size() != 2)
-						throw DataError{ "[", token.line, ":", token.column, "] Unexpected token" };
+						unexpected_token();
 					break;
 				}
 				if (!command)
@@ -76,7 +66,7 @@ namespace Yt
 						break;
 
 					default:
-						throw DataError{ "[", token.line, ":", token.column, "] Unexpected token" };
+						unexpected_token();
 					}
 				}
 				else
@@ -85,37 +75,37 @@ namespace Yt
 					{
 					case ScriptScanner::Token::Identifier:
 						if (command->_name == "=" && command->_args.size() != 1)
-							throw DataError{ "[", token.line, ":", token.column, "] Unexpected token" };
+							unexpected_token();
 						command->_args.emplace_back(new (_temporaries.allocate()) ScriptValue{ token.string, ScriptValue::Type::Name });
 						break;
 
 					case ScriptScanner::Token::Number:
 						if (command->_name == "=" && command->_args.size() != 1)
-							throw DataError{ "[", token.line, ":", token.column, "] Unexpected token" };
+							unexpected_token();
 						command->_args.emplace_back(new (_temporaries.allocate()) ScriptValue{ token.string, ScriptValue::Type::Literal });
 						break;
 
 					case ScriptScanner::Token::String:
 						if (command->_name == "=" && command->_args.size() != 1)
-							throw DataError{ "[", token.line, ":", token.column, "] Unexpected token" };
+							unexpected_token();
 						command->_args.emplace_back(new (_temporaries.allocate()) ScriptValue{ token.string, ScriptValue::Type::String });
 						break;
 
 					case ScriptScanner::Token::Separator:
 						if (command->_name == "=" && command->_args.size() != 2)
-							throw DataError{ "[", token.line, ":", token.column, "] Unexpected token" };
+							unexpected_token();
 						command = nullptr;
 						break;
 
 					case ScriptScanner::Token::Equals:
 						if (!command->_args.empty())
-							throw DataError{ "[", token.line, ":", token.column, "] Unexpected token" };
+							unexpected_token();
 						command->_args.emplace_back(new (_temporaries.allocate()) ScriptValue{ command->_name, ScriptValue::Type::Name });
 						command->_name = "=";
 						break;
 
 					default:
-						throw DataError{ "[", token.line, ":", token.column, "] Unexpected token" };
+						unexpected_token();
 					}
 				}
 			}

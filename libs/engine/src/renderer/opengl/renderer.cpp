@@ -18,6 +18,7 @@
 
 #ifndef NDEBUG
 #	include <csignal>
+#	include <fmt/format.h>
 #endif
 
 namespace
@@ -125,14 +126,14 @@ namespace Yt
 		GlShaderHandle vertex{ _gl, GL_VERTEX_SHADER };
 		if (!vertex.compile(vertex_shader))
 		{
-			Logger::log(vertex.info_log());
+			Logger::write(vertex.info_log());
 			return {};
 		}
 
 		GlShaderHandle fragment{ _gl, GL_FRAGMENT_SHADER };
 		if (!fragment.compile(fragment_shader))
 		{
-			Logger::log(fragment.info_log());
+			Logger::write(fragment.info_log());
 			return {};
 		}
 
@@ -251,22 +252,22 @@ namespace Yt
 		switch (type)
 		{
 		case GL_DEBUG_TYPE_ERROR:
-			Logger::log("(OpenGL) Error! ", message);
+			Logger::write(fmt::format("(OpenGL) Error! {}", message));
 			break;
 		case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
-			Logger::log("(OpenGL) Deprecated behavior! ", message);
+			Logger::write(fmt::format("(OpenGL) Deprecated behavior! {}", message));
 			break;
 		case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
-			Logger::log("(OpenGL) Undefined behavior! ", message);
+			Logger::write(fmt::format("(OpenGL) Undefined behavior! {}", message));
 			break;
 		case GL_DEBUG_TYPE_PORTABILITY:
-			Logger::log("(OpenGL) Portability warning! ", message);
+			Logger::write(fmt::format("(OpenGL) Portability warning! {}", message));
 			break;
 		case GL_DEBUG_TYPE_PERFORMANCE:
-			Logger::log("(OpenGL) Performance warning! ", message);
+			Logger::write(fmt::format("(OpenGL) Performance warning! {}", message));
 			break;
 		default:
-			Logger::log("(OpenGL) ", message);
+			Logger::write(fmt::format("(OpenGL) ", message));
 			stop = false;
 			break;
 		}

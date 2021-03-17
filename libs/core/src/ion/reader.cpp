@@ -1,19 +1,6 @@
-//
 // This file is part of the Yttrium toolkit.
-// Copyright (C) 2019 Sergei Blagodarin.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+// Copyright (C) Sergei Blagodarin.
+// SPDX-License-Identifier: Apache-2.0
 
 #include <yttrium/ion/reader.h>
 
@@ -25,6 +12,8 @@
 
 #include <array>
 #include <vector>
+
+#include <fmt/format.h>
 
 namespace
 {
@@ -91,37 +80,37 @@ namespace Yt
 	void IonToken::check_end() const
 	{
 		if (_type != Type::End)
-			throw IonError{ _line, _column, "End of file expected" };
+			throw IonError{ fmt::format("({}:{}) End of file expected", _line, _column) };
 	}
 
 	void IonToken::check_list_begin() const
 	{
 		if (_type != Type::ListBegin)
-			throw IonError{ _line, _column, "'[' expected" };
+			throw IonError{ fmt::format("({}:{}) '[' expected", _line, _column) };
 	}
 
 	void IonToken::check_list_end() const
 	{
 		if (_type != Type::ListEnd)
-			throw IonError{ _line, _column, "']' expected" };
+			throw IonError{ fmt::format("({}:{}) ']' expected", _line, _column) };
 	}
 
 	void IonToken::check_name(std::string_view name) const
 	{
 		if (to_name() != name)
-			throw IonError{ _line, _column, "'", name, "' expected" };
+			throw IonError{ fmt::format("({}:{}) '{}' expected", _line, _column, name) };
 	}
 
 	void IonToken::check_object_begin() const
 	{
 		if (_type != Type::ObjectBegin)
-			throw IonError{ _line, _column, "'{' expected" };
+			throw IonError{ fmt::format("({}:{}) '{{' expected", _line, _column) };
 	}
 
 	void IonToken::check_object_end() const
 	{
 		if (_type != Type::ObjectEnd)
-			throw IonError{ _line, _column, "'}' expected" };
+			throw IonError{ fmt::format("({}:{}) '}}' expected", _line, _column) };
 	}
 
 	IonToken& IonToken::next(IonReader& ion)
@@ -132,7 +121,7 @@ namespace Yt
 	Bgra32 IonToken::to_color() const
 	{
 		if (_type != Type::ColorValue)
-			throw IonError{ _line, _column, "ION color expected" };
+			throw IonError{ fmt::format("({}:{}) ION color expected", _line, _column) };
 
 		const auto d = [this](std::size_t i) {
 			const auto c = _text[i];
@@ -150,21 +139,21 @@ namespace Yt
 		case 5: return Bgra32{ dd(3), dd(2), dd(1), dd(4) };
 		case 7: return Bgra32{ d(5) * 16 + d(6), d(3) * 16 + d(4), d(1) * 16 + d(2) };
 		case 9: return Bgra32{ d(5) * 16 + d(6), d(3) * 16 + d(4), d(1) * 16 + d(2), d(7) * 16 + d(8) };
-		default: throw IonError{ _line, _column, "Bad ION color" };
+		default: throw IonError{ fmt::format("({}:{}) Bad ION color", _line, _column) };
 		}
 	}
 
 	std::string_view IonToken::to_name() const
 	{
 		if (_type != Type::Name)
-			throw IonError{ _line, _column, "ION name expected" };
+			throw IonError{ fmt::format("({}:{}) ION name expected", _line, _column) };
 		return _text;
 	}
 
 	std::string_view IonToken::to_value() const
 	{
 		if (_type != Type::StringValue)
-			throw IonError{ _line, _column, "ION value expected" };
+			throw IonError{ fmt::format("({}:{}) ION value expected", _line, _column) };
 		return _text;
 	}
 
@@ -183,13 +172,13 @@ namespace Yt
 				switch (::class_of(*_cursor))
 				{
 				case Other:
-					throw IonError{ _line, _cursor - _line_base, "Bad character" };
+					throw IonError{ fmt::format("({}:{}) Bad character", _line, _cursor - _line_base) };
 
 				case End:
 					if (_cursor == static_cast<const char*>(_buffer.data()) + _buffer.size())
 						return make_token<IonToken::Type::End>(_cursor, 0);
 					else
-						throw IonError{ _line, _cursor - _line_base, "Bad character" };
+						throw IonError{ fmt::format("({}:{}) Bad character", _line, _cursor - _line_base) };
 
 				case Space:
 					_cursor = forward_find_if(_cursor + 1, [](char c) { return ::class_of(c) != Space; });
@@ -213,7 +202,7 @@ namespace Yt
 						return make_token<IonToken::Type::Name>(begin, _cursor - begin);
 					}
 					else
-						throw IonError{ _line, _cursor - _line_base, "Unexpected ION name" };
+						throw IonError{ fmt::format("({}:{}) Unexpected ION name", _line, _cursor - _line_base) };
 
 				case Quote:
 					if (_stack.back() & AcceptValues)
@@ -226,10 +215,10 @@ namespace Yt
 							switch (*cursor)
 							{
 							case '\0':
-								throw IonError{ _line, cursor - _line_base, cursor == static_cast<const char*>(_buffer.data()) + _buffer.size() ? "Unexpected end of file" : "Bad character" };
+								throw IonError{ fmt::format("({}:{}) {}", _line, cursor - _line_base, cursor == static_cast<const char*>(_buffer.data()) + _buffer.size() ? "Unexpected end of file" : "Bad character") };
 							case '\n':
 							case '\r':
-								throw IonError{ _line, cursor - _line_base, "Unexpected end of line" };
+								throw IonError{ fmt::format("({}:{}) Unexpected end of line", _line, cursor - _line_base) };
 							default:
 								++cursor;
 							}
@@ -238,7 +227,7 @@ namespace Yt
 						return make_token<IonToken::Type::StringValue, -1>(base, cursor - base, quote == '`');
 					}
 					else
-						throw IonError{ _line, _cursor - _line_base, "Unexpected ION value" };
+						throw IonError{ fmt::format("({}:{}) Unexpected ION value", _line, _cursor - _line_base) };
 
 				case Hash:
 					if (_stack.back() & AcceptValues)
@@ -246,12 +235,12 @@ namespace Yt
 						const auto begin = _cursor;
 						const auto end = forward_find_if(begin + 1, [](char c) { return (c < '0' || c > '9') && (c < 'a' || c > 'f'); });
 						if (const auto next_class = ::class_of(*end); next_class == Other || next_class == Name)
-							throw IonError{ _line, end - _line_base, "Bad character" };
+							throw IonError{ fmt::format("({}:{}) Bad character", _line, end - _line_base) };
 						_cursor = end;
 						return make_token<IonToken::Type::ColorValue>(begin, end - begin);
 					}
 					else
-						throw IonError{ _line, _cursor - _line_base, "Unexpected ION value" };
+						throw IonError{ fmt::format("({}:{}) Unexpected ION value", _line, _cursor - _line_base) };
 
 				case LBrace:
 					if (_stack.back() & AcceptValues)
@@ -260,7 +249,7 @@ namespace Yt
 						return make_token<IonToken::Type::ObjectBegin>(_cursor++, 1);
 					}
 					else
-						throw IonError{ _line, _cursor - _line_base, "Unexpected list" };
+						throw IonError{ fmt::format("({}:{}) Unexpected list", _line, _cursor - _line_base) };
 
 				case RBrace:
 					if (_stack.back() & AcceptNames && _stack.size() > 1)
@@ -269,7 +258,7 @@ namespace Yt
 						return make_token<IonToken::Type::ObjectEnd>(_cursor++, 1);
 					}
 					else
-						throw IonError{ _line, _cursor - _line_base, "Unexpected end of object" };
+						throw IonError{ fmt::format("({}:{}) Unexpected end of object", _line, _cursor - _line_base) };
 
 				case LBracket:
 					if (_stack.back() & AcceptValues)
@@ -278,7 +267,7 @@ namespace Yt
 						return make_token<IonToken::Type::ListBegin>(_cursor++, 1);
 					}
 					else
-						throw IonError{ _line, _cursor - _line_base, "Unexpected list" };
+						throw IonError{ fmt::format("({}:{}) Unexpected list", _line, _cursor - _line_base) };
 
 				case RBracket:
 					if ((_stack.back() & (AcceptNames | AcceptValues)) == AcceptValues)
@@ -287,7 +276,7 @@ namespace Yt
 						return make_token<IonToken::Type::ListEnd>(_cursor++, 1);
 					}
 					else
-						throw IonError{ _line, _cursor - _line_base, "Unexpected end of object" };
+						throw IonError{ fmt::format("({}:{}) Unexpected end of object", _line, _cursor - _line_base) };
 
 				case Comment:
 					if (auto next = _cursor + 1; *next == '/')
@@ -296,7 +285,7 @@ namespace Yt
 						break;
 					}
 					else
-						throw IonError{ _line, next - _line_base, "Bad character" };
+						throw IonError{ fmt::format("({}:{}) Bad character", _line, next - _line_base) };
 				}
 			}
 		}

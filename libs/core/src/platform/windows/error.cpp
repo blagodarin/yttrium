@@ -1,31 +1,19 @@
-//
 // This file is part of the Yttrium toolkit.
-// Copyright (C) 2019 Sergei Blagodarin.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+// Copyright (C) Sergei Blagodarin.
+// SPDX-License-Identifier: Apache-2.0
 
 #include "error.h"
 
 #include <yttrium/exceptions.h>
 #include <yttrium/logger.h>
-#include <yttrium/utils/string.h>
 
 #include <primal/pointer.hpp>
 
 #include <array>
 
 #include <windows.h>
+
+#include <fmt/format.h>
 
 namespace
 {
@@ -54,19 +42,19 @@ namespace Yt
 	std::string error_to_string(unsigned long code, std::string_view fallback_message)
 	{
 		if (const auto description = ::windows_error_description(code))
-			return make_string("[0x", Hex32{ code }, "] ", std::string_view{ description });
+			return fmt::format("[0x{:8X}] {}", code, description.get());
 		if (!fallback_message.empty())
-			return make_string("[0x", Hex32{ code }, "] ", fallback_message, '.');
-		return make_string("[0x", Hex32{ code }, "].");
+			return fmt::format("[0x{:8X}] {}.", code, fallback_message);
+		return fmt::format("[0x{:8X}].", code);
 	}
 
 	void log_error(const char* function, unsigned long error) noexcept
 	{
 		std::array<char, Logger::MaxMessageSize + 1> buffer;
 		if (const auto description = ::windows_error_description(error))
-			std::snprintf(buffer.data(), buffer.size(), "[%s] (0x%08X) %s", function, static_cast<unsigned>(error), description.get());
+			*fmt::format_to_n(buffer.data(), buffer.size() - 1, "[{}] (0x{:8X}) {}", function, error, description.get()).out = '\0';
 		else
-			std::snprintf(buffer.data(), buffer.size(), "[%s] (0x%08X)", function, static_cast<unsigned>(error));
+			*fmt::format_to_n(buffer.data(), buffer.size() - 1, "[{}] (0x{:8X})", function, error).out = '\0';
 		Logger::write(buffer.data());
 	}
 
@@ -79,6 +67,6 @@ namespace Yt
 	void throw_last_error(std::string_view function)
 	{
 		if (const auto error = ::GetLastError(); error != ERROR_SUCCESS)
-			throw InitializationError{ function, " failed: ", error_to_string(error) };
+			throw InitializationError{ fmt::format("{} failed: {}", function, error_to_string(error)) };
 	}
 }

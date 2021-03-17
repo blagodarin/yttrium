@@ -3,12 +3,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <yttrium/utils/string.h>
-#include "string.h"
 
-#include <array>
 #include <charconv>
 #include <cmath>
-#include <limits>
 
 namespace
 {
@@ -90,35 +87,6 @@ namespace
 
 namespace Yt
 {
-	void _append_to(std::string& string, long long value)
-	{
-		std::array<char, std::numeric_limits<long long>::digits10 + 2> buffer; // Extra chars for a "lossy" digit and a sign.
-		auto [ptr, ec] = std::to_chars(buffer.data(), buffer.data() + buffer.size(), value);
-		string.append(buffer.data(), ptr);
-	}
-
-	void _append_to(std::string& string, unsigned long long value)
-	{
-		std::array<char, std::numeric_limits<unsigned long long>::digits10 + 1> buffer; // Extra char for a "lossy" digit.
-		auto [ptr, ec] = std::to_chars(buffer.data(), buffer.data() + buffer.size(), value);
-		string.append(buffer.data(), ptr);
-	}
-
-	void _append_to(std::string& string, Hex32 value)
-	{
-		std::array<char, 8> buffer;
-		auto [ptr, ec] = std::to_chars(buffer.data(), buffer.data() + buffer.size(), value._value, 16);
-		const auto count = static_cast<std::size_t>(ptr - buffer.data());
-		string.append(8 - count, '0');
-		string.append(buffer.data(), count);
-	}
-
-	void _append_to(std::string& string, double value)
-	{
-		std::array<char, 32> buffer;
-		string.append(buffer.data(), static_cast<size_t>(std::snprintf(buffer.data(), buffer.size(), "%g", value)));
-	}
-
 	bool from_chars(std::string_view string, int32_t& value) noexcept
 	{
 		const auto end = string.data() + string.size();

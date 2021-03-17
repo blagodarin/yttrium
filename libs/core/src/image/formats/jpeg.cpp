@@ -102,7 +102,7 @@ namespace
 		{
 			char buffer[JMSG_LENGTH_MAX];
 			common->err->format_message(common, buffer);
-			Yt::Logger::log(buffer);
+			Yt::Logger::write(buffer);
 		}
 
 		static void reset_buffer(jpeg_compress_struct* compress) noexcept

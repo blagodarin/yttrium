@@ -1,25 +1,14 @@
-//
 // This file is part of the Yttrium toolkit.
-// Copyright (C) 2019 Sergei Blagodarin.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+// Copyright (C) Sergei Blagodarin.
+// SPDX-License-Identifier: Apache-2.0
 
 #include "scanner.h"
 
 #include <yttrium/exceptions.h>
 
 #include <array>
+
+#include <fmt/format.h>
 
 namespace
 {
@@ -112,7 +101,7 @@ namespace Yt
 				has_sign = true;
 				++_cursor;
 				if (::kind_of[static_cast<unsigned char>(*_cursor)] != C::Digit)
-					throw DataError{ "[", _line, ":", _cursor - _line_origin, "] '+' or '-' must be followed by a digit" };
+					throw DataError{ fmt::format("[{}:{}] '+' or '-' must be followed by a digit", _line, _cursor - _line_origin) };
 				[[fallthrough]];
 			case C::Digit: {
 				const auto begin = has_sign ? _cursor - 1 : _cursor;
@@ -167,13 +156,13 @@ namespace Yt
 						case '\'': *end++ = '\''; break;
 						case 'n': *end++ = '\n'; break;
 						case 'r': *end++ = '\r'; break;
-						default: throw DataError{ "[", _line, ":", _cursor - _line_origin, "] Invalid escape character" };
+						default: throw DataError{ fmt::format("[{}:{}] Invalid escape character", _line, _cursor - _line_origin) };
 						}
 						++_cursor;
 					}
 					else if (*_cursor == '\n' || *_cursor == '\r')
 					{
-						throw DataError{ "[", _line, ":", _cursor - _line_origin, "] Unexpected end of line" };
+						throw DataError{ fmt::format("[{}:{}] Unexpected end of line", _line, _cursor - _line_origin) };
 					}
 					else if (_cursor != _end)
 					{
@@ -183,7 +172,7 @@ namespace Yt
 						++end;
 					}
 					else
-						throw DataError{ "[", _line, ":", _cursor - _line_origin, "] Unexpected end of file" };
+						throw DataError{ fmt::format("[{}:{}] Unexpected end of file", _line, _cursor - _line_origin) };
 				}
 				token.string = { begin, static_cast<size_t>(end - begin) };
 			}
@@ -202,7 +191,7 @@ namespace Yt
 				break;
 
 			default:
-				throw DataError{ "[", _line, ":", _cursor - _line_origin, "] Invalid character" };
+				throw DataError{ fmt::format("[{}:{}] Invalid character", _line, _cursor - _line_origin) };
 			}
 		}
 	}

@@ -1,19 +1,6 @@
-//
 // This file is part of the Yttrium toolkit.
-// Copyright (C) 2019 Sergei Blagodarin.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+// Copyright (C) Sergei Blagodarin.
+// SPDX-License-Identifier: Apache-2.0
 
 #include <yttrium/script/context.h>
 
@@ -26,6 +13,8 @@
 #include <algorithm>
 #include <iterator>
 #include <unordered_map>
+
+#include <fmt/format.h>
 
 namespace Yt
 {
@@ -64,20 +53,20 @@ namespace Yt
 	{
 		if (name.empty())
 		{
-			Logger::log("Invalid command \"\"");
+			Logger::write("Invalid command \"\"");
 			return false;
 		}
 
 		const auto command = _private->_commands.find(name);
 		if (command == _private->_commands.end())
 		{
-			Logger::log("Unknown command \"", name, '"');
+			Logger::write(fmt::format("Unknown command \"{}\"", name));
 			return false;
 		}
 
 		if (args.size() < command->second._min_args || args.size() > command->second._max_args)
 		{
-			Logger::log("Argument number mismatch for \"", name, "\": ", args.size(), " instead of ", command->second._min_args, "-", command->second._max_args);
+			Logger::write(fmt::format("Argument number mismatch for \"{}\": {} instead of {}-{}", name, args.size(), command->second._min_args, command->second._max_args));
 			return false;
 		}
 
@@ -90,13 +79,13 @@ namespace Yt
 		const auto command = _private->_commands.find(name);
 		if (command == _private->_commands.end())
 		{
-			Logger::log("Unknown command \"", name, '"');
+			Logger::write(fmt::format("Unknown command \"{}\"", name));
 			return false;
 		}
 
 		if (arg_strings.size() < command->second._min_args || arg_strings.size() > command->second._max_args)
 		{
-			Logger::log("Argument number mismatch for \"", name, "\": ", arg_strings.size(), " instead of ", command->second._min_args, "-", command->second._max_args);
+			Logger::write(fmt::format("Argument number mismatch for \"{}\": {} instead of {}-{}", name, arg_strings.size(), command->second._min_args, command->second._max_args));
 			return false;
 		}
 
@@ -160,7 +149,7 @@ namespace Yt
 		for (auto left = source.data(), right = left, end = left + source.size();;)
 		{
 			right = std::find(right, end, '{');
-			append_to(target, std::string_view{ left, static_cast<size_t>(right - left) });
+			target.append(left, static_cast<size_t>(right - left));
 			if (right == end)
 				break;
 			left = ++right;
@@ -169,7 +158,7 @@ namespace Yt
 				break;
 			const auto value = find({ left, static_cast<size_t>(right - left) });
 			if (value)
-				append_to(target, value->string());
+				target += value->string();
 			left = ++right;
 		}
 	}

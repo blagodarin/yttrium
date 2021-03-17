@@ -21,6 +21,8 @@
 #include <mutex>
 #include <functional>
 
+#include <fmt/format.h>
+
 namespace
 {
 	bool read_texture_filter(Yt::IonReader& ion, Yt::IonToken& token, Yt::Texture2D::Filter& filter)
@@ -70,10 +72,10 @@ namespace Yt
 				return i->second;
 			auto source = _storage.open(name);
 			if (!source)
-				throw ResourceError{ "Can't find \"", name, "\"" };
+				throw ResourceError{ fmt::format("Can't find \"{}\"", name) };
 			auto resource_ptr = factory(std::move(source));
 			if (!resource_ptr)
-				throw DataError{ "Can't load \"", name, "\"" }; // We don't have more information at this point. =(
+				throw DataError{ fmt::format("Can't load \"{}\"", name) }; // We don't have more information at this point. =(
 			_map.emplace(name, resource_ptr);
 			return resource_ptr;
 		}
@@ -146,49 +148,46 @@ namespace Yt
 			for (auto token = ion.read(); token.type() != IonToken::Type::End;)
 			{
 				const auto ion_name = token.to_name();
-				const auto make_location = [name, &token] {
-					return make_string("(", name, ":", token.line(), ":", token.column(), ") ");
-				};
 				if (ion_name == "vertex_shader")
 				{
 					if (vertex_shader)
-						throw DataError{ make_location(), "Duplicate 'vertex_shader'" };
+						throw DataError{ fmt::format("({}:{}:{}) Duplicate 'vertex_shader'", name, token.line(), token.column()) };
 					vertex_shader = _private->_storage.open(ion.read().to_value());
 					if (!vertex_shader)
-						throw DataError{ make_location(), "Bad 'vertex_shader'" };
+						throw DataError{ fmt::format("({}:{}:{}) Bad 'vertex_shader'", name, token.line(), token.column()) };
 					token = ion.read();
 				}
 				else if (ion_name == "fragment_shader")
 				{
 					if (fragment_shader)
-						throw DataError{ make_location(), "Duplicate 'fragment_shader'" };
+						throw DataError{ fmt::format("({}:{}:{}) Duplicate 'fragment_shader'", name, token.line(), token.column()) };
 					fragment_shader = _private->_storage.open(ion.read().to_value());
 					if (!fragment_shader)
-						throw DataError{ make_location(), "Bad 'fragment_shader'" };
+						throw DataError{ fmt::format("({}:{}:{}) Bad 'fragment_shader'", name, token.line(), token.column()) };
 					token = ion.read();
 				}
 				else if (ion_name == "texture")
 				{
 					if (texture)
-						throw DataError{ make_location(), "Duplicate 'texture'" };
+						throw DataError{ fmt::format("({}:{}:{}) Duplicate 'texture'", name, token.line(), token.column()) };
 					const auto texture_name = ion.read().to_value();
 					if (texture_name.empty())
-						throw DataError{ make_location(), "Bad 'texture'" };
+						throw DataError{ fmt::format("({}:{}:{}) Bad 'texture'", name, token.line(), token.column()) };
 					if (!::read_texture_filter(ion, token.next(ion), texture_filter))
-						throw DataError{ make_location(), "Bad texture property" };
+						throw DataError{ fmt::format("({}:{}:{}) Bad texture property", name, token.line(), token.column()) };
 					texture = load_texture_2d(texture_name);
 				}
 				else
-					throw DataError{ make_location(), "Unknown material entry '", ion_name, "'" };
+					throw DataError{ fmt::format("({}:{}:{}) Unknown material entry '{}'", name, token.line(), token.column(), ion_name) };
 			}
 			if (!vertex_shader)
-				throw DataError{ "(", name, ") No 'vertex_shader'" };
+				throw DataError{ fmt::format("({}) No 'vertex_shader'", name) };
 			if (!fragment_shader)
-				throw DataError{ "(", name, ") No 'fragment_shader'" };
+				throw DataError{ fmt::format("({}) No 'fragment_shader'", name) };
 			// cppcheck-suppress shadowVar
 			auto program = _private->_render_manager->create_program(vertex_shader->to_string(), fragment_shader->to_string());
 			if (!program)
-				throw DataError{ "(", name, ") Bad 'vertex_shader' or 'fragment_shader'" };
+				throw DataError{ fmt::format("({}) Bad 'vertex_shader' or 'fragment_shader'", name) };
 			return std::make_shared<MaterialImpl>(std::move(program), std::move(texture), texture_filter);
 		});
 	}
@@ -209,7 +208,7 @@ namespace Yt
 		return _private->_texture_2d_cache.fetch(name, [this, name](std::unique_ptr<Source>&& source) -> std::shared_ptr<const Texture2D> {
 			auto image = Image::load(*source);
 			if (!image)
-				throw DataError{ "Can't load \"", name, "\"" };
+				throw DataError{ fmt::format("Can't load \"{}\"", name) };
 			return _private->_render_manager->create_texture_2d(*image);
 		});
 	}
@@ -225,7 +224,7 @@ namespace Yt
 	{
 		auto source = _private->_storage.open(name);
 		if (!source)
-			throw ResourceError{ "Missing \"", name, "\"" };
+			throw ResourceError{ fmt::format("Missing \"{}\"", name) };
 		return source;
 	}
 
