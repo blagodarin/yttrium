@@ -173,7 +173,7 @@ namespace
 		{
 			VkFormatProperties properties;
 			vkGetPhysicalDeviceFormatProperties(device, format_id, &properties);
-			Yt::Logger::write(fmt::format("  {} {} ({})", properties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT ? '+' : '-', format_name, format_id));
+			Yt::Logger::write(fmt::format("  {} {} ({})", (properties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT) ? '+' : '-', format_name, format_id));
 		}
 		Yt::Logger::write("");
 	}

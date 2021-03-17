@@ -1,19 +1,6 @@
-//
 // This file is part of the Yttrium toolkit.
-// Copyright (C) 2019 Sergei Blagodarin.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+// Copyright (C) Sergei Blagodarin.
+// SPDX-License-Identifier: Apache-2.0
 
 #pragma once
 
@@ -27,37 +14,37 @@ namespace Yt
 	class Rect
 	{
 	public:
-		Rect() = default;
-		Rect(const Point& top_left, const Point& bottom_right)
+		constexpr Rect() noexcept = default;
+		constexpr Rect(const Point& top_left, const Point& bottom_right) noexcept
 			: _left{ top_left._x }, _top{ top_left._y }, _right{ bottom_right._x }, _bottom{ bottom_right._y } {}
-		Rect(const Point& top_left, const Size& s)
+		constexpr Rect(const Point& top_left, const Size& s) noexcept
 			: _left{ top_left._x }, _top{ top_left._y }, _right{ _left + s._width }, _bottom{ _top + s._height } {}
-		explicit Rect(const Size& s)
+		explicit constexpr Rect(const Size& s) noexcept
 			: _right{ s._width }, _bottom{ s._height } {}
 
-		int bottom() const { return _bottom; }
-		Point bottom_left() const { return { _left, _bottom }; }
-		Point bottom_right() const { return { _right, _bottom }; }
-		int height() const { return _bottom - _top; }
-		int left() const { return _left; }
-		int right() const { return _right; }
-		Size size() const { return { width(), height() }; }
-		int top() const { return _top; }
-		Point top_left() const { return { _left, _top }; }
-		Point top_right() const { return { _right, _top }; }
-		int width() const { return _right - _left; }
+		constexpr int bottom() const noexcept { return _bottom; }
+		constexpr Point bottom_left() const noexcept { return { _left, _bottom }; }
+		constexpr Point bottom_right() const noexcept { return { _right, _bottom }; }
+		constexpr int height() const noexcept { return _bottom - _top; }
+		constexpr int left() const noexcept { return _left; }
+		constexpr int right() const noexcept { return _right; }
+		constexpr Size size() const noexcept { return { width(), height() }; }
+		constexpr int top() const noexcept { return _top; }
+		constexpr Point top_left() const noexcept { return { _left, _top }; }
+		constexpr Point top_right() const noexcept { return { _right, _top }; }
+		constexpr int width() const noexcept { return _right - _left; }
 
 		///
-		Point center() const { return { (_left + _right) / 2, (_top + _bottom) / 2 }; }
+		constexpr Point center() const noexcept { return { (_left + _right) / 2, (_top + _bottom) / 2 }; }
 
 		///
-		bool is_empty() const
+		constexpr bool is_empty() const noexcept
 		{
 			return _left >= _right || _top >= _bottom;
 		}
 
 		///
-		Point bound(const Point& p) const
+		constexpr Point bound(const Point& p) const noexcept
 		{
 			auto x = p._x;
 			if (x < _left)
@@ -73,7 +60,7 @@ namespace Yt
 		}
 
 		///
-		Rect centered_at(const Rect& rect) const
+		constexpr Rect centered_at(const Rect& rect) const noexcept
 		{
 			return {
 				{ (rect._right + rect._left - width()) / 2, (rect._bottom + rect._top - height()) / 2 },
@@ -82,28 +69,28 @@ namespace Yt
 		}
 
 		///
-		bool contains(const Point& p) const
+		constexpr bool contains(const Point& p) const noexcept
 		{
 			return _left <= p._x && p._x < _right
 				&& _top <= p._y && p._y < _bottom;
 		}
 
 		///
-		bool contains(const Rect& rect) const
+		constexpr bool contains(const Rect& rect) const noexcept
 		{
 			return _left <= rect._left && rect._right <= _right
 				&& _top <= rect._top && rect._bottom <= _bottom;
 		}
 
 		///
-		bool contains_fast(const Point& p) const
+		constexpr bool contains_fast(const Point& p) const noexcept
 		{
 			return ((p._x - _left) ^ (p._x - _right)) < 0
 				&& ((p._y - _top) ^ (p._y - _bottom)) < 0;
 		}
 
 		///
-		Rect intersected(const Rect& rect) const
+		constexpr Rect intersected(const Rect& rect) const noexcept
 		{
 			return {
 				{ std::max(_left, rect._left), std::max(_top, rect._top) },
@@ -115,14 +102,14 @@ namespace Yt
 		/// \note This function reports no intersection of a null rect with itself,
 		/// though it does report an intersection for a null rect with a non-null rect
 		/// if the point of the null rect lies inside the non-null rect.
-		bool intersects(const Rect& rect) const
+		constexpr bool intersects(const Rect& rect) const noexcept
 		{
 			return _left < rect._right && rect._left < _right
 				&& _top < rect._bottom && rect._top < _bottom;
 		}
 
 		/// Find whether the rects intersect.
-		bool intersects_fast(const Rect& rect) const
+		constexpr bool intersects_fast(const Rect& rect) const noexcept
 		{
 			return (_left - rect._right) * (_right - rect._left) < 0
 				&& (_top - rect._bottom) * (_bottom - rect._top) < 0;
@@ -133,7 +120,7 @@ namespace Yt
 		/// \note The function assumes that the subtraction result of any two coordinates along the same axis is valid.
 		/// \note The function reports an intersection of a null rect with itself
 		/// or with a non-null rect if the point of the null rect lies inside the non-null rect.
-		bool intersects_fastest(const Rect& rect) const
+		constexpr bool intersects_fastest(const Rect& rect) const noexcept
 		{
 			return ((_left - rect._right) ^ (rect._left - _right)) >= 0
 				&& ((_top - rect._bottom) ^ (rect._top - _bottom)) >= 0;

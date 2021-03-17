@@ -10,12 +10,14 @@
 
 namespace Yt
 {
+	class RectF;
 	class RenderManager;
 	class Renderer2D;
 	class Size;
 	class SizeF;
 	class Source;
 	class TextCapture;
+	class Texture2D;
 	class Vector2;
 
 	class Font
@@ -27,5 +29,7 @@ namespace Yt
 		virtual void render(Renderer2D&, const Vector2& topLeft, float fontSize, std::string_view, TextCapture* = nullptr) const = 0;
 		virtual Size text_size(std::string_view) const = 0;
 		virtual SizeF text_size(std::string_view, const SizeF& font_size) const = 0;
+		virtual std::shared_ptr<const Texture2D> texture() const noexcept = 0;
+		virtual RectF white_rect() const noexcept = 0;
 	};
 }

@@ -52,6 +52,7 @@ namespace Yt
 		void label(std::string_view text, const RectF& = {});
 		GuiLayout& layout() noexcept;
 		Renderer2D& renderer() noexcept { return _renderer; }
+		void selectBlankTexture();
 		void setButtonStyle(const GuiButtonStyle&) noexcept;
 		void setEditStyle(const GuiEditStyle&) noexcept;
 		void setLabelStyle(const GuiLabelStyle&) noexcept;

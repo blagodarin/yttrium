@@ -38,6 +38,8 @@ namespace Yt
 		GuiEditStyle _editStyle;
 		GuiLabelStyle _labelStyle;
 		std::shared_ptr<const Font> _defaultFont;
+		std::shared_ptr<const Texture2D> _blankTexture;
+		RectF _blankTextureRect;
 		GuiLayout _layout{ {} };
 
 		explicit GuiStateData(Window& window) noexcept
@@ -74,6 +76,17 @@ namespace Yt
 			}
 			return { count, false };
 		}
+
+		void updateBlankTexture(const std::shared_ptr<const Font>& font) noexcept
+		{
+			if (font)
+			{
+				_blankTexture = font->texture();
+				_blankTextureRect = font->white_rect();
+			}
+			else
+				_blankTexture = {};
+		}
 	};
 
 	GuiState::GuiState(Window& window)
@@ -106,8 +119,10 @@ namespace Yt
 	{
 		_state._cursor.emplace(_state._window.cursor());
 		_state._layout = GuiLayout{ RectF{ Rect{ _state._window.size() } } };
+		_state._blankTexture = {};
 		setButtonStyle({});
 		setLabelStyle({});
+		setEditStyle({});
 	}
 
 	GuiFrame::~GuiFrame() noexcept
@@ -165,7 +180,8 @@ namespace Yt
 					clicked = true;
 			}
 		}
-		_renderer.setTexture({});
+		_state.updateBlankTexture(_state._buttonStyle._font);
+		selectBlankTexture();
 		_renderer.setColor(styleState->_backgroundColor);
 		_renderer.addRect(rect);
 		if (_state._buttonStyle._font)
@@ -224,6 +240,7 @@ namespace Yt
 			return;
 		const auto fontSize = usedRect.height() * _state._buttonStyle._fontSize;
 		const auto padding = (usedRect.height() - _state._buttonStyle._font->text_size(text, { 1, fontSize })._height) / 2;
+		_state.updateBlankTexture(_state._labelStyle._font);
 		_renderer.setColor(_state._labelStyle._textColor);
 		_state._labelStyle._font->render(_renderer, usedRect.top_left() + Vector2{ padding, padding }, fontSize, text);
 	}
@@ -231,6 +248,13 @@ namespace Yt
 	GuiLayout& GuiFrame::layout() noexcept
 	{
 		return _state._layout;
+	}
+
+	void GuiFrame::selectBlankTexture()
+	{
+		_renderer.setTexture(_state._blankTexture);
+		if (_state._blankTexture)
+			_renderer.setTextureRect(_state._blankTextureRect);
 	}
 
 	void GuiFrame::setButtonStyle(const GuiButtonStyle& style) noexcept
@@ -295,15 +319,16 @@ namespace Yt
 				}
 			}
 		}
-		_renderer.setTexture({});
+		_state.updateBlankTexture(_state._editStyle._font);
+		selectBlankTexture();
 		_renderer.setColor(styleState->_backgroundColor);
 		_renderer.addRect(rect);
-		if (_state._buttonStyle._font)
+		if (_state._editStyle._font)
 		{
-			const auto fontSize = rect.height() * _state._buttonStyle._fontSize;
+			const auto fontSize = rect.height() * _state._editStyle._fontSize;
 			const auto textPadding = (rect.height() - fontSize) / 2;
 			_renderer.setColor(styleState->_textColor);
-			_state._buttonStyle._font->render(_renderer, rect.top_left() + Vector2{ textPadding, textPadding }, fontSize, text);
+			_state._editStyle._font->render(_renderer, rect.top_left() + Vector2{ textPadding, textPadding }, fontSize, text);
 		}
 		return false;
 	}

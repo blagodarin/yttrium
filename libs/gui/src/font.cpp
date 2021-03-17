@@ -23,6 +23,19 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
+namespace
+{
+	constexpr size_t builtin_width = 4;
+	constexpr size_t builtin_height = 4;
+	constexpr uint8_t builtin_data[builtin_height][builtin_width]{
+		{ 0xff, 0xff, 0x00, 0x00 },
+		{ 0xff, 0xff, 0x00, 0x00 },
+		{ 0x00, 0x00, 0x00, 0x00 },
+		{ 0x00, 0x00, 0x00, 0x00 },
+	};
+	constexpr Yt::RectF builtin_white_rect{ {}, Yt::SizeF{ 1, 1 } };
+}
+
 namespace Yt
 {
 	struct FreeTypeWrapper
@@ -67,6 +80,17 @@ namespace Yt
 			size_t x_offset = 0;
 			size_t y_offset = 0;
 			size_t row_height = 0;
+			const auto copy_rect = [this, &x_offset, &y_offset](const uint8_t* src, size_t width, size_t height, size_t stride) {
+				auto dst = static_cast<uint8_t*>(_image.data()) + _image.info().stride() * y_offset + x_offset;
+				for (size_t y = 0; y < height; ++y)
+				{
+					std::memcpy(dst, src, width);
+					src += stride;
+					dst += _image.info().stride();
+				}
+				x_offset += width + 1;
+			};
+			copy_rect(::builtin_data[0], ::builtin_width, ::builtin_height, ::builtin_width);
 			const auto baseline = static_cast<FT_Int>(size) * _freetype._face->ascender / _freetype._face->height;
 			for (FT_UInt char_code = 0; char_code < 65536; ++char_code)
 			{
@@ -86,20 +110,12 @@ namespace Yt
 				}
 				if (y_offset + glyph->bitmap.rows > _image.info().height())
 					break; // TODO: Report error.
-				auto src = glyph->bitmap.buffer;
-				auto dst = static_cast<uint8_t*>(_image.data()) + _image.info().stride() * y_offset + x_offset;
-				for (unsigned y = 0; y < glyph->bitmap.rows; ++y)
-				{
-					std::memcpy(dst, src, glyph->bitmap.width);
-					src += glyph->bitmap.pitch;
-					dst += _image.info().stride();
-				}
 				auto& font_char = _chars[char_code];
 				font_char.glyph_index = glyph_index;
 				font_char.rect = { { static_cast<int>(x_offset), static_cast<int>(y_offset) }, Size{ static_cast<int>(glyph->bitmap.width), static_cast<int>(glyph->bitmap.rows) } };
 				font_char.offset = { glyph->bitmap_left, baseline - glyph->bitmap_top };
 				font_char.advance = static_cast<int>(glyph->advance.x >> 6);
-				x_offset += glyph->bitmap.width + 1;
+				copy_rect(glyph->bitmap.buffer, glyph->bitmap.width, glyph->bitmap.rows, glyph->bitmap.pitch);
 				if (row_height < glyph->bitmap.rows)
 					row_height = glyph->bitmap.rows;
 			}
@@ -175,6 +191,16 @@ namespace Yt
 		{
 			const SizeF size{ text_size(text) };
 			return { font_size._width * (size._width * font_size._height / size._height), font_size._height };
+		}
+
+		std::shared_ptr<const Texture2D> texture() const noexcept override
+		{
+			return _texture;
+		}
+
+		RectF white_rect() const noexcept override
+		{
+			return ::builtin_white_rect;
 		}
 
 	private:
