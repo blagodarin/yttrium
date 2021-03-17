@@ -54,7 +54,7 @@ namespace Yt
 	class RenderPassImpl : public RenderPass
 	{
 	public:
-		RenderPassImpl(RenderBackend&, RenderBuiltin&, RenderPassData&, const Size& window_size, RenderReport&);
+		RenderPassImpl(RenderBackend&, RenderBuiltin&, RenderPassData&, const Size& viewport_size, RenderReport&);
 		~RenderPassImpl() noexcept override;
 
 		void draw_mesh(const Mesh&) override;
@@ -77,7 +77,6 @@ namespace Yt
 		void push_transformation(const Matrix4&);
 
 	private:
-		const BackendTexture2D* current_texture_2d() const;
 		void update_state();
 
 	private:

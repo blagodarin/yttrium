@@ -28,7 +28,7 @@ namespace Yt
 			Buffer _vertices;
 			Buffer _indices;
 
-			Part(const std::shared_ptr<const Texture2D>& texture) noexcept
+			explicit Part(const std::shared_ptr<const Texture2D>& texture) noexcept
 				: _texture{ texture } {}
 		};
 
@@ -46,7 +46,7 @@ namespace Yt
 			size_t _baseIndex = 0;
 		};
 
-		Renderer2DData(const ViewportData& viewportData)
+		explicit Renderer2DData(const ViewportData& viewportData)
 			: _viewportData{ viewportData }
 			, _currentPart{ &_parts.emplace_back(_viewportData._renderer_builtin._white_texture) }
 		{
@@ -60,11 +60,13 @@ namespace Yt
 			batch._vertices[0] = { position.top_left(), texture.top_left(), color };
 			batch._vertices[1] = { position.bottom_left(), texture.bottom_left(), color };
 			batch._vertices[2] = { position.top_right(), texture.top_right(), color };
+			// cppcheck-suppress unreadVariable
 			batch._vertices[3] = { position.bottom_right(), texture.bottom_right(), color };
 
 			batch._indices[0] = static_cast<uint16_t>(batch._baseIndex);
 			batch._indices[1] = static_cast<uint16_t>(batch._baseIndex + 1);
 			batch._indices[2] = static_cast<uint16_t>(batch._baseIndex + 2);
+			// cppcheck-suppress unreadVariable
 			batch._indices[3] = static_cast<uint16_t>(batch._baseIndex + 3);
 		}
 
@@ -179,10 +181,12 @@ namespace Yt
 		{
 			assert(texture);
 			if (_currentPart->_texture != texture)
+			{
 				if (_currentPart->_vertices.size() > 0)
 					advancePart(texture);
 				else
 					_currentPart->_texture = texture;
+			}
 			_textureRect = static_cast<const BackendTexture2D*>(texture.get())->full_rectangle();
 			_textureBorders = {};
 		}
@@ -214,11 +218,13 @@ namespace Yt
 		batch._vertices[0] = { quad._a, _data->_textureRect.top_left(), _data->_color };
 		batch._vertices[1] = { quad._d, _data->_textureRect.bottom_left(), _data->_color };
 		batch._vertices[2] = { quad._b, _data->_textureRect.top_right(), _data->_color };
+		// cppcheck-suppress unreadVariable
 		batch._vertices[3] = { quad._c, _data->_textureRect.bottom_right(), _data->_color };
 
 		batch._indices[0] = static_cast<uint16_t>(batch._baseIndex);
 		batch._indices[1] = static_cast<uint16_t>(batch._baseIndex + 1);
 		batch._indices[2] = static_cast<uint16_t>(batch._baseIndex + 2);
+		// cppcheck-suppress unreadVariable
 		batch._indices[3] = static_cast<uint16_t>(batch._baseIndex + 3);
 	}
 

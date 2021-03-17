@@ -195,11 +195,6 @@ namespace Yt
 		_data._matrix_stack.emplace_back(_data._matrix_stack.back().first * matrix, RenderMatrixType::Model);
 	}
 
-	const BackendTexture2D* RenderPassImpl::current_texture_2d() const
-	{
-		return static_cast<const BackendTexture2D*>(_data._texture_stack.back().first);
-	}
-
 	void RenderPassImpl::flush_2d(const Buffer& vertices, const Buffer& indices) noexcept
 	{
 		update_state();
