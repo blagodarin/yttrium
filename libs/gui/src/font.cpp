@@ -80,13 +80,20 @@ namespace Yt
 			size_t x_offset = 0;
 			size_t y_offset = 0;
 			size_t row_height = 0;
-			const auto copy_rect = [this, &x_offset, &y_offset](const uint8_t* src, size_t width, size_t height, size_t stride) {
-				auto dst = static_cast<uint8_t*>(_image.data()) + _image.info().stride() * y_offset + x_offset;
-				for (size_t y = 0; y < height; ++y)
+			const auto copy_rect = [&](const uint8_t* src, size_t width, size_t height, ptrdiff_t stride) {
+				if (height > 0)
 				{
-					std::memcpy(dst, src, width);
-					src += stride;
-					dst += _image.info().stride();
+					if (stride < 0)
+						src += (height - 1) * static_cast<size_t>(-stride);
+					auto dst = static_cast<uint8_t*>(_image.data()) + _image.info().stride() * y_offset + x_offset;
+					for (size_t y = 0; y < height; ++y)
+					{
+						std::memcpy(dst, src, width);
+						src += stride;
+						dst += _image.info().stride();
+					}
+					if (row_height < height)
+						row_height = height;
 				}
 				x_offset += width + 1;
 			};
@@ -116,8 +123,6 @@ namespace Yt
 				font_char.offset = { glyph->bitmap_left, baseline - glyph->bitmap_top };
 				font_char.advance = static_cast<int>(glyph->advance.x >> 6);
 				copy_rect(glyph->bitmap.buffer, glyph->bitmap.width, glyph->bitmap.rows, glyph->bitmap.pitch);
-				if (row_height < glyph->bitmap.rows)
-					row_height = glyph->bitmap.rows;
 			}
 			_texture = render_manager.create_texture_2d(_image);
 		}
@@ -159,7 +164,11 @@ namespace Yt
 				if (current == _chars.end())
 					continue;
 				if (_has_kerning && previous != _chars.end())
-					x += static_cast<float>(kerning(previous->second.glyph_index, current->second.glyph_index)) * scaling;
+				{
+					FT_Vector kerning;
+					if (!FT_Get_Kerning(_freetype._face, previous->second.glyph_index, current->second.glyph_index, FT_KERNING_DEFAULT, &kerning))
+						x += static_cast<float>(kerning.x >> 6) * scaling;
+				}
 				renderer.setTextureRect(Yt::RectF{ current->second.rect });
 				renderer.addRect({ { x + static_cast<float>(current->second.offset._x) * scaling, y + static_cast<float>(current->second.offset._y) * scaling },
 					SizeF(current->second.rect.size()) * scaling });
@@ -180,7 +189,11 @@ namespace Yt
 				if (current == _chars.end())
 					continue;
 				if (_has_kerning && previous != _chars.end())
-					width += kerning(previous->second.glyph_index, current->second.glyph_index);
+				{
+					FT_Vector kerning;
+					if (!FT_Get_Kerning(_freetype._face, previous->second.glyph_index, current->second.glyph_index, FT_KERNING_DEFAULT, &kerning))
+						width += static_cast<int>(kerning.x >> 6);
+				}
 				width += current->second.advance;
 				previous = current;
 			}
@@ -201,13 +214,6 @@ namespace Yt
 		RectF white_rect() const noexcept override
 		{
 			return ::builtin_white_rect;
-		}
-
-	private:
-		int kerning(FT_UInt left_glyph, FT_UInt right_glyph) const noexcept
-		{
-			FT_Vector kerning_vector;
-			return !FT_Get_Kerning(_freetype._face, left_glyph, right_glyph, FT_KERNING_DEFAULT, &kerning_vector) ? static_cast<int>(kerning_vector.x >> 6) : 0;
 		}
 
 	private:

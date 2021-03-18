@@ -119,7 +119,7 @@ namespace Yt
 	{
 		_state._cursor.emplace(_state._window.cursor());
 		_state._layout = GuiLayout{ RectF{ Rect{ _state._window.size() } } };
-		_state._blankTexture = {};
+		_state.updateBlankTexture(_state._defaultFont);
 		setButtonStyle({});
 		setLabelStyle({});
 		setEditStyle({});
