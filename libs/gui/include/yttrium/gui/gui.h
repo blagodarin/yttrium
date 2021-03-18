@@ -32,6 +32,7 @@ namespace Yt
 		~GuiState() noexcept;
 
 		void processKeyEvent(const KeyEvent&);
+		void processTextInput(std::string_view);
 		void setDefaultFont(const std::shared_ptr<const Font>&) noexcept;
 
 	private:

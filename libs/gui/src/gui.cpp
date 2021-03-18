@@ -34,16 +34,118 @@ namespace Yt
 		static constexpr uint16_t kProcessedFlag = 0x8000;
 		static constexpr uint16_t kKeySearchMask = kPayloadMask | kTextFlag | kProcessedFlag;
 
+		struct KeyboardItem
+		{
+			std::string _id;
+			bool _present = false;
+			size_t _cursor = 0;
+			std::chrono::steady_clock::time_point _cursorMark;
+
+			constexpr void adjustToText(std::string_view text) noexcept
+			{
+				if (_cursor > text.size())
+					_cursor = text.size();
+				else if (_cursor < text.size())
+					while (_cursor > 0 && primal::isUtf8Continuation(text[_cursor]))
+						--_cursor;
+			}
+
+			void onBackspace(std::string& text) noexcept
+			{
+				if (const auto cursor = leftStep(text); cursor != _cursor)
+				{
+					text.erase(cursor, _cursor - cursor);
+					_cursor = cursor;
+					_cursorMark = std::chrono::steady_clock::now();
+				}
+			}
+
+			void onDelete(std::string& text) noexcept
+			{
+				if (const auto cursor = rightStep(text); cursor != _cursor)
+				{
+					text.erase(_cursor, cursor - _cursor);
+					_cursorMark = std::chrono::steady_clock::now();
+				}
+			}
+
+			constexpr void onEnd(std::string_view text) noexcept
+			{
+				if (_cursor < text.size())
+				{
+					_cursor = text.size();
+					_cursorMark = std::chrono::steady_clock::now();
+				}
+			}
+
+			constexpr void onHome() noexcept
+			{
+				if (_cursor > 0)
+				{
+					_cursor = 0;
+					_cursorMark = std::chrono::steady_clock::now();
+				}
+			}
+
+			constexpr void onLeft(std::string_view text) noexcept
+			{
+				if (const auto cursor = leftStep(text); cursor != _cursor)
+				{
+					_cursor = cursor;
+					_cursorMark = std::chrono::steady_clock::now();
+				}
+			}
+
+			void onPaste(std::string& text, std::string_view paste)
+			{
+				text.insert(_cursor, paste);
+				_cursor += paste.size();
+				_cursorMark = std::chrono::steady_clock::now();
+			}
+
+			constexpr void onRight(std::string_view text) noexcept
+			{
+				if (const auto cursor = rightStep(text); cursor != _cursor)
+				{
+					_cursor = cursor;
+					_cursorMark = std::chrono::steady_clock::now();
+				}
+			}
+
+		private:
+			constexpr size_t leftStep(std::string_view text) const noexcept
+			{
+				assert(_cursor <= text.size());
+				if (!_cursor)
+					return 0;
+				auto offset = _cursor;
+				do
+					--offset;
+				while (offset > 0 && primal::isUtf8Continuation(text[offset]));
+				return offset;
+			}
+
+			constexpr size_t rightStep(std::string_view text) const noexcept
+			{
+				assert(_cursor <= text.size());
+				if (_cursor == text.size())
+					return 0;
+				auto offset = _cursor;
+				do
+					++offset;
+				while (offset < text.size() && primal::isUtf8Continuation(text[offset]));
+				return offset;
+			}
+		};
+
 		Window& _window;
 		std::vector<uint16_t> _inputEvents;
+		std::vector<std::string> _textInputs;
 		std::optional<Vector2> _mouseCursor;
 		std::string _mouseItem;
 		bool _mouseItemPresent = false;
 		Key _mouseItemKey = Key::Null;
-		std::string _keyboardItem;
-		bool _keyboardItemPresent = false;
-		size_t _keyboardItemCursor = 0;
-		std::chrono::steady_clock::time_point _keyboardItemCursorMark;
+		KeyboardItem _keyboardItem;
 		GuiButtonStyle _buttonStyle;
 		GuiEditStyle _editStyle;
 		GuiLabelStyle _labelStyle;
@@ -87,22 +189,19 @@ namespace Yt
 			return { count, false };
 		}
 
-		void captureKeyboard(std::function<bool(Key)>&& callback)
+		void captureKeyboard(std::function<bool(Key)>&& keyCallback, std::function<void(std::string_view)>&& textCallback)
 		{
-			assert(!_keyboardItem.empty());
-			bool processed = false;
+			assert(!_keyboardItem._id.empty());
 			for (auto& event : _inputEvents)
 			{
-				if (!(event & (kTextFlag | kProcessedFlag)))
-				{
-					event |= kProcessedFlag;
-					processed = true;
-					if ((event & kPressedFlag) && !callback(static_cast<Key>(event & kPayloadMask)))
-						break;
-				}
+				if (event & kProcessedFlag)
+					continue;
+				event |= kProcessedFlag;
+				if (event & kTextFlag)
+					textCallback(_textInputs[event & kPayloadMask]);
+				else if ((event & kPressedFlag) && !keyCallback(static_cast<Key>(event & kPayloadMask)))
+					break;
 			}
-			if (processed)
-				_keyboardItemCursorMark = std::chrono::steady_clock::now();
 		}
 
 		std::optional<Vector2> captureMouse(const RectF& rect) noexcept
@@ -144,6 +243,16 @@ namespace Yt
 		_data->_inputEvents.emplace_back(encodedEvent);
 	}
 
+	void GuiState::processTextInput(std::string_view text)
+	{
+		const auto index = _data->_textInputs.size();
+		if (index >= GuiStateData::kPayloadMask)
+			return;
+		_data->_inputEvents.reserve(_data->_inputEvents.size() + 1);
+		_data->_textInputs.emplace_back(text);
+		_data->_inputEvents.emplace_back(static_cast<uint16_t>(GuiStateData::kTextFlag | index));
+	}
+
 	void GuiState::setDefaultFont(const std::shared_ptr<const Font>& font) noexcept
 	{
 		_data->_defaultFont = font;
@@ -155,7 +264,7 @@ namespace Yt
 	{
 		_state._mouseCursor.emplace(_state._window.cursor());
 		_state._mouseItemPresent = false;
-		_state._keyboardItemPresent = false;
+		_state._keyboardItem._present = false;
 		_state._layout = GuiLayout{ RectF{ Rect{ _state._window.size() } } };
 		_state.updateBlankTexture(_state._defaultFont);
 		setButtonStyle({});
@@ -175,12 +284,13 @@ namespace Yt
 			_state._mouseItem.clear();
 			_state._mouseItemKey = Key::Null;
 		}
-		if (!_state._keyboardItemPresent)
+		if (!_state._keyboardItem._present)
 		{
-			_state._keyboardItem.clear();
-			_state._keyboardItemCursor = 0;
+			_state._keyboardItem._id.clear();
+			_state._keyboardItem._cursor = 0;
 		}
 		_state._inputEvents.clear();
+		_state._textInputs.clear();
 	}
 
 	bool GuiFrame::button(std::string_view id, std::string_view text, const RectF& rect)
@@ -195,7 +305,7 @@ namespace Yt
 		{
 			assert(_state._mouseCursor);
 			assert(!_state._mouseItemPresent);
-			assert(_state._keyboardItem.empty());
+			assert(_state._keyboardItem._id.empty());
 			const auto hovered = rect.contains(*_state._mouseCursor);
 			const auto released = _state.captureClick(_state._mouseItemKey, false, true).second;
 			if (released)
@@ -231,9 +341,9 @@ namespace Yt
 				}
 				else
 					clicked = true;
-				_state._keyboardItem.clear();
-				_state._keyboardItemPresent = false;
-				_state._keyboardItemCursor = 0;
+				_state._keyboardItem._id.clear();
+				_state._keyboardItem._present = false;
+				_state._keyboardItem._cursor = 0;
 			}
 		}
 		_state.updateBlankTexture(_state._buttonStyle._font);
@@ -279,9 +389,9 @@ namespace Yt
 						_state._mouseItemPresent = true;
 						_state._mouseItemKey = key;
 					}
-					_state._keyboardItem.clear();
-					_state._keyboardItemPresent = false;
-					_state._keyboardItemCursor = 0;
+					_state._keyboardItem._id.clear();
+					_state._keyboardItem._present = false;
+					_state._keyboardItem._cursor = 0;
 					return maybeCaptured;
 				}
 		}
@@ -353,7 +463,7 @@ namespace Yt
 		{
 			assert(_state._mouseCursor);
 			assert(!_state._mouseItemPresent);
-			assert(_state._keyboardItem == id);
+			assert(_state._keyboardItem._id == id);
 			const auto released = _state.captureClick(_state._mouseItemKey, false, true).second;
 			if (released)
 			{
@@ -379,49 +489,55 @@ namespace Yt
 					_state._mouseItemPresent = true;
 					_state._mouseItemKey = Key::Mouse1;
 				}
-				_state._keyboardItem = id;
-				_state._keyboardItemCursorMark = std::chrono::steady_clock::now();
+				_state._keyboardItem._id = id;
+				_state._keyboardItem._cursorMark = std::chrono::steady_clock::now();
 			}
 		}
-		if (_state._keyboardItem == id)
+		if (_state._keyboardItem._id == id)
 		{
-			assert(!_state._keyboardItemPresent);
-			_state._keyboardItemPresent = true;
+			assert(!_state._keyboardItem._present);
+			_state._keyboardItem._present = true;
 			styleState = &_state._editStyle._active;
 			showCursor = true;
-			if (_state._keyboardItemCursor > text.size())
-				_state._keyboardItemCursor = text.size();
-			else if (_state._keyboardItemCursor < text.size())
-				while (_state._keyboardItemCursor > 0 && primal::isUtf8Continuation(text[_state._keyboardItemCursor]))
-					--_state._keyboardItemCursor;
-			_state.captureKeyboard([&](Key key) {
-				switch (key)
-				{
-				case Key::Enter:
-				case Key::NumEnter:
-					entered = true;
-					[[fallthrough]];
-				case Key::Escape:
-					_state._keyboardItem.clear();
-					_state._keyboardItemPresent = false;
-					return false;
-				case Key::Left:
-					if (_state._keyboardItemCursor > 0)
-						do
-							--_state._keyboardItemCursor;
-						while (_state._keyboardItemCursor > 0 && primal::isUtf8Continuation(text[_state._keyboardItemCursor]));
-					break;
-				case Key::Right:
-					if (_state._keyboardItemCursor < text.size())
-						do
-							++_state._keyboardItemCursor;
-						while (_state._keyboardItemCursor < text.size() && primal::isUtf8Continuation(text[_state._keyboardItemCursor]));
-					break;
-				default:
-					break;
-				}
-				return true;
-			});
+			_state._keyboardItem.adjustToText(text);
+			_state.captureKeyboard(
+				[&](Key key) {
+					switch (key)
+					{
+					case Key::Enter:
+					case Key::NumEnter:
+						entered = true;
+						[[fallthrough]];
+					case Key::Escape:
+						_state._keyboardItem._id.clear();
+						_state._keyboardItem._present = false;
+						return false;
+					case Key::Left:
+						_state._keyboardItem.onLeft(text);
+						break;
+					case Key::Right:
+						_state._keyboardItem.onRight(text);
+						break;
+					case Key::Backspace:
+						_state._keyboardItem.onBackspace(text);
+						break;
+					case Key::Delete:
+						_state._keyboardItem.onDelete(text);
+						break;
+					case Key::Home:
+						_state._keyboardItem.onHome();
+						break;
+					case Key::End:
+						_state._keyboardItem.onEnd(text);
+						break;
+					default:
+						break;
+					}
+					return true;
+				},
+				[&](std::string_view paste) {
+					_state._keyboardItem.onPaste(text, paste);
+				});
 		}
 		_state.updateBlankTexture(_state._editStyle._font);
 		selectBlankTexture();
@@ -432,9 +548,9 @@ namespace Yt
 			const auto fontSize = rect.height() * _state._editStyle._fontSize;
 			const auto textPadding = (rect.height() - fontSize) / 2;
 			_renderer.setColor(styleState->_textColor);
-			TextCapture capture{ _state._keyboardItemCursor, 0, 0 };
+			TextCapture capture{ _state._keyboardItem._cursor, 0, 0 };
 			_state._editStyle._font->render(_renderer, rect.top_left() + Vector2{ textPadding, textPadding }, fontSize, text, &capture);
-			if (showCursor && capture._has_cursor && std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - _state._keyboardItemCursorMark).count() % 1000 < 500)
+			if (showCursor && capture._has_cursor && std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - _state._keyboardItem._cursorMark).count() % 1000 < 500)
 			{
 				_renderer.setTextureRect(_state._editStyle._font->white_rect());
 				_renderer.setColor(_state._editStyle._cursorColor);
