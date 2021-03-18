@@ -132,7 +132,7 @@ namespace Yt
 			auto x = topLeft.x;
 			const auto y = topLeft.y;
 			float selection_left = 0;
-			const auto do_capture = [fontSize, capture, x, y, &selection_left](size_t offset) {
+			const auto do_capture = [fontSize, capture, &x, y, &selection_left](size_t offset) {
 				if (!capture)
 					return;
 				if (capture->_cursor_pos == offset)
