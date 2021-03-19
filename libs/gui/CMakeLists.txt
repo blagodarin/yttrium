@@ -10,7 +10,6 @@ add_library(ygui STATIC
 	include/yttrium/gui/gui.h
 	include/yttrium/gui/layout.h
 	include/yttrium/gui/style.h
-	include/yttrium/gui/text_capture.h
 	src/font.cpp
 	src/gui.cpp
 	src/layout.cpp

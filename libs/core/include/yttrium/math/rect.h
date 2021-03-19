@@ -192,6 +192,9 @@ namespace Yt
 			return { x, y };
 		}
 
+		constexpr void set_right(float right) noexcept { _right = right; }
+		constexpr void set_width(float width) noexcept { _right = _left + width; }
+
 	private:
 		float _left = 0;
 		float _top = 0;

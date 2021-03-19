@@ -5,9 +5,7 @@
 #include <yttrium/gui/font.h>
 
 #include <yttrium/exceptions.h>
-#include <yttrium/gui/text_capture.h>
 #include <yttrium/image/image.h>
-#include <yttrium/math/size.h>
 #include <yttrium/renderer/2d.h>
 #include <yttrium/renderer/manager.h>
 #include <yttrium/renderer/texture.h>
@@ -18,6 +16,7 @@
 
 #include <cassert>
 #include <cstring>
+#include <optional>
 #include <unordered_map>
 
 #include <ft2build.h>
@@ -127,35 +126,36 @@ namespace Yt
 			_texture = render_manager.create_texture_2d(_image);
 		}
 
-		void render(Renderer2D& renderer, const Vector2& topLeft, float fontSize, std::string_view text, TextCapture* capture) const override
+		void render(Renderer2D& renderer, const RectF& rect, std::string_view text, TextCapture* capture) const override
 		{
-			auto x = topLeft.x;
-			const auto y = topLeft.y;
-			float selection_left = 0;
-			const auto do_capture = [fontSize, capture, &x, y, &selection_left](size_t offset) {
+			auto x = rect.left();
+			const auto y = rect.top();
+			std::optional<float> selectionX;
+			const auto do_capture = [&](size_t offset) {
 				if (!capture)
 					return;
 				if (capture->_cursor_pos == offset)
 				{
-					capture->_cursor_rect = { { x, y }, SizeF{ 2, fontSize } };
+					capture->_cursor_rect = { { x, y }, SizeF{ 2, rect.height() } };
 					capture->_has_cursor = true;
 				}
-				if (capture->_selection_begin < capture->_selection_end)
+				if (capture->_selection_end == capture->_selection_begin)
+					return;
+				if (selectionX)
 				{
-					if (offset == capture->_selection_begin)
+					if (offset == capture->_selection_end)
 					{
-						selection_left = x;
-					}
-					else if (offset == capture->_selection_end)
-					{
-						capture->_selection_rect = { { selection_left, y }, Vector2{ x, y + fontSize } };
 						capture->_has_selection = true;
+						capture->_selection_rect = { { *selectionX, y }, Vector2{ x, y + rect.height() } };
+						selectionX.reset();
 					}
 				}
+				else if (offset == capture->_selection_begin)
+					selectionX = x;
 			};
 
 			renderer.setTexture(_texture);
-			const auto scaling = fontSize / static_cast<float>(_size);
+			const auto scaling = rect.height() / static_cast<float>(_size);
 			auto previous = _chars.end();
 			for (size_t i = 0; i < text.size();)
 			{
@@ -169,17 +169,44 @@ namespace Yt
 					if (!FT_Get_Kerning(_freetype._face, previous->second.glyph_index, current->second.glyph_index, FT_KERNING_DEFAULT, &kerning))
 						x += static_cast<float>(kerning.x >> 6) * scaling;
 				}
-				renderer.setTextureRect(Yt::RectF{ current->second.rect });
-				renderer.addRect({ { x + static_cast<float>(current->second.offset._x) * scaling, y + static_cast<float>(current->second.offset._y) * scaling },
-					SizeF(current->second.rect.size()) * scaling });
+				RectF positionRect{ { x + static_cast<float>(current->second.offset._x) * scaling, y + static_cast<float>(current->second.offset._y) * scaling }, SizeF(current->second.rect.size()) * scaling };
+				if (positionRect.left() >= rect.right())
+				{
+					if (capture && selectionX)
+					{
+						capture->_has_selection = true;
+						capture->_selection_rect = { { *selectionX, y }, Vector2{ rect.right(), y + rect.height() } };
+					}
+					return;
+				}
+				RectF textureRect{ current->second.rect };
+				bool clipped = false;
+				if (positionRect.right() > rect.right())
+				{
+					const auto originalWidth = positionRect.width();
+					positionRect.set_right(rect.right());
+					textureRect.set_width(textureRect.width() * positionRect.width() / originalWidth);
+					clipped = true;
+				}
+				renderer.setTextureRect(textureRect);
+				renderer.addBorderlessRect(positionRect);
 				do_capture(offset);
+				if (clipped)
+				{
+					if (capture && selectionX)
+					{
+						capture->_has_selection = true;
+						capture->_selection_rect = { { *selectionX, y }, Vector2{ rect.right(), y + rect.height() } };
+					}
+					return;
+				}
 				x += static_cast<float>(current->second.advance) * scaling;
 				previous = current;
 			}
 			do_capture(text.size());
 		}
 
-		Size text_size(std::string_view text) const override
+		SizeF text_size(std::string_view text, float font_size) const override
 		{
 			int width = 0;
 			auto previous = _chars.end();
@@ -197,13 +224,7 @@ namespace Yt
 				width += current->second.advance;
 				previous = current;
 			}
-			return { width, _size };
-		}
-
-		SizeF text_size(std::string_view text, const SizeF& font_size) const override
-		{
-			const SizeF size{ text_size(text) };
-			return { font_size._width * (size._width * font_size._height / size._height), font_size._height };
+			return { static_cast<float>(width) * font_size / static_cast<float>(_size), font_size };
 		}
 
 		std::shared_ptr<const Texture2D> texture() const noexcept override

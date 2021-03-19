@@ -53,23 +53,6 @@ namespace Yt
 			_textureRect = static_cast<const BackendTexture2D*>(_currentPart->_texture.get())->full_rectangle();
 		}
 
-		void addRect(const RectF& position, const RectF& texture, Bgra32 color)
-		{
-			auto batch = prepareBatch(4, 4);
-
-			batch._vertices[0] = { position.top_left(), texture.top_left(), color };
-			batch._vertices[1] = { position.bottom_left(), texture.bottom_left(), color };
-			batch._vertices[2] = { position.top_right(), texture.top_right(), color };
-			// cppcheck-suppress unreadVariable
-			batch._vertices[3] = { position.bottom_right(), texture.bottom_right(), color };
-
-			batch._indices[0] = static_cast<uint16_t>(batch._baseIndex);
-			batch._indices[1] = static_cast<uint16_t>(batch._baseIndex + 1);
-			batch._indices[2] = static_cast<uint16_t>(batch._baseIndex + 2);
-			// cppcheck-suppress unreadVariable
-			batch._indices[3] = static_cast<uint16_t>(batch._baseIndex + 3);
-		}
-
 		void addRect(const RectF& position, const RectF& texture, const MarginsF& borders, Bgra32 color)
 		{
 			const auto textureSize = _currentPart->_texture->size();
@@ -228,6 +211,25 @@ namespace Yt
 		batch._indices[3] = static_cast<uint16_t>(batch._baseIndex + 3);
 	}
 
+	size_t Renderer2D::addBorderlessRect(const RectF& rect)
+	{
+		auto batch = _data->prepareBatch(4, 4);
+
+		batch._vertices[0] = { rect.top_left(), _data->_textureRect.top_left(), _data->_color };
+		batch._vertices[1] = { rect.bottom_left(), _data->_textureRect.bottom_left(), _data->_color };
+		batch._vertices[2] = { rect.top_right(), _data->_textureRect.top_right(), _data->_color };
+		// cppcheck-suppress unreadVariable
+		batch._vertices[3] = { rect.bottom_right(), _data->_textureRect.bottom_right(), _data->_color };
+
+		batch._indices[0] = static_cast<uint16_t>(batch._baseIndex);
+		batch._indices[1] = static_cast<uint16_t>(batch._baseIndex + 1);
+		batch._indices[2] = static_cast<uint16_t>(batch._baseIndex + 2);
+		// cppcheck-suppress unreadVariable
+		batch._indices[3] = static_cast<uint16_t>(batch._baseIndex + 3);
+
+		return (static_cast<size_t>(_data->_currentPart - _data->_parts.data()) << 16) + batch._baseIndex;
+	}
+
 	void Renderer2D::addRect(const RectF& rect)
 	{
 		_data->addRect(rect, _data->_textureRect, _data->_textureBorders, _data->_color);
@@ -260,6 +262,20 @@ namespace Yt
 		_data->_textureBorders = {};
 	}
 
+	void Renderer2D::rewriteBorderlessRect(size_t id, const RectF& rect)
+	{
+		const auto partIndex = id >> 16;
+		assert(partIndex <= static_cast<size_t>(_data->_currentPart - _data->_parts.data()));
+		auto& vertexBuffer = _data->_parts[partIndex]._vertices;
+		const auto vertexIndex = id & 0xffff;
+		assert(vertexIndex + 4 <= vertexBuffer.size() / sizeof(Vertex2D));
+		auto* const vertices = static_cast<Vertex2D*>(vertexBuffer.data()) + vertexIndex;
+		vertices[0]._position = rect.top_left();
+		vertices[1]._position = rect.bottom_left();
+		vertices[2]._position = rect.top_right();
+		vertices[3]._position = rect.bottom_right();
+	}
+
 	void Renderer2D::setColor(Bgra32 color)
 	{
 		_data->_color = color;
@@ -284,5 +300,10 @@ namespace Yt
 				borders._left / textureSize._width,
 			};
 		}
+	}
+
+	SizeF Renderer2D::viewportSize() const noexcept
+	{
+		return SizeF{ _data->_viewportData._window_size };
 	}
 }

@@ -20,6 +20,7 @@ namespace Yt
 		, _hovered{ Bgra32::grayscale(0x11, 0xdd), Bgra32::grayscale(0xee) }
 		, _active{ Bgra32::grayscale(0x22, 0xee), Bgra32::white() }
 		, _cursorColor{ Bgra32::white() }
+		, _selectionColor{ Bgra32::grayscale(0x55) }
 	{
 	}
 

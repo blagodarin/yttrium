@@ -44,6 +44,7 @@ namespace Yt
 		State _hovered;
 		State _active;
 		Bgra32 _cursorColor;
+		Bgra32 _selectionColor;
 		GuiEditStyle() noexcept;
 	};
 

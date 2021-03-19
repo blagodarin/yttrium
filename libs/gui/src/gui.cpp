@@ -9,7 +9,6 @@
 #include <yttrium/gui/font.h>
 #include <yttrium/gui/layout.h>
 #include <yttrium/gui/style.h>
-#include <yttrium/gui/text_capture.h>
 #include <yttrium/math/rect.h>
 #include <yttrium/renderer/2d.h>
 
@@ -21,6 +20,22 @@
 #include <vector>
 
 #include <primal/utf8.hpp>
+
+namespace
+{
+	constexpr Yt::RectF relativeHeightInRect(const Yt::RectF& rect, float relativeHeight) noexcept
+	{
+		const auto padding = rect.height() * (1 - relativeHeight) / 2;
+		return { rect.top_left() + padding, rect.bottom_right() - padding };
+	}
+
+	constexpr Yt::RectF sizeInRect(const Yt::RectF& rect, const Yt::SizeF& size) noexcept
+	{
+		const auto yPadding = (rect.height() - size._height) / 2;
+		const auto xPadding = std::max(yPadding, (rect.width() - size._width) / 2);
+		return { rect.top_left() + Yt::Vector2{ xPadding, yPadding }, rect.bottom_right() - Yt::Vector2{ xPadding, yPadding } };
+	}
+}
 
 namespace Yt
 {
@@ -369,10 +384,7 @@ namespace Yt
 			_state._mouseItemKey = Key::Null;
 		}
 		if (!_state._keyboardItem._present)
-		{
 			_state._keyboardItem._id.clear();
-			_state._keyboardItem._cursor = 0;
-		}
 		_state._inputEvents.clear();
 		_state._textInputs.clear();
 	}
@@ -426,8 +438,6 @@ namespace Yt
 				else
 					clicked = true;
 				_state._keyboardItem._id.clear();
-				_state._keyboardItem._present = false;
-				_state._keyboardItem._cursor = 0;
 			}
 		}
 		_state.updateBlankTexture(_state._buttonStyle._font);
@@ -436,10 +446,8 @@ namespace Yt
 		_renderer.addRect(rect);
 		if (_state._buttonStyle._font)
 		{
-			const auto fontSize = rect.height() * _state._buttonStyle._fontSize;
-			const auto textSize = _state._buttonStyle._font->text_size(text, { 1, fontSize });
 			_renderer.setColor(styleState->_textColor);
-			_state._buttonStyle._font->render(_renderer, rect.top_left() + Vector2{ rect.width() - textSize._width, rect.height() - textSize._height } / 2, fontSize, text);
+			_state._buttonStyle._font->render(_renderer, ::sizeInRect(rect, _state._buttonStyle._font->text_size(text, rect.height() * _state._buttonStyle._fontSize)), text);
 		}
 		return clicked;
 	}
@@ -474,8 +482,6 @@ namespace Yt
 						_state._mouseItemKey = key;
 					}
 					_state._keyboardItem._id.clear();
-					_state._keyboardItem._present = false;
-					_state._keyboardItem._cursor = 0;
 					return maybeCaptured;
 				}
 		}
@@ -491,14 +497,14 @@ namespace Yt
 	{
 		if (!_state._labelStyle._font)
 			return;
-		const auto usedRect = rect == RectF{} ? _state._layout.add() : rect;
+		auto usedRect = rect == RectF{} ? _state._layout.add() : rect;
 		if (usedRect.top() == usedRect.bottom())
 			return;
-		const auto fontSize = usedRect.height() * _state._buttonStyle._fontSize;
-		const auto padding = (usedRect.height() - _state._buttonStyle._font->text_size(text, { 1, fontSize })._height) / 2;
+		if (usedRect.left() == usedRect.right())
+			usedRect.set_right(_renderer.viewportSize()._width);
 		_state.updateBlankTexture(_state._labelStyle._font);
 		_renderer.setColor(_state._labelStyle._textColor);
-		_state._labelStyle._font->render(_renderer, usedRect.top_left() + Vector2{ padding, padding }, fontSize, text);
+		_state._labelStyle._font->render(_renderer, ::relativeHeightInRect(usedRect, _state._buttonStyle._fontSize), text);
 	}
 
 	GuiLayout& GuiFrame::layout() noexcept
@@ -574,7 +580,9 @@ namespace Yt
 					_state._mouseItemKey = Key::Mouse1;
 				}
 				_state._keyboardItem._id = id;
+				_state._keyboardItem._cursor = 0;
 				_state._keyboardItem._cursorMark = std::chrono::steady_clock::now();
+				_state._keyboardItem._selectionSize = 0;
 			}
 		}
 		if (_state._keyboardItem._id == id)
@@ -594,7 +602,6 @@ namespace Yt
 						[[fallthrough]];
 					case Key::Escape:
 						_state._keyboardItem._id.clear();
-						_state._keyboardItem._present = false;
 						active = false;
 						return false;
 					case Key::Left:
@@ -630,22 +637,25 @@ namespace Yt
 		_renderer.addRect(rect);
 		if (_state._editStyle._font)
 		{
-			const auto fontSize = rect.height() * _state._editStyle._fontSize;
-			const auto textPadding = (rect.height() - fontSize) / 2;
-			_renderer.setColor(styleState->_textColor);
-			TextCapture capture{ _state._keyboardItem._cursor, _state._keyboardItem._selectionOffset, _state._keyboardItem._selectionSize };
-			_state._editStyle._font->render(_renderer, rect.top_left() + Vector2{ textPadding, textPadding }, fontSize, text, &capture);
-			if (capture._has_selection)
+			size_t selectionRect = 0;
+			if (active)
 			{
-				_renderer.setTextureRect(_state._editStyle._font->white_rect());
-				_renderer.setColor(Bgra32::white(0x33));
-				_renderer.addRect(capture._selection_rect);
+				_renderer.setColor(_state._editStyle._selectionColor);
+				selectionRect = _renderer.addBorderlessRect({});
 			}
-			if (active && capture._has_cursor && std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - _state._keyboardItem._cursorMark).count() % 1000 < 500)
+			_renderer.setColor(styleState->_textColor);
+			Font::TextCapture capture{ _state._keyboardItem._cursor, _state._keyboardItem._selectionOffset, _state._keyboardItem._selectionSize };
+			_state._editStyle._font->render(_renderer, ::relativeHeightInRect(rect, _state._editStyle._fontSize), text, &capture);
+			if (active)
 			{
-				_renderer.setTextureRect(_state._editStyle._font->white_rect());
-				_renderer.setColor(_state._editStyle._cursorColor);
-				_renderer.addRect(capture._cursor_rect);
+				if (capture._has_selection)
+					_renderer.rewriteBorderlessRect(selectionRect, capture._selection_rect);
+				if (capture._has_cursor && std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - _state._keyboardItem._cursorMark).count() % 1000 < 500)
+				{
+					_renderer.setTextureRect(_state._editStyle._font->white_rect());
+					_renderer.setColor(_state._editStyle._cursorColor);
+					_renderer.addRect(capture._cursor_rect);
+				}
 			}
 		}
 		return entered;
