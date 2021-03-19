@@ -28,8 +28,9 @@ namespace Yt
 	{
 	public:
 		static constexpr uint16_t kPayloadMask = 0x00ff;
-		static constexpr uint16_t kPressedFlag = 0x0100;
-		static constexpr uint16_t kAutorepeatFlag = 0x0200;
+		static constexpr uint16_t kShiftFlag = 0x0100;
+		static constexpr uint16_t kPressedFlag = 0x1000;
+		static constexpr uint16_t kAutorepeatFlag = 0x2000;
 		static constexpr uint16_t kTextFlag = 0x4000;
 		static constexpr uint16_t kProcessedFlag = 0x8000;
 		static constexpr uint16_t kKeySearchMask = kPayloadMask | kTextFlag | kProcessedFlag;
@@ -40,6 +41,8 @@ namespace Yt
 			bool _present = false;
 			size_t _cursor = 0;
 			std::chrono::steady_clock::time_point _cursorMark;
+			size_t _selectionOffset = 0;
+			size_t _selectionSize = 0;
 
 			constexpr void adjustToText(std::string_view text) noexcept
 			{
@@ -48,93 +51,172 @@ namespace Yt
 				else if (_cursor < text.size())
 					while (_cursor > 0 && primal::isUtf8Continuation(text[_cursor]))
 						--_cursor;
+				if (_selectionOffset > _cursor)
+					_selectionOffset = _cursor;
+				if (const auto maxSelectionSize = text.size() - _selectionOffset; maxSelectionSize < _selectionSize)
+					_selectionSize = maxSelectionSize;
 			}
 
 			void onBackspace(std::string& text) noexcept
 			{
-				if (const auto cursor = leftStep(text); cursor != _cursor)
+				assert(_cursor <= text.size());
+				size_t count = 0;
+				if (_selectionSize > 0)
 				{
-					text.erase(cursor, _cursor - cursor);
-					_cursor = cursor;
-					_cursorMark = std::chrono::steady_clock::now();
+					assert(_cursor == _selectionOffset
+						|| _cursor == _selectionOffset + _selectionSize);
+					count = std::exchange(_selectionSize, 0);
+					_cursor = _selectionOffset;
 				}
+				else if (_cursor > 0)
+				{
+					count = leftStep(text);
+					_cursor -= count;
+				}
+				else
+					return;
+				text.erase(_cursor, count);
+				_cursorMark = std::chrono::steady_clock::now();
 			}
 
 			void onDelete(std::string& text) noexcept
 			{
-				if (const auto cursor = rightStep(text); cursor != _cursor)
+				assert(_cursor <= text.size());
+				size_t count = 0;
+				if (_selectionSize > 0)
 				{
-					text.erase(_cursor, cursor - _cursor);
-					_cursorMark = std::chrono::steady_clock::now();
+					assert(_cursor == _selectionOffset
+						|| _cursor == _selectionOffset + _selectionSize);
+					count = std::exchange(_selectionSize, 0);
+					_cursor = _selectionOffset;
 				}
+				else if (_cursor < text.size())
+					count = rightStep(text);
+				else
+					return;
+				text.erase(_cursor, count);
+				_cursorMark = std::chrono::steady_clock::now();
 			}
 
-			constexpr void onEnd(std::string_view text) noexcept
+			void onEnd(std::string_view text, bool shift) noexcept
 			{
 				if (_cursor < text.size())
 				{
+					if (shift)
+					{
+						if (!_selectionSize)
+							_selectionOffset = _cursor;
+						else if (_cursor == _selectionOffset)
+							_selectionOffset += _selectionSize;
+						_selectionSize = text.size() - _selectionOffset;
+					}
 					_cursor = text.size();
 					_cursorMark = std::chrono::steady_clock::now();
 				}
+				if (!shift)
+					_selectionSize = 0;
 			}
 
-			constexpr void onHome() noexcept
+			void onHome(bool shift) noexcept
 			{
 				if (_cursor > 0)
 				{
+					if (shift)
+					{
+						if (_selectionSize > 0 && _selectionOffset < _cursor)
+							_selectionSize = _selectionOffset;
+						else
+							_selectionSize += _cursor;
+						_selectionOffset = 0;
+					}
 					_cursor = 0;
 					_cursorMark = std::chrono::steady_clock::now();
 				}
+				if (!shift)
+					_selectionSize = 0;
 			}
 
-			constexpr void onLeft(std::string_view text) noexcept
+			void onLeft(std::string_view text, bool shift) noexcept
 			{
-				if (const auto cursor = leftStep(text); cursor != _cursor)
+				if (_cursor > 0)
 				{
-					_cursor = cursor;
+					const auto step = leftStep(text);
+					assert(step > 0 && step <= _cursor);
+					_cursor -= step;
 					_cursorMark = std::chrono::steady_clock::now();
+					if (shift)
+					{
+						if (_selectionSize > 0 && _selectionOffset <= _cursor)
+							_selectionSize -= step;
+						else
+						{
+							_selectionSize += step;
+							_selectionOffset = _cursor;
+						}
+					}
 				}
+				if (!shift)
+					_selectionSize = 0;
 			}
 
 			void onPaste(std::string& text, std::string_view paste)
 			{
+				if (_selectionSize > 0)
+				{
+					text.erase(_selectionOffset, _selectionSize);
+					_cursor = _selectionOffset;
+					_selectionSize = 0;
+				}
 				text.insert(_cursor, paste);
 				_cursor += paste.size();
 				_cursorMark = std::chrono::steady_clock::now();
 			}
 
-			constexpr void onRight(std::string_view text) noexcept
+			void onRight(std::string_view text, bool shift) noexcept
 			{
-				if (const auto cursor = rightStep(text); cursor != _cursor)
+				if (_cursor < text.size())
 				{
-					_cursor = cursor;
+					const auto step = rightStep(text);
+					assert(step > 0 && step <= text.size() - _cursor);
+					if (shift)
+					{
+						if (_selectionSize > 0 && _selectionOffset == _cursor)
+						{
+							_selectionSize -= step;
+							_selectionOffset += step;
+						}
+						else
+						{
+							_selectionOffset = _cursor - _selectionSize;
+							_selectionSize += step;
+						}
+					}
+					_cursor += step;
 					_cursorMark = std::chrono::steady_clock::now();
 				}
+				if (!shift)
+					_selectionSize = 0;
 			}
 
 		private:
 			constexpr size_t leftStep(std::string_view text) const noexcept
 			{
-				assert(_cursor <= text.size());
-				if (!_cursor)
-					return 0;
+				assert(_cursor > 0);
 				auto offset = _cursor;
 				do
 					--offset;
 				while (offset > 0 && primal::isUtf8Continuation(text[offset]));
-				return offset;
+				return _cursor - offset;
 			}
 
 			constexpr size_t rightStep(std::string_view text) const noexcept
 			{
-				assert(_cursor <= text.size());
-				if (_cursor == text.size())
-					return 0;
+				assert(_cursor < text.size());
 				auto offset = _cursor;
 				do
 					++offset;
 				while (offset < text.size() && primal::isUtf8Continuation(text[offset]));
-				return offset;
+				return offset - _cursor;
 			}
 		};
 
@@ -189,7 +271,7 @@ namespace Yt
 			return { count, false };
 		}
 
-		void captureKeyboard(std::function<bool(Key)>&& keyCallback, std::function<void(std::string_view)>&& textCallback)
+		void captureKeyboard(std::function<bool(Key, bool)>&& keyCallback, std::function<void(std::string_view)>&& textCallback)
 		{
 			assert(!_keyboardItem._id.empty());
 			for (auto& event : _inputEvents)
@@ -199,7 +281,7 @@ namespace Yt
 				event |= kProcessedFlag;
 				if (event & kTextFlag)
 					textCallback(_textInputs[event & kPayloadMask]);
-				else if ((event & kPressedFlag) && !keyCallback(static_cast<Key>(event & kPayloadMask)))
+				else if ((event & kPressedFlag) && !keyCallback(static_cast<Key>(event & kPayloadMask), event & kShiftFlag))
 					break;
 			}
 		}
@@ -239,6 +321,8 @@ namespace Yt
 			encodedEvent |= GuiStateData::kPressedFlag;
 			if (event._autorepeat)
 				encodedEvent |= GuiStateData::kAutorepeatFlag;
+			if (event._modifiers & KeyEvent::Modifier::Shift)
+				encodedEvent |= GuiStateData::kShiftFlag;
 		}
 		_data->_inputEvents.emplace_back(encodedEvent);
 	}
@@ -458,7 +542,7 @@ namespace Yt
 			return false;
 		bool entered = false;
 		const auto* styleState = &_state._editStyle._normal;
-		bool showCursor = false;
+		bool active = false;
 		if (_state._mouseItem == id)
 		{
 			assert(_state._mouseCursor);
@@ -498,10 +582,10 @@ namespace Yt
 			assert(!_state._keyboardItem._present);
 			_state._keyboardItem._present = true;
 			styleState = &_state._editStyle._active;
-			showCursor = true;
+			active = true;
 			_state._keyboardItem.adjustToText(text);
 			_state.captureKeyboard(
-				[&](Key key) {
+				[&](Key key, bool shift) {
 					switch (key)
 					{
 					case Key::Enter:
@@ -511,12 +595,13 @@ namespace Yt
 					case Key::Escape:
 						_state._keyboardItem._id.clear();
 						_state._keyboardItem._present = false;
+						active = false;
 						return false;
 					case Key::Left:
-						_state._keyboardItem.onLeft(text);
+						_state._keyboardItem.onLeft(text, shift);
 						break;
 					case Key::Right:
-						_state._keyboardItem.onRight(text);
+						_state._keyboardItem.onRight(text, shift);
 						break;
 					case Key::Backspace:
 						_state._keyboardItem.onBackspace(text);
@@ -525,10 +610,10 @@ namespace Yt
 						_state._keyboardItem.onDelete(text);
 						break;
 					case Key::Home:
-						_state._keyboardItem.onHome();
+						_state._keyboardItem.onHome(shift);
 						break;
 					case Key::End:
-						_state._keyboardItem.onEnd(text);
+						_state._keyboardItem.onEnd(text, shift);
 						break;
 					default:
 						break;
@@ -548,9 +633,15 @@ namespace Yt
 			const auto fontSize = rect.height() * _state._editStyle._fontSize;
 			const auto textPadding = (rect.height() - fontSize) / 2;
 			_renderer.setColor(styleState->_textColor);
-			TextCapture capture{ _state._keyboardItem._cursor, 0, 0 };
+			TextCapture capture{ _state._keyboardItem._cursor, _state._keyboardItem._selectionOffset, _state._keyboardItem._selectionSize };
 			_state._editStyle._font->render(_renderer, rect.top_left() + Vector2{ textPadding, textPadding }, fontSize, text, &capture);
-			if (showCursor && capture._has_cursor && std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - _state._keyboardItem._cursorMark).count() % 1000 < 500)
+			if (capture._has_selection)
+			{
+				_renderer.setTextureRect(_state._editStyle._font->white_rect());
+				_renderer.setColor(Bgra32::white(0x33));
+				_renderer.addRect(capture._selection_rect);
+			}
+			if (active && capture._has_cursor && std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - _state._keyboardItem._cursorMark).count() % 1000 < 500)
 			{
 				_renderer.setTextureRect(_state._editStyle._font->white_rect());
 				_renderer.setColor(_state._editStyle._cursorColor);
