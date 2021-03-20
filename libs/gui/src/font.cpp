@@ -24,15 +24,15 @@
 
 namespace
 {
-	constexpr size_t builtin_width = 4;
-	constexpr size_t builtin_height = 4;
-	constexpr uint8_t builtin_data[builtin_height][builtin_width]{
+	constexpr size_t builtinWidth = 4;
+	constexpr size_t builtinHeight = 4;
+	constexpr uint8_t builtinData[builtinHeight][builtinWidth]{
 		{ 0xff, 0xff, 0x00, 0x00 },
 		{ 0xff, 0xff, 0x00, 0x00 },
 		{ 0x00, 0x00, 0x00, 0x00 },
 		{ 0x00, 0x00, 0x00, 0x00 },
 	};
-	constexpr Yt::RectF builtin_white_rect{ {}, Yt::SizeF{ 1, 1 } };
+	constexpr Yt::RectF builtinWhiteRect{ {}, Yt::SizeF{ 1, 1 } };
 }
 
 namespace Yt
@@ -40,7 +40,7 @@ namespace Yt
 	struct FreeTypeWrapper
 	{
 		FT_Library _library = nullptr;
-		Buffer _face_buffer;
+		Buffer _faceBuffer;
 		FT_Face _face = nullptr;
 
 		FreeTypeWrapper()
@@ -62,20 +62,20 @@ namespace Yt
 			if (buffer.size() > static_cast<size_t>(std::numeric_limits<FT_Long>::max())
 				|| FT_New_Memory_Face(_library, static_cast<const FT_Byte*>(buffer.data()), static_cast<FT_Long>(buffer.size()), 0, &_face))
 				throw DataError{ "Failed to load font" };
-			_face_buffer = std::move(buffer);
+			_faceBuffer = std::move(buffer);
 		}
 	};
 
-	class FontImpl : public Font
+	class FontImpl final : public Font
 	{
 	public:
-		FontImpl(const Source& source, RenderManager& render_manager, size_t size)
+		FontImpl(const Source& source, RenderManager& renderManager, size_t size)
 			: _size{ static_cast<int>(size) }
-			, _image{ { size * 32, size * 32, PixelFormat::Intensity8 } }
 		{
 			_freetype.load(source.to_buffer());
-			_has_kerning = FT_HAS_KERNING(_freetype._face);
+			_hasKerning = FT_HAS_KERNING(_freetype._face);
 			FT_Set_Pixel_Sizes(_freetype._face, 0, static_cast<FT_UInt>(size));
+			Image image{ { size * 32, size * 32, PixelFormat::Intensity8 } };
 			size_t x_offset = 0;
 			size_t y_offset = 0;
 			size_t row_height = 0;
@@ -84,102 +84,69 @@ namespace Yt
 				{
 					if (stride < 0)
 						src += (height - 1) * static_cast<size_t>(-stride);
-					auto dst = static_cast<uint8_t*>(_image.data()) + _image.info().stride() * y_offset + x_offset;
+					auto dst = static_cast<uint8_t*>(image.data()) + image.info().stride() * y_offset + x_offset;
 					for (size_t y = 0; y < height; ++y)
 					{
 						std::memcpy(dst, src, width);
 						src += stride;
-						dst += _image.info().stride();
+						dst += image.info().stride();
 					}
 					if (row_height < height)
 						row_height = height;
 				}
 				x_offset += width + 1;
 			};
-			copy_rect(::builtin_data[0], ::builtin_width, ::builtin_height, ::builtin_width);
+			copy_rect(::builtinData[0], ::builtinWidth, ::builtinHeight, ::builtinWidth);
 			const auto baseline = static_cast<FT_Int>(size) * _freetype._face->ascender / _freetype._face->height;
-			for (FT_UInt char_code = 0; char_code < 65536; ++char_code)
+			for (FT_UInt codepoint = 0; codepoint < 65536; ++codepoint)
 			{
-				const auto glyph_index = FT_Get_Char_Index(_freetype._face, char_code);
-				if (!glyph_index)
+				const auto id = FT_Get_Char_Index(_freetype._face, codepoint);
+				if (!id)
 					continue;
-
-				if (FT_Load_Glyph(_freetype._face, glyph_index, FT_LOAD_RENDER))
+				if (FT_Load_Glyph(_freetype._face, id, FT_LOAD_RENDER))
 					continue; // TODO: Report error.
-
 				const auto glyph = _freetype._face->glyph;
-				if (x_offset + glyph->bitmap.width > _image.info().width())
+				if (x_offset + glyph->bitmap.width > image.info().width())
 				{
 					x_offset = 0;
 					y_offset += row_height + 1;
 					row_height = 0;
 				}
-				if (y_offset + glyph->bitmap.rows > _image.info().height())
+				if (y_offset + glyph->bitmap.rows > image.info().height())
 					break; // TODO: Report error.
-				auto& font_char = _chars[char_code];
-				font_char.glyph_index = glyph_index;
-				font_char.rect = { { static_cast<int>(x_offset), static_cast<int>(y_offset) }, Size{ static_cast<int>(glyph->bitmap.width), static_cast<int>(glyph->bitmap.rows) } };
-				font_char.offset = { glyph->bitmap_left, baseline - glyph->bitmap_top };
-				font_char.advance = static_cast<int>(glyph->advance.x >> 6);
+				auto& glyphInfo = _glyph[codepoint];
+				glyphInfo._id = id;
+				glyphInfo._rect = { { static_cast<int>(x_offset), static_cast<int>(y_offset) }, Size{ static_cast<int>(glyph->bitmap.width), static_cast<int>(glyph->bitmap.rows) } };
+				glyphInfo._offset = { glyph->bitmap_left, baseline - glyph->bitmap_top };
+				glyphInfo._advance = static_cast<int>(glyph->advance.x >> 6);
 				copy_rect(glyph->bitmap.buffer, glyph->bitmap.width, glyph->bitmap.rows, glyph->bitmap.pitch);
 			}
-			_texture = render_manager.create_texture_2d(_image);
+			_texture = renderManager.create_texture_2d(image);
 		}
 
-		void render(Renderer2D& renderer, const RectF& rect, std::string_view text, TextCapture* capture) const override
+		void render(Renderer2D& renderer, const RectF& rect, std::string_view text) const override
 		{
-			auto x = rect.left();
-			const auto y = rect.top();
-			std::optional<float> selectionX;
-			const auto do_capture = [&](size_t offset) {
-				if (!capture)
-					return;
-				if (capture->_cursor_pos == offset)
-				{
-					capture->_cursor_rect = { { x, y }, SizeF{ 2, rect.height() } };
-					capture->_has_cursor = true;
-				}
-				if (capture->_selection_end == capture->_selection_begin)
-					return;
-				if (selectionX)
-				{
-					if (offset == capture->_selection_end)
-					{
-						capture->_has_selection = true;
-						capture->_selection_rect = { { *selectionX, y }, Vector2{ x, y + rect.height() } };
-						selectionX.reset();
-					}
-				}
-				else if (offset == capture->_selection_begin)
-					selectionX = x;
-			};
-
+			const auto scale = rect.height() / static_cast<float>(_size);
+			int x = 0;
+			auto previous = _glyph.end();
 			renderer.setTexture(_texture);
-			const auto scaling = rect.height() / static_cast<float>(_size);
-			auto previous = _chars.end();
 			for (size_t i = 0; i < text.size();)
 			{
 				const auto offset = i;
-				const auto current = _chars.find(primal::readUtf8(text, i));
-				if (current == _chars.end())
+				const auto current = _glyph.find(primal::readUtf8(text, i));
+				if (current == _glyph.end())
 					continue;
-				if (_has_kerning && previous != _chars.end())
+				if (_hasKerning && previous != _glyph.end())
 				{
 					FT_Vector kerning;
-					if (!FT_Get_Kerning(_freetype._face, previous->second.glyph_index, current->second.glyph_index, FT_KERNING_DEFAULT, &kerning))
-						x += static_cast<float>(kerning.x >> 6) * scaling;
+					if (!FT_Get_Kerning(_freetype._face, previous->second._id, current->second._id, FT_KERNING_DEFAULT, &kerning))
+						x += static_cast<int>(kerning.x >> 6);
 				}
-				RectF positionRect{ { x + static_cast<float>(current->second.offset._x) * scaling, y + static_cast<float>(current->second.offset._y) * scaling }, SizeF(current->second.rect.size()) * scaling };
-				if (positionRect.left() >= rect.right())
-				{
-					if (capture && selectionX)
-					{
-						capture->_has_selection = true;
-						capture->_selection_rect = { { *selectionX, y }, Vector2{ rect.right(), y + rect.height() } };
-					}
-					return;
-				}
-				RectF textureRect{ current->second.rect };
+				const auto left = rect.left() + static_cast<float>(x + current->second._offset._x) * scale;
+				if (left >= rect.right())
+					break;
+				RectF positionRect{ { left, rect.top() + static_cast<float>(current->second._offset._y) * scale }, SizeF{ current->second._rect.size() } * scale };
+				RectF textureRect{ current->second._rect };
 				bool clipped = false;
 				if (positionRect.right() > rect.right())
 				{
@@ -190,41 +157,58 @@ namespace Yt
 				}
 				renderer.setTextureRect(textureRect);
 				renderer.addBorderlessRect(positionRect);
-				do_capture(offset);
 				if (clipped)
-				{
-					if (capture && selectionX)
-					{
-						capture->_has_selection = true;
-						capture->_selection_rect = { { *selectionX, y }, Vector2{ rect.right(), y + rect.height() } };
-					}
 					return;
-				}
-				x += static_cast<float>(current->second.advance) * scaling;
+				x += current->second._advance;
 				previous = current;
 			}
-			do_capture(text.size());
 		}
 
-		SizeF text_size(std::string_view text, float font_size) const override
+		float textWidth(std::string_view text, float fontSize, TextCapture* capture) const override
 		{
-			int width = 0;
-			auto previous = _chars.end();
+			const auto scale = fontSize / static_cast<float>(_size);
+
+			int x = 0;
+			std::optional<float> selectionX;
+			const auto updateCapture = [&](size_t offset) {
+				if (!capture)
+					return;
+				if (capture->_cursorOffset == offset)
+					capture->_cursorPosition.emplace(static_cast<float>(x) * scale);
+				if (capture->_selectionBegin < capture->_selectionEnd)
+				{
+					if (selectionX)
+					{
+						if (offset == capture->_selectionEnd)
+						{
+							capture->_selectionRange.emplace(*selectionX, static_cast<float>(x) * scale);
+							selectionX.reset();
+						}
+					}
+					else if (offset == capture->_selectionBegin)
+						selectionX = static_cast<float>(x) * scale;
+				}
+			};
+
+			auto previous = _glyph.end();
 			for (size_t i = 0; i < text.size();)
 			{
-				const auto current = _chars.find(primal::readUtf8(text, i));
-				if (current == _chars.end())
+				const auto offset = i;
+				const auto current = _glyph.find(primal::readUtf8(text, i));
+				if (current == _glyph.end())
 					continue;
-				if (_has_kerning && previous != _chars.end())
+				if (_hasKerning && previous != _glyph.end())
 				{
 					FT_Vector kerning;
-					if (!FT_Get_Kerning(_freetype._face, previous->second.glyph_index, current->second.glyph_index, FT_KERNING_DEFAULT, &kerning))
-						width += static_cast<int>(kerning.x >> 6);
+					if (!FT_Get_Kerning(_freetype._face, previous->second._id, current->second._id, FT_KERNING_DEFAULT, &kerning))
+						x += static_cast<int>(kerning.x >> 6);
 				}
-				width += current->second.advance;
+				updateCapture(offset);
+				x += current->second._advance;
 				previous = current;
 			}
-			return { static_cast<float>(width) * font_size / static_cast<float>(_size), font_size };
+			updateCapture(text.size());
+			return static_cast<float>(x) * scale;
 		}
 
 		std::shared_ptr<const Texture2D> texture() const noexcept override
@@ -232,30 +216,33 @@ namespace Yt
 			return _texture;
 		}
 
-		RectF white_rect() const noexcept override
+		RectF textureRect(Graphics graphics) const noexcept override
 		{
-			return ::builtin_white_rect;
+			switch (graphics)
+			{
+			case Graphics::WhiteRect: return ::builtinWhiteRect;
+			}
+			return {};
 		}
 
 	private:
-		struct FontChar
+		struct Glyph
 		{
-			FT_UInt glyph_index = 0;
-			Rect rect;
-			Point offset;
-			int advance = 0;
+			FT_UInt _id = 0;
+			Rect _rect;
+			Point _offset;
+			int _advance = 0;
 		};
 
 		FreeTypeWrapper _freetype;
 		const int _size;
-		bool _has_kerning = false;
-		Image _image;
-		std::unordered_map<char32_t, FontChar> _chars;
+		bool _hasKerning = false;
+		std::unordered_map<char32_t, Glyph> _glyph;
 		std::shared_ptr<const Texture2D> _texture;
 	};
 
-	std::shared_ptr<const Font> Font::load(const Source& source, RenderManager& render_manager)
+	std::shared_ptr<const Font> Font::load(const Source& source, RenderManager& renderManager)
 	{
-		return std::make_shared<FontImpl>(source, render_manager, 64);
+		return std::make_shared<FontImpl>(source, renderManager, 64);
 	}
 }

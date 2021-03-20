@@ -314,7 +314,7 @@ namespace Yt
 			if (font)
 			{
 				_blankTexture = font->texture();
-				_blankTextureRect = font->white_rect();
+				_blankTextureRect = font->textureRect(Font::Graphics::WhiteRect);
 			}
 			else
 				_blankTexture = {};
@@ -446,8 +446,10 @@ namespace Yt
 		_renderer.addRect(rect);
 		if (_state._buttonStyle._font)
 		{
+			const auto textHeight = rect.height() * _state._buttonStyle._fontSize;
+			const auto textWidth = _state._buttonStyle._font->textWidth(text, textHeight);
 			_renderer.setColor(styleState->_textColor);
-			_state._buttonStyle._font->render(_renderer, ::sizeInRect(rect, _state._buttonStyle._font->text_size(text, rect.height() * _state._buttonStyle._fontSize)), text);
+			_state._buttonStyle._font->render(_renderer, ::sizeInRect(rect, { textWidth, textHeight }), text);
 		}
 		return clicked;
 	}
@@ -637,24 +639,29 @@ namespace Yt
 		_renderer.addRect(rect);
 		if (_state._editStyle._font)
 		{
-			size_t selectionRect = 0;
-			if (active)
+			const auto textRect = ::relativeHeightInRect(rect, _state._editStyle._fontSize);
+			Font::TextCapture capture{ _state._keyboardItem._cursor, _state._keyboardItem._selectionOffset, _state._keyboardItem._selectionSize };
+			const auto textWidth = _state._editStyle._font->textWidth(text, textRect.height(), &capture);
+			if (active && capture._selectionRange)
 			{
-				_renderer.setColor(_state._editStyle._selectionColor);
-				selectionRect = _renderer.addBorderlessRect({});
+				const auto selectionLeft = textRect.left() + capture._selectionRange->first;
+				if (selectionLeft < textRect.right())
+				{
+					const auto selectionRight = std::min(textRect.left() + capture._selectionRange->second, textRect.right());
+					_renderer.setColor(_state._editStyle._selectionColor);
+					_renderer.addBorderlessRect({ { selectionLeft, textRect.top() }, Vector2{ selectionRight, textRect.bottom() } });
+				}
 			}
 			_renderer.setColor(styleState->_textColor);
-			Font::TextCapture capture{ _state._keyboardItem._cursor, _state._keyboardItem._selectionOffset, _state._keyboardItem._selectionSize };
-			_state._editStyle._font->render(_renderer, ::relativeHeightInRect(rect, _state._editStyle._fontSize), text, &capture);
-			if (active)
+			_state._editStyle._font->render(_renderer, textRect, text);
+			if (active && capture._cursorPosition)
 			{
-				if (capture._has_selection)
-					_renderer.rewriteBorderlessRect(selectionRect, capture._selection_rect);
-				if (capture._has_cursor && std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - _state._keyboardItem._cursorMark).count() % 1000 < 500)
+				const auto cursorX = textRect.left() + *capture._cursorPosition;
+				if (cursorX < textRect.right() && std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - _state._keyboardItem._cursorMark).count() % 1000 < 500)
 				{
-					_renderer.setTextureRect(_state._editStyle._font->white_rect());
+					_renderer.setTextureRect(_state._editStyle._font->textureRect(Font::Graphics::WhiteRect));
 					_renderer.setColor(_state._editStyle._cursorColor);
-					_renderer.addRect(capture._cursor_rect);
+					_renderer.addRect({ { cursorX, textRect.top() }, Vector2{ std::min(cursorX + 2, textRect.right()), textRect.bottom() } });
 				}
 			}
 		}
