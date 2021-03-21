@@ -34,14 +34,15 @@ namespace Yt
 		constexpr void setAxis(Axis axis) noexcept { _axis = axis; }
 		constexpr void setSize(const SizeF& size) noexcept { _defaultSize = size; }
 		constexpr void setSpacing(float spacing) noexcept { _spacing = spacing; }
+		void skip(float distance) noexcept;
 		[[nodiscard]] constexpr Vector2 transform(const Vector2& point) const noexcept { return point * _scaling + _offset; }
 		[[nodiscard]] constexpr RectF transform(const RectF& rect) const noexcept { return rect * _scaling + _offset; }
 
 	private:
 		const RectF _rect;
+		float _scaling = 1;
 		Vector2 _offset{ 0, 0 };
 		SizeF _size = _rect.size();
-		float _scaling = 1;
 		Vector2 _direction{ 1, 1 };
 		Vector2 _position{ 0, 0 };
 		Axis _axis = Axis::X;

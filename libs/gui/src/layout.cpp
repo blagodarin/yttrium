@@ -33,28 +33,36 @@ namespace Yt
 		const auto heightRatio = _rect.height() / size._height;
 		if (widthRatio > heightRatio)
 		{
-			_offset = { (_rect.width() - size._width) / 2, 0 };
 			_scaling = heightRatio;
+			_offset = { (_rect.width() - size._width * _scaling) / 2, 0 };
 		}
 		else
 		{
-			_offset = { 0, (_rect.height() - size._height) / 2 };
 			_scaling = widthRatio;
+			_offset = { 0, (_rect.height() - size._height * _scaling) / 2 };
 		}
 		_size = size;
 	}
 
 	void GuiLayout::scaleForHeight(float height) noexcept
 	{
-		_offset = { 0, 0 };
 		_scaling = _rect.height() / height;
+		_offset = { 0, 0 };
 		_size = { _rect.width() / _scaling, height };
 	}
 
 	void GuiLayout::scaleForWidth(float width) noexcept
 	{
-		_offset = { 0, 0 };
 		_scaling = _rect.width() / width;
+		_offset = { 0, 0 };
 		_size = { width, _rect.height() / _scaling };
+	}
+
+	void GuiLayout::skip(float distance) noexcept
+	{
+		if (_axis == Axis::X)
+			_position.x += _direction.x * distance;
+		else
+			_position.y += _direction.y * distance;
 	}
 }
