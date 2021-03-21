@@ -170,7 +170,7 @@ namespace Yt
 				else
 					_currentPart->_texture = texture;
 			}
-			_textureRect = static_cast<const BackendTexture2D*>(texture.get())->full_rectangle();
+			_textureRect = _viewportData._renderer.map_rect({ { 0, 0 }, SizeF{ 1, 1 } }, static_cast<const BackendTexture2D*>(_currentPart->_texture.get())->orientation());
 			_textureBorders = {};
 		}
 
@@ -198,11 +198,11 @@ namespace Yt
 	{
 		const auto batch = _data->prepareBatch(4, 4);
 
-		batch._vertices[0] = { quad._a, _data->_textureRect.top_left(), _data->_color };
-		batch._vertices[1] = { quad._d, _data->_textureRect.bottom_left(), _data->_color };
-		batch._vertices[2] = { quad._b, _data->_textureRect.top_right(), _data->_color };
+		batch._vertices[0] = { quad._a, _data->_textureRect.topLeft(), _data->_color };
+		batch._vertices[1] = { quad._d, _data->_textureRect.bottomLeft(), _data->_color };
+		batch._vertices[2] = { quad._b, _data->_textureRect.topRight(), _data->_color };
 		// cppcheck-suppress unreadVariable
-		batch._vertices[3] = { quad._c, _data->_textureRect.bottom_right(), _data->_color };
+		batch._vertices[3] = { quad._c, _data->_textureRect.bottomRight(), _data->_color };
 
 		batch._indices[0] = static_cast<uint16_t>(batch._baseIndex);
 		batch._indices[1] = static_cast<uint16_t>(batch._baseIndex + 1);
@@ -215,11 +215,11 @@ namespace Yt
 	{
 		auto batch = _data->prepareBatch(4, 4);
 
-		batch._vertices[0] = { rect.top_left(), _data->_textureRect.top_left(), _data->_color };
-		batch._vertices[1] = { rect.bottom_left(), _data->_textureRect.bottom_left(), _data->_color };
-		batch._vertices[2] = { rect.top_right(), _data->_textureRect.top_right(), _data->_color };
+		batch._vertices[0] = { rect.topLeft(), _data->_textureRect.topLeft(), _data->_color };
+		batch._vertices[1] = { rect.bottomLeft(), _data->_textureRect.bottomLeft(), _data->_color };
+		batch._vertices[2] = { rect.topRight(), _data->_textureRect.topRight(), _data->_color };
 		// cppcheck-suppress unreadVariable
-		batch._vertices[3] = { rect.bottom_right(), _data->_textureRect.bottom_right(), _data->_color };
+		batch._vertices[3] = { rect.bottomRight(), _data->_textureRect.bottomRight(), _data->_color };
 
 		batch._indices[0] = static_cast<uint16_t>(batch._baseIndex);
 		batch._indices[1] = static_cast<uint16_t>(batch._baseIndex + 1);
@@ -270,10 +270,10 @@ namespace Yt
 		const auto vertexIndex = id & 0xffff;
 		assert(vertexIndex + 4 <= vertexBuffer.size() / sizeof(Vertex2D));
 		auto* const vertices = static_cast<Vertex2D*>(vertexBuffer.data()) + vertexIndex;
-		vertices[0]._position = rect.top_left();
-		vertices[1]._position = rect.bottom_left();
-		vertices[2]._position = rect.top_right();
-		vertices[3]._position = rect.bottom_right();
+		vertices[0]._position = rect.topLeft();
+		vertices[1]._position = rect.bottomLeft();
+		vertices[2]._position = rect.topRight();
+		vertices[3]._position = rect.bottomRight();
 	}
 
 	void Renderer2D::setColor(Bgra32 color)

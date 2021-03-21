@@ -211,7 +211,7 @@ namespace Yt
 		const auto map_point = [orientation](const Vector2& point) -> Vector2 {
 			return { point.x, orientation == ImageOrientation::XRightYDown ? point.y : 1.f - point.y };
 		};
-		return { map_point(rect.top_left()), map_point(rect.bottom_right()) };
+		return { map_point(rect.topLeft()), map_point(rect.bottomRight()) };
 	}
 
 	void GlRenderer::set_program(const RenderProgram* program)

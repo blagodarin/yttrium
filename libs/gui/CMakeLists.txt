@@ -6,10 +6,14 @@ primal_set_folder(libs)
 source_group("src" REGULAR_EXPRESSION ".*\\.(h|cpp)$")
 source_group("include" REGULAR_EXPRESSION "/include/yttrium/gui/")
 add_library(ygui STATIC
+	include/yttrium/gui/context.h
 	include/yttrium/gui/font.h
 	include/yttrium/gui/gui.h
 	include/yttrium/gui/layout.h
 	include/yttrium/gui/style.h
+	src/context.cpp
+	src/context_data.cpp
+	src/context_data.h
 	src/font.cpp
 	src/gui.cpp
 	src/layout.cpp

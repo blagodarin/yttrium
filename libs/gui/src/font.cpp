@@ -151,8 +151,8 @@ namespace Yt
 				if (positionRect.right() > rect.right())
 				{
 					const auto originalWidth = positionRect.width();
-					positionRect.set_right(rect.right());
-					textureRect.set_width(textureRect.width() * positionRect.width() / originalWidth);
+					positionRect._right = rect._right;
+					textureRect.setWidth(textureRect.width() * positionRect.width() / originalWidth);
 					clipped = true;
 				}
 				renderer.setTextureRect(textureRect);

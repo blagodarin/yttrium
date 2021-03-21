@@ -4,8 +4,7 @@
 
 #pragma once
 
-#include <yttrium/math/color.h>
-#include <yttrium/math/rect.h>
+#include <yttrium/gui/layout.h>
 
 #include <memory>
 #include <optional>
@@ -15,9 +14,10 @@ namespace Yt
 {
 	class Font;
 	struct GuiButtonStyle;
+	class GuiContext;
+	class GuiContextData;
 	struct GuiEditStyle;
 	struct GuiLabelStyle;
-	class GuiLayout;
 	enum class Key;
 	class KeyEvent;
 	class RectF;
@@ -25,42 +25,35 @@ namespace Yt
 	class Vector2;
 	class Window;
 
-	class GuiState
+	enum class GuiAlignment
 	{
-	public:
-		explicit GuiState(Window&);
-		~GuiState() noexcept;
-
-		void processKeyEvent(const KeyEvent&);
-		void processTextInput(std::string_view);
-		void setDefaultFont(const std::shared_ptr<const Font>&) noexcept;
-
-	private:
-		const std::unique_ptr<class GuiStateData> _data;
-		friend class GuiFrame;
+		Left,
+		Center,
+		Right,
 	};
 
 	class GuiFrame
 	{
 	public:
-		explicit GuiFrame(GuiState&, Renderer2D&);
+		explicit GuiFrame(GuiContext&, Renderer2D&);
 		~GuiFrame() noexcept;
 
-		bool button(std::string_view id, std::string_view text, const RectF& = {});
+		bool addButton(std::string_view id, std::string_view text, const RectF& = {});
+		std::optional<Vector2> addDragArea(std::string_view id, const RectF&, Key);
+		std::optional<Vector2> addHoverArea(const RectF&) noexcept;
+		void addLabel(std::string_view text, GuiAlignment = GuiAlignment::Left, const RectF& = {});
+		bool addStringEdit(std::string_view id, std::string& text, const RectF& = {});
 		bool captureKeyDown(Key) noexcept;
-		std::optional<Vector2> dragArea(std::string_view id, const RectF&, Key);
-		std::optional<Vector2> hoverArea(const RectF&) noexcept;
-		void label(std::string_view text, const RectF& = {});
-		GuiLayout& layout() noexcept;
+		GuiLayout& layout() noexcept { return _layout; }
 		Renderer2D& renderer() noexcept { return _renderer; }
 		void selectBlankTexture();
 		void setButtonStyle(const GuiButtonStyle&) noexcept;
 		void setEditStyle(const GuiEditStyle&) noexcept;
 		void setLabelStyle(const GuiLabelStyle&) noexcept;
-		bool stringEdit(std::string_view id, std::string& text, const RectF& = {});
 
 	private:
-		GuiStateData& _state;
+		GuiContextData& _context;
 		Renderer2D& _renderer;
+		GuiLayout _layout;
 	};
 }

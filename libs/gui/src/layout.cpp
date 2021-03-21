@@ -6,28 +6,55 @@
 
 namespace Yt
 {
-	GuiLayout::GuiLayout(const RectF& rect) noexcept
-		: _rect{ rect }
-	{
-	}
-
 	RectF GuiLayout::add(const SizeF& size) noexcept
 	{
-		const auto usedSize = size == SizeF{} ? _defaultSize : size;
-		const auto x = _position.x + usedSize._width * _direction.x;
-		const auto y = _position.y + usedSize._height * _direction.y;
-		const RectF rect{ { _direction.x > 0 ? _position.x : x, _direction.y > 0 ? _position.y : y }, usedSize * _scaling };
+		const auto rectSize = size == SizeF{} ? _defaultSize : size;
+		const auto x1 = _position.x + rectSize._width * (_direction.x - 1) / 2;
+		const auto x2 = _position.x + rectSize._width * (_direction.x + 1) / 2;
+		const auto y1 = _position.y + rectSize._height * (_direction.y - 1) / 2;
+		const auto y2 = _position.y + rectSize._height * (_direction.y + 1) / 2;
 		if (_axis == Axis::X)
-			_position.x = x + _spacing * _direction.x;
+			_position.x = _direction.x > 0 ? x2 + _spacing : x1 - _spacing;
 		else
-			_position.y = y + _spacing * _direction.y;
-		return rect;
+			_position.y = _direction.y > 0 ? y2 + _spacing : y1 - _spacing;
+		return RectF{ { x1, y1 }, Vector2{ x2, y2 } } * _scaling + _offset;
 	}
 
 	void GuiLayout::fromPoint(const Vector2& point, const Vector2& direction, Axis axis, float padding) noexcept
 	{
-		_direction = direction * _scaling;
+		_direction = direction;
 		_position = point + padding * _direction;
 		_axis = axis;
+	}
+
+	void GuiLayout::mapToCenter(const SizeF& size) noexcept
+	{
+		const auto widthRatio = _rect.width() / size._width;
+		const auto heightRatio = _rect.height() / size._height;
+		if (widthRatio > heightRatio)
+		{
+			_offset = { (_rect.width() - size._width) / 2, 0 };
+			_scaling = heightRatio;
+		}
+		else
+		{
+			_offset = { 0, (_rect.height() - size._height) / 2 };
+			_scaling = widthRatio;
+		}
+		_size = size;
+	}
+
+	void GuiLayout::scaleForHeight(float height) noexcept
+	{
+		_offset = { 0, 0 };
+		_scaling = _rect.height() / height;
+		_size = { _rect.width() / _scaling, height };
+	}
+
+	void GuiLayout::scaleForWidth(float width) noexcept
+	{
+		_offset = { 0, 0 };
+		_scaling = _rect.width() / width;
+		_size = { width, _rect.height() / _scaling };
 	}
 }

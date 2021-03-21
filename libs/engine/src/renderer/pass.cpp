@@ -17,6 +17,10 @@
 
 #include <cassert>
 
+#ifndef NDEBUG
+#	include <algorithm>
+#endif
+
 namespace
 {
 	// Makes Y point forward and Z point up.
