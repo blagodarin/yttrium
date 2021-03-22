@@ -8,17 +8,39 @@
 
 namespace Yt
 {
+	class GuiFrame;
+
 	class GuiLayout
 	{
 	public:
+		struct Center
+		{
+			const float _width;
+			const float _height;
+		};
+
+		struct Height
+		{
+			const float _height;
+		};
+
+		struct Width
+		{
+			const float _width;
+		};
+
 		enum class Axis
 		{
 			X,
 			Y,
 		};
 
-		explicit GuiLayout(const RectF& rect) noexcept
-			: _rect{ rect } {}
+		GuiLayout() noexcept;
+		explicit GuiLayout(GuiFrame&) noexcept;
+		GuiLayout(GuiFrame&, const Center&) noexcept;
+		GuiLayout(GuiFrame&, const Height&) noexcept;
+		GuiLayout(GuiFrame&, const Width&) noexcept;
+		~GuiLayout() noexcept;
 
 		RectF add(const SizeF& = {}) noexcept;
 		void fromBottomCenter(float padding = 0) noexcept { fromPoint({ _size._width / 2, _size._height }, { 0, -1 }, Axis::Y, padding); }
@@ -28,21 +50,17 @@ namespace Yt
 		void fromTopCenter(float padding = 0) noexcept { fromPoint({ _size._width / 2, 0 }, { 0, 1 }, Axis::Y, padding); }
 		void fromTopLeft(Axis axis, float padding = 0) noexcept { fromPoint({ 0, 0 }, { 1, 1 }, axis, padding); }
 		void fromTopRight(Axis axis, float padding = 0) noexcept { fromPoint({ _size._width, 0 }, { -1, 1 }, axis, padding); }
-		void mapToCenter(const SizeF&) noexcept;
-		void scaleForHeight(float height) noexcept;
-		void scaleForWidth(float width) noexcept;
 		constexpr void setAxis(Axis axis) noexcept { _axis = axis; }
 		constexpr void setSize(const SizeF& size) noexcept { _defaultSize = size; }
 		constexpr void setSpacing(float spacing) noexcept { _spacing = spacing; }
 		void skip(float distance) noexcept;
-		[[nodiscard]] constexpr Vector2 transform(const Vector2& point) const noexcept { return point * _scaling + _offset; }
-		[[nodiscard]] constexpr RectF transform(const RectF& rect) const noexcept { return rect * _scaling + _offset; }
 
 	private:
-		const RectF _rect;
+		GuiFrame* const _frame;
+		GuiLayout* const _previous;
 		float _scaling = 1;
 		Vector2 _offset{ 0, 0 };
-		SizeF _size = _rect.size();
+		SizeF _size;
 		Vector2 _direction{ 1, 1 };
 		Vector2 _position{ 0, 0 };
 		Axis _axis = Axis::X;

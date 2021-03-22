@@ -163,6 +163,7 @@ namespace Yt
 		[[nodiscard]] constexpr bool empty() const noexcept { return _left >= _right || _top >= _bottom; }
 		[[nodiscard]] constexpr float height() const noexcept { return _bottom - _top; }
 		[[nodiscard]] constexpr float left() const noexcept { return _left; }
+		[[nodiscard]] constexpr bool null() const noexcept { return _left == _right && _top == _bottom; }
 		[[nodiscard]] constexpr float right() const noexcept { return _right; }
 		constexpr void setHeight(float value) noexcept { _bottom = _top + value; }
 		constexpr void setWidth(float value) noexcept { _right = _left + value; }

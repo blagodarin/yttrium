@@ -35,9 +35,10 @@ namespace Yt
 	GuiFrame::GuiFrame(GuiContext& context, Renderer2D& renderer)
 		: _context{ *context._data }
 		, _renderer{ renderer }
-		, _layout{ RectF{ Rect{ _context._window.size() } } }
 	{
-		_context._mouseCursor.emplace(_context._window.cursor());
+		_context._mouseCursor = Vector2{ _context._window.cursor() };
+		_context._mouseCursorTaken = false;
+		_context._mouseHoverTaken = false;
 		_context._mouseItemPresent = false;
 		_context._keyboardItem._present = false;
 		_context.updateBlankTexture(_context._defaultFont);
@@ -67,17 +68,17 @@ namespace Yt
 	bool GuiFrame::addButton(std::string_view id, std::string_view text, const RectF& rect)
 	{
 		assert(!id.empty());
-		const auto widgetRect = rect == RectF{} ? _layout.add() : rect;
+		const auto widgetRect = rect.null() ? _context._layout->add() : rect;
 		if (widgetRect.empty())
 			return false;
 		bool clicked = false;
 		const auto* styleState = &_context._buttonStyle._normal;
 		if (_context._mouseItem == id)
 		{
-			assert(_context._mouseCursor);
+			assert(!_context._mouseHoverTaken);
 			assert(!_context._mouseItemPresent);
 			assert(_context._keyboardItem._id.empty());
-			const auto hovered = widgetRect.contains(*_context._mouseCursor);
+			const auto hovered = widgetRect.contains(_context._mouseCursor);
 			const auto released = _context.captureClick(_context._mouseItemKey, false, true).second;
 			if (released)
 			{
@@ -87,17 +88,17 @@ namespace Yt
 				{
 					clicked = true;
 					styleState = &_context._buttonStyle._hovered;
-					_context._mouseCursor.reset();
+					_context._mouseHoverTaken = true;
 				}
 			}
 			else
 			{
 				styleState = &_context._buttonStyle._pressed;
-				_context._mouseCursor.reset();
+				_context._mouseHoverTaken = true;
 				_context._mouseItemPresent = true;
 			}
 		}
-		else if (_context._mouseItem.empty() && _context.captureMouse(widgetRect))
+		else if (_context._mouseItem.empty() && _context.takeMouseHover(widgetRect))
 		{
 			assert(!_context._mouseItemPresent);
 			styleState = &_context._buttonStyle._hovered;
@@ -132,20 +133,19 @@ namespace Yt
 	std::optional<Vector2> GuiFrame::addDragArea(std::string_view id, const RectF& rect, Key key)
 	{
 		assert(!id.empty());
-		const auto widgetRect = _layout.transform(rect);
 		if (_context._mouseItem == id)
 		{
-			assert(_context._mouseCursor);
+			assert(!_context._mouseHoverTaken);
 			assert(!_context._mouseItemPresent);
-			auto captured = widgetRect.bound(*_context._mouseCursor);
-			_context._mouseCursor.reset();
+			auto captured = rect.bound(_context._mouseCursor);
+			_context._mouseHoverTaken = true;
 			_context._mouseItemPresent = true;
 			return captured;
 		}
 		if (_context._mouseItem.empty())
 		{
 			assert(!_context._mouseItemPresent);
-			if (auto maybeCaptured = _context.captureMouse(widgetRect))
+			if (auto maybeHover = _context.takeMouseHover(rect))
 				if (const auto [pressed, released] = _context.captureClick(key, false); pressed)
 				{
 					if (!released)
@@ -155,7 +155,7 @@ namespace Yt
 						_context._mouseItemKey = key;
 					}
 					_context._keyboardItem._id.clear();
-					return maybeCaptured;
+					return maybeHover;
 				}
 		}
 		return {};
@@ -163,14 +163,14 @@ namespace Yt
 
 	std::optional<Vector2> GuiFrame::addHoverArea(const RectF& rect) noexcept
 	{
-		return _context.captureMouse(rect);
+		return _context.takeMouseHover(rect);
 	}
 
 	void GuiFrame::addLabel(std::string_view text, GuiAlignment alignment, const RectF& rect)
 	{
 		if (!_context._labelStyle._font)
 			return;
-		auto textRect = rect == RectF{} ? _layout.add() : rect;
+		auto textRect = rect.null() ? _context._layout->add() : rect;
 		if (textRect.top() >= textRect.bottom())
 			return;
 		const auto verticalPadding = textRect.height() * (1 - _context._buttonStyle._fontSize) / 2;
@@ -202,7 +202,7 @@ namespace Yt
 	bool GuiFrame::addStringEdit(std::string_view id, std::string& text, const RectF& rect)
 	{
 		assert(!id.empty());
-		const auto widgetRect = rect == RectF{} ? _layout.add() : rect;
+		const auto widgetRect = rect.null() ? _context._layout->add() : rect;
 		if (widgetRect.empty())
 			return false;
 		bool entered = false;
@@ -210,7 +210,7 @@ namespace Yt
 		bool active = false;
 		if (_context._mouseItem == id)
 		{
-			assert(_context._mouseCursor);
+			assert(!_context._mouseHoverTaken);
 			assert(!_context._mouseItemPresent);
 			assert(_context._keyboardItem._id == id);
 			const auto released = _context.captureClick(_context._mouseItemKey, false, true).second;
@@ -218,16 +218,16 @@ namespace Yt
 			{
 				_context._mouseItem.clear();
 				_context._mouseItemKey = Key::Null;
-				if (widgetRect.contains(*_context._mouseCursor))
-					_context._mouseCursor.reset();
+				if (widgetRect.contains(_context._mouseCursor))
+					_context._mouseHoverTaken = true;
 			}
 			else
 			{
 				styleState = &_context._editStyle._active;
-				_context._mouseCursor.reset();
+				_context._mouseHoverTaken = true;
 			}
 		}
-		else if (_context._mouseItem.empty() && _context.captureMouse(widgetRect))
+		else if (_context._mouseItem.empty() && _context.takeMouseHover(widgetRect))
 		{
 			styleState = &_context._editStyle._hovered;
 			if (const auto [pressed, released] = _context.captureClick(Key::Mouse1, false); pressed)
@@ -323,6 +323,11 @@ namespace Yt
 			}
 		}
 		return entered;
+	}
+
+	std::optional<Vector2> GuiFrame::takeMouseCursor() noexcept
+	{
+		return _context.takeMouseCursor(RectF{ _renderer.viewportSize() });
 	}
 
 	bool GuiFrame::captureKeyDown(Key key) noexcept

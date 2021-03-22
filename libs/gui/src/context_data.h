@@ -16,6 +16,8 @@
 
 namespace Yt
 {
+	class GuiLayout;
+
 	class GuiContextData
 	{
 	public:
@@ -215,7 +217,9 @@ namespace Yt
 		Window& _window;
 		std::vector<uint16_t> _inputEvents;
 		std::vector<std::string> _textInputs;
-		std::optional<Vector2> _mouseCursor;
+		Vector2 _mouseCursor{ 0, 0 };
+		bool _mouseCursorTaken = false;
+		bool _mouseHoverTaken = false;
 		std::string _mouseItem;
 		bool _mouseItemPresent = false;
 		Key _mouseItemKey = Key::Null;
@@ -226,9 +230,9 @@ namespace Yt
 		std::shared_ptr<const Font> _defaultFont;
 		std::shared_ptr<const Texture2D> _blankTexture;
 		RectF _blankTextureRect;
+		GuiLayout* _layout = nullptr;
 
-		explicit GuiContextData(Window& window) noexcept
-			: _window{ window } {}
+		explicit GuiContextData(Window&) noexcept;
 
 		std::pair<unsigned, bool> captureClick(Key key, bool autorepeat, bool release = false) noexcept
 		{
@@ -277,12 +281,21 @@ namespace Yt
 			}
 		}
 
-		std::optional<Vector2> captureMouse(const RectF& rect) noexcept
+		std::optional<Vector2> takeMouseCursor(const RectF& rect) noexcept
 		{
-			std::optional<Vector2> captured;
-			if (_mouseCursor && rect.contains(*_mouseCursor))
-				captured.swap(_mouseCursor);
-			return captured;
+			if (_mouseCursorTaken || !rect.contains(_mouseCursor))
+				return {};
+			_mouseCursorTaken = true;
+			_mouseHoverTaken = true;
+			return _mouseCursor;
+		}
+
+		std::optional<Vector2> takeMouseHover(const RectF& rect) noexcept
+		{
+			if (_mouseHoverTaken || !rect.contains(_mouseCursor))
+				return {};
+			_mouseHoverTaken = true;
+			return _mouseCursor;
 		}
 
 		void updateBlankTexture(const std::shared_ptr<const Font>& font) noexcept

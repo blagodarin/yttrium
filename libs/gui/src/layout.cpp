@@ -4,8 +4,70 @@
 
 #include <yttrium/gui/layout.h>
 
+#include <yttrium/gui/gui.h>
+#include "context_data.h"
+
 namespace Yt
 {
+	GuiLayout::GuiLayout() noexcept
+		: _frame{ nullptr }
+		, _previous{ nullptr }
+	{
+	}
+
+	GuiLayout::GuiLayout(GuiFrame& frame) noexcept
+		: _frame{ &frame }
+		, _previous{ std::exchange(frame._context._layout, this) }
+		, _size{ frame._context._window.size() }
+	{
+	}
+
+	GuiLayout::GuiLayout(GuiFrame& frame, const Center& mapping) noexcept
+		: _frame{ &frame }
+		, _previous{ std::exchange(_frame->_context._layout, this) }
+	{
+		const SizeF viewport{ _frame->_context._window.size() };
+		const auto widthRatio = viewport._width / mapping._width;
+		const auto heightRatio = viewport._height / mapping._height;
+		if (widthRatio > heightRatio)
+		{
+			_scaling = heightRatio;
+			_offset = { (viewport._width - mapping._width * _scaling) / 2, 0 };
+		}
+		else
+		{
+			_scaling = widthRatio;
+			_offset = { 0, (viewport._height - mapping._height * _scaling) / 2 };
+		}
+		_size = { mapping ._width, mapping._height};
+	}
+
+	GuiLayout::GuiLayout(GuiFrame& frame, const Height& mapping) noexcept
+		: _frame{ &frame }
+		, _previous{ std::exchange(_frame->_context._layout, this) }
+	{
+		const SizeF viewport{ _frame->_context._window.size() };
+		_scaling = viewport._height / mapping._height;
+		_offset = { 0, 0 };
+		_size = { viewport._width / _scaling, mapping._height };
+	}
+
+	GuiLayout::GuiLayout(GuiFrame& frame, const Width& mapping) noexcept
+		: _frame{ &frame }
+		, _previous{ std::exchange(_frame->_context._layout, this) }
+	{
+		const SizeF viewport{ _frame->_context._window.size() };
+		_scaling = viewport._width / mapping._width;
+		_offset = { 0, 0 };
+		_size = { mapping._width, viewport._height / _scaling };
+	}
+
+	GuiLayout::~GuiLayout() noexcept
+	{
+		if (_frame)
+			_frame->_context._layout = _previous;
+	}
+
 	RectF GuiLayout::add(const SizeF& size) noexcept
 	{
 		const auto rectSize = size == SizeF{} ? _defaultSize : size;
@@ -25,37 +87,6 @@ namespace Yt
 		_direction = direction;
 		_position = point + padding * _direction;
 		_axis = axis;
-	}
-
-	void GuiLayout::mapToCenter(const SizeF& size) noexcept
-	{
-		const auto widthRatio = _rect.width() / size._width;
-		const auto heightRatio = _rect.height() / size._height;
-		if (widthRatio > heightRatio)
-		{
-			_scaling = heightRatio;
-			_offset = { (_rect.width() - size._width * _scaling) / 2, 0 };
-		}
-		else
-		{
-			_scaling = widthRatio;
-			_offset = { 0, (_rect.height() - size._height * _scaling) / 2 };
-		}
-		_size = size;
-	}
-
-	void GuiLayout::scaleForHeight(float height) noexcept
-	{
-		_scaling = _rect.height() / height;
-		_offset = { 0, 0 };
-		_size = { _rect.width() / _scaling, height };
-	}
-
-	void GuiLayout::scaleForWidth(float width) noexcept
-	{
-		_scaling = _rect.width() / width;
-		_offset = { 0, 0 };
-		_size = { width, _rect.height() / _scaling };
 	}
 
 	void GuiLayout::skip(float distance) noexcept

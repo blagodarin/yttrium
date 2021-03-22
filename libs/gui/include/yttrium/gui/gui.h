@@ -18,12 +18,11 @@ namespace Yt
 	class GuiContextData;
 	struct GuiEditStyle;
 	struct GuiLabelStyle;
+	class GuiLayout;
 	enum class Key;
-	class KeyEvent;
 	class RectF;
 	class Renderer2D;
 	class Vector2;
-	class Window;
 
 	enum class GuiAlignment
 	{
@@ -43,8 +42,8 @@ namespace Yt
 		std::optional<Vector2> addHoverArea(const RectF&) noexcept;
 		void addLabel(std::string_view text, GuiAlignment = GuiAlignment::Left, const RectF& = {});
 		bool addStringEdit(std::string_view id, std::string& text, const RectF& = {});
+		std::optional<Vector2> takeMouseCursor() noexcept;
 		bool captureKeyDown(Key) noexcept;
-		GuiLayout& layout() noexcept { return _layout; }
 		Renderer2D& renderer() noexcept { return _renderer; }
 		void selectBlankTexture();
 		void setButtonStyle(const GuiButtonStyle&) noexcept;
@@ -54,6 +53,6 @@ namespace Yt
 	private:
 		GuiContextData& _context;
 		Renderer2D& _renderer;
-		GuiLayout _layout;
+		friend GuiLayout;
 	};
 }
