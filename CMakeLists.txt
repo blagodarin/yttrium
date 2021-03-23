@@ -241,7 +241,7 @@ add_subdirectory(tools/yrc)
 add_subdirectory(tools/ypack)
 add_subdirectory(tools/ytr)
 
-add_subdirectory(libs/engine)
+add_subdirectory(libs/renderer)
 
 if(YTTRIUM_TESTS)
 	enable_testing()

@@ -21,7 +21,7 @@ add_library(ygui STATIC
 	)
 include_config(ygui ${PROJECT_BINARY_DIR}/config.h)
 target_include_directories(ygui PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-target_link_libraries(ygui PRIVATE yapplication ycore yengine primal Freetype::Freetype)
+target_link_libraries(ygui PRIVATE yapplication ycore yrenderer primal Freetype::Freetype)
 set_target_properties(ygui PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 primal_install(ygui EXPORT YttriumTargets)
 install(DIRECTORY include/yttrium DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})

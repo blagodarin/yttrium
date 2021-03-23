@@ -5,7 +5,7 @@
 #include "wgl.h"
 
 #include <yttrium/exceptions.h>
-#include "../../../engine/src/renderer/opengl/version.h"
+#include "../../../renderer/src/backend/opengl/version.h"
 #include "../opengl.h"
 
 #include <cstring>
