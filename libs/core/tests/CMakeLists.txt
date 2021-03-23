@@ -24,7 +24,6 @@ add_executable(test_core
 	src/point.cpp
 	src/reader.cpp
 	src/rect.cpp
-	src/script.cpp
 	src/source.cpp
 	src/temporary_file.cpp
 	src/test_utils.cpp

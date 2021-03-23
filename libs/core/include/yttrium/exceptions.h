@@ -34,14 +34,6 @@ namespace Yt
 	};
 
 	///
-	class GuiDataError : public DataError
-	{
-	public:
-		explicit GuiDataError(const std::string& message)
-			: DataError{ message } {}
-	};
-
-	///
 	class IonError : public DataError
 	{
 	public:

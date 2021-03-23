@@ -9,7 +9,6 @@ source_group("include/image" REGULAR_EXPRESSION "/include/yttrium/image/")
 source_group("include/ion" REGULAR_EXPRESSION "/include/yttrium/ion/")
 source_group("include/math" REGULAR_EXPRESSION "/include/yttrium/math/")
 source_group("include/memory" REGULAR_EXPRESSION "/include/yttrium/memory/")
-source_group("include/script" REGULAR_EXPRESSION "/include/yttrium/script/")
 source_group("include/storage" REGULAR_EXPRESSION "/include/yttrium/storage/")
 source_group("include/utils" REGULAR_EXPRESSION "/include/yttrium/utils/")
 source_group("src/image" REGULAR_EXPRESSION "/src/image/")
@@ -20,7 +19,6 @@ source_group("src/memory" REGULAR_EXPRESSION "/src/memory/")
 source_group("src/platform" REGULAR_EXPRESSION "/src/platform/")
 source_group("src/platform/posix" REGULAR_EXPRESSION "/src/platform/posix/")
 source_group("src/platform/windows" REGULAR_EXPRESSION "/src/platform/windows/")
-source_group("src/script" REGULAR_EXPRESSION "/src/script/")
 source_group("src/storage" REGULAR_EXPRESSION "/src/storage/")
 source_group("src/storage/formats" REGULAR_EXPRESSION "/src/storage/formats/")
 source_group("src/utils" REGULAR_EXPRESSION "/src/utils/")
@@ -46,10 +44,6 @@ add_library(ycore STATIC
 	include/yttrium/memory/buffer.h
 	include/yttrium/memory/buffer_appender.h
 	include/yttrium/memory/pool.h
-	include/yttrium/script/args.h
-	include/yttrium/script/code.h
-	include/yttrium/script/context.h
-	include/yttrium/script/value.h
 	include/yttrium/storage/package.h
 	include/yttrium/storage/paths.h
 	include/yttrium/storage/reader.h
@@ -87,12 +81,6 @@ add_library(ycore STATIC
 	src/memory/raw.h
 	src/platform/file.h
 	src/platform/virtual_memory.h
-	src/script/args.cpp
-	src/script/code.cpp
-	src/script/context.cpp
-	src/script/scanner.cpp
-	src/script/scanner.h
-	src/script/value.cpp
 	src/storage/formats/ypq.cpp
 	src/storage/formats/ypq.h
 	src/storage/package.cpp
