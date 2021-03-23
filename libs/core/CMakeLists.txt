@@ -42,7 +42,6 @@ add_library(ycore STATIC
 	include/yttrium/math/vector.h
 	include/yttrium/memory/buffer.h
 	include/yttrium/memory/buffer_appender.h
-	include/yttrium/memory/pool.h
 	include/yttrium/storage/package.h
 	include/yttrium/storage/paths.h
 	include/yttrium/storage/reader.h
@@ -76,7 +75,6 @@ add_library(ycore STATIC
 	src/memory/buffer.cpp
 	src/memory/buffer_memory.cpp
 	src/memory/buffer_memory.h
-	src/memory/pool.cpp
 	src/memory/raw.h
 	src/platform/file.h
 	src/platform/virtual_memory.h
