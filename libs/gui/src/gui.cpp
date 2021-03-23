@@ -64,7 +64,7 @@ namespace Yt
 		_context._inputEvents.clear();
 		_context._textInputs.clear();
 		for (auto& keyState : _context._keyStates)
-			keyState &= ~GuiContextData::kKeyStateTaken;
+			keyState &= static_cast<uint8_t>(~GuiContextData::kKeyStateTaken);
 	}
 
 	bool GuiFrame::addButton(std::string_view id, std::string_view text, const RectF& rect)

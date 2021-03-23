@@ -145,16 +145,16 @@ namespace Yt
 				if (left >= rect.right())
 					break;
 				RectF positionRect{ { left, rect.top() + static_cast<float>(current->second._offset._y) * scale }, SizeF{ current->second._rect.size() } * scale };
-				RectF textureRect{ current->second._rect };
+				RectF glyphRect{ current->second._rect };
 				bool clipped = false;
 				if (positionRect.right() > rect.right())
 				{
 					const auto originalWidth = positionRect.width();
 					positionRect._right = rect._right;
-					textureRect.setWidth(textureRect.width() * positionRect.width() / originalWidth);
+					glyphRect.setWidth(glyphRect.width() * positionRect.width() / originalWidth);
 					clipped = true;
 				}
-				renderer.setTextureRect(textureRect);
+				renderer.setTextureRect(glyphRect);
 				renderer.addBorderlessRect(positionRect);
 				if (clipped)
 					return;

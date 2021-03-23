@@ -39,7 +39,7 @@ namespace Yt
 			_scaling = widthRatio;
 			_offset = { 0, (viewport._height - mapping._height * _scaling) / 2 };
 		}
-		_size = { mapping ._width, mapping._height};
+		_size = { mapping._width, mapping._height };
 	}
 
 	GuiLayout::GuiLayout(GuiFrame& frame, const Height& mapping) noexcept
