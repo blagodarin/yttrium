@@ -63,6 +63,8 @@ namespace Yt
 			_context._keyboardItem._id.clear();
 		_context._inputEvents.clear();
 		_context._textInputs.clear();
+		for (auto& keyState : _context._keyStates)
+			keyState &= ~GuiContextData::kKeyStateTaken;
 	}
 
 	bool GuiFrame::addButton(std::string_view id, std::string_view text, const RectF& rect)
@@ -298,7 +300,7 @@ namespace Yt
 		{
 			const auto textRect = ::relativeHeightInRect(widgetRect, _context._editStyle._fontSize);
 			Font::TextCapture capture{ _context._keyboardItem._cursor, _context._keyboardItem._selectionOffset, _context._keyboardItem._selectionSize };
-			const auto textWidth = _context._editStyle._font->textWidth(text, textRect.height(), &capture);
+			_context._editStyle._font->textWidth(text, textRect.height(), &capture);
 			if (active && capture._selectionRange)
 			{
 				const auto selectionLeft = textRect.left() + capture._selectionRange->first;
@@ -330,9 +332,18 @@ namespace Yt
 		return _context.takeMouseCursor(RectF{ _renderer.viewportSize() });
 	}
 
-	bool GuiFrame::captureKeyDown(Key key) noexcept
+	bool GuiFrame::takeKeyPress(Key key) noexcept
 	{
 		return _context.captureClick(key, false).first > 0;
+	}
+
+	std::optional<bool> GuiFrame::takeKeyState(Key key) noexcept
+	{
+		auto& keyState = _context._keyStates[static_cast<uint8_t>(key)];
+		if (keyState & GuiContextData::kKeyStateTaken)
+			return {};
+		keyState |= GuiContextData::kKeyStateTaken;
+		return static_cast<bool>(keyState & GuiContextData::kKeyStatePressed);
 	}
 
 	void GuiFrame::selectBlankTexture()

@@ -89,6 +89,11 @@ namespace Yt
 		_axis = axis;
 	}
 
+	RectF GuiLayout::map(const RectF& rect) const noexcept
+	{
+		return rect * _scaling + _offset;
+	}
+
 	void GuiLayout::skip(float distance) noexcept
 	{
 		if (_axis == Axis::X)

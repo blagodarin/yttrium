@@ -50,6 +50,7 @@ namespace Yt
 		void fromTopCenter(float padding = 0) noexcept { fromPoint({ _size._width / 2, 0 }, { 0, 1 }, Axis::Y, padding); }
 		void fromTopLeft(Axis axis, float padding = 0) noexcept { fromPoint({ 0, 0 }, { 1, 1 }, axis, padding); }
 		void fromTopRight(Axis axis, float padding = 0) noexcept { fromPoint({ _size._width, 0 }, { -1, 1 }, axis, padding); }
+		[[nodiscard]] RectF map(const RectF&) const noexcept;
 		constexpr void setAxis(Axis axis) noexcept { _axis = axis; }
 		constexpr void setSize(const SizeF& size) noexcept { _defaultSize = size; }
 		constexpr void setSpacing(float spacing) noexcept { _spacing = spacing; }

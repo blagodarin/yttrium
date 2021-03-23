@@ -132,7 +132,6 @@ namespace Yt
 			renderer.setTexture(_texture);
 			for (size_t i = 0; i < text.size();)
 			{
-				const auto offset = i;
 				const auto current = _glyph.find(primal::readUtf8(text, i));
 				if (current == _glyph.end())
 					continue;

@@ -27,6 +27,7 @@ namespace Yt
 				encodedEvent |= GuiContextData::kShiftFlag;
 		}
 		_data->_inputEvents.emplace_back(encodedEvent);
+		_data->_keyStates[static_cast<uint8_t>(event._key)] = event._pressed ? GuiContextData::kKeyStatePressed : 0;
 	}
 
 	void GuiContext::processTextInput(std::string_view text)

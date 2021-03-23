@@ -42,13 +42,14 @@ namespace Yt
 		std::optional<Vector2> addHoverArea(const RectF&) noexcept;
 		void addLabel(std::string_view text, GuiAlignment = GuiAlignment::Left, const RectF& = {});
 		bool addStringEdit(std::string_view id, std::string& text, const RectF& = {});
-		std::optional<Vector2> takeMouseCursor() noexcept;
-		bool captureKeyDown(Key) noexcept;
 		Renderer2D& renderer() noexcept { return _renderer; }
 		void selectBlankTexture();
 		void setButtonStyle(const GuiButtonStyle&) noexcept;
 		void setEditStyle(const GuiEditStyle&) noexcept;
 		void setLabelStyle(const GuiLabelStyle&) noexcept;
+		bool takeKeyPress(Key) noexcept;
+		std::optional<bool> takeKeyState(Key) noexcept;
+		std::optional<Vector2> takeMouseCursor() noexcept;
 
 	private:
 		GuiContextData& _context;

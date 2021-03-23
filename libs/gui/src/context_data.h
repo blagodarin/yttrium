@@ -231,6 +231,10 @@ namespace Yt
 		std::shared_ptr<const Texture2D> _blankTexture;
 		RectF _blankTextureRect;
 		GuiLayout* _layout = nullptr;
+		std::array<uint8_t, 256> _keyStates{};
+
+		static constexpr uint8_t kKeyStateTaken = 0x80;
+		static constexpr uint8_t kKeyStatePressed = 0x01;
 
 		explicit GuiContextData(Window&) noexcept;
 
