@@ -103,7 +103,7 @@ namespace Yt
 	class ResourceLoaderPrivate
 	{
 	public:
-		ResourceLoaderPrivate(const Storage& storage, RenderManager* render_manager)
+		ResourceLoaderPrivate(const Storage& storage, RenderManager& render_manager)
 			: _storage{ storage }, _render_manager{ render_manager } {}
 
 		bool release_unused()
@@ -111,20 +111,18 @@ namespace Yt
 			auto released = _material_cache.release_unused(); // Uses textures.
 			released += _mesh_cache.release_unused();
 			released += _texture_2d_cache.release_unused();
-			released += _translation_cache.release_unused();
 			return released > 0;
 		}
 
 	public:
 		const Storage& _storage;
-		RenderManager* const _render_manager = nullptr;
+		RenderManager& _render_manager;
 		ResourceCache<Material> _material_cache{ _storage };
 		ResourceCache<Mesh> _mesh_cache{ _storage };
 		ResourceCache<Texture2D> _texture_2d_cache{ _storage };
-		ResourceCache<Translation> _translation_cache{ _storage };
 	};
 
-	ResourceLoader::ResourceLoader(const Storage& storage, RenderManager* render_manager)
+	ResourceLoader::ResourceLoader(const Storage& storage, RenderManager& render_manager)
 		: _private{ std::make_unique<ResourceLoaderPrivate>(storage, render_manager) }
 	{
 	}
@@ -133,8 +131,6 @@ namespace Yt
 
 	std::shared_ptr<const Material> ResourceLoader::load_material(std::string_view name)
 	{
-		if (!_private->_render_manager)
-			return {};
 		return _private->_material_cache.fetch(name, [this, name](std::unique_ptr<Source>&& source) -> std::shared_ptr<const Material> {
 			IonReader ion{ *source };
 			// cppcheck-suppress shadowVar
@@ -185,7 +181,7 @@ namespace Yt
 			if (!fragment_shader)
 				throw DataError{ fmt::format("({}) No 'fragment_shader'", name) };
 			// cppcheck-suppress shadowVar
-			auto program = _private->_render_manager->create_program(vertex_shader->to_string(), fragment_shader->to_string());
+			auto program = _private->_render_manager.create_program(vertex_shader->to_string(), fragment_shader->to_string());
 			if (!program)
 				throw DataError{ fmt::format("({}) Bad 'vertex_shader' or 'fragment_shader'", name) };
 			return std::make_shared<MaterialImpl>(std::move(program), std::move(texture), texture_filter);
@@ -194,38 +190,19 @@ namespace Yt
 
 	std::shared_ptr<const Mesh> ResourceLoader::load_mesh(std::string_view name)
 	{
-		if (!_private->_render_manager)
-			return {};
 		return _private->_mesh_cache.fetch(name, [this, name](std::unique_ptr<Source>&& source) {
-			return _private->_render_manager->load_mesh(*source, name);
+			return _private->_render_manager.load_mesh(*source, name);
 		});
 	}
 
 	std::shared_ptr<const Texture2D> ResourceLoader::load_texture_2d(std::string_view name)
 	{
-		if (!_private->_render_manager)
-			return {};
 		return _private->_texture_2d_cache.fetch(name, [this, name](std::unique_ptr<Source>&& source) -> std::shared_ptr<const Texture2D> {
 			auto image = Image::load(*source);
 			if (!image)
 				throw DataError{ fmt::format("Can't load \"{}\"", name) };
-			return _private->_render_manager->create_texture_2d(*image);
+			return _private->_render_manager.create_texture_2d(*image);
 		});
-	}
-
-	std::shared_ptr<const Translation> ResourceLoader::load_translation(std::string_view name)
-	{
-		return _private->_translation_cache.fetch(name, [](std::unique_ptr<Source>&& source) {
-			return Translation::load(*source);
-		});
-	}
-
-	std::unique_ptr<Source> ResourceLoader::open(std::string_view name)
-	{
-		auto source = _private->_storage.open(name);
-		if (!source)
-			throw ResourceError{ fmt::format("Missing \"{}\"", name) };
-		return source;
 	}
 
 	void ResourceLoader::release_unused()
@@ -235,7 +212,7 @@ namespace Yt
 		assert(!_private->release_unused());
 	}
 
-	RenderManager* ResourceLoader::render_manager() const
+	RenderManager& ResourceLoader::render_manager() noexcept
 	{
 		return _private->_render_manager;
 	}

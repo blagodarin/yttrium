@@ -250,7 +250,6 @@ if(YTTRIUM_TESTS)
 	add_subdirectory(libs/audio/tests)
 	add_subdirectory(libs/core/tests)
 	add_subdirectory(libs/core/tests/bootstrap)
-	add_subdirectory(libs/engine/tests)
 endif()
 
 if(YTTRIUM_CLANG_TIDY)
