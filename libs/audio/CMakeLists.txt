@@ -7,7 +7,6 @@ source_group("src" REGULAR_EXPRESSION ".*\\.(h|cpp)$")
 source_group("src/formats" REGULAR_EXPRESSION "/src/formats/")
 source_group("include" REGULAR_EXPRESSION "/include/")
 add_library(yaudio STATIC
-	include/yttrium/audio/api.h
 	include/yttrium/audio/format.h
 	include/yttrium/audio/manager.h
 	include/yttrium/audio/reader.h

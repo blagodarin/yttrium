@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <yttrium/api.h>
 #include <yttrium/renderer/texture.h>
 #include <yttrium/utils/flags.h>
 
@@ -19,7 +18,7 @@ namespace Yt
 	class SizeF;
 
 	/// Base class for RenderPass modifiers.
-	class Y_ENGINE_API RenderModifier
+	class RenderModifier
 	{
 	public:
 		RenderModifier(const RenderModifier&) = delete;
@@ -32,7 +31,7 @@ namespace Yt
 	};
 
 	///
-	class Y_ENGINE_API Push3D : public RenderModifier
+	class Push3D : public RenderModifier
 	{
 	public:
 		///
@@ -43,7 +42,7 @@ namespace Yt
 	};
 
 	///
-	class Y_ENGINE_API PushProgram : public RenderModifier
+	class PushProgram : public RenderModifier
 	{
 	public:
 		///
@@ -54,7 +53,7 @@ namespace Yt
 	};
 
 	///
-	class Y_ENGINE_API PushTexture : public RenderModifier
+	class PushTexture : public RenderModifier
 	{
 	public:
 		///
@@ -68,7 +67,7 @@ namespace Yt
 	};
 
 	///
-	class Y_ENGINE_API PushMaterial : public RenderModifier
+	class PushMaterial : public RenderModifier
 	{
 	public:
 		///
@@ -84,7 +83,7 @@ namespace Yt
 	};
 
 	///
-	class Y_ENGINE_API PushTransformation : public RenderModifier
+	class PushTransformation : public RenderModifier
 	{
 	public:
 		/// Multiplies the current transformation matrix by the specified one,

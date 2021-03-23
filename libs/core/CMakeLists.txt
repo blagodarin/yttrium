@@ -23,7 +23,6 @@ source_group("src/storage" REGULAR_EXPRESSION "/src/storage/")
 source_group("src/storage/formats" REGULAR_EXPRESSION "/src/storage/formats/")
 source_group("src/utils" REGULAR_EXPRESSION "/src/utils/")
 add_library(ycore STATIC
-	include/yttrium/api.h
 	include/yttrium/exceptions.h
 	include/yttrium/image/image.h
 	include/yttrium/image/utils.h
