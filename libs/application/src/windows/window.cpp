@@ -9,7 +9,7 @@
 #include <yttrium/image/image.h>
 #include <yttrium/math/point.h>
 #include <yttrium/math/size.h>
-#include "../../../core/src/image/formats/bmp.h"
+#include "../../../image/src/formats/bmp.h"
 #include "../../../core/src/platform/windows/error.h"
 #include "../window_callbacks.h"
 

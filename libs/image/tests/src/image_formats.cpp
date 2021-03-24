@@ -8,7 +8,6 @@
 #include <yttrium/storage/temporary_file.h>
 #include <yttrium/storage/writer.h>
 #include "image.h"
-#include "iostream.h"
 
 #include <doctest.h>
 

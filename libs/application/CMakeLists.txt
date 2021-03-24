@@ -23,7 +23,7 @@ add_library(yapplication STATIC
 	)
 include_config(yapplication ${PROJECT_BINARY_DIR}/config.h)
 target_include_directories(yapplication PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-target_link_libraries(yapplication PUBLIC ycore PRIVATE primal)
+target_link_libraries(yapplication PUBLIC ycore PRIVATE yimage primal)
 set_target_properties(yapplication PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 if(YTTRIUM_RENDERER STREQUAL "opengl")
 	target_sources(yapplication PRIVATE

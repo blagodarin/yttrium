@@ -9,10 +9,6 @@ add_executable(test_core
 	src/buffer_appender.cpp
 	src/color.cpp
 	src/flags.cpp
-	src/image.cpp
-	src/image.h
-	src/image_formats.cpp
-	src/image_formats.h
 	src/ion_reader.cpp
 	src/ion_writer.cpp
 	src/iostream.cpp
@@ -35,4 +31,4 @@ add_executable(test_core
 include_config(test_core ${PROJECT_BINARY_DIR}/config.h)
 target_link_libraries(test_core PRIVATE ycore ytest)
 set_target_properties(test_core PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-add_test(NAME core COMMAND test_core WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data)
+add_test(NAME core COMMAND test_core)
