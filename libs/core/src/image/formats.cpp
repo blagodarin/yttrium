@@ -10,7 +10,6 @@
 #include <yttrium/utils/numeric.h>
 
 #include <algorithm>
-#include <new>
 
 namespace Yt
 {

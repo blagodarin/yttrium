@@ -89,9 +89,7 @@ add_library(ycore STATIC
 	src/storage/writer.cpp
 	src/storage/writer.h
 	src/translation.cpp
-	src/utils/adler32.h
 	src/utils/algorithm.h
-	src/utils/crc32.h
 	src/utils/string.cpp
 	)
 include_config(ycore ${PROJECT_BINARY_DIR}/config.h)
