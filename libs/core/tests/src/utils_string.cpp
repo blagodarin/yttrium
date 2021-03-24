@@ -3,24 +3,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <yttrium/utils/string.h>
-#include "../../src/utils/string.h"
-
-#include <cstring>
-#include <memory>
 
 #include <doctest.h>
-
-TEST_CASE("utils_string.ends_with")
-{
-	using Yt::ends_with;
-
-	CHECK(ends_with("", ""));
-	CHECK(ends_with("test", ""));
-	CHECK(ends_with("test", "t"));
-	CHECK(!ends_with("test", "tes"));
-	CHECK(ends_with("test", "test"));
-	CHECK(!ends_with("test", "test "));
-}
 
 TEST_CASE("utils_string.from_chars.int32")
 {

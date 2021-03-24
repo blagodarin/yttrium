@@ -91,10 +91,8 @@ add_library(ycore STATIC
 	src/translation.cpp
 	src/utils/adler32.h
 	src/utils/algorithm.h
-	src/utils/atomic_counters.h
 	src/utils/crc32.h
 	src/utils/string.cpp
-	src/utils/string.h
 	)
 include_config(ycore ${PROJECT_BINARY_DIR}/config.h)
 target_include_directories(ycore PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)

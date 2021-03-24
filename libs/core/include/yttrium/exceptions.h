@@ -17,14 +17,6 @@ namespace Yt
 			: std::runtime_error{ message } {}
 	};
 
-	/// Thrown if the requested operation is not supported by the implementation.
-	class NotSupportedError : public std::runtime_error
-	{
-	public:
-		explicit NotSupportedError(const std::string& message)
-			: std::runtime_error{ message } {}
-	};
-
 	/// Thrown if a resource can't be loaded from the supplied data.
 	class DataError : public std::runtime_error
 	{

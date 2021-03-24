@@ -6,7 +6,6 @@
 
 #include <yttrium/logger.h>
 #include <yttrium/storage/source.h>
-#include "../utils/string.h"
 #include "formats/ypq.h"
 #include "package.h"
 
