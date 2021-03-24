@@ -23,25 +23,16 @@ FetchContent_MakeAvailable(Primal Aulos)
 
 primal_set_defaults()
 
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
-set(CMAKE_CXX_VISIBILITY_PRESET hidden)
-set(CMAKE_DEBUG_POSTFIX d)
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
-set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
-set(CMAKE_THREAD_PREFER_PTHREAD ON)
-set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
+if(WIN32)
+	set(CMAKE_DEBUG_POSTFIX "d")
+endif()
 
 include(cmake/utils.cmake)
 
 option(YTTRIUM_WITH_JPEG "Enable JPEG support (requires libjpeg)" ON)
 option(YTTRIUM_WITH_OGGVORBIS "Enable Ogg Vorbis support (requires libvorbisfile)" ON)
 if(NOT YTTRIUM_SUBPROJECT)
-	option(YTTRIUM_CLANG_TIDY "Enable running ClangTidy ('tidy' target)" OFF)
-	option(YTTRIUM_SANITIZERS "Enable sanitizers" OFF)
 	option(YTTRIUM_TESTS "Build tests" OFF)
-	mark_as_advanced(YTTRIUM_CLANG_TIDY YTTRIUM_SANITIZERS)
 endif()
 
 primal_provide_fmt(fmt_ROOT STATIC_RUNTIME ON)
@@ -101,11 +92,6 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 		add_compile_options(-msse2)
 	endif()
 
-	if(YTTRIUM_SANITIZERS)
-		add_compile_options(-fsanitize=address -fsanitize=undefined -fno-sanitize=nonnull-attribute)
-		list(APPEND DYNAMIC_LINKER_FLAGS -fsanitize=address -fsanitize=undefined)
-	endif()
-
 	# Warnings.
 	add_compile_options(-Werror -Weverything
 		-Wno-c++98-compat
@@ -128,28 +114,6 @@ endif()
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	if(Y_ARCH_X86 AND NOT Y_ARCH_AMD64)
 		add_compile_options(-msse2)
-	endif()
-
-	option(YTTRIUM_COVERAGE "Build with coverage analysis support" OFF)
-	if(YTTRIUM_COVERAGE)
-		add_compile_options(--coverage)
-		list(APPEND DYNAMIC_LINKER_FLAGS --coverage)
-	endif()
-
-	option(YTTRIUM_PROFILING "Build with profiling support" OFF)
-	if(YTTRIUM_PROFILING)
-		add_compile_options(-pg)
-		list(APPEND DYNAMIC_LINKER_FLAGS -pg)
-	endif()
-
-	mark_as_advanced(YTTRIUM_COVERAGE YTTRIUM_PROFILING)
-
-	if(YTTRIUM_SANITIZERS)
-		add_compile_options(-fsanitize=address -fsanitize=undefined -fno-sanitize=nonnull-attribute)
-		if(BUILD_SHARED_LIBS)
-			add_compile_options(-fno-sanitize=vptr)
-		endif()
-		list(APPEND DYNAMIC_LINKER_FLAGS -fsanitize=address -fsanitize=undefined)
 	endif()
 
 	# Warnings.
@@ -232,16 +196,16 @@ append_options(CMAKE_STATIC_LINKER_FLAGS ${STATIC_LINKER_FLAGS})
 configure_file(cmake/config.h.in ${PROJECT_BINARY_DIR}/config.h)
 
 add_subdirectory(libs/core)
-add_subdirectory(libs/application)
-add_subdirectory(libs/audio)
-add_subdirectory(libs/gui)
 add_subdirectory(libs/main)
 
 add_subdirectory(tools/yrc)
 add_subdirectory(tools/ypack)
 add_subdirectory(tools/ytr)
 
+add_subdirectory(libs/application)
+add_subdirectory(libs/audio)
 add_subdirectory(libs/renderer)
+add_subdirectory(libs/gui)
 
 if(YTTRIUM_TESTS)
 	enable_testing()
@@ -250,24 +214,6 @@ if(YTTRIUM_TESTS)
 	add_subdirectory(libs/audio/tests)
 	add_subdirectory(libs/core/tests)
 	add_subdirectory(libs/core/tests/bootstrap)
-endif()
-
-if(YTTRIUM_CLANG_TIDY)
-	find_package(ClangTidy 7.0.0 REQUIRED)
-	set(_cpps)
-	foreach(_target ycore yengine)
-		get_target_property(_source_dir ${_target} SOURCE_DIR)
-		get_target_property(_sources ${_target} SOURCES)
-		foreach(_source ${_sources})
-			if(_source MATCHES "^.*\.cpp$" AND NOT _source STREQUAL "utils/string.cpp") # The skipped file segfaults clang-tidy.
-				list(APPEND _cpps ${_source_dir}/${_source})
-			endif()
-		endforeach()
-	endforeach()
-	add_custom_target(tidy
-		COMMAND ${CLANG_TIDY_EXECUTABLE} -header-filter=.* -p=${PROJECT_BINARY_DIR} -quiet ${_cpps}
-		COMMENT "Running ClangTidy"
-		VERBATIM)
 endif()
 
 include(CMakePackageConfigHelpers)
