@@ -4,9 +4,9 @@
 
 #include "pass.h"
 
-#include <yttrium/math/line.h>
-#include <yttrium/math/matrix.h>
-#include <yttrium/math/quad.h>
+#include <yttrium/geometry/line.h>
+#include <yttrium/geometry/matrix.h>
+#include <yttrium/geometry/quad.h>
 #include <yttrium/memory/buffer_appender.h>
 #include <yttrium/renderer/program.h>
 #include <yttrium/renderer/report.h>

@@ -25,16 +25,6 @@ add_library(ycore STATIC
 	include/yttrium/ion/writer.h
 	include/yttrium/logger.h
 	include/yttrium/math/color.h
-	include/yttrium/math/euler.h
-	include/yttrium/math/line.h
-	include/yttrium/math/margins.h
-	include/yttrium/math/matrix.h
-	include/yttrium/math/plane.h
-	include/yttrium/math/point.h
-	include/yttrium/math/quad.h
-	include/yttrium/math/rect.h
-	include/yttrium/math/size.h
-	include/yttrium/math/vector.h
 	include/yttrium/memory/buffer.h
 	include/yttrium/memory/buffer_appender.h
 	include/yttrium/storage/package.h

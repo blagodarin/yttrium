@@ -4,8 +4,7 @@
 
 primal_set_folder(libs)
 source_group("src" REGULAR_EXPRESSION ".*\\.(h|cpp)$")
-source_group("include" REGULAR_EXPRESSION "/include/yttrium/image/")
-source_group("src" REGULAR_EXPRESSION "/src/")
+source_group("include" REGULAR_EXPRESSION "/include/")
 source_group("src/formats" REGULAR_EXPRESSION "/src/formats/")
 add_library(yimage STATIC
 	include/yttrium/image/image.h

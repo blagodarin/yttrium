@@ -4,7 +4,7 @@
 
 #include "program.h"
 
-#include <yttrium/math/matrix.h>
+#include <yttrium/geometry/matrix.h>
 #include "renderer.h"
 
 namespace Yt

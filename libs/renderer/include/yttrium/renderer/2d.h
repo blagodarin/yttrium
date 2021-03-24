@@ -5,7 +5,7 @@
 #pragma once
 
 #include <yttrium/math/color.h>
-#include <yttrium/math/margins.h>
+#include <yttrium/geometry/margins.h>
 
 #include <memory>
 #include <string_view>

@@ -5,7 +5,7 @@
 #pragma once
 
 #include <yttrium/application/id.h>
-#include <yttrium/math/size.h>
+#include <yttrium/geometry/size.h>
 #include "application.h"
 
 #if Y_RENDERER_OPENGL

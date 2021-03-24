@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <yttrium/math/size.h>
+#include <yttrium/geometry/size.h>
 
 namespace Yt
 {

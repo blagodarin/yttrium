@@ -6,7 +6,7 @@
 #include "window.h"
 
 #include <yttrium/application/application.h>
-#include <yttrium/math/rect.h>
+#include <yttrium/geometry/rect.h>
 
 // TODO: Windowed mode.
 

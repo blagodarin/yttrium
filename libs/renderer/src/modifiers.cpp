@@ -4,7 +4,7 @@
 
 #include <yttrium/renderer/modifiers.h>
 
-#include <yttrium/math/matrix.h>
+#include <yttrium/geometry/matrix.h>
 #include <yttrium/renderer/program.h>
 #include <yttrium/renderer/texture.h>
 #include "material.h"

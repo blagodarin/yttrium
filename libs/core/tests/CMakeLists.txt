@@ -14,19 +14,14 @@ add_executable(test_core
 	src/iostream.cpp
 	src/iostream.h
 	src/logger.cpp
-	src/margins.cpp
-	src/matrix.cpp
 	src/package.cpp
-	src/point.cpp
 	src/reader.cpp
-	src/rect.cpp
 	src/source.cpp
 	src/temporary_file.cpp
 	src/test_utils.cpp
 	src/translation.cpp
 	src/utils_numeric.cpp
 	src/utils_string.cpp
-	src/vector.cpp
 	)
 include_config(test_core ${PROJECT_BINARY_DIR}/config.h)
 target_link_libraries(test_core PRIVATE ycore ytest)

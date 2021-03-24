@@ -4,10 +4,10 @@
 
 #include <yttrium/renderer/2d.h>
 
-#include <yttrium/math/margins.h>
-#include <yttrium/math/matrix.h>
-#include <yttrium/math/quad.h>
-#include <yttrium/math/rect.h>
+#include <yttrium/geometry/margins.h>
+#include <yttrium/geometry/matrix.h>
+#include <yttrium/geometry/quad.h>
+#include <yttrium/geometry/rect.h>
 #include <yttrium/memory/buffer.h>
 #include <yttrium/renderer/modifiers.h>
 #include <yttrium/renderer/program.h>

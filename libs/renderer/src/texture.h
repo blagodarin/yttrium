@@ -7,7 +7,7 @@
 #include <yttrium/renderer/texture.h>
 
 #include <yttrium/image/image.h>
-#include <yttrium/math/size.h>
+#include <yttrium/geometry/size.h>
 
 namespace Yt
 {

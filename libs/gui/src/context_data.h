@@ -4,9 +4,9 @@
 
 #include <yttrium/application/key.h>
 #include <yttrium/application/window.h>
+#include <yttrium/geometry/rect.h>
 #include <yttrium/gui/font.h>
 #include <yttrium/gui/style.h>
-#include <yttrium/math/rect.h>
 
 #include <primal/utf8.hpp>
 

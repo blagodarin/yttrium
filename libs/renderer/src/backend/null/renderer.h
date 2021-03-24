@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <yttrium/math/rect.h>
+#include <yttrium/geometry/rect.h>
 #include <yttrium/renderer/mesh.h>
 #include "../backend.h"
 

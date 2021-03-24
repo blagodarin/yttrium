@@ -4,8 +4,8 @@
 
 #pragma once
 
+#include <yttrium/geometry/vector.h>
 #include <yttrium/math/color.h>
-#include <yttrium/math/vector.h>
 #include <yttrium/renderer/manager.h>
 #include <yttrium/renderer/texture.h>
 

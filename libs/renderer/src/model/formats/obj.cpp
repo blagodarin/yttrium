@@ -5,7 +5,7 @@
 #include "obj.h"
 
 #include <yttrium/exceptions.h>
-#include <yttrium/math/vector.h>
+#include <yttrium/geometry/vector.h>
 #include <yttrium/memory/buffer_appender.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/storage/source.h>

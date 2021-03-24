@@ -4,7 +4,7 @@
 
 #include "wrappers.h"
 
-#include <yttrium/math/matrix.h>
+#include <yttrium/geometry/matrix.h>
 
 #include <cassert>
 #include <stdexcept>

@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <yttrium/math/rect.h>
-
 #include <memory>
 #include <optional>
 #include <string_view>
@@ -13,6 +11,7 @@
 
 namespace Yt
 {
+	class RectF;
 	class RenderManager;
 	class Renderer2D;
 	class Source;

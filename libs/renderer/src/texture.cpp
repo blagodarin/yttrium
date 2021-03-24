@@ -4,7 +4,7 @@
 
 #include "texture.h"
 
-#include <yttrium/math/rect.h>
+#include <yttrium/geometry/rect.h>
 #include "backend/backend.h"
 
 namespace Yt

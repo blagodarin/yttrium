@@ -7,8 +7,8 @@
 #include <yttrium/application/key.h>
 #include <yttrium/exceptions.h>
 #include <yttrium/image/image.h>
-#include <yttrium/math/point.h>
-#include <yttrium/math/size.h>
+#include <yttrium/geometry/point.h>
+#include <yttrium/geometry/size.h>
 #include "../../../image/src/formats/bmp.h"
 #include "../../../core/src/platform/windows/error.h"
 #include "../window_callbacks.h"
