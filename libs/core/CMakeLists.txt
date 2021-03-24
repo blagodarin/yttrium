@@ -24,7 +24,6 @@ add_library(ycore STATIC
 	include/yttrium/ion/reader.h
 	include/yttrium/ion/writer.h
 	include/yttrium/logger.h
-	include/yttrium/math/color.h
 	include/yttrium/memory/buffer.h
 	include/yttrium/memory/buffer_appender.h
 	include/yttrium/storage/package.h

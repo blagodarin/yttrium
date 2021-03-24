@@ -7,7 +7,6 @@ source_group("src" REGULAR_EXPRESSION ".*\\.(h|cpp)$")
 add_executable(test_core
 	src/buffer.cpp
 	src/buffer_appender.cpp
-	src/color.cpp
 	src/flags.cpp
 	src/ion_reader.cpp
 	src/ion_writer.cpp

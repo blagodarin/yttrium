@@ -6,7 +6,7 @@
 #include "utils.h"
 
 #include <yttrium/image/image.h>
-#include <yttrium/math/color.h>
+#include <yttrium/image/color.h>
 
 #include <cstring>
 

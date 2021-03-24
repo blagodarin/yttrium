@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <yttrium/math/color.h>
+#include <yttrium/image/color.h>
 
 #include <memory>
 

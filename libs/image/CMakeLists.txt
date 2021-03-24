@@ -7,6 +7,7 @@ source_group("src" REGULAR_EXPRESSION ".*\\.(h|cpp)$")
 source_group("include" REGULAR_EXPRESSION "/include/")
 source_group("src/formats" REGULAR_EXPRESSION "/src/formats/")
 add_library(yimage STATIC
+	include/yttrium/image/color.h
 	include/yttrium/image/image.h
 	include/yttrium/image/utils.h
 	src/formats.cpp
@@ -25,7 +26,7 @@ add_library(yimage STATIC
 	)
 include_config(yimage ${PROJECT_BINARY_DIR}/config.h)
 target_include_directories(yimage PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-target_link_libraries(yimage PRIVATE ycore)
+target_link_libraries(yimage PUBLIC ycore)
 set_target_properties(yimage PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 if(YTTRIUM_WITH_JPEG)
 	target_link_libraries(yimage PRIVATE JPEG::JPEG)

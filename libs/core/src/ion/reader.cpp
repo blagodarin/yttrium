@@ -5,7 +5,6 @@
 #include <yttrium/ion/reader.h>
 
 #include <yttrium/exceptions.h>
-#include <yttrium/math/color.h>
 #include <yttrium/memory/buffer.h>
 #include <yttrium/storage/source.h>
 #include "../utils/algorithm.h"
@@ -26,7 +25,6 @@ namespace
 		Lf,       // '\n'.
 		Name,     // 'A'-'Z', 'a'-'z', '0'-'9' or '_'.
 		Quote,    // '"', '`'.
-		Hash,     // '#'.
 		LBrace,   // '{'.
 		RBrace,   // '}'.
 		LBracket, // '['.
@@ -39,7 +37,7 @@ namespace
 		Other, Space, Lf, Space, Space, Cr, Other, Other,         // \t \n \v \f \r
 		Other, Other, Other, Other, Other, Other, Other, Other,   //
 		Other, Other, Other, Other, Other, Other, Other, Other,   //
-		Space, Other, Quote, Hash, Other, Other, Other, Other,    //   ! " # $ % & '
+		Space, Other, Quote, Other, Other, Other, Other, Other,   //   ! " # $ % & '
 		Other, Other, Other, Other, Other, Other, Other, Comment, // ( ) * + , - . /
 		Name, Name, Name, Name, Name, Name, Name, Name,           // 0 1 2 3 4 5 6 7
 		Name, Name, Other, Other, Other, Other, Other, Other,     // 8 9 : ; < = > ?
@@ -116,31 +114,6 @@ namespace Yt
 	IonToken& IonToken::next(IonReader& ion)
 	{
 		return *this = ion.read();
-	}
-
-	Bgra32 IonToken::to_color() const
-	{
-		if (_type != Type::ColorValue)
-			throw IonError{ fmt::format("({}:{}) ION color expected", _line, _column) };
-
-		const auto d = [this](std::size_t i) {
-			const auto c = _text[i];
-			return c < 'a' ? c - '0' : c - 'a' + 10;
-		};
-
-		const auto dd = [&d](std::size_t i) {
-			const auto value = d(i);
-			return value * 16 + value;
-		};
-
-		switch (_text.size())
-		{
-		case 4: return Bgra32{ dd(3), dd(2), dd(1) };
-		case 5: return Bgra32{ dd(3), dd(2), dd(1), dd(4) };
-		case 7: return Bgra32{ d(5) * 16 + d(6), d(3) * 16 + d(4), d(1) * 16 + d(2) };
-		case 9: return Bgra32{ d(5) * 16 + d(6), d(3) * 16 + d(4), d(1) * 16 + d(2), d(7) * 16 + d(8) };
-		default: throw IonError{ fmt::format("({}:{}) Bad ION color", _line, _column) };
-		}
 	}
 
 	std::string_view IonToken::to_name() const
@@ -225,19 +198,6 @@ namespace Yt
 						}
 						_cursor = cursor + 1;
 						return make_token<IonToken::Type::StringValue, -1>(base, cursor - base, quote == '`');
-					}
-					else
-						throw IonError{ fmt::format("({}:{}) Unexpected ION value", _line, _cursor - _line_base) };
-
-				case Hash:
-					if (_stack.back() & AcceptValues)
-					{
-						const auto begin = _cursor;
-						const auto end = forward_find_if(begin + 1, [](char c) { return (c < '0' || c > '9') && (c < 'a' || c > 'f'); });
-						if (const auto next_class = ::class_of(*end); next_class == Other || next_class == Name)
-							throw IonError{ fmt::format("({}:{}) Bad character", _line, end - _line_base) };
-						_cursor = end;
-						return make_token<IonToken::Type::ColorValue>(begin, end - begin);
 					}
 					else
 						throw IonError{ fmt::format("({}:{}) Unexpected ION value", _line, _cursor - _line_base) };

@@ -1,23 +1,9 @@
-//
 // This file is part of the Yttrium toolkit.
-// Copyright (C) 2019 Sergei Blagodarin.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+// Copyright (C) Sergei Blagodarin.
+// SPDX-License-Identifier: Apache-2.0
 
 #include <yttrium/exceptions.h>
 #include <yttrium/ion/reader.h>
-#include <yttrium/math/color.h>
 #include <yttrium/storage/source.h>
 #include <yttrium/utils/numeric.h>
 #include "iostream.h"
@@ -32,11 +18,6 @@ using Yt::IonToken;
 
 namespace Yt
 {
-	inline bool operator==(const Color4f& a, const Color4f& b)
-	{
-		return a._r == b._r && a._g == b._g && a._b == b._b && a._a == b._a;
-	}
-
 	inline bool operator==(const IonToken& a, const IonToken& b)
 	{
 		return a.line() == b.line() && a.column() == b.column() && a.type() == b.type() && a.text() == b.text() && a.translatable() == b.translatable();
@@ -90,27 +71,6 @@ TEST_CASE("ion.reader.token.iostream")
 	std::ostringstream stream;
 	stream << IonToken{ 1, 2, IonToken::Type::End, "test" };
 	CHECK(stream.str() == "{1,2,IonToken::Type(" + std::to_string(to_underlying(IonToken::Type::End)) + "),R\"(test)\"}");
-}
-
-TEST_CASE("ion.reader.token.to_color")
-{
-	const auto color = [](std::string_view text) {
-		return IonToken{ 1, 1, IonToken::Type::ColorValue, text }.to_color();
-	};
-
-	CHECK(color("#00f") == Yt::Bgra32::blue());
-	CHECK(color("#f0f0") == Yt::Bgra32::magenta(0));
-	CHECK(color("#0000ff") == Yt::Bgra32::blue());
-	CHECK(color("#ff00ff00") == Yt::Bgra32::magenta(0));
-
-	CHECK_THROWS_AS(color("#"), IonError);
-	CHECK_THROWS_AS(color("#1"), IonError);
-	CHECK_THROWS_AS(color("#12"), IonError);
-	CHECK_THROWS_AS(color("#12345"), IonError);
-	CHECK_THROWS_AS(color("#1234567"), IonError);
-	CHECK_THROWS_AS(color("#123456789"), IonError);
-
-	CHECK_THROWS_AS(IonToken(1, 1, IonToken::Type::StringValue, "value").to_color(), IonError);
 }
 
 TEST_CASE("ion.reader.token.to_name")
@@ -369,20 +329,4 @@ TEST_CASE("ion.reader.translatable")
 	CHECK(ion->read() == IonToken(1, 1, IonToken::Type::Name, "name1"));
 	CHECK(ion->read() == IonToken(1, 6, IonToken::Type::StringValue, "value1"));
 	CHECK(ion->read() == IonToken(1, 14, IonToken::Type::StringValue, "value2", true));
-}
-
-TEST_CASE("ion.reader.colors")
-{
-	{
-		TestData ion{ R"(name#01234567#89abcdef`)" };
-		CHECK(ion->read() == IonToken(1, 1, IonToken::Type::Name, "name"));
-		CHECK(ion->read() == IonToken(1, 5, IonToken::Type::ColorValue, "#01234567"));
-		CHECK(ion->read() == IonToken(1, 14, IonToken::Type::ColorValue, "#89abcdef"));
-	}
-	{
-		TestData ion{ R"(name#01234567#89ABCDEF`)" };
-		CHECK(ion->read() == IonToken(1, 1, IonToken::Type::Name, "name"));
-		CHECK(ion->read() == IonToken(1, 5, IonToken::Type::ColorValue, "#01234567"));
-		CHECK_THROWS_AS(ion->read(), IonError); // Only lowercase hexadecimal digits are allowed.
-	}
 }

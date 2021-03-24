@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <yttrium/math/color.h>
 #include <yttrium/geometry/vector.h>
+#include <yttrium/image/color.h>
 
 namespace Yt
 {

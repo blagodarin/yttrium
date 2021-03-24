@@ -5,6 +5,7 @@
 primal_set_folder(tests)
 source_group("src" REGULAR_EXPRESSION ".*\\.(h|cpp)$")
 add_executable(test_image
+	src/color.cpp
 	src/image.cpp
 	src/image.h
 	src/image_formats.cpp

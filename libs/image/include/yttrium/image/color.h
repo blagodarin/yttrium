@@ -35,15 +35,5 @@ namespace Yt
 		static constexpr Bgra32 yellow(uint8_t alpha = 255) noexcept { return Bgra32{ 0, 255, 255, alpha }; }
 	};
 
-	class Color4f
-	{
-	public:
-		float _r, _g, _b, _a;
-
-		Color4f() noexcept = default;
-		constexpr Color4f(float r, float g, float b, float a = 1.f) noexcept
-			: _r{ r }, _g{ g }, _b{ b }, _a{ a } {}
-	};
-
 	constexpr bool operator==(const Bgra32& a, const Bgra32& b) noexcept { return a._b == b._b && a._g == b._g && a._r == b._r && a._a == b._a; }
 }

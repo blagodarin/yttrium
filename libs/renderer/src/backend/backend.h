@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <yttrium/geometry/vector.h>
-#include <yttrium/math/color.h>
 #include <yttrium/renderer/manager.h>
 #include <yttrium/renderer/texture.h>
 
@@ -15,6 +13,7 @@ namespace Yt
 	enum class ImageOrientation;
 	class MeshData;
 	class RectF;
+	class Size;
 
 	class RenderBackend
 	{

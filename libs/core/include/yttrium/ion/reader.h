@@ -9,7 +9,6 @@
 
 namespace Yt
 {
-	class Bgra32;
 	class Source;
 
 	class IonToken
@@ -19,7 +18,6 @@ namespace Yt
 		{
 			Name,
 			StringValue,
-			ColorValue,
 			ListBegin,
 			ListEnd,
 			ObjectBegin,
@@ -43,7 +41,6 @@ namespace Yt
 		void check_object_begin() const;
 		void check_object_end() const;
 		IonToken& next(class IonReader&);
-		Bgra32 to_color() const;
 		std::string_view to_name() const;
 		std::string_view to_value() const;
 
