@@ -9,12 +9,13 @@
 namespace Yt
 {
 	class Application;
+	class EventCallbacks;
 	class WindowPrivate;
 
 	class ApplicationPrivate
 	{
 	public:
-		bool process_events();
+		bool process_events(EventCallbacks&);
 		WindowPrivate* window() const noexcept { return _window.load(); }
 
 		static void add_window(Application&, WindowPrivate&);

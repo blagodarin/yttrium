@@ -8,19 +8,40 @@
 #include <yttrium/application/application.h>
 #include <yttrium/geometry/rect.h>
 
+#include <cassert>
+
 // TODO: Windowed mode.
 
 namespace Yt
 {
-	WindowPrivate::WindowPrivate(Application& application)
+	WindowPrivate::WindowPrivate(Application& application, Window& window)
 		: _application{ application, *this }
+		, _window{ window }
 	{
 		const auto size = _backend.size();
 		if (size)
 			on_resize_event(*size);
 	}
 
-	void WindowPrivate::update()
+	bool WindowPrivate::process_events(EventCallbacks& callbacks)
+	{
+		class SetCallbacks
+		{
+		public:
+			constexpr SetCallbacks(EventCallbacks*& dst, EventCallbacks& src) noexcept
+				: _dst{ dst }, _previous{ _dst } { _dst = &src; }
+			constexpr ~SetCallbacks() noexcept { _dst = _previous; }
+
+		private:
+			EventCallbacks*& _dst;
+			EventCallbacks* const _previous;
+		};
+		assert(!_callbacks);
+		SetCallbacks set_callbacks{ _callbacks, callbacks };
+		return _backend.process_events();
+	}
+
+	void WindowPrivate::update(EventCallbacks& callbacks)
 	{
 		if (!_is_active)
 			return;
@@ -38,8 +59,8 @@ namespace Yt
 		else
 			_backend.set_cursor(_cursor);
 
-		if (_on_cursor_moved)
-			_on_cursor_moved(dx, dy);
+		if (dx != 0 || dy != 0)
+			callbacks.onWindowMouseMove(_window, dx, dy);
 	}
 
 	void WindowPrivate::on_focus_event(bool is_focused)
@@ -51,8 +72,7 @@ namespace Yt
 	{
 		KeyEvent event{ key, pressed, autorepeat };
 		event._modifiers = modifiers;
-		if (_on_key_event)
-			_on_key_event(event);
+		_callbacks->onWindowKeyEvent(_window, event);
 	}
 
 	void WindowPrivate::on_resize_event(const Size& size)
@@ -70,8 +90,7 @@ namespace Yt
 
 	void WindowPrivate::on_text_input(std::string_view text)
 	{
-		if (_on_text_input)
-			_on_text_input(text);
+		_callbacks->onWindowTextInput(_window, text);
 	}
 
 	void WindowPrivate::lock_cursor(bool lock)
@@ -91,7 +110,7 @@ namespace Yt
 	}
 
 	Window::Window(Application& application, const std::string& title)
-		: _private{ std::make_unique<WindowPrivate>(application) }
+		: _private{ std::make_unique<WindowPrivate>(application, *this) }
 	{
 		set_title(title);
 	}
@@ -116,21 +135,6 @@ namespace Yt
 	void Window::lock_cursor(bool lock)
 	{
 		_private->lock_cursor(lock);
-	}
-
-	void Window::on_cursor_moved(const std::function<void(int, int)>& callback)
-	{
-		_private->_on_cursor_moved = callback;
-	}
-
-	void Window::on_key_event(const std::function<void(const KeyEvent&)>& callback)
-	{
-		_private->_on_key_event = callback;
-	}
-
-	void Window::on_text_input(const std::function<void(std::string_view)>& callback)
-	{
-		_private->_on_text_input = callback;
 	}
 
 	bool Window::set_cursor(const Point& cursor)

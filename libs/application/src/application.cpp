@@ -11,11 +11,11 @@
 
 namespace Yt
 {
-	bool ApplicationPrivate::process_events()
+	bool ApplicationPrivate::process_events(EventCallbacks& callbacks)
 	{
-		if (auto* window = _window.load(); window && window->process_events())
+		if (auto* window = _window.load(); window && window->process_events(callbacks))
 		{
-			window->update();
+			window->update(callbacks);
 			return true;
 		}
 		return false;
@@ -35,8 +35,8 @@ namespace Yt
 
 	Application::~Application() noexcept = default;
 
-	bool Application::process_events()
+	bool Application::process_events(EventCallbacks& callbacks)
 	{
-		return _private->process_events();
+		return _private->process_events(callbacks);
 	}
 }

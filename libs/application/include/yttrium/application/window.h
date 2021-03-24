@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <functional>
 #include <memory>
 #include <string_view>
 
@@ -12,7 +11,6 @@ namespace Yt
 {
 	class Application;
 	class Image;
-	class KeyEvent;
 	class Point;
 	class Size;
 	struct WindowID;
@@ -38,15 +36,6 @@ namespace Yt
 
 		///
 		void lock_cursor(bool lock);
-
-		///
-		void on_cursor_moved(const std::function<void(int dx, int dy)>&);
-
-		///
-		void on_key_event(const std::function<void(const KeyEvent&)>&);
-
-		///
-		void on_text_input(const std::function<void(std::string_view)>&);
 
 		///
 		bool set_cursor(const Point& cursor);

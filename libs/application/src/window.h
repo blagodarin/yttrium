@@ -8,20 +8,19 @@
 #include "window_backend.h"
 #include "window_callbacks.h"
 
-#include <functional>
-
 namespace Yt
 {
 	class RenderPass;
 	class Window;
+	class WindowCallbacks;
 
 	class WindowPrivate final : private WindowBackendCallbacks
 	{
 	public:
-		explicit WindowPrivate(Application&);
+		explicit WindowPrivate(Application&, Window&);
 
-		bool process_events() { return _backend.process_events(); }
-		void update();
+		bool process_events(EventCallbacks&);
+		void update(EventCallbacks&);
 
 	private:
 		void on_focus_event(bool is_focused) override;
@@ -35,14 +34,13 @@ namespace Yt
 
 	private:
 		const ApplicationStub _application;
+		Window& _window;
+		EventCallbacks* _callbacks = nullptr;
 		WindowBackend _backend{ *this };
 		bool _is_active = false;
 		Point _cursor;
 		bool _is_cursor_locked = false;
 		Size _size;
-		std::function<void(int, int)> _on_cursor_moved;
-		std::function<void(const KeyEvent&)> _on_key_event;
-		std::function<void(std::string_view)> _on_text_input;
 
 		friend Window;
 	};

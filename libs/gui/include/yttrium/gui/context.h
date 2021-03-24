@@ -5,12 +5,11 @@
 #pragma once
 
 #include <memory>
-#include <string_view>
 
 namespace Yt
 {
+	class EventCallbacks;
 	class Font;
-	class KeyEvent;
 	class Window;
 
 	class GuiContext
@@ -19,8 +18,7 @@ namespace Yt
 		explicit GuiContext(Window&);
 		~GuiContext() noexcept;
 
-		void processKeyEvent(const KeyEvent&);
-		void processTextInput(std::string_view);
+		EventCallbacks& eventCallbacks() noexcept;
 		void setDefaultFont(const std::shared_ptr<const Font>&) noexcept;
 
 	private:

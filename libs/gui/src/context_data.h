@@ -2,6 +2,7 @@
 // Copyright (C) Sergei Blagodarin.
 // SPDX-License-Identifier: Apache-2.0
 
+#include <yttrium/application/application.h>
 #include <yttrium/application/key.h>
 #include <yttrium/application/window.h>
 #include <yttrium/geometry/rect.h>
@@ -12,13 +13,14 @@
 
 #include <cassert>
 #include <chrono>
+#include <functional>
 #include <optional>
 
 namespace Yt
 {
 	class GuiLayout;
 
-	class GuiContextData
+	class GuiContextData : public EventCallbacks
 	{
 	public:
 		static constexpr uint16_t kPayloadMask = 0x00ff;
@@ -312,5 +314,10 @@ namespace Yt
 			else
 				_blankTexture = {};
 		}
+
+	private:
+		void onWindowMouseMove(const Window&, int dx, int dy) override;
+		void onWindowKeyEvent(const Window&, const KeyEvent&) override;
+		void onWindowTextInput(const Window&, std::string_view) override;
 	};
 }
