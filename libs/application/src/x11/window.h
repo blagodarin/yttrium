@@ -25,7 +25,7 @@ namespace Yt
 
 		void close() noexcept;
 		bool get_cursor(Point&);
-		WindowID id() const noexcept { return { reinterpret_cast<intptr_t>(_application.display()), static_cast<intptr_t>(_window.get()) }; }
+		WindowID id() const noexcept { return { _application.display(), static_cast<intptr_t>(_window.get()) }; }
 		bool process_events();
 		bool set_cursor(const Point&);
 		void set_icon(const Image&);

@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <yttrium/utils/flags.h>
-
 namespace Yt
 {
 	/// Input key.
@@ -181,26 +179,5 @@ namespace Yt
 		WheelRight = 0x8F,
 
 		// - Unassigned keys (0x90 - 0xFF).
-	};
-
-	/// %Key event.
-	class KeyEvent
-	{
-	public:
-		enum class Modifier
-		{
-			Shift = 1 << 0,   ///< Key::LShift or Key::RShift is pressed.
-			Control = 1 << 1, ///< Key::LControl or Key::RControl is pressed.
-			Alt = 1 << 2,     ///< Key::LAlt or Key::RAlt is pressed.
-		};
-
-		Key _key;                   ///< Key.
-		bool _pressed;              ///< Is the key pressed?
-		bool _autorepeat;           ///< Is it an autorepeat event?
-		Flags<Modifier> _modifiers; ///< Modifier mask.
-
-		///
-		constexpr KeyEvent(Key key, bool pressed, bool autorepeat) noexcept
-			: _key{ key }, _pressed{ pressed }, _autorepeat{ autorepeat } {}
 	};
 }

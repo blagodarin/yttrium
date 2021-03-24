@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <yttrium/application/application.h>
-#include <yttrium/application/key.h>
+#include <yttrium/application/event.h>
 #include <yttrium/application/window.h>
 #include <yttrium/geometry/rect.h>
 #include <yttrium/gui/font.h>

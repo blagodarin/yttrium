@@ -5,21 +5,10 @@
 #pragma once
 
 #include <memory>
-#include <string_view>
 
 namespace Yt
 {
-	class KeyEvent;
-	class Window;
-
-	class EventCallbacks
-	{
-	public:
-		virtual ~EventCallbacks() noexcept = default;
-		virtual void onWindowMouseMove(const Window&, int dx, int dy) = 0;
-		virtual void onWindowKeyEvent(const Window&, const KeyEvent&) = 0;
-		virtual void onWindowTextInput(const Window&, std::string_view) = 0;
-	};
+	class EventCallbacks;
 
 	///
 	class Application

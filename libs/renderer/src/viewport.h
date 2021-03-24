@@ -2,7 +2,6 @@
 // Copyright (C) Sergei Blagodarin.
 // SPDX-License-Identifier: Apache-2.0
 
-#include <yttrium/application/id.h>
 #include <yttrium/application/window.h>
 #include "builtin.h"
 #include "pass.h"

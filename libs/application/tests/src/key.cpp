@@ -2,7 +2,7 @@
 // Copyright (C) Sergei Blagodarin.
 // SPDX-License-Identifier: Apache-2.0
 
-#include <yttrium/application/key.h>
+#include <yttrium/application/event.h>
 
 #include <doctest.h>
 

@@ -10,7 +10,7 @@ source_group("src/xcb" REGULAR_EXPRESSION "/src/xcb/")
 source_group("include" REGULAR_EXPRESSION "/include/")
 add_library(yapplication STATIC
 	include/yttrium/application/application.h
-	include/yttrium/application/id.h
+	include/yttrium/application/event.h
 	include/yttrium/application/key.h
 	include/yttrium/application/window.h
 	src/application.cpp

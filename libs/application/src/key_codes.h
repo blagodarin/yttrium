@@ -6,6 +6,8 @@
 
 #include <yttrium/application/key.h>
 
+#include <cstdint>
+
 namespace Yt
 {
 	// This mapping is based on <uapi/linux/input-event-codes.h> from Linux source code.

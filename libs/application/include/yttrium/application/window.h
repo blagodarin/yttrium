@@ -5,7 +5,7 @@
 #pragma once
 
 #include <memory>
-#include <string_view>
+#include <string>
 
 namespace Yt
 {
@@ -13,7 +13,14 @@ namespace Yt
 	class Image;
 	class Point;
 	class Size;
-	struct WindowID;
+
+	struct WindowID
+	{
+		const void* _application = nullptr;
+		intptr_t _window = 0;
+		constexpr WindowID(const void* application, intptr_t window) noexcept
+			: _application{ application }, _window{ window } {}
+	};
 
 	///
 	class Window

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <yttrium/application/key.h>
+#include <yttrium/application/event.h>
 
 #include <primal/pointer.hpp>
 

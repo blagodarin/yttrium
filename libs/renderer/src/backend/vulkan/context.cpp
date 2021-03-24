@@ -103,7 +103,7 @@ namespace
 #ifdef VK_USE_PLATFORM_WIN32_KHR
 		VkWin32SurfaceCreateInfoKHR info;
 		info.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
-		info.hinstance = reinterpret_cast<HINSTANCE>(window_id._application);
+		info.hinstance = static_cast<HINSTANCE>(window_id._application);
 		info.hwnd = reinterpret_cast<HWND>(window_id._window);
 
 		VkSurfaceKHR handle = VK_NULL_HANDLE;
@@ -113,7 +113,7 @@ namespace
 #ifdef VK_USE_PLATFORM_XCB_KHR
 		VkXcbSurfaceCreateInfoKHR info;
 		info.sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR;
-		info.connection = reinterpret_cast<xcb_connection_t*>(window_id._application);
+		info.connection = static_cast<xcb_connection_t*>(window_id._application);
 		info.window = static_cast<xcb_window_t>(window_id._window);
 
 		VkSurfaceKHR handle = VK_NULL_HANDLE;
