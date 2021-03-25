@@ -21,8 +21,8 @@ namespace Yt
 	class Quad;
 	class RenderBackend;
 	class RenderBuiltin;
+	class RenderMetrics;
 	class RenderProgram;
-	struct RenderReport;
 
 	enum class RenderMatrixType
 	{
@@ -54,7 +54,7 @@ namespace Yt
 	class RenderPassImpl : public RenderPass
 	{
 	public:
-		RenderPassImpl(RenderBackend&, RenderBuiltin&, RenderPassData&, const Size& viewport_size, RenderReport&);
+		RenderPassImpl(RenderBackend&, RenderBuiltin&, RenderPassData&, const Size& viewport_size, RenderMetrics&);
 		~RenderPassImpl() noexcept override;
 
 		void draw_mesh(const Mesh&) override;
@@ -84,7 +84,7 @@ namespace Yt
 		RenderBuiltin& _builtin;
 		RenderPassData& _data;
 		const SizeF _viewport_size;
-		RenderReport& _report;
+		RenderMetrics& _metrics;
 
 		const Texture2D* _current_texture = nullptr;
 		Flags<Texture2D::Filter> _current_texture_filter = Texture2D::NearestFilter;

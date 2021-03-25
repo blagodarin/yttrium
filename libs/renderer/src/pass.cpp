@@ -8,8 +8,8 @@
 #include <yttrium/geometry/matrix.h>
 #include <yttrium/geometry/quad.h>
 #include <yttrium/memory/buffer_appender.h>
+#include <yttrium/renderer/metrics.h>
 #include <yttrium/renderer/program.h>
-#include <yttrium/renderer/report.h>
 #include <yttrium/utils/string.h>
 #include "backend/backend.h"
 #include "builtin.h"
@@ -38,12 +38,12 @@ namespace Yt
 
 	RenderPassData::~RenderPassData() noexcept = default;
 
-	RenderPassImpl::RenderPassImpl(RenderBackend& backend, RenderBuiltin& builtin, RenderPassData& data, const Size& viewport_size, RenderReport& report)
+	RenderPassImpl::RenderPassImpl(RenderBackend& backend, RenderBuiltin& builtin, RenderPassData& data, const Size& viewport_size, RenderMetrics& metrics)
 		: _backend{ backend }
 		, _builtin{ builtin }
 		, _data{ data }
 		, _viewport_size{ viewport_size }
-		, _report{ report }
+		, _metrics{ metrics }
 	{
 		_backend.clear();
 	}
@@ -59,8 +59,8 @@ namespace Yt
 	void RenderPassImpl::draw_mesh(const Mesh& mesh)
 	{
 		update_state();
-		_report._triangles += _backend.draw_mesh(mesh);
-		++_report._draw_calls;
+		_metrics._triangles += _backend.draw_mesh(mesh);
+		++_metrics._draw_calls;
 	}
 
 	Matrix4 RenderPassImpl::full_matrix() const
@@ -203,8 +203,8 @@ namespace Yt
 	{
 		update_state();
 		_backend.flush_2d(vertices, indices);
-		_report._triangles += indices.size() / sizeof(uint16_t) - 2;
-		++_report._draw_calls;
+		_metrics._triangles += indices.size() / sizeof(uint16_t) - 2;
+		++_metrics._draw_calls;
 	}
 
 	void RenderPassImpl::update_state()
@@ -217,12 +217,12 @@ namespace Yt
 			{
 				_current_program = program;
 				_backend.set_program(program);
-				++_report._shader_switches;
+				++_metrics._shader_switches;
 #ifndef NDEBUG
 				if (std::none_of(_data._seen_programs.begin(), _data._seen_programs.end(), [program](const auto seen_program) { return program == seen_program; }))
 					_data._seen_programs.emplace_back(program);
 				else
-					++_report._extra_shader_switches;
+					++_metrics._extra_shader_switches;
 #endif
 			}
 		}
@@ -235,12 +235,12 @@ namespace Yt
 			{
 				_current_texture = texture;
 				_backend.set_texture(*texture, _current_texture_filter);
-				++_report._texture_switches;
+				++_metrics._texture_switches;
 #ifndef NDEBUG
 				if (std::none_of(_data._seen_textures.begin(), _data._seen_textures.end(), [texture](const auto seen_texture) { return texture == seen_texture; }))
 					_data._seen_textures.emplace_back(texture);
 				else
-					++_report._extra_texture_switches;
+					++_metrics._extra_texture_switches;
 #endif
 			}
 		}

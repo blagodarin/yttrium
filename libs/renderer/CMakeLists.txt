@@ -15,10 +15,10 @@ add_library(yrenderer STATIC
 	include/yttrium/renderer/manager.h
 	include/yttrium/renderer/material.h
 	include/yttrium/renderer/mesh.h
+	include/yttrium/renderer/metrics.h
 	include/yttrium/renderer/modifiers.h
 	include/yttrium/renderer/pass.h
 	include/yttrium/renderer/program.h
-	include/yttrium/renderer/report.h
 	include/yttrium/renderer/resource_loader.h
 	include/yttrium/renderer/texture.h
 	include/yttrium/renderer/viewport.h

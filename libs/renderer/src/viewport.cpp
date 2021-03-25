@@ -16,7 +16,12 @@ namespace Yt
 
 	Viewport::~Viewport() noexcept = default;
 
-	void Viewport::render(RenderReport& report, const std::function<void(RenderPass&)>& callback)
+	RenderMetrics Viewport::metrics() const noexcept
+	{
+		return _data->_metrics;
+	}
+
+	void Viewport::render(const std::function<void(RenderPass&)>& callback)
 	{
 		const auto window_size = _data->_window.size();
 		if (window_size != _data->_window_size)
@@ -24,8 +29,9 @@ namespace Yt
 			_data->_renderer.set_viewport_size(window_size);
 			_data->_window_size = window_size;
 		}
+		_data->_metrics = RenderMetrics{};
 		{
-			RenderPassImpl pass{ *_data->_renderer._backend, _data->_renderer_builtin, _data->_render_pass_data, window_size, report };
+			RenderPassImpl pass{ *_data->_renderer._backend, _data->_renderer_builtin, _data->_render_pass_data, window_size, _data->_metrics };
 			callback(pass);
 		}
 		_data->_window.swap_buffers();

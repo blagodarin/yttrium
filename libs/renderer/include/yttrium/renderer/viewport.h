@@ -11,8 +11,8 @@ namespace Yt
 {
 	class Image;
 	class RenderManager;
+	class RenderMetrics;
 	class RenderPass;
-	struct RenderReport;
 	class Window;
 
 	///
@@ -22,8 +22,10 @@ namespace Yt
 		explicit Viewport(Window&);
 		~Viewport() noexcept;
 
+		RenderMetrics metrics() const noexcept;
+
 		///
-		void render(RenderReport&, const std::function<void(RenderPass&)>&);
+		void render(const std::function<void(RenderPass&)>&);
 
 		///
 		RenderManager& render_manager();
