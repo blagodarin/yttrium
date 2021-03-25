@@ -4,36 +4,32 @@
 
 #include <yttrium/storage/package.h>
 
-#include <yttrium/logger.h>
+#include <yttrium/exceptions.h>
 #include <yttrium/storage/source.h>
 #include "formats/ypq.h"
 #include "package.h"
 
 #include <fmt/format.h>
 
+#include <cassert>
+
 namespace Yt
 {
-	std::unique_ptr<PackageReader> PackageReader::create(const std::filesystem::path& path, PackageType type)
+	std::unique_ptr<PackageReader> PackageReader::create(std::unique_ptr<Source>&& source, PackageType type)
 	{
+		assert(source);
 		if (type == PackageType::Auto)
 		{
-			if (path.extension() == ".ypq")
+			uint32_t magic = 0;
+			if (!source->read_at(0, magic))
+				return {};
+			if (magic == kYpqSignature)
 				type = PackageType::Ypq;
 			else
-				return {};
+				throw DataError{ "Unknown package format" }; // TODO: Report this error with package source name.
 		}
-		auto source = Source::from(path);
-		if (!source)
-			return {};
-		try
-		{
-			if (type == PackageType::Ypq)
-				return std::make_unique<YpqReader>(std::move(source));
-		}
-		catch (const BadPackage& e)
-		{
-			Logger::write(fmt::format("({}) {}", path.string(), e.what()));
-		}
+		if (type == PackageType::Ypq)
+			return std::make_unique<YpqReader>(std::move(source));
 		return {};
 	}
 

@@ -91,6 +91,7 @@ namespace Yt
 		const Storage::UseFileSystem _use_file_system;
 		std::vector<std::unique_ptr<const PackageReader>> _packages;
 		std::list<BufferAttachment> _buffers;
+		std::vector<std::unique_ptr<Source>> _sources;
 		std::map<std::string_view, std::variant<std::monostate, BufferEntry, PackageEntry>> _stored;
 	};
 
@@ -108,9 +109,12 @@ namespace Yt
 
 	void Storage::attach_package(const std::filesystem::path& path, PackageType type)
 	{
-		auto package = PackageReader::create(path, type);
+		auto source = Source::from(path);
+		if (!source)
+			throw MissingDataError{ fmt::format("Missing \"{}\"", path.string()) };
+		auto package = PackageReader::create(std::move(source), type);
 		if (!package)
-			throw MissingDataError{ fmt::format("Unable to open \"{}\"", path.string()) };
+			throw DataError{ fmt::format("Unable to load package \"{}\"", path.string()) };
 		_private->attach_package(std::move(package));
 	}
 

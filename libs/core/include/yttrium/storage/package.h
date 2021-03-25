@@ -25,7 +25,7 @@ namespace Yt
 	{
 	public:
 		///
-		static std::unique_ptr<PackageReader> create(const std::filesystem::path&, PackageType = PackageType::Auto);
+		static std::unique_ptr<PackageReader> create(std::unique_ptr<Source>&&, PackageType = PackageType::Auto);
 
 		virtual ~PackageReader() = default;
 

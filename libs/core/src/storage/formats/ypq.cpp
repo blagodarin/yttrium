@@ -24,8 +24,6 @@ namespace
 		uint32_t entry_count = 0;
 		uint32_t index_size = 0;
 		uint32_t reserved = 0;
-
-		static constexpr auto Signature = Yt::make_cc('\xDF', 'Y', 'P', 'Q');
 	};
 
 	struct YpqEntry
@@ -54,7 +52,7 @@ namespace Yt
 	{
 		YpqHeader header;
 		if (!_source->read_at(0, header)
-			|| header.signature != YpqHeader::Signature)
+			|| header.signature != kYpqSignature)
 			throw BadPackage{ "Not an YPQ package" };
 
 		const auto metadata_offset = sizeof header + sizeof(YpqEntry) * header.entry_count;
@@ -165,7 +163,7 @@ namespace Yt
 			entry.data_offset = data_offset;
 
 		YpqHeader header;
-		header.signature = YpqHeader::Signature;
+		header.signature = kYpqSignature;
 		header.entry_count = static_cast<uint32_t>(_entries.size());
 		header.index_size = static_cast<uint32_t>(data_offset);
 		if (!_writer.write(header))
