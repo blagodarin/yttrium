@@ -18,7 +18,7 @@ namespace Yt
 	{
 	public:
 		///
-		explicit AudioReader(std::unique_ptr<Source>&&);
+		explicit AudioReader(std::unique_ptr<Source>&&, bool looping = false);
 		~AudioReader() noexcept;
 
 		/// Returns audio format.
