@@ -18,7 +18,6 @@ add_executable(test_core
 	src/source.cpp
 	src/temporary_file.cpp
 	src/test_utils.cpp
-	src/translation.cpp
 	src/utils_numeric.cpp
 	src/utils_string.cpp
 	)

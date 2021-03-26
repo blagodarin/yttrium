@@ -33,7 +33,6 @@ add_library(ycore STATIC
 	include/yttrium/storage/storage.h
 	include/yttrium/storage/temporary_file.h
 	include/yttrium/storage/writer.h
-	include/yttrium/translation.h
 	include/yttrium/utils/clock.h
 	include/yttrium/utils/flags.h
 	include/yttrium/utils/numeric.h
@@ -60,7 +59,6 @@ add_library(ycore STATIC
 	src/storage/storage.cpp
 	src/storage/writer.cpp
 	src/storage/writer.h
-	src/translation.cpp
 	src/utils/algorithm.h
 	src/utils/string.cpp
 	)

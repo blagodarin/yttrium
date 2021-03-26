@@ -13,7 +13,6 @@
 #include <yttrium/renderer/texture.h>
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/storage.h>
-#include <yttrium/translation.h>
 #include "material.h"
 
 #include <cassert>

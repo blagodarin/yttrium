@@ -3,12 +3,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <yttrium/exceptions.h>
+#include <yttrium/i18n/translation.h>
 #include <yttrium/ion/reader.h>
 #include <yttrium/logger.h>
 #include <yttrium/main.h>
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/writer.h>
-#include <yttrium/translation.h>
 
 #include <iostream>
 
