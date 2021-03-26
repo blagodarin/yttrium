@@ -7,7 +7,7 @@
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/temporary.h>
 #include "../../../../base/src/posix/error.h"
-#include "../../storage/writer.h"
+#include "../../writer.h"
 #include "temporary.h"
 
 #include <cstdlib>
