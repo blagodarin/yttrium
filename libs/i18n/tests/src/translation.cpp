@@ -7,9 +7,16 @@
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/temporary.h>
 #include <yttrium/storage/writer.h>
-#include <yttrium/test/utils.h>
 
 #include <doctest.h>
+
+namespace
+{
+	Yt::Buffer make_buffer(std::string_view text)
+	{
+		return { text.size(), text.data() };
+	}
+}
 
 TEST_CASE("translation.load")
 {

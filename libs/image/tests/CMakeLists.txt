@@ -10,8 +10,10 @@ add_executable(test_image
 	src/image.h
 	src/image_formats.cpp
 	src/image_formats.h
+	src/main.cpp
 	)
 include_config(test_image ${PROJECT_BINARY_DIR}/config.h)
-target_link_libraries(test_image PRIVATE yimage ystorage ytest)
+target_include_directories(test_image PRIVATE ${PRIMAL_DOWNLOAD_DIR})
+target_link_libraries(test_image PRIVATE yimage ystorage)
 set_target_properties(test_image PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 add_test(NAME image COMMAND test_image WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data)

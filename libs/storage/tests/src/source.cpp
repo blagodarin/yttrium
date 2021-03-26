@@ -5,11 +5,24 @@
 #include <yttrium/base/buffer.h>
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/temporary.h>
-#include <yttrium/test/utils.h>
 
+#include <algorithm>
 #include <cstring>
+#include <random>
 
 #include <doctest.h>
+
+namespace
+{
+	Yt::Buffer make_random_buffer(size_t size)
+	{
+		std::default_random_engine engine;
+		std::uniform_int_distribution<unsigned> distribution{ 0, std::numeric_limits<uint8_t>::max() }; // Visual C++ 2017 doesn't allow uint8_t distribution.
+		Yt::Buffer buffer{ size };
+		std::generate(buffer.begin(), buffer.end(), [&engine, &distribution] { return static_cast<uint8_t>(distribution(engine)); });
+		return buffer;
+	}
+}
 
 TEST_CASE("source.from")
 {
