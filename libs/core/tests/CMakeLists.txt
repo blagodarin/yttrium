@@ -9,10 +9,6 @@ add_executable(test_core
 	src/buffer_appender.cpp
 	src/flags.cpp
 	src/logger.cpp
-	src/package.cpp
-	src/reader.cpp
-	src/source.cpp
-	src/temporary_file.cpp
 	src/test_utils.cpp
 	src/utils_numeric.cpp
 	src/utils_string.cpp

@@ -5,7 +5,7 @@
 #include "image_formats.h"
 
 #include <yttrium/storage/source.h>
-#include <yttrium/storage/temporary_file.h>
+#include <yttrium/storage/temporary.h>
 #include <yttrium/storage/writer.h>
 #include "image.h"
 
