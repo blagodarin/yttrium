@@ -16,9 +16,9 @@ namespace Yt
 
 	struct WindowID
 	{
-		const void* _application = nullptr;
+		void* _application = nullptr;
 		intptr_t _window = 0;
-		constexpr WindowID(const void* application, intptr_t window) noexcept
+		constexpr WindowID(void* application, intptr_t window) noexcept
 			: _application{ application }, _window{ window } {}
 	};
 
