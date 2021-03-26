@@ -6,11 +6,11 @@
 
 #include <yttrium/renderer/pass.h>
 
+#include <yttrium/base/buffer.h>
+#include <yttrium/base/flags.h>
 #include <yttrium/geometry/margins.h>
 #include <yttrium/geometry/rect.h>
-#include <yttrium/memory/buffer.h>
 #include <yttrium/renderer/texture.h>
-#include <yttrium/utils/flags.h>
 
 #include <string>
 

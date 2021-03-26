@@ -4,13 +4,13 @@
 
 #include "pass.h"
 
+#include <yttrium/base/buffer_appender.h>
+#include <yttrium/base/string.h>
 #include <yttrium/geometry/line.h>
 #include <yttrium/geometry/matrix.h>
 #include <yttrium/geometry/quad.h>
-#include <yttrium/memory/buffer_appender.h>
 #include <yttrium/renderer/metrics.h>
 #include <yttrium/renderer/program.h>
-#include <yttrium/utils/string.h>
 #include "backend/backend.h"
 #include "builtin.h"
 #include "texture.h"

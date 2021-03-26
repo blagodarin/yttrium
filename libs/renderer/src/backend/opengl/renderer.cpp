@@ -4,10 +4,10 @@
 
 #include "renderer.h"
 
+#include <yttrium/base/logger.h>
+#include <yttrium/base/numeric.h>
 #include <yttrium/geometry/matrix.h>
 #include <yttrium/geometry/rect.h>
-#include <yttrium/logger.h>
-#include <yttrium/utils/numeric.h>
 #include "../../2d.h"
 #include "../../model/mesh_data.h"
 #include "mesh.h"

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <yttrium/exceptions.h>
+#include <yttrium/base/exceptions.h>
 
 namespace Yt
 {

@@ -4,8 +4,8 @@
 
 #include <yttrium/storage/storage.h>
 
-#include <yttrium/exceptions.h>
-#include <yttrium/memory/buffer.h>
+#include <yttrium/base/buffer.h>
+#include <yttrium/base/exceptions.h>
 #include <yttrium/storage/source.h>
 #include "source.h"
 

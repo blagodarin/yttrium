@@ -2,9 +2,9 @@
 // Copyright (C) Sergei Blagodarin.
 // SPDX-License-Identifier: Apache-2.0
 
-#include <yttrium/exceptions.h>
+#include <yttrium/base/exceptions.h>
+#include <yttrium/base/logger.h>
 #include <yttrium/ion/reader.h>
-#include <yttrium/logger.h>
 #include <yttrium/main.h>
 #include <yttrium/storage/package.h>
 #include <yttrium/storage/source.h>

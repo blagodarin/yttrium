@@ -4,8 +4,8 @@
 
 #include <yttrium/audio/reader.h>
 
-#include <yttrium/exceptions.h>
-#include <yttrium/utils/numeric.h>
+#include <yttrium/base/exceptions.h>
+#include <yttrium/base/numeric.h>
 #include "formats/aulos.h"
 #include "formats/wav.h"
 

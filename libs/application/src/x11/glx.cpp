@@ -4,7 +4,7 @@
 
 #include "glx.h"
 
-#include <yttrium/exceptions.h>
+#include <yttrium/base/exceptions.h>
 #include "../../../renderer/src/backend/opengl/version.h"
 #include "../opengl.h"
 

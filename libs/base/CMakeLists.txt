@@ -1,0 +1,48 @@
+# This file is part of the Yttrium toolkit.
+# Copyright (C) Sergei Blagodarin.
+# SPDX-License-Identifier: Apache-2.0
+
+primal_set_folder(libs)
+source_group("src" REGULAR_EXPRESSION ".*\\.(h|cpp)$")
+source_group("src/posix" REGULAR_EXPRESSION "src/posix/")
+source_group("src/windows" REGULAR_EXPRESSION "src/windows/")
+source_group("include" REGULAR_EXPRESSION "include/")
+add_library(ybase STATIC
+	include/yttrium/base/buffer.h
+	include/yttrium/base/buffer_appender.h
+	include/yttrium/base/clock.h
+	include/yttrium/base/exceptions.h
+	include/yttrium/base/flags.h
+	include/yttrium/base/logger.h
+	include/yttrium/base/numeric.h
+	include/yttrium/base/string.h
+	src/buffer.cpp
+	src/buffer_memory.cpp
+	src/buffer_memory.h
+	src/logger.cpp
+	src/main.cpp
+	src/ring_log.cpp
+	src/ring_log.h
+	src/string.cpp
+	src/virtual_memory.h
+	)
+include_config(ybase ${PROJECT_BINARY_DIR}/config.h)
+target_include_directories(ybase PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+target_link_libraries(ybase PRIVATE primal fmt::fmt Threads::Threads)
+set_target_properties(ybase PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+if(WIN32)
+	target_compile_definitions(ybase PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
+	target_sources(ybase PRIVATE
+		src/windows/error.cpp
+		src/windows/error.h
+		src/windows/virtual_memory.cpp
+		)
+else()
+	target_sources(ybase PRIVATE
+		src/posix/error.cpp
+		src/posix/error.h
+		src/posix/virtual_memory.cpp
+		)
+endif()
+primal_install(ybase EXPORT YttriumTargets)
+install(DIRECTORY include/yttrium DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})

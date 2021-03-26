@@ -5,7 +5,7 @@
 #include "context.h"
 
 #include <yttrium/application/window.h>
-#include <yttrium/logger.h>
+#include <yttrium/base/logger.h>
 #include "handles.h"
 
 #include <algorithm>

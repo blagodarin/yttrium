@@ -4,7 +4,7 @@
 
 #include <yttrium/storage/temporary.h>
 
-#include "../../../../core/src/platform/posix/error.h"
+#include "../../../../base/src/posix/error.h"
 #include "temporary.h"
 
 #include <unistd.h>

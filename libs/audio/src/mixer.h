@@ -5,7 +5,7 @@
 #pragma once
 
 #include <yttrium/audio/format.h>
-#include <yttrium/memory/buffer.h>
+#include <yttrium/base/buffer.h>
 
 #include <aulosplay/player.hpp>
 

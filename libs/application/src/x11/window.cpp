@@ -4,9 +4,9 @@
 
 #include "window.h"
 
-#include <yttrium/exceptions.h>
-#include <yttrium/image/image.h>
+#include <yttrium/base/exceptions.h>
 #include <yttrium/geometry/point.h>
+#include <yttrium/image/image.h>
 #include "../key_codes.h"
 #include "../window_callbacks.h"
 

@@ -4,9 +4,9 @@
 
 #include "obj.h"
 
-#include <yttrium/exceptions.h>
+#include <yttrium/base/buffer_appender.h>
+#include <yttrium/base/exceptions.h>
 #include <yttrium/geometry/vector.h>
-#include <yttrium/memory/buffer_appender.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/storage/source.h>
 #include "../mesh_data.h"

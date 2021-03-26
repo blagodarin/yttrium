@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <yttrium/utils/numeric.h>
+#include <yttrium/base/numeric.h>
 
 namespace Yt
 {

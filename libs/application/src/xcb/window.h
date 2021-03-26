@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <yttrium/application/id.h>
+#include <yttrium/application/window.h>
 #include <yttrium/geometry/size.h>
 #include "application.h"
 

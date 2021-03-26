@@ -5,7 +5,7 @@
 #include <yttrium/storage/writer.h>
 #include "writer.h"
 
-#include <yttrium/memory/buffer.h>
+#include <yttrium/base/buffer.h>
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/temporary.h>
 #include "platforms/file.h"

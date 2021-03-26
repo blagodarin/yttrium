@@ -4,7 +4,7 @@
 
 #include "builtin.h"
 
-#include <yttrium/exceptions.h>
+#include <yttrium/base/exceptions.h>
 #include <yttrium/image/image.h>
 #include <yttrium/renderer/program.h>
 #include "backend/backend.h"

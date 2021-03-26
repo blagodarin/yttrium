@@ -4,7 +4,7 @@
 
 #include <yttrium/gui/font.h>
 
-#include <yttrium/exceptions.h>
+#include <yttrium/base/exceptions.h>
 #include <yttrium/geometry/rect.h>
 #include <yttrium/image/image.h>
 #include <yttrium/renderer/2d.h>

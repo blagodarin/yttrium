@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <yttrium/memory/buffer.h>
+#include <yttrium/base/buffer.h>
 
 #include <optional>
 

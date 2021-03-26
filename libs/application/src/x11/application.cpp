@@ -4,7 +4,7 @@
 
 #include "application.h"
 
-#include <yttrium/exceptions.h>
+#include <yttrium/base/exceptions.h>
 
 #include <clocale>
 

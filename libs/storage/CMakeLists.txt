@@ -31,7 +31,7 @@ add_library(ystorage STATIC
 	)
 include_config(ystorage ${PROJECT_BINARY_DIR}/config.h)
 target_include_directories(ystorage PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-target_link_libraries(ystorage PRIVATE ycore primal fmt::fmt)
+target_link_libraries(ystorage PRIVATE ybase primal fmt::fmt)
 set_target_properties(ystorage PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 	set_property(SOURCE src/writer.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-tautological-type-limit-compare)

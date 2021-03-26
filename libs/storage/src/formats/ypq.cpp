@@ -4,9 +4,9 @@
 
 #include "ypq.h"
 
+#include <yttrium/base/numeric.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/storage/source.h>
-#include <yttrium/utils/numeric.h>
 #include "../package.h"
 
 #include <cstring>

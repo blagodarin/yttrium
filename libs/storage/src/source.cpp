@@ -5,7 +5,7 @@
 #include <yttrium/storage/source.h>
 #include "source.h"
 
-#include <yttrium/memory/buffer.h>
+#include <yttrium/base/buffer.h>
 
 #include <algorithm>
 #include <cstring>

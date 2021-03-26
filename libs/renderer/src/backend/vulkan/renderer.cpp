@@ -4,9 +4,9 @@
 
 #include "renderer.h"
 
+#include <yttrium/base/numeric.h>
 #include <yttrium/geometry/matrix.h>
 #include <yttrium/geometry/rect.h>
-#include <yttrium/utils/numeric.h>
 #include "../../model/mesh_data.h"
 #include "handles.h"
 #include "helpers.h"

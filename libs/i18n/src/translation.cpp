@@ -4,7 +4,7 @@
 
 #include <yttrium/i18n/translation.h>
 
-#include <yttrium/exceptions.h>
+#include <yttrium/base/exceptions.h>
 #include <yttrium/ion/reader.h>
 #include <yttrium/ion/writer.h>
 #include <yttrium/storage/writer.h>

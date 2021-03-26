@@ -11,6 +11,6 @@ add_executable(test_storage
 	src/temporary.cpp
 	)
 include_config(test_storage ${PROJECT_BINARY_DIR}/config.h)
-target_link_libraries(test_storage PRIVATE ycore ystorage ytest)
+target_link_libraries(test_storage PRIVATE ybase ystorage ytest)
 set_target_properties(test_storage PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 add_test(NAME storage COMMAND test_storage)

@@ -6,7 +6,7 @@
 
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/temporary.h>
-#include "../../../../core/src/platform/posix/error.h"
+#include "../../../../base/src/posix/error.h"
 #include "../../storage/writer.h"
 #include "temporary.h"
 

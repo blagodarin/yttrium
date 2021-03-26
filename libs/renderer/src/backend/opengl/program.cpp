@@ -4,7 +4,7 @@
 
 #include "program.h"
 
-#include <yttrium/logger.h>
+#include <yttrium/base/logger.h>
 
 namespace Yt
 {

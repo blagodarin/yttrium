@@ -4,7 +4,7 @@
 
 #include <yttrium/storage/package.h>
 
-#include <yttrium/exceptions.h>
+#include <yttrium/base/exceptions.h>
 #include <yttrium/storage/source.h>
 #include "formats/ypq.h"
 #include "package.h"

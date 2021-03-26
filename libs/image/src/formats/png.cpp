@@ -2,9 +2,9 @@
 // Copyright (C) Sergei Blagodarin.
 // SPDX-License-Identifier: Apache-2.0
 
+#include <yttrium/base/numeric.h>
 #include <yttrium/image/image.h>
 #include <yttrium/storage/writer.h>
-#include <yttrium/utils/numeric.h>
 #include "../formats.h"
 
 #include <array>

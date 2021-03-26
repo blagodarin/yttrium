@@ -4,7 +4,7 @@
 
 #include "aulos.h"
 
-#include <yttrium/exceptions.h>
+#include <yttrium/base/exceptions.h>
 
 #include <aulos/composition.hpp>
 #include <aulos/format.hpp>

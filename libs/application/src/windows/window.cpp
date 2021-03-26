@@ -5,12 +5,12 @@
 #include "window.h"
 
 #include <yttrium/application/key.h>
-#include <yttrium/exceptions.h>
+#include <yttrium/base/exceptions.h>
 #include <yttrium/image/image.h>
 #include <yttrium/geometry/point.h>
 #include <yttrium/geometry/size.h>
+#include "../../../base/src/windows/error.h"
 #include "../../../image/src/formats/bmp.h"
-#include "../../../core/src/platform/windows/error.h"
 #include "../window_callbacks.h"
 
 #include <cassert>

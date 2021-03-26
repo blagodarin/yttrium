@@ -4,7 +4,7 @@
 
 #include <yttrium/test/utils.h>
 
-#include <yttrium/memory/buffer.h>
+#include <yttrium/base/buffer.h>
 
 #include <algorithm>
 #include <cstring>

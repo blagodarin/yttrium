@@ -30,7 +30,7 @@ add_library(yaudio STATIC
 	)
 include_config(yaudio ${PROJECT_BINARY_DIR}/config.h)
 target_include_directories(yaudio PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-target_link_libraries(yaudio PRIVATE ycore ystorage aulos aulosplay)
+target_link_libraries(yaudio PRIVATE ybase ystorage aulos aulosplay)
 set_target_properties(yaudio PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 if(YTTRIUM_WITH_OGGVORBIS)
 	target_link_libraries(yaudio PRIVATE Vorbis::vorbisfile)

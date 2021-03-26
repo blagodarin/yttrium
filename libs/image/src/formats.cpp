@@ -4,10 +4,10 @@
 
 #include "formats.h"
 
+#include <yttrium/base/numeric.h>
 #include <yttrium/image/image.h>
 #include <yttrium/storage/reader.h>
 #include <yttrium/storage/source.h>
-#include <yttrium/utils/numeric.h>
 
 #include <algorithm>
 

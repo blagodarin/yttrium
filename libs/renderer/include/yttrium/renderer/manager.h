@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <yttrium/utils/flags.h>
+#include <yttrium/base/flags.h>
 
 #include <memory>
 #include <string>

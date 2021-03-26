@@ -26,7 +26,7 @@ add_library(yimage STATIC
 	)
 include_config(yimage ${PROJECT_BINARY_DIR}/config.h)
 target_include_directories(yimage PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-target_link_libraries(yimage PUBLIC ycore PRIVATE ystorage)
+target_link_libraries(yimage PUBLIC ybase PRIVATE ystorage)
 set_target_properties(yimage PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 if(YTTRIUM_WITH_JPEG)
 	target_link_libraries(yimage PRIVATE JPEG::JPEG)

@@ -4,7 +4,7 @@
 
 #include "manager.h"
 
-#include <yttrium/logger.h>
+#include <yttrium/base/logger.h>
 #include "mixer.h"
 #include "sound.h"
 

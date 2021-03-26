@@ -5,8 +5,8 @@
 #include "application.h"
 
 #include <yttrium/geometry/size.h>
-#include <yttrium/utils/numeric.h>
-#include "../../../core/src/platform/windows/error.h"
+#include <yttrium/base/numeric.h>
+#include "../../../base/src/windows/error.h"
 
 #include <primal/utf8.hpp>
 

@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <yttrium/memory/buffer.h>
+#include <yttrium/base/buffer.h>
+#include <yttrium/base/numeric.h>
 #include <yttrium/storage/package.h>
 #include <yttrium/storage/writer.h>
-#include <yttrium/utils/numeric.h>
 
 #include <vector>
 

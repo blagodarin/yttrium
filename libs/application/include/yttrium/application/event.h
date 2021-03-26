@@ -5,7 +5,7 @@
 #pragma once
 
 #include <yttrium/application/key.h>
-#include <yttrium/utils/flags.h>
+#include <yttrium/base/flags.h>
 
 #include <string_view>
 

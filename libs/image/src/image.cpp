@@ -4,9 +4,9 @@
 
 #include <yttrium/image/image.h>
 
+#include <yttrium/base/numeric.h>
 #include <yttrium/storage/paths.h>
 #include <yttrium/storage/writer.h>
-#include <yttrium/utils/numeric.h>
 #include "formats.h"
 #include "utils.h"
 

@@ -4,8 +4,8 @@
 
 #include "gl.h"
 
-#include <yttrium/exceptions.h>
-#include <yttrium/logger.h>
+#include <yttrium/base/exceptions.h>
+#include <yttrium/base/logger.h>
 #include "version.h"
 
 #include <algorithm>

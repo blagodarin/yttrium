@@ -4,8 +4,8 @@
 
 #pragma once
 
+#include <yttrium/base/flags.h>
 #include <yttrium/renderer/texture.h>
-#include <yttrium/utils/flags.h>
 
 #include <string>
 

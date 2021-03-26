@@ -2,8 +2,8 @@
 // Copyright (C) Sergei Blagodarin.
 // SPDX-License-Identifier: Apache-2.0
 
+#include <yttrium/base/logger.h>
 #include <yttrium/image/image.h>
-#include <yttrium/logger.h>
 #include <yttrium/storage/writer.h>
 #include "../formats.h"
 

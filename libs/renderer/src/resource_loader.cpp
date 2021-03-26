@@ -4,7 +4,7 @@
 
 #include <yttrium/renderer/resource_loader.h>
 
-#include <yttrium/exceptions.h>
+#include <yttrium/base/exceptions.h>
 #include <yttrium/image/image.h>
 #include <yttrium/ion/reader.h>
 #include <yttrium/renderer/manager.h>

@@ -4,7 +4,7 @@
 
 #include "wav.h"
 
-#include <yttrium/exceptions.h>
+#include <yttrium/base/exceptions.h>
 #include "../wav.h"
 
 #include <algorithm>

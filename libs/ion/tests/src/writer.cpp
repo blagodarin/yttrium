@@ -2,8 +2,8 @@
 // Copyright (C) Sergei Blagodarin.
 // SPDX-License-Identifier: Apache-2.0
 
+#include <yttrium/base/buffer.h>
 #include <yttrium/ion/writer.h>
-#include <yttrium/memory/buffer.h>
 #include <yttrium/storage/writer.h>
 
 #include <doctest.h>
