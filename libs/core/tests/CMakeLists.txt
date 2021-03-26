@@ -8,10 +8,6 @@ add_executable(test_core
 	src/buffer.cpp
 	src/buffer_appender.cpp
 	src/flags.cpp
-	src/ion_reader.cpp
-	src/ion_writer.cpp
-	src/iostream.cpp
-	src/iostream.h
 	src/logger.cpp
 	src/package.cpp
 	src/reader.cpp

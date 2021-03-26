@@ -5,12 +5,9 @@
 primal_set_folder(libs)
 source_group("src" REGULAR_EXPRESSION ".*\\.(h|cpp)$")
 source_group("include" REGULAR_EXPRESSION "/include/")
-source_group("include/ion" REGULAR_EXPRESSION "/include/yttrium/ion/")
-source_group("include/math" REGULAR_EXPRESSION "/include/yttrium/math/")
 source_group("include/memory" REGULAR_EXPRESSION "/include/yttrium/memory/")
 source_group("include/storage" REGULAR_EXPRESSION "/include/yttrium/storage/")
 source_group("include/utils" REGULAR_EXPRESSION "/include/yttrium/utils/")
-source_group("src/ion" REGULAR_EXPRESSION "/src/ion/")
 source_group("src/logger" REGULAR_EXPRESSION "/src/logger/")
 source_group("src/memory" REGULAR_EXPRESSION "/src/memory/")
 source_group("src/platform" REGULAR_EXPRESSION "/src/platform/")
@@ -21,8 +18,6 @@ source_group("src/storage/formats" REGULAR_EXPRESSION "/src/storage/formats/")
 source_group("src/utils" REGULAR_EXPRESSION "/src/utils/")
 add_library(ycore STATIC
 	include/yttrium/exceptions.h
-	include/yttrium/ion/reader.h
-	include/yttrium/ion/writer.h
 	include/yttrium/logger.h
 	include/yttrium/memory/buffer.h
 	include/yttrium/memory/buffer_appender.h
@@ -37,8 +32,6 @@ add_library(ycore STATIC
 	include/yttrium/utils/flags.h
 	include/yttrium/utils/numeric.h
 	include/yttrium/utils/string.h
-	src/ion/reader.cpp
-	src/ion/writer.cpp
 	src/logger/logger.cpp
 	src/logger/ring_log.cpp
 	src/logger/ring_log.h
@@ -59,7 +52,6 @@ add_library(ycore STATIC
 	src/storage/storage.cpp
 	src/storage/writer.cpp
 	src/storage/writer.h
-	src/utils/algorithm.h
 	src/utils/string.cpp
 	)
 include_config(ycore ${PROJECT_BINARY_DIR}/config.h)

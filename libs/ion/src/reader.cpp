@@ -7,7 +7,6 @@
 #include <yttrium/exceptions.h>
 #include <yttrium/memory/buffer.h>
 #include <yttrium/storage/source.h>
-#include "../utils/algorithm.h"
 
 #include <array>
 #include <vector>
@@ -70,6 +69,14 @@ namespace
 	CharClass class_of(char c)
 	{
 		return ::char_class[static_cast<unsigned char>(c)];
+	}
+
+	template <typename I, typename P>
+	constexpr I forward_find_if(I iterator, P&& predicate)
+	{
+		for (; !predicate(*iterator); ++iterator)
+			;
+		return iterator;
 	}
 }
 

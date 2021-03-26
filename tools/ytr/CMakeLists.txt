@@ -7,6 +7,6 @@ source_group("src" REGULAR_EXPRESSION ".*\\.(h|cpp)$")
 add_executable(ytr
 	src/main.cpp
 	)
-target_link_libraries(ytr PRIVATE ycore yi18n ymain)
+target_link_libraries(ytr PRIVATE ycore yi18n yion ymain)
 set_target_properties(ytr PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 primal_install(ytr)

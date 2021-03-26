@@ -46,7 +46,7 @@ add_library(yrenderer STATIC
 	)
 include_config(yrenderer ${PROJECT_BINARY_DIR}/config.h)
 target_include_directories(yrenderer PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-target_link_libraries(yrenderer PUBLIC ycore ygeometry yimage PRIVATE yapplication yaudio primal fmt::fmt Threads::Threads)
+target_link_libraries(yrenderer PUBLIC ycore ygeometry yimage PRIVATE yapplication yaudio yion primal fmt::fmt Threads::Threads)
 set_target_properties(yrenderer PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 if(YTTRIUM_RENDERER STREQUAL "opengl")
 	target_sources(yrenderer PRIVATE

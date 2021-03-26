@@ -11,7 +11,7 @@ add_library(yi18n STATIC
 	)
 include_config(yi18n ${PROJECT_BINARY_DIR}/config.h)
 target_include_directories(yi18n PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-target_link_libraries(yi18n PRIVATE ycore)
+target_link_libraries(yi18n PRIVATE ycore yion)
 set_target_properties(yi18n PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 primal_install(yi18n EXPORT YttriumTargets)
 install(DIRECTORY include/yttrium DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
