@@ -10,7 +10,7 @@ source_group("src/backend/vulkan" REGULAR_EXPRESSION "/src/backend/vulkan/")
 source_group("src/model" REGULAR_EXPRESSION "/src/model/")
 source_group("src/model/formats" REGULAR_EXPRESSION "/src/model/formats/")
 source_group("include" REGULAR_EXPRESSION "/include/yttrium/renderer/")
-add_library(yrenderer STATIC
+add_library(Y_renderer STATIC
 	include/yttrium/renderer/2d.h
 	include/yttrium/renderer/manager.h
 	include/yttrium/renderer/material.h
@@ -44,12 +44,12 @@ add_library(yrenderer STATIC
 	src/viewport.cpp
 	src/viewport.h
 	)
-include_config(yrenderer ${PROJECT_BINARY_DIR}/config.h)
-target_include_directories(yrenderer PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-target_link_libraries(yrenderer PUBLIC ygeometry yimage PRIVATE yapplication yaudio yion ystorage primal fmt::fmt Threads::Threads)
-set_target_properties(yrenderer PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+include_config(Y_renderer ${PROJECT_BINARY_DIR}/config.h)
+target_include_directories(Y_renderer PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+target_link_libraries(Y_renderer PUBLIC Y_geometry Y_image PRIVATE Y_application Y_audio Y_ion Y_storage primal fmt::fmt Threads::Threads)
+set_target_properties(Y_renderer PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 if(YTTRIUM_RENDERER STREQUAL "opengl")
-	target_sources(yrenderer PRIVATE
+	target_sources(Y_renderer PRIVATE
 		src/backend/opengl/api.h
 		src/backend/opengl/gl.cpp
 		src/backend/opengl/gl.h
@@ -64,20 +64,20 @@ if(YTTRIUM_RENDERER STREQUAL "opengl")
 		src/backend/opengl/wrappers.cpp
 		src/backend/opengl/wrappers.h
 		)
-	add_yrc_sources(yrenderer
+	add_yrc_sources(Y_renderer
 		src/backend/opengl/2d_fs.glsl
 		src/backend/opengl/2d_vs.glsl
 		)
-	target_link_libraries(yrenderer PRIVATE OpenGL::GL)
+	target_link_libraries(Y_renderer PRIVATE OpenGL::GL)
 	if(WIN32)
 		primal_download("https://www.khronos.org/registry/OpenGL/api/GL/glext.h" NAME GL/glext.h)
-		target_include_directories(yrenderer PRIVATE ${PRIMAL_DOWNLOAD_DIR})
+		target_include_directories(Y_renderer PRIVATE ${PRIMAL_DOWNLOAD_DIR})
 	endif()
 	if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 		set_property(SOURCE src/backend/opengl/gl.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-useless-cast)
 	endif()
 elseif(YTTRIUM_RENDERER STREQUAL "vulkan")
-	target_sources(yrenderer PRIVATE
+	target_sources(Y_renderer PRIVATE
 		src/backend/vulkan/buffer.cpp
 		src/backend/vulkan/buffer.h
 		src/backend/vulkan/context.cpp
@@ -101,30 +101,30 @@ elseif(YTTRIUM_RENDERER STREQUAL "vulkan")
 		src/backend/vulkan/wrappers.cpp
 		src/backend/vulkan/wrappers.h
 		)
-	add_yglslc_sources(yrenderer
+	add_yglslc_sources(Y_renderer
 		FRAGMENT src/backend/vulkan/2d_fs.glsl
 		VERTEX src/backend/vulkan/2d_vs.glsl
 		)
-	target_link_libraries(yrenderer PRIVATE Vulkan::Vulkan)
+	target_link_libraries(Y_renderer PRIVATE Vulkan::Vulkan)
 	if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 		# VK_NULL_HANDLE is defined to be 0 and is used for both pointers and integers.
-		target_compile_options(yrenderer PRIVATE -Wno-zero-as-null-pointer-constant)
+		target_compile_options(Y_renderer PRIVATE -Wno-zero-as-null-pointer-constant)
 	endif()
 else()
-	target_sources(yrenderer PRIVATE
+	target_sources(Y_renderer PRIVATE
 		src/backend/null/renderer.cpp
 		src/backend/null/renderer.h
 		)
 endif()
 if(WIN32)
-	target_compile_definitions(yrenderer PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
+	target_compile_definitions(Y_renderer PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
 	if(YTTRIUM_RENDERER STREQUAL "vulkan")
-		target_compile_definitions(yrenderer PRIVATE VK_USE_PLATFORM_WIN32_KHR)
+		target_compile_definitions(Y_renderer PRIVATE VK_USE_PLATFORM_WIN32_KHR)
 	endif()
 else()
 	if(YTTRIUM_RENDERER STREQUAL "vulkan")
-		target_compile_definitions(yrenderer PRIVATE VK_USE_PLATFORM_XCB_KHR)
+		target_compile_definitions(Y_renderer PRIVATE VK_USE_PLATFORM_XCB_KHR)
 	endif()
 endif()
-primal_install(yrenderer EXPORT YttriumTargets)
+primal_install(Y_renderer EXPORT YttriumTargets)
 install(DIRECTORY include/yttrium DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})

@@ -7,6 +7,6 @@ source_group("src" REGULAR_EXPRESSION ".*\\.(h|cpp)$")
 add_executable(ypack
 	src/main.cpp
 	)
-target_link_libraries(ypack PRIVATE ybase yion ymain ystorage)
+target_link_libraries(ypack PRIVATE Y_base Y_ion Y_main Y_storage)
 set_target_properties(ypack PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 primal_install(ypack)

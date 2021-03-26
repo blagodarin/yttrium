@@ -5,7 +5,7 @@
 primal_set_folder(libs)
 source_group("src" REGULAR_EXPRESSION ".*\\.(h|cpp)$")
 source_group("include" REGULAR_EXPRESSION "/include/")
-add_library(ygeometry STATIC
+add_library(Y_geometry STATIC
 	include/yttrium/geometry/euler.h
 	include/yttrium/geometry/line.h
 	include/yttrium/geometry/margins.h
@@ -19,8 +19,8 @@ add_library(ygeometry STATIC
 	src/matrix.cpp
 	src/vector.cpp
 	)
-include_config(ygeometry ${PROJECT_BINARY_DIR}/config.h)
-target_include_directories(ygeometry PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-set_target_properties(ygeometry PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-primal_install(ygeometry EXPORT YttriumTargets)
+include_config(Y_geometry ${PROJECT_BINARY_DIR}/config.h)
+target_include_directories(Y_geometry PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+set_target_properties(Y_geometry PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+primal_install(Y_geometry EXPORT YttriumTargets)
 install(DIRECTORY include/yttrium DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})

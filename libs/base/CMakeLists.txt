@@ -7,7 +7,7 @@ source_group("src" REGULAR_EXPRESSION ".*\\.(h|cpp)$")
 source_group("src/posix" REGULAR_EXPRESSION "src/posix/")
 source_group("src/windows" REGULAR_EXPRESSION "src/windows/")
 source_group("include" REGULAR_EXPRESSION "include/")
-add_library(ybase STATIC
+add_library(Y_base STATIC
 	include/yttrium/base/buffer.h
 	include/yttrium/base/buffer_appender.h
 	include/yttrium/base/clock.h
@@ -26,23 +26,23 @@ add_library(ybase STATIC
 	src/string.cpp
 	src/virtual_memory.h
 	)
-include_config(ybase ${PROJECT_BINARY_DIR}/config.h)
-target_include_directories(ybase PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-target_link_libraries(ybase PRIVATE primal fmt::fmt Threads::Threads)
-set_target_properties(ybase PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+include_config(Y_base ${PROJECT_BINARY_DIR}/config.h)
+target_include_directories(Y_base PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+target_link_libraries(Y_base PRIVATE primal fmt::fmt Threads::Threads)
+set_target_properties(Y_base PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 if(WIN32)
-	target_compile_definitions(ybase PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
-	target_sources(ybase PRIVATE
+	target_compile_definitions(Y_base PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
+	target_sources(Y_base PRIVATE
 		src/windows/error.cpp
 		src/windows/error.h
 		src/windows/virtual_memory.cpp
 		)
 else()
-	target_sources(ybase PRIVATE
+	target_sources(Y_base PRIVATE
 		src/posix/error.cpp
 		src/posix/error.h
 		src/posix/virtual_memory.cpp
 		)
 endif()
-primal_install(ybase EXPORT YttriumTargets)
+primal_install(Y_base EXPORT YttriumTargets)
 install(DIRECTORY include/yttrium DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})

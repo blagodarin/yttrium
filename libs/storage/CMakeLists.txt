@@ -9,7 +9,7 @@ source_group("src/platforms" REGULAR_EXPRESSION "/src/platforms/")
 source_group("src/platforms/posix" REGULAR_EXPRESSION "/src/platforms/posix/")
 source_group("src/platforms/windows" REGULAR_EXPRESSION "/src/platforms/windows/")
 source_group("include" REGULAR_EXPRESSION "/include/")
-add_library(ystorage STATIC
+add_library(Y_storage STATIC
 	include/yttrium/storage/package.h
 	include/yttrium/storage/paths.h
 	include/yttrium/storage/reader.h
@@ -29,22 +29,22 @@ add_library(ystorage STATIC
 	src/writer.cpp
 	src/writer.h
 	)
-include_config(ystorage ${PROJECT_BINARY_DIR}/config.h)
-target_include_directories(ystorage PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-target_link_libraries(ystorage PRIVATE ybase primal fmt::fmt)
-set_target_properties(ystorage PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+include_config(Y_storage ${PROJECT_BINARY_DIR}/config.h)
+target_include_directories(Y_storage PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+target_link_libraries(Y_storage PRIVATE Y_base primal fmt::fmt)
+set_target_properties(Y_storage PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 	set_property(SOURCE src/writer.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-tautological-type-limit-compare)
 endif()
 if(WIN32)
-	target_compile_definitions(ystorage PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
-	target_sources(ystorage PRIVATE
+	target_compile_definitions(Y_storage PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
+	target_sources(Y_storage PRIVATE
 		src/platforms/windows/file.cpp
 		src/platforms/windows/paths.cpp
 		src/platforms/windows/temporary.cpp
 		)
 else()
-	target_sources(ystorage PRIVATE
+	target_sources(Y_storage PRIVATE
 		src/platforms/posix/file.cpp
 		src/platforms/posix/paths.cpp
 		src/platforms/posix/temporary.cpp
@@ -52,5 +52,5 @@ else()
 		)
 	set_property(SOURCE src/platforms/posix/file.cpp APPEND PROPERTY COMPILE_DEFINITIONS _FILE_OFFSET_BITS=64)
 endif()
-primal_install(ystorage EXPORT YttriumTargets)
+primal_install(Y_storage EXPORT YttriumTargets)
 install(DIRECTORY include/yttrium DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})

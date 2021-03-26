@@ -5,15 +5,15 @@
 primal_set_folder(libs)
 source_group("src" REGULAR_EXPRESSION ".*\\.(h|cpp)$")
 source_group("include" REGULAR_EXPRESSION "/include/")
-add_library(yion STATIC
+add_library(Y_ion STATIC
 	include/yttrium/ion/reader.h
 	include/yttrium/ion/writer.h
 	src/reader.cpp
 	src/writer.cpp
 	)
-include_config(yion ${PROJECT_BINARY_DIR}/config.h)
-target_include_directories(yion PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-target_link_libraries(yion PRIVATE ybase ystorage fmt::fmt)
-set_target_properties(yion PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-primal_install(yion EXPORT YttriumTargets)
+include_config(Y_ion ${PROJECT_BINARY_DIR}/config.h)
+target_include_directories(Y_ion PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+target_link_libraries(Y_ion PRIVATE Y_base Y_storage fmt::fmt)
+set_target_properties(Y_ion PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+primal_install(Y_ion EXPORT YttriumTargets)
 install(DIRECTORY include/yttrium DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})

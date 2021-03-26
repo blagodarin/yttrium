@@ -5,7 +5,7 @@
 primal_set_folder(libs)
 source_group("src" REGULAR_EXPRESSION ".*\\.(h|cpp)$")
 source_group("include" REGULAR_EXPRESSION "/include/yttrium/gui/")
-add_library(ygui STATIC
+add_library(Y_gui STATIC
 	include/yttrium/gui/context.h
 	include/yttrium/gui/font.h
 	include/yttrium/gui/gui.h
@@ -19,9 +19,9 @@ add_library(ygui STATIC
 	src/layout.cpp
 	src/style.cpp
 	)
-include_config(ygui ${PROJECT_BINARY_DIR}/config.h)
-target_include_directories(ygui PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-target_link_libraries(ygui PUBLIC ygeometry yimage PRIVATE yapplication yrenderer ystorage primal Freetype::Freetype)
-set_target_properties(ygui PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-primal_install(ygui EXPORT YttriumTargets)
+include_config(Y_gui ${PROJECT_BINARY_DIR}/config.h)
+target_include_directories(Y_gui PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+target_link_libraries(Y_gui PUBLIC Y_geometry Y_image PRIVATE Y_application Y_renderer Y_storage primal Freetype::Freetype)
+set_target_properties(Y_gui PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+primal_install(Y_gui EXPORT YttriumTargets)
 install(DIRECTORY include/yttrium DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})

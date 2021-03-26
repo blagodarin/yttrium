@@ -6,7 +6,7 @@ primal_set_folder(libs)
 source_group("src" REGULAR_EXPRESSION ".*\\.(h|cpp)$")
 source_group("include" REGULAR_EXPRESSION "/include/")
 source_group("src/formats" REGULAR_EXPRESSION "/src/formats/")
-add_library(yimage STATIC
+add_library(Y_image STATIC
 	include/yttrium/image/color.h
 	include/yttrium/image/image.h
 	include/yttrium/image/utils.h
@@ -24,13 +24,13 @@ add_library(yimage STATIC
 	src/utils.cpp
 	src/utils.h
 	)
-include_config(yimage ${PROJECT_BINARY_DIR}/config.h)
-target_include_directories(yimage PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-target_link_libraries(yimage PUBLIC ybase PRIVATE ystorage)
-set_target_properties(yimage PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+include_config(Y_image ${PROJECT_BINARY_DIR}/config.h)
+target_include_directories(Y_image PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+target_link_libraries(Y_image PUBLIC Y_base PRIVATE Y_storage)
+set_target_properties(Y_image PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 if(YTTRIUM_WITH_JPEG)
-	target_link_libraries(yimage PRIVATE JPEG::JPEG)
-	target_sources(yimage PRIVATE
+	target_link_libraries(Y_image PRIVATE JPEG::JPEG)
+	target_sources(Y_image PRIVATE
 		src/formats/jpeg.cpp
 		)
 	if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
@@ -42,5 +42,5 @@ if(YTTRIUM_WITH_JPEG)
 			)
 	endif()
 endif()
-primal_install(yimage EXPORT YttriumTargets)
+primal_install(Y_image EXPORT YttriumTargets)
 install(DIRECTORY include/yttrium DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
