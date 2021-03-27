@@ -8,15 +8,15 @@
 #include "../../../src/formats/bmp.h"
 #include "../../../src/formats/dds.h"
 #include "../../../src/formats/ico.h"
-#include "../../src/image_formats.h"
+#include "../../src/formats.h"
 
 #include <cstring>
 
 namespace
 {
-	bool write_color_gradient(Yt::Writer& writer, bool with_alpha, Yt::ImageOrientation orientation)
+	bool writeTestImageData(Yt::Writer& writer, bool withAlpha, Yt::ImageOrientation orientation)
 	{
-		const auto image = ::make_test_image(with_alpha, orientation);
+		const auto image = ::makeTestImage(withAlpha, orientation);
 		return writer.write_all(image.data(), image.info().frame_size());
 	}
 }
@@ -24,7 +24,7 @@ namespace
 int main()
 {
 	Yt::Logger logger;
-	::make_gray8_test_image<16>().save(Yt::Writer{ "gradient8.tga" }, Yt::ImageFormat::Tga);
+#if YTTRIUM_IMAGE_BMP
 	{
 		Yt::BmpFileHeader file_header;
 		file_header.file_type = Yt::BmpFileType::Bm;
@@ -47,16 +47,20 @@ int main()
 
 		Yt::Writer writer{ "gradient24.bmp" };
 		if (writer.write(file_header) && writer.write(info_header))
-			::write_color_gradient(writer, false, Yt::ImageOrientation::XRightYDown);
+			::writeTestImageData(writer, false, Yt::ImageOrientation::XRightYDown);
 	}
+#endif
+#if YTTRIUM_IMAGE_JPEG
 	{
 		Yt::Buffer buffer;
-		::make_test_image(false, Yt::ImageOrientation::XRightYDown).save(Yt::Writer{ buffer }, Yt::ImageFormat::Jpeg);
+		::makeTestImage(false, Yt::ImageOrientation::XRightYDown).save(Yt::Writer{ buffer }, Yt::ImageFormat::Jpeg);
 		Yt::Writer{ "gradient24.jpg" }.write_all(buffer);
+#	if YTTRIUM_IMAGE_TGA
 		Yt::Image::load(*Yt::Source::from(std::move(buffer)))->save(Yt::Writer{ "gradient24.jpg.tga" }, Yt::ImageFormat::Tga);
+#	endif
 	}
-	::make_test_image(false, Yt::ImageOrientation::XRightYDown).save(Yt::Writer{ "gradient24.png" }, Yt::ImageFormat::Png);
-	::make_test_image(false, Yt::ImageOrientation::XRightYDown).save(Yt::Writer{ "gradient24.tga" }, Yt::ImageFormat::Tga);
+#endif
+#if YTTRIUM_IMAGE_DDS
 	{
 		Yt::DDS_HEADER header;
 		std::memset(&header, 0, sizeof header);
@@ -76,8 +80,10 @@ int main()
 
 		Yt::Writer writer{ "gradient32.dds" };
 		if (writer.write(header))
-			::write_color_gradient(writer, true, Yt::ImageOrientation::XRightYDown);
+			::writeTestImageData(writer, true, Yt::ImageOrientation::XRightYDown);
 	}
+#endif
+#if YTTRIUM_IMAGE_ICO
 	{
 		constexpr uint32_t mask_data_size = (16 * 16 / 8) * 2; // Two 16x16 bitmasks (XOR bitmask and AND bitmask).
 		constexpr uint32_t image_data_size = 16 * 16 * 4;
@@ -111,12 +117,20 @@ int main()
 		bitmap_header.required_colors = 0;
 
 		Yt::Writer writer{ "gradient32.ico" };
-		if (writer.write(file_header) && writer.write(image_header) && writer.write(bitmap_header) && ::write_color_gradient(writer, true, Yt::ImageOrientation::XRightYUp))
+		if (writer.write(file_header) && writer.write(image_header) && writer.write(bitmap_header) && ::writeTestImageData(writer, true, Yt::ImageOrientation::XRightYUp))
 		{
 			const auto mask_data_buffer = std::make_unique<uint8_t[]>(mask_data_size);
 			std::memset(mask_data_buffer.get(), 0, mask_data_size);
 			writer.write(mask_data_buffer.get(), mask_data_size);
 		}
 	}
-	::make_test_image(true, Yt::ImageOrientation::XRightYDown).save(Yt::Writer{ "gradient32.tga" }, Yt::ImageFormat::Tga);
+#endif
+#if YTTRIUM_IMAGE_PNG
+	::makeTestImage(false, Yt::ImageOrientation::XRightYDown).save(Yt::Writer{ "gradient24.png" }, Yt::ImageFormat::Png);
+#endif
+#if YTTRIUM_IMAGE_TGA
+	::makeTestImageGray8<16>().save(Yt::Writer{ "gradient8.tga" }, Yt::ImageFormat::Tga);
+	::makeTestImage(false, Yt::ImageOrientation::XRightYDown).save(Yt::Writer{ "gradient24.tga" }, Yt::ImageFormat::Tga);
+	::makeTestImage(true, Yt::ImageOrientation::XRightYDown).save(Yt::Writer{ "gradient32.tga" }, Yt::ImageFormat::Tga);
+#endif
 }

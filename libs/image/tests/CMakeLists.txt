@@ -6,10 +6,10 @@ primal_set_folder(tests)
 source_group("src" REGULAR_EXPRESSION ".*\\.(h|cpp)$")
 add_executable(test_image
 	src/color.cpp
+	src/formats.cpp
+	src/formats.h
 	src/image.cpp
 	src/image.h
-	src/image_formats.cpp
-	src/image_formats.h
 	src/main.cpp
 	)
 target_include_directories(test_image PRIVATE ${PRIMAL_DOWNLOAD_DIR})

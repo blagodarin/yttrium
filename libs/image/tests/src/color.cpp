@@ -6,10 +6,9 @@
 
 #include <doctest.h>
 
-TEST_CASE("color.bgra32")
+TEST_CASE("Bgra32")
 {
 	using Yt::Bgra32;
-
 	{
 		Bgra32 color{ 1, 2, 3 };
 		CHECK(color._b == 1u);

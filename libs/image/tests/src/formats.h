@@ -6,20 +6,9 @@
 
 #include <yttrium/image/image.h>
 
-template <unsigned size>
-inline Yt::Image make_gray8_test_image()
+inline Yt::Image makeTestImage(bool withAlpha, Yt::ImageOrientation orientation = Yt::ImageOrientation::XRightYDown)
 {
-	Yt::Buffer buffer{ size * size };
-	auto data = &buffer[0];
-	for (unsigned y = 0; y < size; ++y)
-		for (unsigned x = 0; x < size; ++x)
-			*data++ = static_cast<uint8_t>(y < size / 2 ? x * size + y / 2 : (size - 1 - x) * size + (size - 1 - y) / 2);
-	return { { size, size, Yt::PixelFormat::Gray8 }, buffer.data() };
-}
-
-inline Yt::Image make_test_image(bool with_alpha, Yt::ImageOrientation orientation = Yt::ImageOrientation::XRightYDown)
-{
-	Yt::Buffer buffer(16 * 16 * (with_alpha ? 4 : 3));
+	Yt::Buffer buffer{ static_cast<size_t>(16 * 16 * (withAlpha ? 4 : 3)) };
 	auto data = &buffer[0];
 	for (int row = 0; row < 16; ++row)
 	{
@@ -50,9 +39,20 @@ inline Yt::Image make_test_image(bool with_alpha, Yt::ImageOrientation orientati
 			*data++ = static_cast<uint8_t>(b);
 			*data++ = static_cast<uint8_t>(g);
 			*data++ = static_cast<uint8_t>(r);
-			if (with_alpha)
+			if (withAlpha)
 				*data++ = static_cast<uint8_t>(x * 16 + 15);
 		}
 	}
-	return { { 16, 16, with_alpha ? Yt::PixelFormat::Bgra32 : Yt::PixelFormat::Bgr24, orientation }, buffer.data() };
+	return { { 16, 16, withAlpha ? Yt::PixelFormat::Bgra32 : Yt::PixelFormat::Bgr24, orientation }, buffer.data() };
+}
+
+template <unsigned kSize>
+inline Yt::Image makeTestImageGray8()
+{
+	Yt::Buffer buffer{ kSize * kSize };
+	auto data = &buffer[0];
+	for (unsigned y = 0; y < kSize; ++y)
+		for (unsigned x = 0; x < kSize; ++x)
+			*data++ = static_cast<uint8_t>(y < kSize / 2 ? x * kSize + y / 2 : (kSize - 1 - x) * kSize + (kSize - 1 - y) / 2);
+	return { { kSize, kSize, Yt::PixelFormat::Gray8 }, buffer.data() };
 }

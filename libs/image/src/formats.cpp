@@ -15,6 +15,7 @@ namespace Yt
 {
 	bool read_image(const Source& source, ImageFormat format, ImageInfo& info, Buffer& buffer)
 	{
+#if YTTRIUM_IMAGE_BMP || YTTRIUM_IMAGE_DDS || YTTRIUM_IMAGE_ICO || YTTRIUM_IMAGE_JPEG || YTTRIUM_IMAGE_TGA
 		if (format == ImageFormat::Auto)
 		{
 			struct
@@ -60,36 +61,36 @@ namespace Yt
 		Reader reader{ source };
 		switch (format)
 		{
-#if YTTRIUM_IMAGE_BMP
+#	if YTTRIUM_IMAGE_BMP
 		case ImageFormat::Bmp:
 			if (!read_bmp_header(reader, info))
 				return false;
 			break;
-#endif
-#if YTTRIUM_IMAGE_DDS
+#	endif
+#	if YTTRIUM_IMAGE_DDS
 		case ImageFormat::Dds:
 			if (!read_dds_header(reader, info))
 				return false;
 			break;
-#endif
-#if YTTRIUM_IMAGE_ICO
+#	endif
+#	if YTTRIUM_IMAGE_ICO
 		case ImageFormat::Ico:
 			if (!read_ico_header(reader, info))
 				return false;
 			break;
-#endif
-#if YTTRIUM_IMAGE_JPEG
+#	endif
+#	if YTTRIUM_IMAGE_JPEG
 		case ImageFormat::Jpeg: {
 			auto input = source.to_buffer();
 			return read_jpeg(input.data(), input.size(), info, buffer);
 		}
-#endif
-#if YTTRIUM_IMAGE_TGA
+#	endif
+#	if YTTRIUM_IMAGE_TGA
 		case ImageFormat::Tga:
 			if (!read_tga_header(reader, info))
 				return false;
 			break;
-#endif
+#	endif
 		default:
 			return false;
 		}
@@ -97,22 +98,37 @@ namespace Yt
 		const auto frame_size = info.frame_size();
 		return buffer.try_reset(frame_size)
 			&& reader.read(buffer.data(), frame_size) == frame_size;
+#else
+		(void)source;
+		(void)format;
+		(void)info;
+		(void)buffer;
+		return false;
+#endif
 	}
 
-	bool write_image([[maybe_unused]] Writer&& writer, ImageFormat format, [[maybe_unused]] int quality, [[maybe_unused]] const ImageInfo& info, [[maybe_unused]] const void* data)
+	bool write_image(Writer&& writer, ImageFormat format, [[maybe_unused]] int quality, const ImageInfo& info, const void* data)
 	{
+#if YTTRIUM_IMAGE_JPEG || YTTRIUM_IMAGE_PNG || YTTRIUM_IMAGE_TGA
 		switch (format)
 		{
-#if YTTRIUM_IMAGE_JPEG
+#	if YTTRIUM_IMAGE_JPEG
 		case ImageFormat::Jpeg: return write_jpeg(writer, info, data, std::clamp(quality, 0, 100));
-#endif
-#if YTTRIUM_IMAGE_PNG
+#	endif
+#	if YTTRIUM_IMAGE_PNG
 		case ImageFormat::Png: return write_png(writer, info, data);
-#endif
-#if YTTRIUM_IMAGE_TGA
+#	endif
+#	if YTTRIUM_IMAGE_TGA
 		case ImageFormat::Tga: return write_tga(writer, info, data);
-#endif
-		default: return false;
+#	endif
+		default: break;
 		}
+#else
+		(void)writer;
+		(void)format;
+		(void)info;
+		(void)data;
+#endif
+		return false;
 	}
 }
