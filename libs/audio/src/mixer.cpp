@@ -14,7 +14,7 @@
 
 namespace
 {
-	void add_saturate_f32(void* dst, const void* src, size_t count) noexcept
+	void addSaturateF32(void* dst, const void* src, size_t count) noexcept
 	{
 		for (size_t i = 0; i < count; ++i)
 			static_cast<float*>(dst)[i] = std::clamp(static_cast<float*>(dst)[i] + static_cast<const float*>(src)[i], -1.f, 1.f);
@@ -30,7 +30,7 @@ namespace Yt
 		assert(_format.channels() == 2);
 	}
 
-	void AudioMixer::play_music(const std::shared_ptr<AudioReader>& music)
+	void AudioMixer::playMusic(const std::shared_ptr<AudioReader>& music)
 	{
 		std::lock_guard lock{ _mutex };
 		if (music == _music)
@@ -40,7 +40,7 @@ namespace Yt
 		_music = music;
 	}
 
-	void AudioMixer::play_sound(const std::shared_ptr<Sound>& sound)
+	void AudioMixer::playSound(const std::shared_ptr<Sound>& sound)
 	{
 		std::lock_guard lock{ _mutex };
 		_sound = std::static_pointer_cast<SoundImpl>(sound);
@@ -60,45 +60,45 @@ namespace Yt
 			auto out = buffer;
 			if (_music)
 			{
-				if (!read(out, maxFrames, _conversion_buffer, *_music))
+				if (!read(out, maxFrames, _conversionBuffer, *_music))
 					_music.reset();
 				else
 				{
-					_mix_buffer.reset(maxFrames * _format.bytes_per_frame());
-					out = static_cast<float*>(_mix_buffer.data());
+					_mixBuffer.reserve(maxFrames * _format.bytes_per_frame());
+					out = reinterpret_cast<float*>(_mixBuffer.data());
 				}
 			}
 			if (_sound)
 			{
-				if (!read(out, maxFrames, _conversion_buffer, _sound->_reader))
+				if (!read(out, maxFrames, _conversionBuffer, _sound->_reader))
 					_sound.reset();
 				else if (out != buffer)
-					add_saturate_f32(buffer, out, maxFrames * _format.channels());
+					::addSaturateF32(buffer, out, maxFrames * _format.channels());
 			}
 		}
 		return maxFrames;
 	}
 
-	bool AudioMixer::read(void* out, size_t out_frames, Buffer& in_buffer, AudioReader& reader)
+	bool AudioMixer::read(void* out, size_t outFrames, primal::Buffer<std::byte>& inBuffer, AudioReader& reader)
 	{
-		if (const auto in_format = reader.format(); in_format == _format)
+		if (const auto inFormat = reader.format(); inFormat == _format)
 		{
-			const auto in_frames = reader.read_frames(out, out_frames);
-			if (!in_frames)
+			const auto inFrames = reader.read_frames(out, outFrames);
+			if (!inFrames)
 				return false;
-			if (in_frames < out_frames)
-				std::memset(static_cast<std::byte*>(out) + in_frames * _format.bytes_per_frame(), 0, (out_frames - in_frames) * _format.bytes_per_frame());
+			if (inFrames < outFrames)
+				std::memset(static_cast<std::byte*>(out) + inFrames * _format.bytes_per_frame(), 0, (outFrames - inFrames) * _format.bytes_per_frame());
 		}
 		else
 		{
-			in_buffer.reset(out_frames * in_format.bytes_per_frame());
-			const auto in_frames = reader.read_frames(in_buffer.data(), out_frames);
-			if (!in_frames)
+			inBuffer.reserve(outFrames * inFormat.bytes_per_frame());
+			const auto inFrames = reader.read_frames(inBuffer.data(), outFrames);
+			if (!inFrames)
 				return false;
-			if (!transform_audio(out, _format, in_buffer.data(), in_format, in_frames))
+			if (!transform_audio(out, _format, inBuffer.data(), inFormat, inFrames))
 				return false;
-			if (in_frames < out_frames)
-				std::memset(static_cast<std::byte*>(out) + in_frames * _format.bytes_per_frame(), 0, (out_frames - in_frames) * _format.bytes_per_frame());
+			if (inFrames < outFrames)
+				std::memset(static_cast<std::byte*>(out) + inFrames * _format.bytes_per_frame(), 0, (outFrames - inFrames) * _format.bytes_per_frame());
 		}
 		return true;
 	}

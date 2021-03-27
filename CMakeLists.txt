@@ -17,8 +17,8 @@ endif()
 
 set(AULOS_AULOSPLAY ON)
 set(AULOS_STATIC_RUNTIME ON)
-FetchContent_Declare(Primal GIT_REPOSITORY https://github.com/blagodarin/primal.git GIT_TAG d01b475e5b263bd7e53f7b691f21f32b22bc03b3)
-FetchContent_Declare(Aulos GIT_REPOSITORY https://github.com/blagodarin/aulos.git GIT_TAG ac2ce48b5cd6f8a5aa6acc1e022d7b97866377fb)
+FetchContent_Declare(Primal GIT_REPOSITORY https://github.com/blagodarin/primal.git GIT_TAG 79b19d63aee0906c7559f3e2b7a434b3919f889a)
+FetchContent_Declare(Aulos GIT_REPOSITORY https://github.com/blagodarin/aulos.git GIT_TAG fb61518c53483bd29b16659fd9099a0e8315f33f)
 FetchContent_MakeAvailable(Primal Aulos)
 
 primal_set_defaults()

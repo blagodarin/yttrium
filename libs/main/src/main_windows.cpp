@@ -16,23 +16,23 @@ namespace
 		primal::Buffer<char*> argv;
 		int argc = 0;
 		{
-			const primal::CPtr<LPWSTR, ::LocalFree> argv_w{ ::CommandLineToArgvW(::GetCommandLineW(), &argc) };
+			const primal::CPtr<LPWSTR, ::LocalFree> argvW{ ::CommandLineToArgvW(::GetCommandLineW(), &argc) };
 			primal::Buffer<int> sizes{ static_cast<size_t>(argc) };
-			size_t buffer_size = 0;
+			size_t bufferSize = 0;
 			for (int i = 0; i < argc; ++i)
 			{
-				const auto size = ::WideCharToMultiByte(CP_UTF8, 0, argv_w[i], -1, nullptr, 0, nullptr, nullptr);
+				const auto size = ::WideCharToMultiByte(CP_UTF8, 0, argvW[i], -1, nullptr, 0, nullptr, nullptr);
 				sizes.data()[i] = size;
-				buffer_size += size;
+				bufferSize += size;
 			}
-			buffer.reallocate(buffer_size);
-			argv.reallocate(argc);
+			buffer.reserve(bufferSize);
+			argv.reserve(argc);
 			size_t bufferOffset = 0;
 			for (int i = 0; i < argc; ++i)
 			{
 				const auto data = buffer.data() + bufferOffset;
 				const auto size = sizes.data()[i];
-				::WideCharToMultiByte(CP_UTF8, 0, argv_w[i], -1, data, size, nullptr, nullptr);
+				::WideCharToMultiByte(CP_UTF8, 0, argvW[i], -1, data, size, nullptr, nullptr);
 				argv.data()[i] = data;
 				bufferOffset += size;
 			}

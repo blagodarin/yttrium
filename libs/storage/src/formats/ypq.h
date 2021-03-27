@@ -4,10 +4,11 @@
 
 #pragma once
 
-#include <yttrium/base/buffer.h>
 #include <yttrium/base/numeric.h>
 #include <yttrium/storage/package.h>
 #include <yttrium/storage/writer.h>
+
+#include <primal/buffer.hpp>
 
 #include <vector>
 
@@ -28,7 +29,7 @@ namespace Yt
 		struct Entry;
 
 		const std::shared_ptr<const Source> _source;
-		Buffer _metadata_buffer;
+		primal::Buffer<char> _metadataBuffer;
 		std::vector<std::string_view> _names;
 		std::vector<Entry> _entries;
 	};

@@ -29,12 +29,12 @@ namespace Yt
 
 	void AudioManagerImpl::play_music(const std::shared_ptr<AudioReader>& music)
 	{
-		_mixer->play_music(music);
+		_mixer->playMusic(music);
 	}
 
 	void AudioManagerImpl::play_sound(const std::shared_ptr<Sound>& sound)
 	{
-		_mixer->play_sound(sound);
+		_mixer->playSound(sound);
 	}
 
 	void AudioManagerImpl::onPlaybackError(aulosplay::PlaybackError error)
