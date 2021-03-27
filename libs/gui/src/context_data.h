@@ -224,7 +224,7 @@ namespace Yt
 		bool _mouseHoverTaken = false;
 		std::string _mouseItem;
 		bool _mouseItemPresent = false;
-		Key _mouseItemKey = Key::Null;
+		Key _mouseItemKey = Key::None;
 		KeyboardItem _keyboardItem;
 		GuiButtonStyle _buttonStyle;
 		GuiEditStyle _editStyle;
@@ -243,7 +243,7 @@ namespace Yt
 		std::pair<unsigned, bool> captureClick(Key key, bool autorepeat, bool release = false) noexcept
 		{
 			const auto i = std::find_if(_inputEvents.begin(), _inputEvents.end(), [key](const auto event) {
-				return (event & kKeySearchMask) == static_cast<uint8_t>(key);
+				return key == Key::None ? !(event & (kTextFlag | kProcessedFlag)) : (event & kKeySearchMask) == static_cast<uint8_t>(key);
 			});
 			if (i == _inputEvents.end())
 				return { 0u, false };
@@ -255,7 +255,7 @@ namespace Yt
 			auto count = static_cast<unsigned>(!(*i & kAutorepeatFlag) || autorepeat);
 			for (auto j = std::next(i); j != _inputEvents.end(); ++j)
 			{
-				if ((*j & kKeySearchMask) == static_cast<uint8_t>(key))
+				if ((*j & kKeySearchMask) == (*i & kPayloadMask))
 				{
 					if (!(*j & kAutorepeatFlag))
 					{

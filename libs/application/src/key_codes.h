@@ -144,7 +144,7 @@ namespace Yt
 		// KEY_LEFTMETA (left Windows key)
 		// KEY_RIGHTMETA (right Windows key)
 		// KEY_COMPOSE (the key between right Windows key and right Control key)
-		default: return Key::Null;
+		default: return Key::None;
 		}
 	}
 }

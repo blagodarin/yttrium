@@ -124,7 +124,7 @@ namespace Yt
 				case VK_OEM_6: return Key::RBracket;
 				case VK_OEM_7: return Key::Apostrophe;
 				}
-			return Key::Null;
+			return Key::None;
 		};
 
 		const auto get_modifiers = [wparam] {

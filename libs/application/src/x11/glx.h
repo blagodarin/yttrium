@@ -7,6 +7,10 @@
 #include <primal/pointer.hpp>
 
 #include <GL/glx.h>
+#ifdef None
+#	undef None
+constexpr long None = 0;
+#endif
 
 namespace Yt
 {

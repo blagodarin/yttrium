@@ -47,6 +47,7 @@ namespace Yt
 		void setButtonStyle(const GuiButtonStyle&) noexcept;
 		void setEditStyle(const GuiEditStyle&) noexcept;
 		void setLabelStyle(const GuiLabelStyle&) noexcept;
+		bool takeAnyKeyPress() noexcept;
 		bool takeKeyPress(Key) noexcept;
 		std::optional<bool> takeKeyState(Key) noexcept;
 		std::optional<Vector2> takeMouseCursor() noexcept;

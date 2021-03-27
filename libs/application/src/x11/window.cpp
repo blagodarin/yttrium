@@ -50,7 +50,7 @@ namespace
 		case Button4: return Yt::Key::Mouse4;
 		case Button5: return Yt::Key::Mouse5;
 		}
-		return Yt::Key::Null;
+		return Yt::Key::None;
 	}
 }
 
@@ -141,7 +141,7 @@ namespace Yt
 		};
 
 		const auto do_key_event = [this](Key key, bool pressed, bool autorepeat, unsigned state) {
-			if (key == Key::Null)
+			if (key == Key::None)
 				return;
 			Flags<KeyEvent::Modifier> modifiers;
 			if (state & ShiftMask)

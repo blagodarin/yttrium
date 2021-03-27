@@ -9,9 +9,9 @@ namespace Yt
 	/// Input key.
 	enum class Key
 	{
-		// Null key (0x00):
+		// No key (0x00):
 
-		Null = 0x00,
+		None = 0x00,
 
 		// Keyboard keys (0x01 - 0x7F):
 

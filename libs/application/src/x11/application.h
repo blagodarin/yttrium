@@ -9,6 +9,10 @@
 #include <type_traits>
 
 #include <X11/Xlib.h>
+#ifdef None
+#	undef None
+constexpr long None = 0;
+#endif
 
 namespace Yt
 {

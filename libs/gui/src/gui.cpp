@@ -49,15 +49,15 @@ namespace Yt
 
 	GuiFrame::~GuiFrame() noexcept
 	{
-		if (_context._mouseItemKey != Key::Null && _context.captureClick(_context._mouseItemKey, false, true).second)
+		if (_context._mouseItemKey != Key::None && _context.captureClick(_context._mouseItemKey, false, true).second)
 		{
 			_context._mouseItem.clear();
-			_context._mouseItemKey = Key::Null;
+			_context._mouseItemKey = Key::None;
 		}
 		if (!_context._mouseItemPresent)
 		{
 			_context._mouseItem.clear();
-			_context._mouseItemKey = Key::Null;
+			_context._mouseItemKey = Key::None;
 		}
 		if (!_context._keyboardItem._present)
 			_context._keyboardItem._id.clear();
@@ -85,7 +85,7 @@ namespace Yt
 			if (released)
 			{
 				_context._mouseItem.clear();
-				_context._mouseItemKey = Key::Null;
+				_context._mouseItemKey = Key::None;
 				if (hovered)
 				{
 					clicked = true;
@@ -219,7 +219,7 @@ namespace Yt
 			if (released)
 			{
 				_context._mouseItem.clear();
-				_context._mouseItemKey = Key::Null;
+				_context._mouseItemKey = Key::None;
 				if (widgetRect.contains(_context._mouseCursor))
 					_context._mouseHoverTaken = true;
 			}
@@ -330,6 +330,11 @@ namespace Yt
 	std::optional<Vector2> GuiFrame::takeMouseCursor() noexcept
 	{
 		return _context.takeMouseCursor(RectF{ _renderer.viewportSize() });
+	}
+
+	bool GuiFrame::takeAnyKeyPress() noexcept
+	{
+		return takeKeyPress(Key::None);
 	}
 
 	bool GuiFrame::takeKeyPress(Key key) noexcept

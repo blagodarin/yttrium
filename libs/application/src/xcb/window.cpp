@@ -31,7 +31,7 @@ namespace
 		case XCB_BUTTON_INDEX_3: return Yt::Key::Mouse3;
 		case XCB_BUTTON_INDEX_4: return Yt::Key::Mouse4;
 		case XCB_BUTTON_INDEX_5: return Yt::Key::Mouse5;
-		default: return Yt::Key::Null;
+		default: return Yt::Key::None;
 		}
 	}
 }
@@ -234,7 +234,7 @@ namespace Yt
 	bool WindowBackend::process_events()
 	{
 		const auto do_key_event = [this](Key key, bool pressed, bool autorepeat, uint16_t state) {
-			if (key == Key::Null)
+			if (key == Key::None)
 				return;
 			Flags<KeyEvent::Modifier> modifiers;
 			if (state & XCB_MOD_MASK_SHIFT)
