@@ -44,11 +44,10 @@ add_library(Y_renderer STATIC
 	src/viewport.cpp
 	src/viewport.h
 	)
-include_config(Y_renderer ${PROJECT_BINARY_DIR}/config.h)
 target_include_directories(Y_renderer PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-target_link_libraries(Y_renderer PUBLIC Y_geometry Y_image PRIVATE Y_application Y_audio Y_ion Y_storage primal fmt::fmt Threads::Threads)
+target_link_libraries(Y_renderer PUBLIC Y_geometry Y_image PRIVATE Y_application Y_ion Y_storage primal fmt::fmt Threads::Threads)
 set_target_properties(Y_renderer PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-if(YTTRIUM_RENDERER STREQUAL "opengl")
+if(YTTRIUM_RENDERER_OPENGL)
 	target_sources(Y_renderer PRIVATE
 		src/backend/opengl/api.h
 		src/backend/opengl/gl.cpp
@@ -76,7 +75,7 @@ if(YTTRIUM_RENDERER STREQUAL "opengl")
 	if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 		set_property(SOURCE src/backend/opengl/gl.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-useless-cast)
 	endif()
-elseif(YTTRIUM_RENDERER STREQUAL "vulkan")
+elseif(YTTRIUM_RENDERER_VULKAN)
 	target_sources(Y_renderer PRIVATE
 		src/backend/vulkan/buffer.cpp
 		src/backend/vulkan/buffer.h
@@ -118,11 +117,11 @@ else()
 endif()
 if(WIN32)
 	target_compile_definitions(Y_renderer PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
-	if(YTTRIUM_RENDERER STREQUAL "vulkan")
+	if(YTTRIUM_RENDERER_VULKAN)
 		target_compile_definitions(Y_renderer PRIVATE VK_USE_PLATFORM_WIN32_KHR)
 	endif()
 else()
-	if(YTTRIUM_RENDERER STREQUAL "vulkan")
+	if(YTTRIUM_RENDERER_VULKAN)
 		target_compile_definitions(Y_renderer PRIVATE VK_USE_PLATFORM_XCB_KHR)
 	endif()
 endif()

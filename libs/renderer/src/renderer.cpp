@@ -12,9 +12,9 @@
 #include "model/formats/obj.h"
 #include "model/mesh_data.h"
 
-#if Y_RENDERER_OPENGL
+#if YTTRIUM_RENDERER_OPENGL
 #	include "backend/opengl/renderer.h"
-#elif Y_RENDERER_VULKAN
+#elif YTTRIUM_RENDERER_VULKAN
 #	include "backend/vulkan/renderer.h"
 #else
 #	include "backend/null/renderer.h"
@@ -26,9 +26,9 @@
 
 namespace Yt
 {
-#if Y_RENDERER_OPENGL
+#if YTTRIUM_RENDERER_OPENGL
 	using RenderBackendImpl = GlRenderer;
-#elif Y_RENDERER_VULKAN
+#elif YTTRIUM_RENDERER_VULKAN
 	using RenderBackendImpl = VulkanRenderer;
 #else
 	using RenderBackendImpl = NullRenderer;

@@ -372,7 +372,7 @@ namespace Yt
 
 	void WindowBackend::swap_buffers()
 	{
-		static_assert(Y_RENDERER_NULL || Y_RENDERER_VULKAN, "Not implemented");
+		static_assert(!YTTRIUM_RENDERER_OPENGL, "Not implemented");
 	}
 
 	WindowBackend::P_Atom WindowBackend::make_atom(std::string_view name)

@@ -21,11 +21,14 @@ add_library(Y_application STATIC
 	src/window_backend.h
 	src/window_callbacks.h
 	)
-include_config(Y_application ${PROJECT_BINARY_DIR}/config.h)
+target_compile_definitions(Y_application PUBLIC
+	YTTRIUM_RENDERER_OPENGL=$<BOOL:${YTTRIUM_RENDERER_OPENGL}>
+	YTTRIUM_RENDERER_VULKAN=$<BOOL:${YTTRIUM_RENDERER_VULKAN}>
+	)
 target_include_directories(Y_application PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 target_link_libraries(Y_application PUBLIC Y_base PRIVATE Y_geometry Y_image primal)
 set_target_properties(Y_application PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-if(YTTRIUM_RENDERER STREQUAL "opengl")
+if(YTTRIUM_RENDERER_OPENGL)
 	target_sources(Y_application PRIVATE
 		src/opengl.h
 		)
@@ -38,7 +41,7 @@ if(WIN32)
 		src/windows/window.cpp
 		src/windows/window.h
 		)
-	if(YTTRIUM_RENDERER STREQUAL "opengl")
+	if(YTTRIUM_RENDERER_OPENGL)
 		target_sources(Y_application PRIVATE
 			src/windows/wgl.cpp
 			src/windows/wgl.h
@@ -48,7 +51,7 @@ if(WIN32)
 		target_include_directories(Y_application PRIVATE ${PRIMAL_DOWNLOAD_DIR})
 	endif()
 else()
-	if(YTTRIUM_RENDERER STREQUAL "opengl")
+	if(YTTRIUM_RENDERER_OPENGL)
 		find_package(X11 REQUIRED)
 		target_sources(Y_application PRIVATE
 			src/x11/application.cpp

@@ -8,7 +8,7 @@
 #include <yttrium/geometry/size.h>
 #include "application.h"
 
-#if Y_RENDERER_OPENGL
+#if YTTRIUM_RENDERER_OPENGL
 #	include "wgl.h"
 #endif
 
@@ -64,7 +64,7 @@ namespace Yt
 		primal::Pointer<std::remove_pointer_t<HICON>, HIconDeleter> _icon;
 		NativeWindow _hwnd = _application.create_window(*this);
 		const WindowDC _hdc{ _hwnd };
-#if Y_RENDERER_OPENGL
+#if YTTRIUM_RENDERER_OPENGL
 		const WglContext _wgl{ _hdc };
 #endif
 		Size _size;
