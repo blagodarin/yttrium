@@ -12,6 +12,7 @@ add_library(Y_audio STATIC
 	include/yttrium/audio/reader.h
 	include/yttrium/audio/sound.h
 	include/yttrium/audio/utils.h
+	src/decoder.cpp
 	src/decoder.h
 	src/manager.cpp
 	src/manager.h

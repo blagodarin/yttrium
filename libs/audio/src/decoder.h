@@ -22,6 +22,8 @@ namespace Yt
 		virtual size_t read_frames(void* buffer, size_t frames) = 0;
 		virtual bool seek_frame(uint64_t frame) = 0;
 
+		static std::unique_ptr<Yt::AudioDecoder> create(std::unique_ptr<Source>&&, bool looping);
+
 	protected:
 		AudioFormat _format;
 		uint64_t _total_frames = 0;
