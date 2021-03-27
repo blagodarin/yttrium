@@ -28,8 +28,8 @@ namespace Yt
 			|| image_header.ico.bits_per_pixel != 32)
 			return false;
 
-		const std::uint16_t width = image_header.width ? image_header.width : 256;
-		const std::uint16_t height = image_header.height ? image_header.height : 256;
+		const uint16_t width = image_header.width ? image_header.width : 256;
+		const uint16_t height = image_header.height ? image_header.height : 256;
 
 		BmpInfoHeader bitmap_header;
 		if (!reader.seek(image_header.data_offset)

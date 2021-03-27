@@ -29,7 +29,6 @@ add_library(Y_storage STATIC
 	src/writer.cpp
 	src/writer.h
 	)
-include_config(Y_storage ${PROJECT_BINARY_DIR}/config.h)
 target_include_directories(Y_storage PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 target_link_libraries(Y_storage PRIVATE Y_base primal fmt::fmt)
 set_target_properties(Y_storage PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")

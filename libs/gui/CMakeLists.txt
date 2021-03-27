@@ -19,7 +19,6 @@ add_library(Y_gui STATIC
 	src/layout.cpp
 	src/style.cpp
 	)
-include_config(Y_gui ${PROJECT_BINARY_DIR}/config.h)
 target_include_directories(Y_gui PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 target_link_libraries(Y_gui PUBLIC Y_geometry Y_image PRIVATE Y_application Y_renderer Y_storage primal Freetype::Freetype)
 set_target_properties(Y_gui PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")

@@ -11,7 +11,6 @@ add_library(Y_ion STATIC
 	src/reader.cpp
 	src/writer.cpp
 	)
-include_config(Y_ion ${PROJECT_BINARY_DIR}/config.h)
 target_include_directories(Y_ion PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 target_link_libraries(Y_ion PRIVATE Y_base Y_storage fmt::fmt)
 set_target_properties(Y_ion PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")

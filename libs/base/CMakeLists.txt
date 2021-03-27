@@ -26,7 +26,6 @@ add_library(Y_base STATIC
 	src/string.cpp
 	src/virtual_memory.h
 	)
-include_config(Y_base ${PROJECT_BINARY_DIR}/config.h)
 target_include_directories(Y_base PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 target_link_libraries(Y_base PRIVATE primal fmt::fmt Threads::Threads)
 set_target_properties(Y_base PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")

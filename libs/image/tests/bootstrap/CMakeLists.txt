@@ -7,7 +7,6 @@ source_group("src" REGULAR_EXPRESSION ".*\\.(h|cpp)$")
 add_executable(bootstrap_image_tests
 	src/main.cpp
 	)
-include_config(bootstrap_image_tests ${PROJECT_BINARY_DIR}/config.h)
 target_link_libraries(bootstrap_image_tests PRIVATE Y_image Y_storage)
 set_target_properties(bootstrap_image_tests PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 add_custom_target(bootstrap

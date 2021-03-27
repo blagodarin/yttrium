@@ -4,10 +4,6 @@
 
 #pragma once
 
-#if !YTTRIUM_WITH_OGGVORBIS
-#	error Ogg Vorbis support is disabled.
-#endif
-
 #include "../decoder.h"
 
 #include <vorbis/vorbisfile.h>

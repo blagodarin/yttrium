@@ -13,10 +13,6 @@ add_library(Y_audio STATIC
 	include/yttrium/audio/sound.h
 	include/yttrium/audio/utils.h
 	src/decoder.h
-	src/formats/aulos.cpp
-	src/formats/aulos.h
-	src/formats/wav.cpp
-	src/formats/wav.h
 	src/manager.cpp
 	src/manager.h
 	src/mixer.cpp
@@ -28,16 +24,24 @@ add_library(Y_audio STATIC
 	src/utils.cpp
 	src/wav.h
 	)
-include_config(Y_audio ${PROJECT_BINARY_DIR}/config.h)
+target_compile_definitions(Y_audio PUBLIC
+	YTTRIUM_AUDIO_AULOS=$<BOOL:${YTTRIUM_AUDIO_AULOS}>
+	YTTRIUM_AUDIO_OGGVORBIS=$<BOOL:${YTTRIUM_AUDIO_OGGVORBIS}>
+	YTTRIUM_AUDIO_WAV=$<BOOL:${YTTRIUM_AUDIO_WAV}>
+	)
 target_include_directories(Y_audio PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-target_link_libraries(Y_audio PRIVATE Y_base Y_storage aulos aulosplay primal)
+target_link_libraries(Y_audio PRIVATE Y_base Y_storage aulosplay primal)
 set_target_properties(Y_audio PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-if(YTTRIUM_WITH_OGGVORBIS)
+if(YTTRIUM_AUDIO_AULOS)
+	target_link_libraries(Y_audio PRIVATE aulos)
+	target_sources(Y_audio PRIVATE src/formats/aulos.cpp src/formats/aulos.h)
+endif()
+if(YTTRIUM_AUDIO_OGGVORBIS)
 	target_link_libraries(Y_audio PRIVATE Vorbis::vorbisfile)
-	target_sources(Y_audio PRIVATE
-		src/formats/ogg_vorbis.cpp
-		src/formats/ogg_vorbis.h
-		)
+	target_sources(Y_audio PRIVATE src/formats/ogg_vorbis.cpp src/formats/ogg_vorbis.h)
+endif()
+if(YTTRIUM_AUDIO_WAV)
+	target_sources(Y_audio PRIVATE src/formats/wav.cpp src/formats/wav.h)
 endif()
 primal_install(Y_audio EXPORT YttriumTargets)
 install(DIRECTORY include/yttrium DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})

@@ -60,28 +60,36 @@ namespace Yt
 		Reader reader{ source };
 		switch (format)
 		{
-		case ImageFormat::Tga:
-			if (!read_tga_header(reader, info))
+#if YTTRIUM_IMAGE_BMP
+		case ImageFormat::Bmp:
+			if (!read_bmp_header(reader, info))
 				return false;
 			break;
-#if YTTRIUM_WITH_JPEG
+#endif
+#if YTTRIUM_IMAGE_DDS
+		case ImageFormat::Dds:
+			if (!read_dds_header(reader, info))
+				return false;
+			break;
+#endif
+#if YTTRIUM_IMAGE_ICO
+		case ImageFormat::Ico:
+			if (!read_ico_header(reader, info))
+				return false;
+			break;
+#endif
+#if YTTRIUM_IMAGE_JPEG
 		case ImageFormat::Jpeg: {
 			auto input = source.to_buffer();
 			return read_jpeg(input.data(), input.size(), info, buffer);
 		}
 #endif
-		case ImageFormat::Dds:
-			if (!read_dds_header(reader, info))
+#if YTTRIUM_IMAGE_TGA
+		case ImageFormat::Tga:
+			if (!read_tga_header(reader, info))
 				return false;
 			break;
-		case ImageFormat::Bmp:
-			if (!read_bmp_header(reader, info))
-				return false;
-			break;
-		case ImageFormat::Ico:
-			if (!read_ico_header(reader, info))
-				return false;
-			break;
+#endif
 		default:
 			return false;
 		}
@@ -91,16 +99,19 @@ namespace Yt
 			&& reader.read(buffer.data(), frame_size) == frame_size;
 	}
 
-	bool write_image(Writer&& writer, ImageFormat format, int quality, const ImageInfo& info, const void* data)
+	bool write_image([[maybe_unused]] Writer&& writer, ImageFormat format, [[maybe_unused]] int quality, [[maybe_unused]] const ImageInfo& info, [[maybe_unused]] const void* data)
 	{
-		quality = std::clamp(quality, 0, 100);
 		switch (format)
 		{
-		case ImageFormat::Tga: return write_tga(writer, info, data);
-#if YTTRIUM_WITH_JPEG
-		case ImageFormat::Jpeg: return write_jpeg(writer, info, data, quality);
+#if YTTRIUM_IMAGE_JPEG
+		case ImageFormat::Jpeg: return write_jpeg(writer, info, data, std::clamp(quality, 0, 100));
 #endif
+#if YTTRIUM_IMAGE_PNG
 		case ImageFormat::Png: return write_png(writer, info, data);
+#endif
+#if YTTRIUM_IMAGE_TGA
+		case ImageFormat::Tga: return write_tga(writer, info, data);
+#endif
 		default: return false;
 		}
 	}

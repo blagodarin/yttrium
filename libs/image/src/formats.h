@@ -15,20 +15,26 @@ namespace Yt
 	class Source;
 	class Writer;
 
+#if YTTRIUM_IMAGE_BMP
 	bool read_bmp_header(Reader&, ImageInfo&);
+#endif
+#if YTTRIUM_IMAGE_DDS
 	bool read_dds_header(Reader&, ImageInfo&);
+#endif
+#if YTTRIUM_IMAGE_ICO
 	bool read_ico_header(Reader&, ImageInfo&);
-
-#if YTTRIUM_WITH_JPEG
+#endif
+#if YTTRIUM_IMAGE_JPEG
 	bool read_jpeg(const void*, size_t, ImageInfo&, Buffer&);
 	bool write_jpeg(Writer&, const ImageInfo&, const void*, int quality);
 #endif
-
+#if YTTRIUM_IMAGE_PNG
 	bool write_png(Writer&, const ImageInfo&, const void*);
-
+#endif
+#if YTTRIUM_IMAGE_TGA
 	bool read_tga_header(Reader&, ImageInfo&);
 	bool write_tga(Writer&, const ImageInfo&, const void*);
-
+#endif
 	bool read_image(const Source&, ImageFormat, ImageInfo&, Buffer&);
 	bool write_image(Writer&&, ImageFormat, int quality, const ImageInfo&, const void*);
 }

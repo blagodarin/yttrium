@@ -12,7 +12,6 @@ add_executable(test_geometry
 	src/rect.cpp
 	src/vector.cpp
 	)
-include_config(test_geometry ${PROJECT_BINARY_DIR}/config.h)
 target_include_directories(test_geometry PRIVATE ${PRIMAL_DOWNLOAD_DIR})
 target_link_libraries(test_geometry PRIVATE Y_geometry)
 set_target_properties(test_geometry PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")

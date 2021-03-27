@@ -13,7 +13,6 @@ add_executable(test_base
 	src/numeric.cpp
 	src/string.cpp
 	)
-include_config(test_base ${PROJECT_BINARY_DIR}/config.h)
 target_include_directories(test_base PRIVATE ${PRIMAL_DOWNLOAD_DIR})
 target_link_libraries(test_base PRIVATE Y_base)
 set_target_properties(test_base PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
