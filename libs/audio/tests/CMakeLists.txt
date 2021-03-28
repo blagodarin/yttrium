@@ -8,7 +8,7 @@ add_executable(test_audio
 	src/main.cpp
 	src/transform.cpp
 	)
-target_include_directories(test_audio PRIVATE ${PRIMAL_DOWNLOAD_DIR})
+target_include_directories(test_audio SYSTEM PRIVATE ${PRIMAL_DOWNLOAD_DIR})
 target_link_libraries(test_audio PRIVATE Y_audio primal)
 set_target_properties(test_audio PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 add_test(NAME audio COMMAND test_audio)
