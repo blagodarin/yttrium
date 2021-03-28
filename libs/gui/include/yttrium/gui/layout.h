@@ -35,7 +35,6 @@ namespace Yt
 			Y,
 		};
 
-		GuiLayout() noexcept;
 		explicit GuiLayout(GuiFrame&) noexcept;
 		GuiLayout(GuiFrame&, const Center&) noexcept;
 		GuiLayout(GuiFrame&, const Height&) noexcept;
@@ -57,7 +56,7 @@ namespace Yt
 		void skip(float distance) noexcept;
 
 	private:
-		GuiFrame* const _frame;
+		GuiFrame& _frame;
 		GuiLayout* const _previous;
 		float _scaling = 1;
 		Vector2 _offset{ 0, 0 };

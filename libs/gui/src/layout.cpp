@@ -9,24 +9,18 @@
 
 namespace Yt
 {
-	GuiLayout::GuiLayout() noexcept
-		: _frame{ nullptr }
-		, _previous{ nullptr }
-	{
-	}
-
 	GuiLayout::GuiLayout(GuiFrame& frame) noexcept
-		: _frame{ &frame }
+		: _frame{ frame }
 		, _previous{ std::exchange(frame._context._layout, this) }
 		, _size{ frame._context._window.size() }
 	{
 	}
 
 	GuiLayout::GuiLayout(GuiFrame& frame, const Center& mapping) noexcept
-		: _frame{ &frame }
-		, _previous{ std::exchange(_frame->_context._layout, this) }
+		: _frame{ frame }
+		, _previous{ std::exchange(frame._context._layout, this) }
 	{
-		const SizeF viewport{ _frame->_context._window.size() };
+		const SizeF viewport{ frame._context._window.size() };
 		const auto widthRatio = viewport._width / mapping._width;
 		const auto heightRatio = viewport._height / mapping._height;
 		if (widthRatio > heightRatio)
@@ -43,20 +37,20 @@ namespace Yt
 	}
 
 	GuiLayout::GuiLayout(GuiFrame& frame, const Height& mapping) noexcept
-		: _frame{ &frame }
-		, _previous{ std::exchange(_frame->_context._layout, this) }
+		: _frame{ frame }
+		, _previous{ std::exchange(frame._context._layout, this) }
 	{
-		const SizeF viewport{ _frame->_context._window.size() };
+		const SizeF viewport{ frame._context._window.size() };
 		_scaling = viewport._height / mapping._height;
 		_offset = { 0, 0 };
 		_size = { viewport._width / _scaling, mapping._height };
 	}
 
 	GuiLayout::GuiLayout(GuiFrame& frame, const Width& mapping) noexcept
-		: _frame{ &frame }
-		, _previous{ std::exchange(_frame->_context._layout, this) }
+		: _frame{ frame }
+		, _previous{ std::exchange(frame._context._layout, this) }
 	{
-		const SizeF viewport{ _frame->_context._window.size() };
+		const SizeF viewport{ frame._context._window.size() };
 		_scaling = viewport._width / mapping._width;
 		_offset = { 0, 0 };
 		_size = { mapping._width, viewport._height / _scaling };
@@ -64,8 +58,7 @@ namespace Yt
 
 	GuiLayout::~GuiLayout() noexcept
 	{
-		if (_frame)
-			_frame->_context._layout = _previous;
+		_frame._context._layout = _previous;
 	}
 
 	RectF GuiLayout::add(const SizeF& size) noexcept

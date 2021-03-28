@@ -22,7 +22,7 @@ namespace Yt
 				: _backgroundColor{ backgroundColor }, _textColor{ textColor } {}
 		};
 		std::shared_ptr<const Font> _font;
-		float _fontSize;
+		float _fontSize = 0;
 		State _normal;
 		State _hovered;
 		State _pressed;
@@ -39,7 +39,7 @@ namespace Yt
 				: _backgroundColor{ backgroundColor }, _textColor{ textColor } {}
 		};
 		std::shared_ptr<const Font> _font;
-		float _fontSize;
+		float _fontSize = 0;
 		State _normal;
 		State _hovered;
 		State _active;
@@ -51,7 +51,7 @@ namespace Yt
 	struct GuiLabelStyle
 	{
 		std::shared_ptr<const Font> _font;
-		float _fontSize;
+		float _fontSize = 0;
 		Bgra32 _textColor;
 		GuiLabelStyle() noexcept;
 	};

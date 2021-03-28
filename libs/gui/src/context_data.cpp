@@ -8,17 +8,16 @@
 
 #include <cassert>
 
-namespace
-{
-	Yt::GuiLayout kNullLayout;
-}
-
 namespace Yt
 {
 	GuiContextData::GuiContextData(Window& window) noexcept
 		: _window{ window }
-		, _layout{ &kNullLayout }
 	{
+	}
+
+	RectF GuiContextData::layoutRect() noexcept
+	{
+		return _layout ? _layout->add() : RectF{};
 	}
 
 	void GuiContextData::onWindowMouseMove([[maybe_unused]] const Window& window, int, int)

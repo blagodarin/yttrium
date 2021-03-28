@@ -287,6 +287,8 @@ namespace Yt
 			}
 		}
 
+		RectF layoutRect() noexcept;
+
 		std::optional<Vector2> takeMouseCursor(const RectF& rect) noexcept
 		{
 			if (_mouseCursorTaken || !rect.contains(_mouseCursor))

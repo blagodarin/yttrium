@@ -70,7 +70,7 @@ namespace Yt
 	bool GuiFrame::addButton(std::string_view id, std::string_view text, const RectF& rect)
 	{
 		assert(!id.empty());
-		const auto widgetRect = rect.null() ? _context._layout->add() : rect;
+		const auto widgetRect = rect.null() ? _context.layoutRect() : rect;
 		if (widgetRect.empty())
 			return false;
 		bool clicked = false;
@@ -172,7 +172,7 @@ namespace Yt
 	{
 		if (!_context._labelStyle._font)
 			return;
-		auto textRect = rect.null() ? _context._layout->add() : rect;
+		auto textRect = rect.null() ? _context.layoutRect() : rect;
 		if (textRect.top() >= textRect.bottom())
 			return;
 		const auto verticalPadding = textRect.height() * (1 - _context._buttonStyle._fontSize) / 2;
@@ -204,7 +204,7 @@ namespace Yt
 	bool GuiFrame::addStringEdit(std::string_view id, std::string& text, const RectF& rect)
 	{
 		assert(!id.empty());
-		const auto widgetRect = rect.null() ? _context._layout->add() : rect;
+		const auto widgetRect = rect.null() ? _context.layoutRect() : rect;
 		if (widgetRect.empty())
 			return false;
 		bool entered = false;
