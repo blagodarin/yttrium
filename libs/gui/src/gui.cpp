@@ -41,6 +41,7 @@ namespace Yt
 		_context._mouseHoverTaken = false;
 		_context._mouseItemPresent = false;
 		_context._keyboardItem._present = false;
+		_context._focusExpected = false;
 		_context.updateBlankTexture(_context._defaultFont);
 		setButtonStyle({});
 		setLabelStyle({});
@@ -240,12 +241,12 @@ namespace Yt
 					_context._mouseItemPresent = true;
 					_context._mouseItemKey = Key::Mouse1;
 				}
-				_context._keyboardItem._id = id;
-				_context._keyboardItem._cursor = 0;
-				_context._keyboardItem._cursorMark = std::chrono::steady_clock::now();
-				_context._keyboardItem._selectionSize = 0;
+				_context._keyboardItem.setFocus(id);
 			}
 		}
+		if (std::exchange(_context._focusExpected, false))
+			if (_context._keyboardItem._id.empty())
+				_context._keyboardItem.setFocus(id);
 		if (_context._keyboardItem._id == id)
 		{
 			assert(!_context._keyboardItem._present);
@@ -325,6 +326,12 @@ namespace Yt
 			}
 		}
 		return entered;
+	}
+
+	void GuiFrame::putDefaultFocus() noexcept
+	{
+		if (_context._keyboardItem._id.empty())
+			_context._focusExpected = true;
 	}
 
 	std::optional<Vector2> GuiFrame::takeMouseCursor() noexcept

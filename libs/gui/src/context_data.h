@@ -194,6 +194,16 @@ namespace Yt
 					_selectionSize = 0;
 			}
 
+			void setFocus(std::string_view id)
+			{
+				_id = id;
+				_present = false;
+				_cursor = std::numeric_limits<size_t>::max();
+				_cursorMark = std::chrono::steady_clock::now();
+				_selectionOffset = 0;
+				_selectionSize = _cursor;
+			}
+
 		private:
 			constexpr size_t leftStep(std::string_view text) const noexcept
 			{
@@ -234,6 +244,7 @@ namespace Yt
 		RectF _blankTextureRect;
 		GuiLayout* _layout = nullptr;
 		std::array<uint8_t, 256> _keyStates{};
+		bool _focusExpected = false;
 
 		static constexpr uint8_t kKeyStateTaken = 0x80;
 		static constexpr uint8_t kKeyStatePressed = 0x01;
