@@ -15,22 +15,13 @@
 
 namespace Yt
 {
-	std::unique_ptr<PackageReader> PackageReader::create(std::unique_ptr<Source>&& source, PackageType type)
+	std::unique_ptr<PackageReader> PackageReader::create(std::unique_ptr<Source>&& source)
 	{
 		assert(source);
-		if (type == PackageType::Auto)
-		{
-			uint32_t magic = 0;
-			if (!source->read_at(0, magic))
-				return {};
-			if (magic == kYpqSignature)
-				type = PackageType::Ypq;
-			else
-				throw DataError{ "Unknown package format" }; // TODO: Report this error with package source name.
-		}
-		if (type == PackageType::Ypq)
+		uint32_t magic = 0;
+		if (source->read_at(0, magic) && magic == kYpqSignature)
 			return std::make_unique<YpqReader>(std::move(source));
-		return {};
+		throw DataError{ "Unknown package format" };
 	}
 
 	std::unique_ptr<PackageWriter> PackageWriter::create(const std::filesystem::path& path, PackageType type)

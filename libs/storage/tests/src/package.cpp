@@ -58,7 +58,7 @@ TEST_CASE("package")
 	std::unique_ptr<Yt::Source> packed_file3;
 
 	{
-		const auto package = Yt::PackageReader::create(Yt::Source::from(package_file), Yt::PackageType::Ypq);
+		const auto package = Yt::PackageReader::create(Yt::Source::from(package_file));
 		REQUIRE(package);
 
 		packed_file3 = ::open_packed(*package, file3.path().string());
@@ -101,7 +101,7 @@ TEST_CASE("package.file_size")
 		REQUIRE(package_writer->commit());
 	}
 
-	const auto package = Yt::PackageReader::create(Yt::Source::from(package_file), Yt::PackageType::Ypq);
+	const auto package = Yt::PackageReader::create(Yt::Source::from(package_file));
 	REQUIRE(package);
 
 	auto packed_file = ::open_packed(*package, file2.path().string());
@@ -126,7 +126,7 @@ TEST_CASE("package.duplicates")
 		REQUIRE(package_writer->commit());
 	}
 
-	const auto package = Yt::PackageReader::create(Yt::Source::from(package_file), Yt::PackageType::Ypq);
+	const auto package = Yt::PackageReader::create(Yt::Source::from(package_file));
 	REQUIRE(package);
 
 	auto packed_file = ::open_packed(*package, file.path().string());

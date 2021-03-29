@@ -4,18 +4,19 @@
 
 #pragma once
 
-#include <yttrium/storage/package.h>
+#include <memory>
+#include <string_view>
 
 namespace Yt
 {
 	class Buffer;
 	class Source;
 
-	///
+	//
 	class Storage
 	{
 	public:
-		///
+		//
 		enum class UseFileSystem
 		{
 			After,
@@ -23,23 +24,19 @@ namespace Yt
 			Never,
 		};
 
-		///
 		explicit Storage(UseFileSystem);
+		~Storage() noexcept;
 
-		///
-		~Storage();
-
-		/// Attaches a buffer to the storage.
+		// Attaches a buffer to the storage.
 		void attach_buffer(std::string_view, Buffer&&);
 
-		/// Attaches a package to the storage.
-		/// Throws MissingDataError if there is no such package.
-		void attach_package(const std::filesystem::path&, PackageType = PackageType::Auto);
+		// Attaches a package to the storage.
+		void attach_package(std::unique_ptr<Source>&&);
 
-		/// Opens a data source.
+		// Opens a data source.
 		std::unique_ptr<Source> open(std::string_view name) const;
 
 	private:
-		const std::unique_ptr<class StoragePrivate> _private;
+		const std::unique_ptr<class StorageData> _data;
 	};
 }

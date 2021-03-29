@@ -6,24 +6,24 @@
 
 #include <yttrium/base/buffer.h>
 #include <yttrium/base/exceptions.h>
+#include <yttrium/storage/package.h>
 #include <yttrium/storage/source.h>
 #include "source.h"
 
+#include <cassert>
 #include <list>
 #include <map>
 #include <variant>
 #include <vector>
 
-#include <fmt/format.h>
-
 // TODO: Hash-based packed file access.
 
 namespace Yt
 {
-	class StoragePrivate
+	class StorageData
 	{
 	public:
-		explicit StoragePrivate(Storage::UseFileSystem use_file_system)
+		explicit StorageData(Storage::UseFileSystem use_file_system)
 			: _use_file_system{ use_file_system }
 		{
 		}
@@ -96,30 +96,28 @@ namespace Yt
 	};
 
 	Storage::Storage(UseFileSystem use_file_system)
-		: _private{ std::make_unique<StoragePrivate>(use_file_system) }
+		: _data{ std::make_unique<StorageData>(use_file_system) }
 	{
 	}
 
-	Storage::~Storage() = default;
+	Storage::~Storage() noexcept = default;
 
 	void Storage::attach_buffer(std::string_view name, Buffer&& buffer)
 	{
-		_private->attach_buffer(name, std::move(buffer));
+		_data->attach_buffer(name, std::move(buffer));
 	}
 
-	void Storage::attach_package(const std::filesystem::path& path, PackageType type)
+	void Storage::attach_package(std::unique_ptr<Source>&& source)
 	{
-		auto source = Source::from(path);
-		if (!source)
-			throw MissingDataError{ fmt::format("Missing \"{}\"", path.string()) };
-		auto package = PackageReader::create(std::move(source), type);
+		assert(source);
+		auto package = PackageReader::create(std::move(source));
 		if (!package)
-			throw DataError{ fmt::format("Unable to load package \"{}\"", path.string()) };
-		_private->attach_package(std::move(package));
+			throw DataError{ "Unable to load package" };
+		_data->attach_package(std::move(package));
 	}
 
 	std::unique_ptr<Source> Storage::open(std::string_view name) const
 	{
-		return _private->open(name);
+		return _data->open(name);
 	}
 }
