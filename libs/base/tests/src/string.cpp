@@ -4,6 +4,8 @@
 
 #include <yttrium/base/string.h>
 
+#include <vector>
+
 #include <doctest.h>
 
 TEST_CASE("utils_string.from_chars.int32")
@@ -124,4 +126,32 @@ TEST_CASE("utils_string.from_chars.double")
 	CHECK(!from_chars("", d));
 	CHECK(!from_chars("1e", d));
 	CHECK(!from_chars("1eA", d));
+}
+
+TEST_CASE("string.strip")
+{
+	const auto check = [](const std::string& withoutSpace, const std::string& withSpace, const std::vector<std::string_view>& strings) {
+		for (const auto string : strings)
+		{
+			{
+				std::string stripped{ string };
+				Yt::strip(stripped, true);
+				CHECK(stripped == withoutSpace);
+			}
+			{
+				std::string stripped{ string };
+				Yt::strip(stripped, false);
+				CHECK(stripped == withSpace);
+			}
+		}
+	};
+	check("", "", { "", " ", "   " });
+	check("a", "a", { "a", " a" });
+	check("b", "b ", { "b ", " b " });
+	check("c d e", "c d e", { "c d e", " c d e" });
+	check("f g h", "f g h ", { "f g h ", " f g h " });
+	check("ijk", "ijk", { "ijk", "   ijk" });
+	check("lmn", "lmn ", { "lmn   ", "   lmn   " });
+	check("opq rst", "opq rst", { "opq   rst", "   opq   rst" });
+	check("uvw xyz", "uvw xyz ", { "uvw   xyz   ", "   uvw   xyz   " });
 }

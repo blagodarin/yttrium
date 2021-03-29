@@ -110,4 +110,23 @@ namespace Yt
 	{
 		return ::float_from_chars(string.data(), string.data() + string.size(), value);
 	}
+
+	void strip(std::string& string, bool removeTrailingSpace) noexcept
+	{
+		auto out = string.begin();
+		char last = '\0';
+		for (auto in = out; in != string.end(); ++in)
+		{
+			if (static_cast<unsigned char>(*in) > 0x20)
+				last = *in;
+			else if (static_cast<unsigned char>(last) > 0x20)
+				last = ' ';
+			else
+				continue;
+			*out++ = last;
+		}
+		if (removeTrailingSpace && last == ' ')
+			--out;
+		string.resize(static_cast<size_t>(out - string.begin()));
+	}
 }
