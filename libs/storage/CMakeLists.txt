@@ -5,9 +5,7 @@
 primal_set_folder(libs)
 source_group("src" REGULAR_EXPRESSION ".*\\.(h|cpp)$")
 source_group("src/formats" REGULAR_EXPRESSION "/src/formats/")
-source_group("src/platforms" REGULAR_EXPRESSION "/src/platforms/")
-source_group("src/platforms/posix" REGULAR_EXPRESSION "/src/platforms/posix/")
-source_group("src/platforms/windows" REGULAR_EXPRESSION "/src/platforms/windows/")
+source_group("src/platform" REGULAR_EXPRESSION "/src/platform/")
 source_group("include" REGULAR_EXPRESSION "/include/")
 add_library(Y_storage STATIC
 	include/yttrium/storage/package.h
@@ -17,7 +15,7 @@ add_library(Y_storage STATIC
 	include/yttrium/storage/storage.h
 	include/yttrium/storage/temporary.h
 	include/yttrium/storage/writer.h
-	src/platforms/file.h
+	src/file.h
 	src/formats/ypq.cpp
 	src/formats/ypq.h
 	src/package.cpp
@@ -38,18 +36,18 @@ endif()
 if(WIN32)
 	target_compile_definitions(Y_storage PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
 	target_sources(Y_storage PRIVATE
-		src/platforms/windows/file.cpp
-		src/platforms/windows/paths.cpp
-		src/platforms/windows/temporary.cpp
+		src/platform/windows/file.cpp
+		src/platform/windows/paths.cpp
+		src/platform/windows/temporary.cpp
 		)
 else()
 	target_sources(Y_storage PRIVATE
-		src/platforms/posix/file.cpp
-		src/platforms/posix/paths.cpp
-		src/platforms/posix/temporary.cpp
-		src/platforms/posix/temporary.h
+		src/platform/posix/file.cpp
+		src/platform/posix/paths.cpp
+		src/platform/posix/temporary.cpp
+		src/platform/posix/temporary.h
 		)
-	set_property(SOURCE src/platforms/posix/file.cpp APPEND PROPERTY COMPILE_DEFINITIONS _FILE_OFFSET_BITS=64)
+	set_property(SOURCE src/platform/posix/file.cpp APPEND PROPERTY COMPILE_DEFINITIONS _FILE_OFFSET_BITS=64)
 endif()
 primal_install(Y_storage EXPORT YttriumTargets)
 install(DIRECTORY include/yttrium DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})

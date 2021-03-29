@@ -8,7 +8,7 @@
 #include <yttrium/base/buffer.h>
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/temporary.h>
-#include "platforms/file.h"
+#include "file.h"
 
 #include <cassert>
 #include <cstring>
