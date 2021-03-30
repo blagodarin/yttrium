@@ -65,7 +65,7 @@ function(yttrium_target_package _target)
 		message(SEND_ERROR "'${_target}' is not a target")
 		return()
 	endif()
-	cmake_parse_arguments(_arg "" "GROUP;INDEX;OUTPUT" "DEPENDS" ${ARGN})
+	cmake_parse_arguments(_arg "EMBED" "GROUP;INDEX;OUTPUT" "DEPENDS" ${ARGN})
 	if(NOT _arg_INDEX)
 		message(SEND_ERROR "Missing INDEX")
 		return()
@@ -90,14 +90,27 @@ function(yttrium_target_package _target)
 		VERBATIM)
 	add_dependencies(${_target} ypack_${_output_identifier})
 	set_target_properties(ypack_${_output_identifier} PROPERTIES FOLDER "Yttrium")
-	add_custom_command(OUTPUT ${_absolute_output}
-		COMMAND ypack ${_relative_index} ${_absolute_output}
-		MAIN_DEPENDENCY ${_absolute_index}
-		COMMENT "Generating ${_relative_output}"
-		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-		VERBATIM)
-	target_sources(${_target} PRIVATE ${_absolute_index} ${_absolute_output})
-	source_group(${_arg_GROUP} FILES ${_absolute_index} ${_absolute_output})
+	if(_arg_EMBED)
+		add_custom_command(OUTPUT ${_absolute_output}.inc
+			COMMAND ypack ${_relative_index} ${_absolute_output}
+			COMMAND yembed --uint8 ${_absolute_output} ${_absolute_output}.inc
+			MAIN_DEPENDENCY ${_absolute_index} DEPENDS ypack yembed
+			COMMENT "Generating ${_absolute_output}.inc"
+			WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+			VERBATIM)
+		target_sources(${_target} PRIVATE ${_absolute_index})
+		source_group(${_arg_GROUP} FILES ${_absolute_index})
+		target_include_directories(${_target} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+	else()
+		add_custom_command(OUTPUT ${_absolute_output}
+			COMMAND ypack ${_relative_index} ${_absolute_output}
+			MAIN_DEPENDENCY ${_absolute_index} DEPENDS ypack
+			COMMENT "Generating ${_relative_output}"
+			WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+			VERBATIM)
+		target_sources(${_target} PRIVATE ${_absolute_index} ${_absolute_output})
+		source_group(${_arg_GROUP} FILES ${_absolute_index} ${_absolute_output})
+	endif()
 endfunction()
 
 function(append_options _variable)

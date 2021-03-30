@@ -4,6 +4,8 @@
 
 #include <yttrium/main.h>
 
+#include <array>
+#include <cstdio>
 #include <cstring>
 #include <filesystem>
 #include <fstream>
@@ -16,14 +18,27 @@ namespace
 	{
 		std::cerr
 			<< "Usage:\n"
-			<< "  yembed --string INPUT OUTPUT\n";
+			<< "  yembed --string INPUT OUTPUT\n"
+			<< "  yembed --uint8 INPUT OUTPUT\n";
 		return 1;
 	}
+
+	enum class Format
+	{
+		string,
+		uint8,
+	};
 }
 
 int ymain(int argc, char** argv)
 {
-	if (argc != 4 || std::strcmp(argv[1], "--string") != 0)
+	if (argc != 4)
+		return usage();
+
+	Format format = Format::string;
+	if (std::strcmp(argv[1], "--uint8") == 0)
+		format = Format::uint8;
+	else if (std::strcmp(argv[1], "--string") != 0)
 		return usage();
 
 	std::vector<char> buffer;
@@ -53,37 +68,61 @@ int ymain(int argc, char** argv)
 		return 1;
 	}
 
-	output << std::hex << '"';
-	bool newline = false; // To prevent "" at the end of newline-terminated files.
-	for (const auto c : buffer)
+	switch (format)
 	{
-		if (newline)
+	case Format::string: {
+		output << std::hex << '"';
+		bool newline = false; // To prevent "" at the end of newline-terminated files.
+		for (const auto c : buffer)
 		{
-			output << "\"\n\"";
-			newline = false;
+			if (newline)
+			{
+				output << "\"\n\"";
+				newline = false;
+			}
+			switch (c)
+			{
+			case '\0': output << "\\0"; break;
+			case '\a': output << "\\a"; break;
+			case '\b': output << "\\b"; break;
+			case '\t': output << "\\t"; break;
+			case '\n':
+				output << "\\n";
+				newline = true;
+				break;
+			case '\v': output << "\\v"; break;
+			case '\f': output << "\\f"; break;
+			case '\r': output << "\\r"; break;
+			case '"': output << "\\\""; break;
+			case '\\': output << "\\\\"; break;
+			default:
+				if (static_cast<unsigned char>(c) < 0x20)
+					output << "\\x" << ((c & 0xf0) >> 4) << (c & 0xf);
+				else
+					output << c;
+			}
 		}
-		switch (c)
-		{
-		case '\0': output << "\\0"; break;
-		case '\a': output << "\\a"; break;
-		case '\b': output << "\\b"; break;
-		case '\t': output << "\\t"; break;
-		case '\n':
-			output << "\\n";
-			newline = true;
-			break;
-		case '\v': output << "\\v"; break;
-		case '\f': output << "\\f"; break;
-		case '\r': output << "\\r"; break;
-		case '"': output << "\\\""; break;
-		case '\\': output << "\\\\"; break;
-		default:
-			if (static_cast<unsigned char>(c) < 0x20)
-				output << "\\x" << ((c & 0xf0) >> 4) << (c & 0xf);
-			else
-				output << c;
-		}
+		output << "\"\n";
+		break;
 	}
-	output << "\"\n";
+	case Format::uint8: {
+		std::array<char, 5> item;
+		std::string line;
+		for (const auto c : buffer)
+		{
+			const auto itemLength = static_cast<size_t>(std::snprintf(item.data(), item.size(), "%u,", unsigned{ static_cast<unsigned char>(c) }));
+			if (line.size() + itemLength >= 80)
+			{
+				line += '\n';
+				output << line;
+				line.clear();
+			}
+			line.append(item.data(), itemLength);
+		}
+		line += '\n';
+		output << line;
+		break;
+	}
+	}
 	return 0;
 }
