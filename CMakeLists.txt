@@ -213,7 +213,7 @@ add_subdirectory(libs/audio)
 add_subdirectory(libs/renderer)
 add_subdirectory(libs/gui)
 
-add_subdirectory(tools/ypack)
+add_subdirectory(tools/pack)
 add_subdirectory(tools/ytr)
 
 if(YTTRIUM_TESTS)
