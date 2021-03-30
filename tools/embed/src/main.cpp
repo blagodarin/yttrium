@@ -16,7 +16,7 @@ namespace
 	{
 		std::cerr
 			<< "Usage:\n"
-			<< "  yrc --string INPUT OUTPUT\n";
+			<< "  yembed --string INPUT OUTPUT\n";
 		return 1;
 	}
 }

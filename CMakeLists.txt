@@ -198,10 +198,12 @@ append_options(CMAKE_RC_FLAGS ${RC_FLAGS})
 append_options(CMAKE_SHARED_LINKER_FLAGS ${DYNAMIC_LINKER_FLAGS})
 append_options(CMAKE_STATIC_LINKER_FLAGS ${STATIC_LINKER_FLAGS})
 
+add_subdirectory(libs/main)
+
+add_subdirectory(tools/embed)
+
 add_subdirectory(libs/base)
 add_subdirectory(libs/storage)
-add_subdirectory(libs/main)
-add_subdirectory(tools/yrc)
 add_subdirectory(libs/geometry)
 add_subdirectory(libs/i18n)
 add_subdirectory(libs/image)

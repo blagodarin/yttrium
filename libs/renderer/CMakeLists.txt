@@ -63,9 +63,9 @@ if(YTTRIUM_RENDERER_OPENGL)
 		src/backend/opengl/wrappers.cpp
 		src/backend/opengl/wrappers.h
 		)
-	add_yrc_sources(Y_renderer
-		src/backend/opengl/2d_fs.glsl
-		src/backend/opengl/2d_vs.glsl
+	yttrium_embed(Y_renderer
+		GROUP "embed"
+		FILES src/backend/opengl/2d_fs.glsl src/backend/opengl/2d_vs.glsl
 		)
 	target_link_libraries(Y_renderer PRIVATE OpenGL::GL)
 	if(WIN32)
@@ -100,7 +100,8 @@ elseif(YTTRIUM_RENDERER_VULKAN)
 		src/backend/vulkan/wrappers.cpp
 		src/backend/vulkan/wrappers.h
 		)
-	add_yglslc_sources(Y_renderer
+	yttrium_embed_spirv(Y_renderer
+		GROUP "embed"
 		FRAGMENT src/backend/vulkan/2d_fs.glsl
 		VERTEX src/backend/vulkan/2d_vs.glsl
 		)
