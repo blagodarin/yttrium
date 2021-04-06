@@ -2,11 +2,7 @@
 // Copyright (C) Sergei Blagodarin.
 // SPDX-License-Identifier: Apache-2.0
 
-#include <yttrium/image/utils.h>
 #include "utils.h"
-
-#include <yttrium/image/image.h>
-#include <yttrium/image/color.h>
 
 #include <cstring>
 
@@ -138,23 +134,5 @@ namespace Yt
 			src += src_stride;
 			dst += dst_stride;
 		}
-	}
-
-	Buffer make_bgra32_tga(size_t width, size_t height, const std::function<Bgra32(size_t, size_t)>& callback)
-	{
-		Image image({ width, height, PixelFormat::Bgra32 });
-		for (size_t y = 0; y < height; ++y)
-		{
-			for (size_t x = 0; x < width; ++x)
-			{
-				const auto pixel = static_cast<uint8_t*>(image.data()) + y * image.info().stride() + x * 4;
-				const auto color = callback(x, y);
-				pixel[0] = color._b;
-				pixel[1] = color._g;
-				pixel[2] = color._r;
-				pixel[3] = color._a;
-			}
-		}
-		return image.to_buffer(ImageFormat::Tga);
 	}
 }

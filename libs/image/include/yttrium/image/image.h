@@ -106,8 +106,6 @@ namespace Yt
 			&& a.orientation() == b.orientation();
 	}
 
-	constexpr bool operator!=(const ImageInfo& a, const ImageInfo& b) noexcept { return !(a == b); }
-
 	///
 	class Image
 	{
@@ -136,6 +134,26 @@ namespace Yt
 
 		///
 		Buffer to_buffer(ImageFormat, int quality = 100) const;
+
+		///
+		template <typename Callback>
+		static Image generateBgra32(size_t width, size_t height, Callback&& callback)
+		{
+			Image image{ { width, height, PixelFormat::Bgra32 } };
+			for (size_t y = 0; y < height; ++y)
+			{
+				for (size_t x = 0; x < width; ++x)
+				{
+					const auto pixel = static_cast<uint8_t*>(image.data()) + y * image.info().stride() + x * 4;
+					const auto color = callback(x, y);
+					pixel[0] = color._b;
+					pixel[1] = color._g;
+					pixel[2] = color._r;
+					pixel[3] = color._a;
+				}
+			}
+			return image;
+		}
 
 		///
 		static bool transform(const ImageInfo&, const void* src_data, const ImageInfo&, void* dst_data) noexcept;

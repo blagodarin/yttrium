@@ -9,7 +9,6 @@ source_group("src/formats" REGULAR_EXPRESSION "/src/formats/")
 add_library(Y_image STATIC
 	include/yttrium/image/color.h
 	include/yttrium/image/image.h
-	include/yttrium/image/utils.h
 	src/formats.cpp
 	src/formats.h
 	src/image.cpp
