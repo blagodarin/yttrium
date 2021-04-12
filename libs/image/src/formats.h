@@ -26,10 +26,10 @@ namespace Yt
 #endif
 #if YTTRIUM_IMAGE_JPEG
 	bool read_jpeg(const void*, size_t, ImageInfo&, Buffer&);
-	bool write_jpeg(Writer&, const ImageInfo&, const void*, int quality);
+	bool write_jpeg(Writer&, const ImageInfo&, const void*, int compression);
 #endif
 #if YTTRIUM_IMAGE_PNG
-	bool write_png(Writer&, const ImageInfo&, const void*);
+	bool write_png(Writer&, const ImageInfo&, const void*, int compression);
 #endif
 #if YTTRIUM_IMAGE_TGA
 	bool read_tga_header(Reader&, ImageInfo&);

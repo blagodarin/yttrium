@@ -36,7 +36,7 @@ namespace
 				::jpeg_destroy_compress(&_compress);
 		}
 
-		bool compress(const Yt::ImageInfo& info, const void* data, int quality) noexcept
+		bool compress(const Yt::ImageInfo& info, const void* data, int compression) noexcept
 		{
 			assert(!_created);
 			if (info.orientation() != Yt::ImageOrientation::XRightYDown && info.orientation() != Yt::ImageOrientation::XRightYUp)
@@ -80,7 +80,7 @@ namespace
 			::jpeg_set_defaults(&_compress);
 			_compress.optimize_coding = TRUE;
 			_compress.dct_method = JDCT_ISLOW;
-			::jpeg_set_quality(&_compress, quality, TRUE);
+			::jpeg_set_quality(&_compress, 100 - compression, TRUE);
 			::jpeg_start_compress(&_compress, TRUE);
 			if (info.orientation() == Yt::ImageOrientation::XRightYDown)
 				for (auto row = static_cast<const JSAMPLE*>(data); _compress.next_scanline < _compress.image_height; row += info.stride())

@@ -62,12 +62,12 @@ namespace Yt
 	{
 	}
 
-	bool Image::save(Writer&& writer, ImageFormat format, int quality) const
+	bool Image::save(Writer&& writer, ImageFormat format, int compression) const
 	{
-		return write_image(std::move(writer), format, quality, _info, _buffer.data());
+		return write_image(std::move(writer), format, compression, _info, _buffer.data());
 	}
 
-	bool Image::save_as_screenshot(ImageFormat format, int quality) const
+	bool Image::save_as_screenshot(ImageFormat format, int compression) const
 	{
 		const auto time = std::time(nullptr);
 		::tm tm;
@@ -79,13 +79,13 @@ namespace Yt
 		std::array<char, 24> buffer;
 		const auto offset = std::strftime(buffer.data(), buffer.size(), "%Y-%m-%d_%H-%M-%S", &tm);
 		std::snprintf(buffer.data() + offset, buffer.size() - offset, "%s", ::image_extension(format));
-		return write_image(Writer{ screenshots_path() / buffer.data() }, format, quality, _info, _buffer.data());
+		return write_image(Writer{ screenshots_path() / buffer.data() }, format, compression, _info, _buffer.data());
 	}
 
-	Buffer Image::to_buffer(ImageFormat format, int quality) const
+	Buffer Image::to_buffer(ImageFormat format, int compression) const
 	{
 		Buffer buffer;
-		return write_image(Writer{ buffer }, format, quality, _info, _buffer.data()) ? std::move(buffer) : Buffer{};
+		return write_image(Writer{ buffer }, format, compression, _info, _buffer.data()) ? std::move(buffer) : Buffer{};
 	}
 
 	bool Image::transform(const ImageInfo& src_info, const void* src_data, const ImageInfo& dst_info, void* dst_data) noexcept

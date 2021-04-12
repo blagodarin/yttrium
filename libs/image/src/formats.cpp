@@ -107,16 +107,16 @@ namespace Yt
 #endif
 	}
 
-	bool write_image(Writer&& writer, ImageFormat format, [[maybe_unused]] int quality, const ImageInfo& info, const void* data)
+	bool write_image(Writer&& writer, ImageFormat format, [[maybe_unused]] int compression, const ImageInfo& info, const void* data)
 	{
 #if YTTRIUM_IMAGE_JPEG || YTTRIUM_IMAGE_PNG || YTTRIUM_IMAGE_TGA
 		switch (format)
 		{
 #	if YTTRIUM_IMAGE_JPEG
-		case ImageFormat::Jpeg: return write_jpeg(writer, info, data, std::clamp(quality, 0, 100));
+		case ImageFormat::Jpeg: return write_jpeg(writer, info, data, std::clamp(compression, 0, 100));
 #	endif
 #	if YTTRIUM_IMAGE_PNG
-		case ImageFormat::Png: return write_png(writer, info, data);
+		case ImageFormat::Png: return write_png(writer, info, data, std::clamp(compression, 0, 100));
 #	endif
 #	if YTTRIUM_IMAGE_TGA
 		case ImageFormat::Tga: return write_tga(writer, info, data);

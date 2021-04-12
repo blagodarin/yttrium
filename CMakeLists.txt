@@ -6,6 +6,7 @@ cmake_minimum_required(VERSION 3.19)
 
 project(Yttrium VERSION 0.0.1 LANGUAGES CXX)
 
+include(CMakeDependentOption)
 include(FetchContent)
 include(GNUInstallDirs)
 
@@ -22,12 +23,13 @@ option(YTTRIUM_IMAGE_BMP "Enable BMP image support" OFF)
 option(YTTRIUM_IMAGE_DDS "Enable DDS image support" OFF)
 option(YTTRIUM_IMAGE_ICO "Enable ICO image support" OFF)
 option(YTTRIUM_IMAGE_JPEG "Enable JPEG image support (requires libjpeg)" OFF)
-option(YTTRIUM_IMAGE_PNG "Enable PNG image support (built-in, write-only, no compression)" OFF)
+option(YTTRIUM_IMAGE_PNG "Enable PNG image support (write only)" OFF)
 option(YTTRIUM_IMAGE_TGA "Enable TGA image support (requires libjpeg)" OFF)
+cmake_dependent_option(YTTRIUM_COMPRESSION_ZLIB "Enable zlib compression support" OFF "NOT YTTRIUM_IMAGE_PNG" ON)
 
 set(AULOS_AULOSPLAY ON)
 set(AULOS_STATIC_RUNTIME ON)
-FetchContent_Declare(Primal GIT_REPOSITORY https://github.com/blagodarin/primal.git GIT_TAG 79b19d63aee0906c7559f3e2b7a434b3919f889a)
+FetchContent_Declare(Primal GIT_REPOSITORY https://github.com/blagodarin/primal.git GIT_TAG 1fd803fa863118d05311b97b0cc3c62c6c649b11)
 FetchContent_Declare(Aulos GIT_REPOSITORY https://github.com/blagodarin/aulos.git GIT_TAG fb61518c53483bd29b16659fd9099a0e8315f33f)
 FetchContent_MakeAvailable(Primal Aulos)
 
@@ -43,21 +45,30 @@ if(NOT YTTRIUM_SUBPROJECT)
 	option(YTTRIUM_TESTS "Build tests" OFF)
 endif()
 
-primal_provide_fmt(fmt_ROOT STATIC_RUNTIME ON)
-find_package(fmt REQUIRED)
-if(WIN32)
-	primal_provide_freetype(Freetype_ROOT STATIC_RUNTIME ON)
-else()
+find_package(Threads REQUIRED)
+if(NOT WIN32)
 	find_package(PkgConfig REQUIRED)
 endif()
+
+# fmt
+primal_provide_fmt(fmt_ROOT STATIC_RUNTIME ON)
+find_package(fmt REQUIRED)
+
+# Freetype
+if(WIN32)
+	primal_provide_freetype(Freetype_ROOT STATIC_RUNTIME ON)
+endif()
 find_package(Freetype REQUIRED)
-find_package(Threads REQUIRED)
+
+# JPEG
 if(YTTRIUM_IMAGE_JPEG)
 	if(WIN32)
 		primal_provide_jpeg(JPEG_ROOT STATIC_RUNTIME ON)
 	endif()
 	find_package(JPEG REQUIRED)
 endif()
+
+# Vorbis
 if(YTTRIUM_AUDIO_OGGVORBIS)
 	if(WIN32)
 		primal_provide_ogg(Ogg_ROOT STATIC_RUNTIME ON)
@@ -67,6 +78,14 @@ if(YTTRIUM_AUDIO_OGGVORBIS)
 		pkg_check_modules(vorbisfile REQUIRED IMPORTED_TARGET vorbisfile)
 		add_library(Vorbis::vorbisfile ALIAS PkgConfig::vorbisfile)
 	endif()
+endif()
+
+# ZLIB
+if(YTTRIUM_COMPRESSION_ZLIB)
+	if(WIN32)
+		primal_provide_zlib(ZLIB_ROOT STATIC_RUNTIME ON)
+	endif()
+	find_package(ZLIB REQUIRED)
 endif()
 
 get_target_architecture(_target_arch)

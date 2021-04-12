@@ -7,8 +7,14 @@
 #include <yttrium/storage/writer.h>
 #include "../formats.h"
 
+#include <primal/buffer.hpp>
+
 #include <array>
+#include <cstring>
 #include <limits>
+
+#define ZLIB_CONST
+#include <zlib.h>
 
 namespace
 {
@@ -57,7 +63,7 @@ namespace
 
 #pragma pack(push, 1)
 
-	struct PngPrefix
+	struct PngHeader
 	{
 		uint64_t signature;
 		struct
@@ -68,11 +74,11 @@ namespace
 			{
 				uint32_t width;
 				uint32_t height;
-				uint8_t bit_depth;
-				PngColorType color_type;
-				PngCompressionMethod compression_method;
-				PngFilterMethod filter_method;
-				PngInterlaceMethod interlace_method;
+				uint8_t bitDepth;
+				PngColorType colorType;
+				PngCompressionMethod compressionMethod;
+				PngFilterMethod filterMethod;
+				PngInterlaceMethod interlaceMethod;
 			} data;
 			uint32_t crc;
 		} ihdr;
@@ -83,7 +89,7 @@ namespace
 		} idat;
 	};
 
-	struct PngSuffix
+	struct PngFooter
 	{
 		struct
 		{
@@ -157,52 +163,11 @@ namespace
 			0xb3667a2e, 0xc4614ab8, 0x5d681b02, 0x2a6f2b94, 0xb40bbe37, 0xc30c8ea1, 0x5a05df1b, 0x2d02ef8d
 		};
 	};
-
-	constexpr uint32_t adler32(const void* data, size_t size, uint32_t base = 1) noexcept
-	{
-		auto s1 = base & 0xffff;
-		auto s2 = base >> 16;
-		auto stride = size % 5552;
-		for (size_t i = 0; i < size;)
-		{
-			for (size_t j = 0; j < stride; ++j)
-			{
-				s1 += static_cast<const uint8_t*>(data)[i + j];
-				s2 += s1;
-			}
-			s1 %= 65521;
-			s2 %= 65521;
-			i += stride;
-			stride = 5552;
-		}
-		return (s2 << 16) + s1;
-	}
-
-	Yt::Buffer make_zlib_buffer(const void* data, size_t size)
-	{
-		constexpr size_t max_block_bytes = 65535;
-		Yt::Buffer buffer;
-		buffer.reserve(size + 2 + (size + max_block_bytes - 1) / max_block_bytes * 5 + 4);
-		Yt::Writer writer{ buffer };
-		writer.write(Yt::swap_bytes(uint16_t{ 0x7801 })); // Deflate algorithm, 32 KiB window, no compression.
-		for (size_t offset = 0; offset < size;)
-		{
-			const auto remaining_bytes = size - offset;
-			const auto block_bytes = remaining_bytes > max_block_bytes ? max_block_bytes : remaining_bytes;
-			writer.write(static_cast<uint8_t>(block_bytes == remaining_bytes));
-			writer.write(static_cast<uint16_t>(block_bytes));
-			writer.write(static_cast<uint16_t>(~block_bytes));
-			writer.write(static_cast<const std::byte*>(data) + offset, block_bytes);
-			offset += block_bytes;
-		}
-		writer.write(Yt::swap_bytes(::adler32(data, size)));
-		return buffer;
-	}
 }
 
 namespace Yt
 {
-	bool write_png(Writer& writer, const ImageInfo& info, const void* data)
+	bool write_png(Writer& writer, const ImageInfo& info, const void* data, int compression)
 	{
 		if (info.orientation() != ImageOrientation::XRightYDown && info.orientation() != ImageOrientation::XRightYUp)
 			return false;
@@ -213,68 +178,86 @@ namespace Yt
 		if (!info.height() || info.height() > std::numeric_limits<uint32_t>::max())
 			return false;
 
-		PixelFormat pixel_format;
-
-		PngPrefix prefix;
-		prefix.signature = PngSignature;
-		prefix.ihdr.length = swap_bytes(uint32_t{ sizeof prefix.ihdr.data });
-		prefix.ihdr.type = PngChunkType::IHDR;
-		prefix.ihdr.data.width = swap_bytes(static_cast<uint32_t>(info.width()));
-		prefix.ihdr.data.height = swap_bytes(static_cast<uint32_t>(info.height()));
-		prefix.ihdr.data.bit_depth = 8;
+		PixelFormat uncompressedPixelFormat;
+		PngColorType pngColorType;
 		switch (info.pixel_format())
 		{
 		case PixelFormat::Gray8:
-			prefix.ihdr.data.color_type = PngColorType::Grayscale;
-			pixel_format = PixelFormat::Gray8;
+			uncompressedPixelFormat = PixelFormat::Gray8;
+			pngColorType = PngColorType::Grayscale;
 			break;
 		case PixelFormat::GrayAlpha16:
-			prefix.ihdr.data.color_type = PngColorType::GrayscaleAlpha;
-			pixel_format = PixelFormat::GrayAlpha16;
+			uncompressedPixelFormat = PixelFormat::GrayAlpha16;
+			pngColorType = PngColorType::GrayscaleAlpha;
 			break;
 		case PixelFormat::Rgb24:
 		case PixelFormat::Bgr24:
-			prefix.ihdr.data.color_type = PngColorType::Truecolor;
-			pixel_format = PixelFormat::Rgb24;
+			uncompressedPixelFormat = PixelFormat::Rgb24;
+			pngColorType = PngColorType::Truecolor;
 			break;
 		case PixelFormat::Rgba32:
 		case PixelFormat::Bgra32:
-			prefix.ihdr.data.color_type = PngColorType::TruecolorAlpha;
-			pixel_format = PixelFormat::Rgba32;
+			uncompressedPixelFormat = PixelFormat::Rgba32;
+			pngColorType = PngColorType::TruecolorAlpha;
 			break;
 		default:
 			return false;
 		}
-		prefix.ihdr.data.compression_method = PngCompressionMethod::Zlib;
-		prefix.ihdr.data.filter_method = PngFilterMethod::Standard;
-		prefix.ihdr.data.interlace_method = PngInterlaceMethod::None;
-		prefix.ihdr.crc = swap_bytes(Crc32{}.process(&prefix.ihdr.type, sizeof prefix.ihdr.type).process(&prefix.ihdr.data, sizeof prefix.ihdr.data).value());
-		prefix.idat.length = 0;
-		prefix.idat.type = PngChunkType::IDAT;
 
-		const auto pixel_size = ImageInfo::pixel_size(pixel_format);
-		const auto stride = 1 + info.width() * pixel_size;
-		ImageInfo png_info{ info.width(), info.height(), stride, pixel_format, ImageOrientation::XRightYDown };
+		const auto stride = 1 + info.width() * ImageInfo::pixel_size(uncompressedPixelFormat);
+		ImageInfo pngInfo{ info.width(), info.height(), stride, uncompressedPixelFormat, ImageOrientation::XRightYDown };
 
-		Buffer image_buffer{ png_info.frame_size() };
-		if (!Image::transform(info, data, png_info, image_buffer.begin() + 1))
+		const auto uncompressedSize = pngInfo.frame_size();
+		primal::Buffer<uint8_t> uncompressedBuffer{ uncompressedSize };
+		if (!Image::transform(info, data, pngInfo, uncompressedBuffer.data() + 1))
 			return false;
 
-		for (size_t i = 0; i < image_buffer.size(); i += stride)
-			image_buffer[i] = to_underlying(PngStandardFilterType::None);
+		for (size_t i = 0; i < uncompressedSize; i += stride)
+			uncompressedBuffer.data()[i] = to_underlying(PngStandardFilterType::None);
 
-		const auto compressed_buffer = make_zlib_buffer(image_buffer.data(), image_buffer.size());
-		prefix.idat.length = swap_bytes(static_cast<uint32_t>(compressed_buffer.size()));
+		struct ZlibCompressor : z_stream
+		{
+			ZlibCompressor() noexcept { std::memset(this, 0, sizeof(z_stream)); }
+			~ZlibCompressor() noexcept { ::deflateEnd(this); }
+		} compressor;
 
-		PngSuffix suffix;
-		suffix.idat.crc = swap_bytes(Crc32{}.process(&prefix.idat.type, sizeof prefix.idat.type).process(compressed_buffer.data(), compressed_buffer.size()).value());
-		suffix.iend.length = 0;
-		suffix.iend.type = PngChunkType::IEND;
-		suffix.iend.crc = swap_bytes(Crc32{}.process(&suffix.iend.type, sizeof suffix.iend.type).value());
+		if (deflateInit(&compressor, (compression + 5) / 11) != Z_OK)
+			return false;
 
-		return writer.try_reserve(sizeof prefix + compressed_buffer.size() + sizeof suffix)
-			&& writer.write(prefix)
-			&& writer.write(compressed_buffer.data(), compressed_buffer.size())
-			&& writer.write(suffix);
+		primal::Buffer<uint8_t> compressedBuffer{ ::deflateBound(&compressor, static_cast<uLong>(uncompressedSize)) };
+		compressor.next_in = uncompressedBuffer.data();
+		compressor.avail_in = static_cast<uInt>(uncompressedSize);
+		compressor.next_out = compressedBuffer.data();
+		compressor.avail_out = static_cast<uInt>(compressedBuffer.capacity());
+		if (::deflate(&compressor, Z_FINISH) != Z_STREAM_END)
+			return false;
+
+		const auto compressedSize = compressedBuffer.capacity() - compressor.avail_out;
+
+		PngHeader header;
+		header.signature = PngSignature;
+		header.ihdr.length = swap_bytes(uint32_t{ sizeof header.ihdr.data }); // TODO: Use something like 'to_big_endian' instaed of 'swap_bytes'.
+		header.ihdr.type = PngChunkType::IHDR;
+		header.ihdr.data.width = swap_bytes(static_cast<uint32_t>(info.width()));
+		header.ihdr.data.height = swap_bytes(static_cast<uint32_t>(info.height()));
+		header.ihdr.data.bitDepth = 8;
+		header.ihdr.data.colorType = pngColorType;
+		header.ihdr.data.compressionMethod = PngCompressionMethod::Zlib;
+		header.ihdr.data.filterMethod = PngFilterMethod::Standard;
+		header.ihdr.data.interlaceMethod = PngInterlaceMethod::None;
+		header.ihdr.crc = swap_bytes(Crc32{}.process(&header.ihdr.type, sizeof header.ihdr.type).process(&header.ihdr.data, sizeof header.ihdr.data).value());
+		header.idat.length = swap_bytes(static_cast<uint32_t>(compressedSize));
+		header.idat.type = PngChunkType::IDAT;
+
+		PngFooter footer;
+		footer.idat.crc = swap_bytes(Crc32{}.process(&header.idat.type, sizeof header.idat.type).process(compressedBuffer.data(), compressedSize).value());
+		footer.iend.length = 0;
+		footer.iend.type = PngChunkType::IEND;
+		footer.iend.crc = swap_bytes(Crc32{}.process(&footer.iend.type, sizeof footer.iend.type).value());
+
+		return writer.try_reserve(sizeof header + compressedSize + sizeof footer)
+			&& writer.write(header)
+			&& writer.write(compressedBuffer.data(), compressedSize) == compressedSize
+			&& writer.write(footer);
 	}
 }
