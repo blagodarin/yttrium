@@ -6,7 +6,8 @@
 
 #include <yttrium/base/exceptions.h>
 #include <yttrium/storage/source.h>
-#include "formats/ypq.h"
+#include "formats/yp_format.h"
+#include "formats/yp_reader.h"
 #include "package.h"
 
 #include <fmt/format.h>
@@ -19,25 +20,8 @@ namespace Yt
 	{
 		assert(source);
 		uint32_t magic = 0;
-		if (source->read_at(0, magic) && magic == kYpqSignature)
-			return std::make_unique<YpqReader>(std::move(source));
+		if (source->read_at(0, magic) && magic == YpFileHeader::kSignature)
+			return std::make_unique<YpReader>(std::move(source));
 		throw DataError{ "Unknown package format" };
-	}
-
-	std::unique_ptr<PackageWriter> PackageWriter::create(const std::filesystem::path& path, PackageType type)
-	{
-		if (type == PackageType::Auto)
-		{
-			if (path.extension() == ".ypq")
-				type = PackageType::Ypq;
-			else
-				return {};
-		}
-		Writer writer{ path };
-		if (!writer)
-			return {};
-		if (type == PackageType::Ypq)
-			return std::make_unique<YpqWriter>(std::move(writer));
-		return {};
 	}
 }

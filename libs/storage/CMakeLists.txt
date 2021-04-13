@@ -15,9 +15,12 @@ add_library(Y_storage STATIC
 	include/yttrium/storage/storage.h
 	include/yttrium/storage/temporary.h
 	include/yttrium/storage/writer.h
+	include/yttrium/storage/yp_writer.h
 	src/file.h
-	src/formats/ypq.cpp
-	src/formats/ypq.h
+	src/formats/yp_format.h
+	src/formats/yp_reader.cpp
+	src/formats/yp_reader.h
+	src/formats/yp_writer.cpp
 	src/package.cpp
 	src/package.h
 	src/reader.cpp

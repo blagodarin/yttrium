@@ -7,6 +7,7 @@
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/temporary.h>
 #include <yttrium/storage/writer.h>
+#include <yttrium/storage/yp_writer.h>
 
 #include <array>
 #include <cstring>
@@ -45,12 +46,11 @@ TEST_CASE("package")
 	Yt::TemporaryFile package_file;
 
 	{
-		const auto package_writer = Yt::PackageWriter::create(package_file.path(), Yt::PackageType::Ypq);
-		REQUIRE(package_writer);
-		REQUIRE(package_writer->add(file1.path().string()));
-		REQUIRE(package_writer->add(file2.path().string()));
-		REQUIRE(package_writer->add(file3.path().string()));
-		REQUIRE(package_writer->commit());
+		Yt::YpWriter package_writer{ Yt::Writer{ package_file } };
+		REQUIRE(package_writer.add(file1.path().string()));
+		REQUIRE(package_writer.add(file2.path().string()));
+		REQUIRE(package_writer.add(file3.path().string()));
+		REQUIRE(package_writer.commit());
 	}
 
 	std::unique_ptr<Yt::Source> packed_file1;
@@ -93,12 +93,11 @@ TEST_CASE("package.file_size")
 
 	Yt::TemporaryFile package_file;
 	{
-		const auto package_writer = Yt::PackageWriter::create(package_file.path(), Yt::PackageType::Ypq);
-		REQUIRE(package_writer);
-		REQUIRE(package_writer->add(file1.path().string()));
-		REQUIRE(package_writer->add(file2.path().string()));
-		REQUIRE(package_writer->add(file3.path().string()));
-		REQUIRE(package_writer->commit());
+		Yt::YpWriter package_writer{ Yt::Writer{ package_file } };
+		REQUIRE(package_writer.add(file1.path().string()));
+		REQUIRE(package_writer.add(file2.path().string()));
+		REQUIRE(package_writer.add(file3.path().string()));
+		REQUIRE(package_writer.commit());
 	}
 
 	const auto package = Yt::PackageReader::create(Yt::Source::from(package_file));
@@ -117,13 +116,12 @@ TEST_CASE("package.duplicates")
 	Yt::TemporaryFile package_file;
 	Yt::TemporaryFile file;
 	{
-		const auto package_writer = Yt::PackageWriter::create(package_file.path(), Yt::PackageType::Ypq);
-		REQUIRE(package_writer);
+		Yt::YpWriter package_writer{ Yt::Writer{ package_file } };
 		Yt::Writer{ file }.write_all(Yt::Buffer{ 1, "1" });
-		REQUIRE(package_writer->add(file.path().string()));
+		REQUIRE(package_writer.add(file.path().string()));
 		Yt::Writer{ file }.write_all(Yt::Buffer{ 2, "23" });
-		REQUIRE(package_writer->add(file.path().string()));
-		REQUIRE(package_writer->commit());
+		REQUIRE(package_writer.add(file.path().string()));
+		REQUIRE(package_writer.commit());
 	}
 
 	const auto package = Yt::PackageReader::create(Yt::Source::from(package_file));
