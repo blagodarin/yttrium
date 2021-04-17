@@ -10,8 +10,6 @@
 #include "formats/yp_reader.h"
 #include "package.h"
 
-#include <fmt/format.h>
-
 #include <cassert>
 
 namespace Yt
@@ -20,7 +18,7 @@ namespace Yt
 	{
 		assert(source);
 		uint32_t magic = 0;
-		if (source->read_at(0, magic) && magic == YpFileHeader::kSignature)
+		if (source->read_at(0, magic) && magic == YpPackageHeader::kSignature)
 			return std::make_unique<YpReader>(std::move(source));
 		throw DataError{ "Unknown package format" };
 	}

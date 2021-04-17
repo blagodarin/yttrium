@@ -5,8 +5,8 @@
 #pragma once
 
 #include <memory>
+#include <span>
 #include <string_view>
-#include <vector>
 
 namespace Yt
 {
@@ -22,7 +22,7 @@ namespace Yt
 		virtual ~PackageReader() = default;
 
 		///
-		virtual const std::vector<std::string_view>& names() const = 0;
+		virtual std::span<const std::string_view> names() const = 0;
 
 		///
 		virtual std::unique_ptr<Source> open(size_t index) const = 0;

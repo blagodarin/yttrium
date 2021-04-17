@@ -31,7 +31,7 @@ add_library(Y_storage STATIC
 	src/writer.h
 	)
 target_include_directories(Y_storage PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-target_link_libraries(Y_storage PRIVATE Y_base primal fmt::fmt)
+target_link_libraries(Y_storage PRIVATE Y_base primal)
 set_target_properties(Y_storage PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 	set_property(SOURCE src/writer.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-tautological-type-limit-compare)

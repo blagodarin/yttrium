@@ -8,24 +8,32 @@
 
 namespace Yt
 {
-#pragma pack(push, 1)
-
-	struct YpFileHeader
+	enum class YpCompression : uint8_t
 	{
-		uint32_t _signature = 0;
-		uint32_t _reserved = 0;
-		uint32_t _indexSize = 0;
-		uint32_t _entryCount = 0;
-
-		static constexpr auto kSignature = make_cc('\xDF', 'Y', 'P', '\xDA');
+		None,
 	};
 
-	struct YpFileEntry
+#pragma pack(push, 1)
+
+	struct YpBlockEntry
 	{
-		uint64_t _dataOffset = 0;
-		uint32_t _dataSize = 0;
-		uint32_t _metadataOffset = 0;
+		uint32_t _compressedSize = 0;
+		uint32_t _uncompressedSize = 0;
+	};
+
+	struct YpPackageHeader
+	{
+		static constexpr auto kSignature = make_cc('\xDF', 'Y', 'P', '\x01'); // The last byte specifies format version.
+
+		uint32_t _signature = kSignature;
+		uint16_t _fileCount = 0;
+		YpCompression _compression = YpCompression::None;
+		uint8_t _reserved = 0;
+		YpBlockEntry _indexBlock;
 	};
 
 #pragma pack(pop)
+
+	static_assert(sizeof(YpPackageHeader) == 16);
+	static_assert(sizeof(YpBlockEntry) == 8);
 }

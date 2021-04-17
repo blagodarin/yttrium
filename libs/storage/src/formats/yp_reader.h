@@ -7,6 +7,7 @@
 #include <yttrium/storage/package.h>
 
 #include <primal/buffer.hpp>
+#include <primal/rigid_vector.hpp>
 
 #include <vector>
 
@@ -18,15 +19,15 @@ namespace Yt
 		explicit YpReader(std::unique_ptr<Source>&&);
 		~YpReader() override;
 
-		const std::vector<std::string_view>& names() const override { return _names; }
+		std::span<const std::string_view> names() const override { return { _names.data(), _names.size() }; }
 		std::unique_ptr<Source> open(std::size_t) const override;
 
 	private:
 		struct Entry;
 
 		const std::shared_ptr<const Source> _source;
-		primal::Buffer<char> _metadataBuffer;
-		std::vector<std::string_view> _names;
-		std::vector<Entry> _entries;
+		primal::RigidVector<Entry> _entries;
+		primal::RigidVector<std::string_view> _names;
+		primal::Buffer<uint8_t> _indexBuffer; // TODO: Store only metadata part of the index.
 	};
 }

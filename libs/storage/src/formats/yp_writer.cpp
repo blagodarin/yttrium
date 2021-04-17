@@ -9,6 +9,7 @@
 #include <yttrium/storage/writer.h>
 #include "yp_format.h"
 
+#include <limits>
 #include <vector>
 
 namespace Yt
@@ -37,7 +38,7 @@ namespace Yt
 
 	bool YpWriter::add(const std::string& path)
 	{
-		if (_data->_committed)
+		if (_data->_committed || _data->_entries.size() == std::numeric_limits<uint16_t>::max())
 			return false;
 		_data->_entries.emplace_back(path);
 		return true;
@@ -46,63 +47,51 @@ namespace Yt
 	bool YpWriter::commit()
 	{
 		if (std::exchange(_data->_committed, true))
-			return false;
+			return _data->_finished;
 
-		std::vector<YpFileEntry> entries;
+		std::vector<YpBlockEntry> indexBlocks;
+		indexBlocks.reserve(_data->_entries.size());
 
-		const auto metadataOffset = sizeof(YpFileHeader) + sizeof(YpFileEntry) * _data->_entries.size();
+		Buffer nameBuffer;
+		Writer nameWriter{ nameBuffer };
+		const auto writeName = [&nameWriter](const std::string& value) {
+			const auto size = static_cast<uint8_t>(value.size());
+			return size == value.size() && nameWriter.write(size) && nameWriter.write(value.data(), size) == size;
+		};
 
-		Buffer metadataBuffer;
-		{
-			Writer writer{ metadataBuffer };
+		const auto packageHeaderOffset = _data->_writer.offset();
 
-			const auto write_string = [&writer](const std::string& value) {
-				const auto size = static_cast<uint8_t>(value.size()); //-V1029
-				return size == value.size() && writer.write(size) && writer.write(value.data(), size);
-			};
-
-			for (const auto& entry : _data->_entries)
-			{
-				entries.emplace_back()._metadataOffset = static_cast<uint32_t>(metadataOffset + writer.offset());
-				if (!write_string(entry._name))
-					return false;
-			}
-		}
-
-		const auto dataOffset = metadataOffset + metadataBuffer.size();
-
-		for (auto& entry : entries)
-			entry._dataOffset = dataOffset;
-
-		YpFileHeader header;
-		header._signature = YpFileHeader::kSignature;
-		header._entryCount = static_cast<uint32_t>(_data->_entries.size());
-		header._indexSize = static_cast<uint32_t>(dataOffset);
+		YpPackageHeader header;
+		header._fileCount = static_cast<uint16_t>(_data->_entries.size());
 		if (!_data->_writer.write(header))
-			return false;
-
-		if (_data->_writer.write(entries.data(), entries.size() * sizeof(YpFileEntry)) != entries.size() * sizeof(YpFileEntry))
-			return false;
-
-		if (_data->_writer.write(metadataBuffer.data(), metadataBuffer.size()) != metadataBuffer.size())
 			return false;
 
 		for (const auto& entry : _data->_entries)
 		{
+			if (!writeName(entry._name))
+				return false;
 			const auto source = Source::from(entry._name);
 			if (!source)
 				return false;
-			const auto i = static_cast<size_t>(&entry - _data->_entries.data());
-			entries[i]._dataOffset = _data->_writer.offset();
-			entries[i]._dataSize = static_cast<uint32_t>(source->size());
-			if (entries[i]._dataSize != source->size())
-				return false;
+			auto& block = indexBlocks.emplace_back();
+			block._uncompressedSize = static_cast<uint32_t>(source->size());
+			block._compressedSize = block._uncompressedSize;
 			if (!_data->_writer.write_all(*source))
 				return false;
 		}
 
-		_data->_writer.seek(sizeof(YpFileHeader));
-		if (_data->_writer.write(entries.data(), entries.size() * sizeof(YpFileEntry)) != entries.size() * sizeof(YpFileEntry))
+		if (!_data->_writer.write_all(indexBlocks.data(), indexBlocks.size() * sizeof(YpBlockEntry))
+			|| !_data->_writer.write_all(nameBuffer.data(), nameBuffer.size()))
+			return false;
+
+		const auto uncompressedIndexSize = indexBlocks.size() * sizeof(YpBlockEntry) + nameBuffer.size();
+		if (uncompressedIndexSize > std::numeric_limits<uint32_t>::max())
+			return false;
+
+		header._indexBlock._uncompressedSize = static_cast<uint32_t>(uncompressedIndexSize);
+		header._indexBlock._compressedSize = header._indexBlock._uncompressedSize;
+		_data->_writer.seek(packageHeaderOffset);
+		if (!_data->_writer.write(header))
 			return false;
 
 		_data->_finished = true;
