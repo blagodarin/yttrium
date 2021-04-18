@@ -5,9 +5,12 @@
 #include <yttrium/storage/yp_writer.h>
 
 #include <yttrium/base/buffer.h>
+#include <yttrium/storage/compressor.h>
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/writer.h>
 #include "yp_format.h"
+
+#include <primal/buffer.hpp>
 
 #include <limits>
 #include <vector>
@@ -27,11 +30,22 @@ namespace Yt
 		std::vector<YpWriterEntry> _entries;
 		bool _committed = false;
 		bool _finished = false;
+		YpCompression _compression = YpCompression::None;
+		std::unique_ptr<Compressor> _compressor;
+		int _compressionLevel = 0;
+
+		explicit YpWriterData(Writer&& writer) noexcept
+			: _writer{ std::move(writer) } {}
 	};
 
 	YpWriter::YpWriter(Writer&& writer)
 		: _data{ std::make_unique<YpWriterData>(std::move(writer)) }
 	{
+#if YTTRIUM_COMPRESSION_ZLIB
+		_data->_compression = YpCompression::Zlib;
+		_data->_compressor = Compressor::zlib();
+		_data->_compressionLevel = 9;
+#endif
 	}
 
 	YpWriter::~YpWriter() noexcept = default;
@@ -63,6 +77,7 @@ namespace Yt
 
 		YpPackageHeader header;
 		header._fileCount = static_cast<uint16_t>(_data->_entries.size());
+		header._compression = _data->_compression;
 		if (!_data->_writer.write(header))
 			return false;
 
@@ -75,9 +90,34 @@ namespace Yt
 				return false;
 			auto& block = indexBlocks.emplace_back();
 			block._uncompressedSize = static_cast<uint32_t>(source->size());
-			block._compressedSize = block._uncompressedSize;
-			if (!_data->_writer.write_all(*source))
+			primal::Buffer<uint8_t> uncompressedBuffer{ block._uncompressedSize };
+			if (!source->read_all_at(0, uncompressedBuffer.data(), block._uncompressedSize))
 				return false;
+			if (_data->_compressor)
+			{
+				if (!_data->_compressor->prepare(_data->_compressionLevel))
+					return false;
+				primal::Buffer<uint8_t> compressedBuffer{ _data->_compressor->maxCompressedSize(block._uncompressedSize) };
+				const auto compressedSize = _data->_compressor->compress(compressedBuffer.data(), compressedBuffer.capacity(), uncompressedBuffer.data(), block._uncompressedSize);
+				if (compressedSize < block._uncompressedSize)
+				{
+					block._compressedSize = static_cast<uint32_t>(compressedSize);
+					if (!_data->_writer.write_all(compressedBuffer.data(), block._compressedSize))
+						return false;
+				}
+				else
+				{
+					block._compressedSize = block._uncompressedSize;
+					if (!_data->_writer.write_all(uncompressedBuffer.data(), block._uncompressedSize))
+						return false;
+				}
+			}
+			else
+			{
+				block._compressedSize = block._uncompressedSize;
+				if (!_data->_writer.write_all(uncompressedBuffer.data(), block._uncompressedSize))
+					return false;
+			}
 		}
 
 		if (!_data->_writer.write_all(indexBlocks.data(), indexBlocks.size() * sizeof(YpBlockEntry))

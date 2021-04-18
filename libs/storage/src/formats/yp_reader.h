@@ -13,6 +13,8 @@
 
 namespace Yt
 {
+	class Decompressor;
+
 	class YpReader final : public PackageReader
 	{
 	public:
@@ -29,5 +31,6 @@ namespace Yt
 		primal::RigidVector<Entry> _entries;
 		primal::RigidVector<std::string_view> _names;
 		primal::Buffer<uint8_t> _indexBuffer; // TODO: Store only metadata part of the index.
+		std::unique_ptr<Decompressor> _decompressor;
 	};
 }

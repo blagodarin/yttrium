@@ -6,6 +6,7 @@
 
 #include <yttrium/base/buffer.h>
 #include <yttrium/base/numeric.h>
+#include <yttrium/storage/decompressor.h>
 #include <yttrium/storage/source.h>
 #include "../package.h"
 #include "yp_format.h"
@@ -31,11 +32,22 @@ namespace Yt
 		YpPackageHeader header;
 		if (!_source->read_at(0, header)
 			|| header._signature != YpPackageHeader::kSignature
-			|| header._compression != YpCompression::None
 			|| header._reserved != 0
 			|| header._indexBlock._compressedSize > _source->size() - sizeof header
 			|| header._fileCount > header._indexBlock._uncompressedSize / sizeof(YpBlockEntry))
 			throw BadPackage{ "Invalid Yttrium package" };
+		switch (header._compression)
+		{
+		case YpCompression::None:
+			break;
+#if YTTRIUM_COMPRESSION_ZLIB
+		case YpCompression::Zlib:
+			_decompressor = Decompressor::zlib();
+			break;
+#endif
+		default:
+			throw BadPackage{ "Invalid Yttrium package" };
+		}
 		const auto indexOffset = _source->size() - header._indexBlock._compressedSize;
 		_indexBuffer.reserve(header._indexBlock._uncompressedSize);
 		if (header._indexBlock._compressedSize == header._indexBlock._uncompressedSize)
@@ -45,12 +57,12 @@ namespace Yt
 		}
 		else
 		{
-			if (header._indexBlock._compressedSize == 0 || header._indexBlock._uncompressedSize == 0)
+			if (!_decompressor || header._indexBlock._compressedSize == 0 || header._indexBlock._compressedSize > header._indexBlock._uncompressedSize)
 				throw BadPackage{ "Invalid Yttrium package" };
 			primal::Buffer<uint8_t> compressedIndexBuffer{ header._indexBlock._compressedSize };
-			if (!_source->read_at(indexOffset, compressedIndexBuffer.data(), header._indexBlock._compressedSize))
+			if (!_source->read_at(indexOffset, compressedIndexBuffer.data(), header._indexBlock._compressedSize)
+				|| !_decompressor->decompress(_indexBuffer.data(), header._indexBlock._uncompressedSize, compressedIndexBuffer.data(), header._indexBlock._compressedSize))
 				throw BadPackage{ "Invalid Yttrium package" };
-			// TODO: Decompress.
 		}
 		std::span<const YpBlockEntry> entries{ reinterpret_cast<YpBlockEntry*>(_indexBuffer.data()), header._fileCount };
 		std::span<const uint8_t> metadata{ _indexBuffer.data() + header._fileCount * sizeof(YpBlockEntry), header._indexBlock._uncompressedSize - header._fileCount * sizeof(YpBlockEntry) };
@@ -59,10 +71,9 @@ namespace Yt
 		uint64_t offset = sizeof header;
 		for (const auto& entry : entries)
 		{
-			if (entry._compressedSize != entry._uncompressedSize
-				|| entry._compressedSize > indexOffset - offset)
+			if (entry._compressedSize == 0 || entry._compressedSize > entry._uncompressedSize || entry._compressedSize > indexOffset - offset)
 				throw BadPackage{ "Invalid Yttrium package" };
-			if (metadata.size() < 1 || metadata.size() < 1 + metadata[0])
+			if (metadata.size() < 1 || metadata[0] > metadata.size() - 1)
 				throw BadPackage{ "Invalid Yttrium package" };
 			_entries.emplace_back(offset, entry._compressedSize, entry._uncompressedSize);
 			_names.emplace_back(reinterpret_cast<const char*>(metadata.data() + 1), metadata[0]);
@@ -80,6 +91,13 @@ namespace Yt
 		const auto& entry = _entries[index];
 		if (entry._compressedSize == entry._uncompressedSize)
 			return Source::from(_source, entry._offset, entry._uncompressedSize);
-		return {}; // TODO: Decompress.
+		if (!_decompressor || entry._compressedSize == 0 || entry._uncompressedSize == 0)
+			return {};
+		primal::Buffer<uint8_t> compressedBuffer{ entry._compressedSize };
+		Buffer uncompressedBuffer{ entry._uncompressedSize };
+		if (!_source->read_at(entry._offset, compressedBuffer.data(), entry._compressedSize)
+			|| !_decompressor->decompress(uncompressedBuffer.data(), entry._uncompressedSize, compressedBuffer.data(), entry._compressedSize))
+			return {};
+		return Source::from(std::move(uncompressedBuffer));
 	}
 }
