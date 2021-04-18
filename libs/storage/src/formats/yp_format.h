@@ -11,6 +11,7 @@ namespace Yt
 	enum class YpCompression : uint8_t
 	{
 		None,
+		Zlib,
 	};
 
 #pragma pack(push, 1)

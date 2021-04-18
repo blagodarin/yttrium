@@ -4,6 +4,7 @@
 
 primal_set_folder(libs)
 source_group("src" REGULAR_EXPRESSION ".*\\.(h|cpp)$")
+source_group("src/compression" REGULAR_EXPRESSION "/src/compression/")
 source_group("src/formats" REGULAR_EXPRESSION "/src/formats/")
 source_group("src/platform" REGULAR_EXPRESSION "/src/platform/")
 source_group("include" REGULAR_EXPRESSION "/include/")
@@ -30,11 +31,20 @@ add_library(Y_storage STATIC
 	src/writer.cpp
 	src/writer.h
 	)
+target_compile_definitions(Y_storage PUBLIC YTTRIUM_COMPRESSION_ZLIB=$<BOOL:${YTTRIUM_COMPRESSION_ZLIB}>)
 target_include_directories(Y_storage PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 target_link_libraries(Y_storage PRIVATE Y_base primal)
 set_target_properties(Y_storage PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 	set_property(SOURCE src/writer.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-tautological-type-limit-compare)
+endif()
+if(YTTRIUM_COMPRESSION_ZLIB)
+	target_compile_definitions(Y_storage PRIVATE ZLIB_CONST)
+	target_link_libraries(Y_storage PRIVATE ZLIB::ZLIB)
+	target_sources(Y_storage PRIVATE
+		src/compression/zlib_compressor.h
+		src/compression/zlib_decompressor.h
+		)
 endif()
 if(WIN32)
 	target_compile_definitions(Y_storage PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)

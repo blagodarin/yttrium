@@ -5,6 +5,7 @@
 #include <yttrium/base/numeric.h>
 #include <yttrium/image/image.h>
 #include <yttrium/storage/writer.h>
+#include "../../storage/src/compression/zlib_compressor.h"
 #include "../formats.h"
 
 #include <primal/buffer.hpp>
@@ -12,9 +13,6 @@
 #include <array>
 #include <cstring>
 #include <limits>
-
-#define ZLIB_CONST
-#include <zlib.h>
 
 namespace
 {
@@ -215,24 +213,14 @@ namespace Yt
 		for (size_t i = 0; i < uncompressedSize; i += stride)
 			uncompressedBuffer.data()[i] = to_underlying(PngStandardFilterType::None);
 
-		struct ZlibCompressor : z_stream
-		{
-			ZlibCompressor() noexcept { std::memset(this, 0, sizeof(z_stream)); }
-			~ZlibCompressor() noexcept { ::deflateEnd(this); }
-		} compressor;
-
-		if (deflateInit(&compressor, (compression + 5) / 11) != Z_OK)
+		ZlibCompressor compressor;
+		if (!compressor.prepare((compression + 5) / 11))
 			return false;
 
-		primal::Buffer<uint8_t> compressedBuffer{ ::deflateBound(&compressor, static_cast<uLong>(uncompressedSize)) };
-		compressor.next_in = uncompressedBuffer.data();
-		compressor.avail_in = static_cast<uInt>(uncompressedSize);
-		compressor.next_out = compressedBuffer.data();
-		compressor.avail_out = static_cast<uInt>(compressedBuffer.capacity());
-		if (::deflate(&compressor, Z_FINISH) != Z_STREAM_END)
+		primal::Buffer<uint8_t> compressedBuffer{ compressor.upperBound(uncompressedSize) };
+		const auto compressedSize = compressor.compress(compressedBuffer.data(), compressedBuffer.capacity(), uncompressedBuffer.data(), uncompressedSize);
+		if (!compressedSize)
 			return false;
-
-		const auto compressedSize = compressedBuffer.capacity() - compressor.avail_out;
 
 		PngHeader header;
 		header.signature = PngSignature;
