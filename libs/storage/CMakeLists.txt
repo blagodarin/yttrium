@@ -9,6 +9,8 @@ source_group("src/formats" REGULAR_EXPRESSION "/src/formats/")
 source_group("src/platform" REGULAR_EXPRESSION "/src/platform/")
 source_group("include" REGULAR_EXPRESSION "/include/")
 add_library(Y_storage STATIC
+	include/yttrium/storage/compressor.h
+	include/yttrium/storage/decompressor.h
 	include/yttrium/storage/package.h
 	include/yttrium/storage/paths.h
 	include/yttrium/storage/reader.h
@@ -42,8 +44,8 @@ if(YTTRIUM_COMPRESSION_ZLIB)
 	target_compile_definitions(Y_storage PRIVATE ZLIB_CONST)
 	target_link_libraries(Y_storage PRIVATE ZLIB::ZLIB)
 	target_sources(Y_storage PRIVATE
-		src/compression/zlib_compressor.h
-		src/compression/zlib_decompressor.h
+		src/compression/zlib_compressor.cpp
+		src/compression/zlib_decompressor.cpp
 		)
 endif()
 if(WIN32)

@@ -4,8 +4,8 @@
 
 #include <yttrium/base/numeric.h>
 #include <yttrium/image/image.h>
+#include <yttrium/storage/compressor.h>
 #include <yttrium/storage/writer.h>
-#include "../../storage/src/compression/zlib_compressor.h"
 #include "../formats.h"
 
 #include <primal/buffer.hpp>
@@ -213,14 +213,17 @@ namespace Yt
 		for (size_t i = 0; i < uncompressedSize; i += stride)
 			uncompressedBuffer.data()[i] = to_underlying(PngStandardFilterType::None);
 
-		ZlibCompressor compressor;
-		if (!compressor.prepare((compression + 5) / 11))
-			return false;
-
-		primal::Buffer<uint8_t> compressedBuffer{ compressor.upperBound(uncompressedSize) };
-		const auto compressedSize = compressor.compress(compressedBuffer.data(), compressedBuffer.capacity(), uncompressedBuffer.data(), uncompressedSize);
-		if (!compressedSize)
-			return false;
+		primal::Buffer<uint8_t> compressedBuffer;
+		size_t compressedSize = 0;
+		{
+			const auto compressor = Compressor::zlib();
+			if (!compressor->prepare((compression + 5) / 11))
+				return false;
+			compressedBuffer.reserve(compressor->maxCompressedSize(uncompressedSize));
+			compressedSize = compressor->compress(compressedBuffer.data(), compressedBuffer.capacity(), uncompressedBuffer.data(), uncompressedSize);
+			if (!compressedSize)
+				return false;
+		}
 
 		PngHeader header;
 		header.signature = PngSignature;

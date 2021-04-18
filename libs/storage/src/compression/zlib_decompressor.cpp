@@ -2,15 +2,15 @@
 // Copyright (C) Sergei Blagodarin.
 // SPDX-License-Identifier: Apache-2.0
 
-#pragma once
+#include <yttrium/storage/decompressor.h>
 
 #include <cstring>
 
 #include <zlib.h>
 
-namespace Yt
+namespace
 {
-	class ZlibDecompressor
+	class ZlibDecompressor final : public Yt::Decompressor
 	{
 	public:
 		ZlibDecompressor() noexcept
@@ -18,7 +18,7 @@ namespace Yt
 			std::memset(&_stream, 0, sizeof _stream);
 		}
 
-		[[nodiscard]] bool decompress(void* dst, size_t dstCapacity, const void* src, size_t srcSize) noexcept
+		[[nodiscard]] bool decompress(void* dst, size_t dstCapacity, const void* src, size_t srcSize) noexcept override
 		{
 			if (inflateInit(&_stream) != Z_OK)
 				return false;
@@ -34,4 +34,12 @@ namespace Yt
 	private:
 		z_stream _stream;
 	};
+}
+
+namespace Yt
+{
+	std::unique_ptr<Yt::Decompressor> Yt::Decompressor::zlib()
+	{
+		return std::make_unique<ZlibDecompressor>();
+	}
 }
