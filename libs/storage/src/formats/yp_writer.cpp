@@ -12,6 +12,7 @@
 
 #include <primal/buffer.hpp>
 
+#include <cstring>
 #include <limits>
 #include <vector>
 
@@ -63,8 +64,9 @@ namespace Yt
 		if (std::exchange(_data->_committed, true))
 			return _data->_finished;
 
-		std::vector<YpBlockEntry> indexBlocks;
-		indexBlocks.reserve(_data->_entries.size());
+		const auto strippedIndexSize = _data->_entries.size() * sizeof(YpBlockEntry);
+		primal::Buffer<std::byte> indexBuffer{ strippedIndexSize };
+		auto indexEntry = reinterpret_cast<YpBlockEntry*>(indexBuffer.data());
 
 		Buffer nameBuffer;
 		Writer nameWriter{ nameBuffer };
@@ -81,6 +83,29 @@ namespace Yt
 		if (!_data->_writer.write(header))
 			return false;
 
+		primal::Buffer<uint8_t> compressedBuffer;
+		const auto writeBlock = [this, &compressedBuffer](YpBlockEntry& block, const void* data, size_t size) {
+			if (size > std::numeric_limits<uint32_t>::max())
+				return false;
+			if (_data->_compressor)
+			{
+				if (!_data->_compressor->prepare(_data->_compressionLevel))
+					return false;
+				compressedBuffer.reserve(_data->_compressor->maxCompressedSize(size), false);
+				const auto compressedSize = _data->_compressor->compress(compressedBuffer.data(), compressedBuffer.capacity(), data, size);
+				if (compressedSize < size)
+				{
+					block._compressedSize = static_cast<uint32_t>(compressedSize);
+					block._uncompressedSize = static_cast<uint32_t>(size);
+					return _data->_writer.write_all(compressedBuffer.data(), compressedSize);
+				}
+			}
+			block._compressedSize = static_cast<uint32_t>(size);
+			block._uncompressedSize = block._compressedSize;
+			return _data->_writer.write_all(data, block._uncompressedSize);
+		};
+
+		primal::Buffer<uint8_t> uncompressedBuffer;
 		for (const auto& entry : _data->_entries)
 		{
 			if (!writeName(entry._name))
@@ -88,48 +113,19 @@ namespace Yt
 			const auto source = Source::from(entry._name);
 			if (!source)
 				return false;
-			auto& block = indexBlocks.emplace_back();
-			block._uncompressedSize = static_cast<uint32_t>(source->size());
-			primal::Buffer<uint8_t> uncompressedBuffer{ block._uncompressedSize };
-			if (!source->read_all_at(0, uncompressedBuffer.data(), block._uncompressedSize))
+			const auto uncompressedSize = source->size();
+			uncompressedBuffer.reserve(uncompressedSize, false);
+			if (!source->read_all_at(0, uncompressedBuffer.data(), uncompressedSize) || !writeBlock(*indexEntry, uncompressedBuffer.data(), uncompressedSize))
 				return false;
-			if (_data->_compressor)
-			{
-				if (!_data->_compressor->prepare(_data->_compressionLevel))
-					return false;
-				primal::Buffer<uint8_t> compressedBuffer{ _data->_compressor->maxCompressedSize(block._uncompressedSize) };
-				const auto compressedSize = _data->_compressor->compress(compressedBuffer.data(), compressedBuffer.capacity(), uncompressedBuffer.data(), block._uncompressedSize);
-				if (compressedSize < block._uncompressedSize)
-				{
-					block._compressedSize = static_cast<uint32_t>(compressedSize);
-					if (!_data->_writer.write_all(compressedBuffer.data(), block._compressedSize))
-						return false;
-				}
-				else
-				{
-					block._compressedSize = block._uncompressedSize;
-					if (!_data->_writer.write_all(uncompressedBuffer.data(), block._uncompressedSize))
-						return false;
-				}
-			}
-			else
-			{
-				block._compressedSize = block._uncompressedSize;
-				if (!_data->_writer.write_all(uncompressedBuffer.data(), block._uncompressedSize))
-					return false;
-			}
+			++indexEntry;
 		}
 
-		if (!_data->_writer.write_all(indexBlocks.data(), indexBlocks.size() * sizeof(YpBlockEntry))
-			|| !_data->_writer.write_all(nameBuffer.data(), nameBuffer.size()))
+		const auto totalIndexSize = strippedIndexSize + nameBuffer.size();
+		indexBuffer.reserve(totalIndexSize);
+		std::memcpy(indexBuffer.data() + strippedIndexSize, nameBuffer.data(), nameBuffer.size());
+		if (!writeBlock(header._indexBlock, indexBuffer.data(), totalIndexSize))
 			return false;
 
-		const auto uncompressedIndexSize = indexBlocks.size() * sizeof(YpBlockEntry) + nameBuffer.size();
-		if (uncompressedIndexSize > std::numeric_limits<uint32_t>::max())
-			return false;
-
-		header._indexBlock._uncompressedSize = static_cast<uint32_t>(uncompressedIndexSize);
-		header._indexBlock._compressedSize = header._indexBlock._uncompressedSize;
 		_data->_writer.seek(packageHeaderOffset);
 		if (!_data->_writer.write(header))
 			return false;
