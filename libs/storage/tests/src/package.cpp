@@ -14,6 +14,8 @@
 
 #include <doctest.h>
 
+// TODO: Test compressed packages.
+
 namespace
 {
 	std::unique_ptr<Yt::Source> open_packed(const Yt::PackageReader& package, std::string_view name)
@@ -46,7 +48,7 @@ TEST_CASE("package")
 	Yt::TemporaryFile package_file;
 
 	{
-		Yt::YpWriter package_writer{ Yt::Writer{ package_file } };
+		Yt::YpWriter package_writer{ Yt::Writer{ package_file }, Yt::YpWriter::Compression::None };
 		REQUIRE(package_writer.add(file1.path().string()));
 		REQUIRE(package_writer.add(file2.path().string()));
 		REQUIRE(package_writer.add(file3.path().string()));
@@ -93,7 +95,7 @@ TEST_CASE("package.file_size")
 
 	Yt::TemporaryFile package_file;
 	{
-		Yt::YpWriter package_writer{ Yt::Writer{ package_file } };
+		Yt::YpWriter package_writer{ Yt::Writer{ package_file }, Yt::YpWriter::Compression::None };
 		REQUIRE(package_writer.add(file1.path().string()));
 		REQUIRE(package_writer.add(file2.path().string()));
 		REQUIRE(package_writer.add(file3.path().string()));
@@ -116,7 +118,7 @@ TEST_CASE("package.duplicates")
 	Yt::TemporaryFile package_file;
 	Yt::TemporaryFile file;
 	{
-		Yt::YpWriter package_writer{ Yt::Writer{ package_file } };
+		Yt::YpWriter package_writer{ Yt::Writer{ package_file }, Yt::YpWriter::Compression::None };
 		Yt::Writer{ file }.write_all(Yt::Buffer{ 1, "1" });
 		REQUIRE(package_writer.add(file.path().string()));
 		Yt::Writer{ file }.write_all(Yt::Buffer{ 2, "23" });

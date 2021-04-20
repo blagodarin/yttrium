@@ -5,6 +5,7 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 #include <string>
 
 namespace Yt
@@ -15,10 +16,16 @@ namespace Yt
 	class YpWriter
 	{
 	public:
-		explicit YpWriter(Writer&&);
+		enum class Compression
+		{
+			None,
+			Zlib,
+		};
+
+		explicit YpWriter(Writer&&, Compression);
 		~YpWriter() noexcept;
 
-		bool add(const std::string&);
+		bool add(const std::string&, const std::optional<int>& compressionLevel = {});
 		bool commit();
 
 	private:

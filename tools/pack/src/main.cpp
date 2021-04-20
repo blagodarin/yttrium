@@ -78,9 +78,9 @@ int ymain(int argc, char** argv)
 				std::cerr << "ERROR: Unable to open " << packagePath << " for writing\n";
 				return 1;
 			}
-			auto packageWriter = std::make_unique<Yt::YpWriter>(std::move(fileWriter));
+			auto packageWriter = std::make_unique<Yt::YpWriter>(std::move(fileWriter), Yt::YpWriter::Compression::Zlib);
 			for (const auto& path : read_index(std::filesystem::u8path(argv[1])))
-				packageWriter->add(path);
+				packageWriter->add(path, 9);
 			if (!packageWriter->commit())
 			{
 				std::cerr << "ERROR: Unable to write " << packagePath << '\n';
