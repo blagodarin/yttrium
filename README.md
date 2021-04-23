@@ -27,3 +27,5 @@ Yttrium is an occasional hobby project, so don't expect it to be something
 actually valuable or to eventually turn into one. Right now it is more like a
 bunch of various ideas piled together and roughly shaped to look game
 engine-ish.
+
+[TODO](docs/todo.md)
