@@ -40,6 +40,7 @@ namespace Yt
 		void check_name(std::string_view) const;
 		void check_object_begin() const;
 		void check_object_end() const;
+		[[nodiscard]] bool is_name(std::string_view name) const noexcept { return _type == Type::Name && _text == name; }
 		IonToken& next(class IonReader&);
 		std::string_view to_name() const;
 		std::string_view to_value() const;

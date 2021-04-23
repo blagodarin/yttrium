@@ -21,8 +21,8 @@ namespace Yt
 	struct YpWriterEntry
 	{
 		std::string _name;
-		std::optional<int> _compressionLevel;
-		explicit YpWriterEntry(std::string_view name, const std::optional<int>& compressionLevel)
+		int _compressionLevel = 0;
+		explicit YpWriterEntry(std::string_view name, int compressionLevel)
 			: _name{ name }, _compressionLevel{ compressionLevel } {}
 	};
 
@@ -63,11 +63,12 @@ namespace Yt
 
 	YpWriter::~YpWriter() noexcept = default;
 
-	bool YpWriter::add(const std::string& path, const std::optional<int>& compressionLevel)
+	bool YpWriter::add(const std::string& path, int compressionLevel)
 	{
 		if (_data->_committed
 			|| _data->_entries.size() == std::numeric_limits<uint16_t>::max()
-			|| (compressionLevel && !(*compressionLevel >= _data->_minCompressionLevel || *compressionLevel <= _data->_maxCompressionLevel)))
+			|| compressionLevel < _data->_minCompressionLevel
+			|| compressionLevel > _data->_maxCompressionLevel)
 			return false;
 		_data->_entries.emplace_back(path, compressionLevel);
 		return true;
@@ -98,12 +99,12 @@ namespace Yt
 			return false;
 
 		primal::Buffer<uint8_t> compressedBuffer;
-		const auto writeBlock = [this, &compressedBuffer](YpBlockEntry& block, const void* data, size_t size, const std::optional<int>& compressionLevel) {
+		const auto writeBlock = [this, &compressedBuffer](YpBlockEntry& block, const void* data, size_t size, int compressionLevel) {
 			if (size > std::numeric_limits<uint32_t>::max())
 				return false;
-			if (compressionLevel && _data->_compressor)
+			if (compressionLevel != 0 && _data->_compressor)
 			{
-				if (!_data->_compressor->prepare(*compressionLevel))
+				if (!_data->_compressor->prepare(compressionLevel))
 					return false;
 				compressedBuffer.reserve(_data->_compressor->maxCompressedSize(size), false);
 				const auto compressedSize = _data->_compressor->compress(compressedBuffer.data(), compressedBuffer.capacity(), data, size);

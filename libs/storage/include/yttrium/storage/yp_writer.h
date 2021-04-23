@@ -5,7 +5,6 @@
 #pragma once
 
 #include <memory>
-#include <optional>
 #include <string>
 
 namespace Yt
@@ -25,7 +24,7 @@ namespace Yt
 		explicit YpWriter(Writer&&, Compression);
 		~YpWriter() noexcept;
 
-		bool add(const std::string&, const std::optional<int>& compressionLevel = {});
+		bool add(const std::string&, int compressionLevel = 0);
 		bool commit();
 
 	private:

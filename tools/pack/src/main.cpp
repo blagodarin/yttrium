@@ -4,8 +4,10 @@
 
 #include <yttrium/base/exceptions.h>
 #include <yttrium/base/logger.h>
+#include <yttrium/base/string.h>
 #include <yttrium/ion/reader.h>
 #include <yttrium/main.h>
+#include <yttrium/storage/compressor.h>
 #include <yttrium/storage/package.h>
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/writer.h>
@@ -25,18 +27,52 @@ namespace
 			throw Yt::DataError{ std::forward<Args>(args)... };
 	}
 
-	std::vector<std::string> read_index(const std::filesystem::path& path)
+	struct Index
+	{
+		struct FileGroup
+		{
+			int32_t _compressionLevel = 0;
+			std::vector<std::string> _files;
+		};
+		Yt::YpWriter::Compression _compression = Yt::YpWriter::Compression::None;
+		std::vector<FileGroup> _groups;
+	};
+
+	Index readIndex(const std::filesystem::path& path)
 	{
 		auto source = Yt::Source::from(path);
 		check(static_cast<bool>(source), "Bad index file");
+		Index result;
 		Yt::IonReader ion{ *source };
-		ion.read().check_name("package");
-		ion.read().check_list_begin();
-		std::vector<std::string> paths;
-		for (auto token = ion.read(); token.type() != Yt::IonToken::Type::ListEnd; token = ion.read())
-			paths.emplace_back(std::string{ token.to_value() });
-		ion.read().check_end();
-		return paths;
+		auto token = ion.read();
+		if (token.is_name("compressor"))
+		{
+			check(token.next(ion).to_value() == "zlib", "Bad compression algorithm");
+			result._compression = Yt::YpWriter::Compression::Zlib;
+			token.next(ion);
+		}
+		while (token.type() != Yt::IonToken::Type::End)
+		{
+			token.check_name("files");
+			token.next(ion);
+			auto& group = result._groups.emplace_back();
+			if (token.type() == Yt::IonToken::Type::ObjectBegin)
+			{
+				token.next(ion).check_name("compression");
+				check(Yt::from_chars(token.next(ion).to_value(), group._compressionLevel), "Bad compression level");
+				token.next(ion).check_object_end();
+				token.next(ion);
+			}
+			token.check_list_begin();
+			token.next(ion);
+			while (token.type() != Yt::IonToken::Type::ListEnd)
+			{
+				group._files.emplace_back(std::string{ token.to_value() });
+				token.next(ion);
+			}
+			token.next(ion);
+		}
+		return result;
 	}
 
 	int usage()
@@ -60,17 +96,20 @@ int ymain(int argc, char** argv)
 		{
 			if (argc != 3)
 				return usage();
-			const auto index_path = std::filesystem::u8path(argv[2]);
-			auto data_timestamp = std::filesystem::file_time_type::min();
-			for (const auto& path : read_index(index_path))
-				data_timestamp = std::max(data_timestamp, std::filesystem::last_write_time(std::filesystem::u8path(path)));
-			if (data_timestamp > std::filesystem::last_write_time(index_path))
-				std::filesystem::last_write_time(index_path, data_timestamp);
+			const auto indexPath = std::filesystem::u8path(argv[2]);
+			auto dataTimestamp = std::filesystem::file_time_type::min();
+			const auto index = readIndex(indexPath);
+			for (const auto& group : index._groups)
+				for (const auto& file : group._files)
+					dataTimestamp = std::max(dataTimestamp, std::filesystem::last_write_time(std::filesystem::u8path(file)));
+			if (dataTimestamp > std::filesystem::last_write_time(indexPath))
+				std::filesystem::last_write_time(indexPath, dataTimestamp);
 		}
 		else
 		{
 			if (argc != 3)
 				return usage();
+			const auto index = readIndex(std::filesystem::u8path(argv[1]));
 			const auto packagePath = std::filesystem::u8path(argv[2]);
 			Yt::Writer fileWriter{ packagePath };
 			if (!fileWriter)
@@ -78,9 +117,10 @@ int ymain(int argc, char** argv)
 				std::cerr << "ERROR: Unable to open " << packagePath << " for writing\n";
 				return 1;
 			}
-			auto packageWriter = std::make_unique<Yt::YpWriter>(std::move(fileWriter), Yt::YpWriter::Compression::Zlib);
-			for (const auto& path : read_index(std::filesystem::u8path(argv[1])))
-				packageWriter->add(path, 9);
+			auto packageWriter = std::make_unique<Yt::YpWriter>(std::move(fileWriter), index._compression);
+			for (const auto& group : index._groups)
+				for (const auto& file : group._files)
+					packageWriter->add(file, group._compressionLevel);
 			if (!packageWriter->commit())
 			{
 				std::cerr << "ERROR: Unable to write " << packagePath << '\n';
