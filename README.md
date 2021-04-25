@@ -10,15 +10,14 @@
 
 Yttrium is (intended to become) a game development toolkit.
 
-Yttrium features:
-* **Friendly and flexible build system.**
-  - To build Yttrium for the first time, you need Internet connection,
-    [Git](https://git-scm.com/downloads/), recent
-    [CMake](https://cmake.org/download/) and a supported C/C++ compiler, and you
-    should already have all that if you build C++ projects from GitHub.
-  - Yttrium can be built as a set of DLLs with user-provided dependencies, or it
-    can yield static libraries that can be linked into a single binary &mdash;
-    the choice is up to you.
+Yttrium is:
+* **Easy to build.**
+  - You'll need Internet connection, [Git](https://git-scm.com/downloads/),
+    recent [CMake](https://cmake.org/download/) and a supported C/C++ compiler,
+    and you should already have all that if you build C++ projects from GitHub.
+  - Yttrium can provide itself with all third-party dependencies.
+    The only exception is [Vulkan SDK](https://www.lunarg.com/vulkan-sdk/)
+    (which is required for the Vulkan backend).
   - Check out [build instructions](docs/building.md) for more details.
     [Contribution guidelines](docs/contributing.md) may also help you find your
     way around.
@@ -28,4 +27,5 @@ actually valuable or to eventually turn into one. Right now it is more like a
 bunch of various ideas piled together and roughly shaped to look game
 engine-ish.
 
-[TODO](docs/todo.md)
+See also:
+* [TODO list](docs/todo.md) with possible future improvements.

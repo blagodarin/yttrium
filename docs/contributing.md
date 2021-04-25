@@ -12,7 +12,7 @@ Yttrium aims to be:
   liability that must be justified.
 * **Comprehensive.** It should be possible to create a full-featured game for
   all supported platforms using only Yttrium libraries and tools (apart from the
-  build system).
+  build system and the things provided by the Yttrium itself).
 
 Please don't hesitate to make a contribution that helps Yttrium follow these
 aims.
@@ -36,17 +36,17 @@ other contributions.
 ## Repository layout
 
 Yttrium components are grouped into several top-level directories:
-* `libs` contains public libraries.
+* `libs` contains libraries.
 * `tools` contains command-line tools. Some of the tools are used to build
   libraries in `libs`.
-* `tests` contains unit tests for the public libraries, as well as other
-  test-related stuff.
-* `benchmarks` contains benchmarks for public library code.
-* `examples` contains example applications build using Yttrium.
+
+Every component is placed in its own directory
+(`libs/xxx` for `Y_xxx` library, `tools/xxx` for `yxxx` tool).
 
 All components have the following structure:
 * `src` contains source code of the component.
 * `include` contains public headers which other components can use.
 * `data` contains data required by the component.
+* `tests` contains unit tests (also with `src` and possibly `data`).
 * Files required to build the component (e. g. *CMakeLists.txt*) are placed
   into the component's root directory.
