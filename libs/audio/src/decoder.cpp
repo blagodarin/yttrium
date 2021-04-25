@@ -5,7 +5,6 @@
 #include "decoder.h"
 
 #include <yttrium/base/exceptions.h>
-#include <yttrium/base/numeric.h>
 
 #if YTTRIUM_AUDIO_AULOS
 #	include "formats/aulos.h"
@@ -16,6 +15,8 @@
 #if YTTRIUM_AUDIO_WAV
 #	include "formats/wav.h"
 #endif
+
+#include <primal/endian.hpp>
 
 namespace Yt
 {
@@ -29,13 +30,13 @@ namespace Yt
 		{
 			switch (signature)
 			{
-			case Yt::make_cc('O', 'g', 'g', 'S'):
+			case primal::makeCC('O', 'g', 'g', 'S'):
 #	if YTTRIUM_AUDIO_OGGVORBIS
 				return std::make_unique<Yt::OggVorbisDecoder>(std::move(source));
 #	else
 				break;
 #	endif
-			case Yt::make_cc('R', 'I', 'F', 'F'):
+			case primal::makeCC('R', 'I', 'F', 'F'):
 #	if YTTRIUM_AUDIO_WAV
 				return std::make_unique<Yt::WavDecoder>(std::move(source));
 #	else

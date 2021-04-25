@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <yttrium/base/numeric.h>
+#include <primal/endian.hpp>
 
 namespace Yt
 {
@@ -222,12 +222,12 @@ namespace Yt
 
 		enum : uint32_t
 		{
-			DXT1 = make_cc('D', 'X', 'T', '1'),
-			DXT2 = make_cc('D', 'X', 'T', '2'),
-			DXT3 = make_cc('D', 'X', 'T', '3'),
-			DXT4 = make_cc('D', 'X', 'T', '4'),
-			DXT5 = make_cc('D', 'X', 'T', '5'),
-			DX10 = make_cc('D', 'X', '1', '0'),
+			DXT1 = primal::makeCC('D', 'X', 'T', '1'),
+			DXT2 = primal::makeCC('D', 'X', 'T', '2'),
+			DXT3 = primal::makeCC('D', 'X', 'T', '3'),
+			DXT4 = primal::makeCC('D', 'X', 'T', '4'),
+			DXT5 = primal::makeCC('D', 'X', 'T', '5'),
+			DX10 = primal::makeCC('D', 'X', '1', '0'),
 		};
 
 		uint32_t dwSize;
@@ -244,7 +244,7 @@ namespace Yt
 	{
 		enum : uint32_t
 		{
-			MAGIC = make_cc('D', 'D', 'S', ' '),
+			MAGIC = primal::makeCC('D', 'D', 'S', ' '),
 			SIZE = 124,
 		};
 

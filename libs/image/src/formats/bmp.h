@@ -4,13 +4,13 @@
 
 #pragma once
 
-#include <yttrium/base/numeric.h>
+#include <primal/endian.hpp>
 
 namespace Yt
 {
 	enum class BmpFileType : uint16_t
 	{
-		Bm = make_cc('B', 'M'),
+		Bm = primal::makeCC('B', 'M'),
 	};
 
 	enum class BmpCompression : uint32_t

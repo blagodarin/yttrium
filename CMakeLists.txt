@@ -29,7 +29,7 @@ cmake_dependent_option(YTTRIUM_COMPRESSION_ZLIB "Enable zlib compression support
 
 set(AULOS_AULOSPLAY ON)
 set(AULOS_STATIC_RUNTIME ON)
-FetchContent_Declare(Primal GIT_REPOSITORY https://github.com/blagodarin/primal.git GIT_TAG 1fd803fa863118d05311b97b0cc3c62c6c649b11)
+FetchContent_Declare(Primal GIT_REPOSITORY https://github.com/blagodarin/primal.git GIT_TAG 2944209a0a37d36e54b5ddc1b2f5b403e5b0f2f4)
 FetchContent_Declare(Aulos GIT_REPOSITORY https://github.com/blagodarin/aulos.git GIT_TAG fb61518c53483bd29b16659fd9099a0e8315f33f)
 FetchContent_MakeAvailable(Primal Aulos)
 

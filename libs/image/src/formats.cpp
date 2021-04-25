@@ -9,6 +9,8 @@
 #include <yttrium/storage/reader.h>
 #include <yttrium/storage/source.h>
 
+#include <primal/endian.hpp>
+
 #include <algorithm>
 
 namespace Yt
@@ -28,16 +30,16 @@ namespace Yt
 				return false;
 			switch (signature.ab)
 			{
-			case make_cc('B', 'M'):
+			case primal::makeCC('B', 'M'):
 				format = ImageFormat::Bmp;
 				break;
-			case make_cc('D', 'D'):
+			case primal::makeCC('D', 'D'):
 				format = ImageFormat::Dds;
 				break;
-			case make_cc('\xff', '\xd8'): // SOI marker.
+			case primal::makeCC('\xff', '\xd8'): // SOI marker.
 				format = ImageFormat::Jpeg;
 				break;
-			case make_cc('\x89', 'P'):
+			case primal::makeCC('\x89', 'P'):
 				format = ImageFormat::Png;
 				break;
 			default:

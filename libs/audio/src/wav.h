@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <yttrium/base/numeric.h>
+#include <primal/endian.hpp>
 
 namespace Yt
 {
@@ -20,8 +20,8 @@ namespace Yt
 	{
 		enum : uint32_t
 		{
-			RIFF = make_cc('R', 'I', 'F', 'F'),
-			WAVE = make_cc('W', 'A', 'V', 'E'),
+			RIFF = primal::makeCC('R', 'I', 'F', 'F'),
+			WAVE = primal::makeCC('W', 'A', 'V', 'E'),
 		};
 
 		uint32_t riff_fourcc;
@@ -33,8 +33,8 @@ namespace Yt
 	{
 		enum : uint32_t
 		{
-			fmt = make_cc('f', 'm', 't', ' '),
-			data = make_cc('d', 'a', 't', 'a'),
+			fmt = primal::makeCC('f', 'm', 't', ' '),
+			data = primal::makeCC('d', 'a', 't', 'a'),
 		};
 
 		uint32_t name_fourcc;

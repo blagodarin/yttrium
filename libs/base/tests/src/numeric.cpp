@@ -46,13 +46,6 @@ TEST_CASE("utils.is_power_of_2")
 		CHECK(int{ is_power_of_2(i) } == table[i]);
 }
 
-TEST_CASE("utils.make_cc")
-{
-	CHECK(Yt::make_cc('\x00', '\xff') == 0xff00);
-	CHECK(Yt::make_cc('\x00', '\x80', '\x7f', '\xff') == 0xff7f8000);
-	CHECK(Yt::make_cc('\x00', '\x01', '\x7e', '\x7f', '\x80', '\x81', '\xfe', '\xff') == 0xfffe81807f7e0100);
-}
-
 TEST_CASE("utils.next_power_of_2")
 {
 	using Yt::next_power_of_2;
@@ -115,12 +108,4 @@ TEST_CASE("utils.same_sign")
 	CHECK(same_sign(std::numeric_limits<intmax_t>::min(), std::numeric_limits<intmax_t>::min()));
 	CHECK(!same_sign(std::numeric_limits<intmax_t>::max(), std::numeric_limits<intmax_t>::min()));
 	CHECK(!same_sign(std::numeric_limits<intmax_t>::min(), std::numeric_limits<intmax_t>::max()));
-}
-
-TEST_CASE("utils.swap_bytes")
-{
-	using Yt::swap_bytes;
-
-	CHECK(swap_bytes(std::uint16_t{ 0xff00 }) == 0x00ff);
-	CHECK(swap_bytes(std::uint32_t{ 0xfff00f00 }) == 0x000ff0ff);
 }

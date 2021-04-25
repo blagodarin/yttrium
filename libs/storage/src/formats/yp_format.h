@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <yttrium/base/numeric.h>
+#include <primal/endian.hpp>
 
 namespace Yt
 {
@@ -24,7 +24,7 @@ namespace Yt
 
 	struct YpPackageHeader
 	{
-		static constexpr auto kSignature = make_cc('\xDF', 'Y', 'P', '\x01'); // The last byte specifies format version.
+		static constexpr auto kSignature = primal::makeCC('\xDF', 'Y', 'P', '\x01'); // The last byte specifies format version.
 
 		uint32_t _signature = kSignature;
 		uint16_t _fileCount = 0;

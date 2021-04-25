@@ -9,6 +9,7 @@
 #include "../formats.h"
 
 #include <primal/buffer.hpp>
+#include <primal/endian.hpp>
 
 #include <array>
 #include <cstring>
@@ -16,13 +17,13 @@
 
 namespace
 {
-	constexpr auto PngSignature = Yt::make_cc('\x89', 'P', 'N', 'G', '\r', '\n', '\x1a', '\n');
+	constexpr auto PngSignature = primal::makeCC('\x89', 'P', 'N', 'G', '\r', '\n', '\x1a', '\n');
 
 	enum class PngChunkType : uint32_t
 	{
-		IDAT = Yt::make_cc('I', 'D', 'A', 'T'),
-		IEND = Yt::make_cc('I', 'E', 'N', 'D'),
-		IHDR = Yt::make_cc('I', 'H', 'D', 'R'),
+		IDAT = primal::makeCC('I', 'D', 'A', 'T'),
+		IEND = primal::makeCC('I', 'E', 'N', 'D'),
+		IHDR = primal::makeCC('I', 'H', 'D', 'R'),
 	};
 
 	enum class PngColorType : uint8_t
@@ -227,24 +228,24 @@ namespace Yt
 
 		PngHeader header;
 		header.signature = PngSignature;
-		header.ihdr.length = swap_bytes(uint32_t{ sizeof header.ihdr.data }); // TODO: Use something like 'to_big_endian' instaed of 'swap_bytes'.
+		header.ihdr.length = primal::bigEndian(uint32_t{ sizeof header.ihdr.data });
 		header.ihdr.type = PngChunkType::IHDR;
-		header.ihdr.data.width = swap_bytes(static_cast<uint32_t>(info.width()));
-		header.ihdr.data.height = swap_bytes(static_cast<uint32_t>(info.height()));
+		header.ihdr.data.width = primal::bigEndian(static_cast<uint32_t>(info.width()));
+		header.ihdr.data.height = primal::bigEndian(static_cast<uint32_t>(info.height()));
 		header.ihdr.data.bitDepth = 8;
 		header.ihdr.data.colorType = pngColorType;
 		header.ihdr.data.compressionMethod = PngCompressionMethod::Zlib;
 		header.ihdr.data.filterMethod = PngFilterMethod::Standard;
 		header.ihdr.data.interlaceMethod = PngInterlaceMethod::None;
-		header.ihdr.crc = swap_bytes(Crc32{}.process(&header.ihdr.type, sizeof header.ihdr.type).process(&header.ihdr.data, sizeof header.ihdr.data).value());
-		header.idat.length = swap_bytes(static_cast<uint32_t>(compressedSize));
+		header.ihdr.crc = primal::bigEndian(Crc32{}.process(&header.ihdr.type, sizeof header.ihdr.type).process(&header.ihdr.data, sizeof header.ihdr.data).value());
+		header.idat.length = primal::bigEndian(static_cast<uint32_t>(compressedSize));
 		header.idat.type = PngChunkType::IDAT;
 
 		PngFooter footer;
-		footer.idat.crc = swap_bytes(Crc32{}.process(&header.idat.type, sizeof header.idat.type).process(compressedBuffer.data(), compressedSize).value());
+		footer.idat.crc = primal::bigEndian(Crc32{}.process(&header.idat.type, sizeof header.idat.type).process(compressedBuffer.data(), compressedSize).value());
 		footer.iend.length = 0;
 		footer.iend.type = PngChunkType::IEND;
-		footer.iend.crc = swap_bytes(Crc32{}.process(&footer.iend.type, sizeof footer.iend.type).value());
+		footer.iend.crc = primal::bigEndian(Crc32{}.process(&footer.iend.type, sizeof footer.iend.type).value());
 
 		return writer.try_reserve(sizeof header + compressedSize + sizeof footer)
 			&& writer.write(header)
