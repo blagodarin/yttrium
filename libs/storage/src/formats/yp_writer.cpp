@@ -128,7 +128,7 @@ namespace Yt
 			const auto source = Source::from(entry._name);
 			if (!source)
 				return false;
-			const auto uncompressedSize = source->size();
+			const auto uncompressedSize = static_cast<size_t>(source->size());
 			uncompressedBuffer.reserve(uncompressedSize, false);
 			if (!source->read_all_at(0, uncompressedBuffer.data(), uncompressedSize) || !writeBlock(*indexEntry, uncompressedBuffer.data(), uncompressedSize, entry._compressionLevel))
 				return false;
