@@ -7,7 +7,7 @@
 #include <array>
 #include <limits>
 
-#include <doctest.h>
+#include <doctest/doctest.h>
 
 TEST_CASE("utils.clamp_to_uint8")
 {

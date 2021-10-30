@@ -10,7 +10,7 @@
 #include <cstring>
 #include <random>
 
-#include <doctest.h>
+#include <doctest/doctest.h>
 
 namespace
 {

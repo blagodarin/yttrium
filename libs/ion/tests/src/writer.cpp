@@ -6,7 +6,7 @@
 #include <yttrium/ion/writer.h>
 #include <yttrium/storage/writer.h>
 
-#include <doctest.h>
+#include <doctest/doctest.h>
 
 using Yt::Buffer;
 using Yt::IonWriter;

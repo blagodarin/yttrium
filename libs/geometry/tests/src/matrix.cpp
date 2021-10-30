@@ -6,7 +6,7 @@
 #include <yttrium/geometry/matrix.h>
 #include <yttrium/geometry/size.h>
 
-#include <doctest.h>
+#include <doctest/doctest.h>
 
 namespace Yt
 {

@@ -9,7 +9,7 @@
 #include <yttrium/storage/writer.h>
 #include "image.h"
 
-#include <doctest.h>
+#include <doctest/doctest.h>
 
 #if YTTRIUM_IMAGE_BMP
 TEST_CASE("BMP.Load.24")

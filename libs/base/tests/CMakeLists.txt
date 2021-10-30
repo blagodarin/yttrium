@@ -9,11 +9,10 @@ add_executable(test_base
 	src/buffer_appender.cpp
 	src/flags.cpp
 	src/logger.cpp
-	src/main.cpp
 	src/numeric.cpp
 	src/string.cpp
 	)
 target_include_directories(test_base SYSTEM PRIVATE ${PRIMAL_DOWNLOAD_DIR})
-target_link_libraries(test_base PRIVATE Y_base)
+target_link_libraries(test_base PRIVATE Y_base doctest::doctest_with_main)
 set_target_properties(test_base PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 add_test(NAME base COMMAND test_base)

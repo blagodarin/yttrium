@@ -4,7 +4,7 @@
 
 #include <yttrium/image/color.h>
 
-#include <doctest.h>
+#include <doctest/doctest.h>
 
 TEST_CASE("Bgra32")
 {

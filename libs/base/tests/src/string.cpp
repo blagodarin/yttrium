@@ -6,7 +6,7 @@
 
 #include <vector>
 
-#include <doctest.h>
+#include <doctest/doctest.h>
 
 TEST_CASE("utils_string.from_chars.int32")
 {

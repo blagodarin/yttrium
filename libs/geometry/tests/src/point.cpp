@@ -4,7 +4,7 @@
 
 #include <yttrium/geometry/point.h>
 
-#include <doctest.h>
+#include <doctest/doctest.h>
 
 TEST_CASE("point")
 {

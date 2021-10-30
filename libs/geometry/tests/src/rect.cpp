@@ -4,7 +4,7 @@
 
 #include <yttrium/geometry/rect.h>
 
-#include <doctest.h>
+#include <doctest/doctest.h>
 
 using Yt::Point;
 using Yt::Rect;

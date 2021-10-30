@@ -4,7 +4,7 @@
 
 #include <yttrium/application/event.h>
 
-#include <doctest.h>
+#include <doctest/doctest.h>
 
 TEST_CASE("key_event")
 {

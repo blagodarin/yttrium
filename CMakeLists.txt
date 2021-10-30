@@ -29,8 +29,8 @@ cmake_dependent_option(YTTRIUM_COMPRESSION_ZLIB "Enable zlib compression support
 
 set(AULOS_AULOSPLAY ON)
 set(AULOS_STATIC_RUNTIME ON)
-FetchContent_Declare(Primal GIT_REPOSITORY https://github.com/blagodarin/primal.git GIT_TAG 2944209a0a37d36e54b5ddc1b2f5b403e5b0f2f4)
-FetchContent_Declare(Aulos GIT_REPOSITORY https://github.com/blagodarin/aulos.git GIT_TAG fb61518c53483bd29b16659fd9099a0e8315f33f)
+FetchContent_Declare(Primal GIT_REPOSITORY https://github.com/blagodarin/primal.git GIT_TAG 693b6824c733f8e35c8d9844b68f1086406d21d4)
+FetchContent_Declare(Aulos GIT_REPOSITORY https://github.com/blagodarin/aulos.git GIT_TAG 96ed2f95579b50db6cc80f2b1f471acc25aabb6e)
 FetchContent_MakeAvailable(Primal Aulos)
 
 primal_set_defaults()
@@ -236,7 +236,8 @@ add_subdirectory(tools/pack)
 add_subdirectory(tools/ytr)
 
 if(YTTRIUM_TESTS)
-	primal_download("https://raw.githubusercontent.com/onqtam/doctest/2.4.4/doctest/doctest.h" SHA1 "7c25b870f3e0cde6d6c8596c60f3592fe557989a")
+	primal_provide_doctest(doctest_ROOT STATIC_RUNTIME ON)
+	find_package(doctest REQUIRED)
 	enable_testing()
 	add_subdirectory(libs/application/tests)
 	add_subdirectory(libs/audio/tests)

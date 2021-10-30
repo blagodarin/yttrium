@@ -127,7 +127,7 @@ namespace Yt
 			return Key::None;
 		};
 
-		const auto get_modifiers = [wparam] {
+		const auto get_modifiers = [] {
 			Flags<KeyEvent::Modifier> modifiers;
 			if (::GetKeyState(VK_SHIFT) & 0x8000)
 				modifiers |= KeyEvent::Modifier::Shift;

@@ -4,7 +4,7 @@
 
 #include <yttrium/base/buffer.h>
 
-#include <doctest.h>
+#include <doctest/doctest.h>
 
 using Yt::Buffer;
 

@@ -4,7 +4,7 @@
 
 #include <yttrium/geometry/margins.h>
 
-#include <doctest.h>
+#include <doctest/doctest.h>
 
 TEST_CASE("margins")
 {

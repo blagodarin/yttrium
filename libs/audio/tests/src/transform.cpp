@@ -10,7 +10,7 @@
 #include <array>
 #include <cstring>
 
-#include <doctest.h>
+#include <doctest/doctest.h>
 
 TEST_CASE("audio.transform.i16_to_i16x2")
 {

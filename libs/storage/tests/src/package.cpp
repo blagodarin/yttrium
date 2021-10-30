@@ -12,7 +12,7 @@
 #include <array>
 #include <cstring>
 
-#include <doctest.h>
+#include <doctest/doctest.h>
 
 // TODO: Test compressed packages.
 

@@ -8,7 +8,7 @@
 #include <mutex>
 #include <thread>
 
-#include <doctest.h>
+#include <doctest/doctest.h>
 
 TEST_CASE("logger.flush")
 {

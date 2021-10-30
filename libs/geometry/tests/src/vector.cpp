@@ -4,7 +4,7 @@
 
 #include <yttrium/geometry/vector.h>
 
-#include <doctest.h>
+#include <doctest/doctest.h>
 
 TEST_CASE("vector2")
 {

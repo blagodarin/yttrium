@@ -8,7 +8,7 @@
 
 #include <array>
 
-#include <doctest.h>
+#include <doctest/doctest.h>
 
 using Yt::Image;
 using Yt::PixelFormat;
