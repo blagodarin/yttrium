@@ -73,7 +73,7 @@ namespace Yt
 		{
 			if (entry._compressedSize == 0 || entry._compressedSize > entry._uncompressedSize || entry._compressedSize > indexOffset - offset)
 				throw BadPackage{ "Invalid Yttrium package" };
-			if (metadata.size() < 1 || metadata[0] > metadata.size() - 1)
+			if (metadata.empty() || metadata[0] > metadata.size() - 1)
 				throw BadPackage{ "Invalid Yttrium package" };
 			_entries.emplace_back(offset, entry._compressedSize, entry._uncompressedSize);
 			_names.emplace_back(reinterpret_cast<const char*>(metadata.data() + 1), metadata[0]);

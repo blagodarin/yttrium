@@ -194,8 +194,8 @@ namespace Yt
 		return true;
 	}
 
-	bool write_jpeg(Writer& writer, const ImageInfo& info, const void* data, int quality)
+	bool write_jpeg(Writer& writer, const ImageInfo& info, const void* data, int compression)
 	{
-		return JpegCompressor{ writer }.compress(info, data, quality);
+		return JpegCompressor{ writer }.compress(info, data, compression);
 	}
 }

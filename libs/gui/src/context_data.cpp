@@ -15,7 +15,7 @@ namespace Yt
 	{
 	}
 
-	RectF GuiContextData::layoutRect() noexcept
+	RectF GuiContextData::layoutRect() noexcept // NOLINT(readability-make-member-function-const)
 	{
 		return _layout ? _layout->add() : RectF{};
 	}

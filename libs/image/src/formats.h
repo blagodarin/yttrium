@@ -36,5 +36,5 @@ namespace Yt
 	bool write_tga(Writer&, const ImageInfo&, const void*);
 #endif
 	bool read_image(const Source&, ImageFormat, ImageInfo&, Buffer&);
-	bool write_image(Writer&&, ImageFormat, int quality, const ImageInfo&, const void*);
+	bool write_image(Writer&&, ImageFormat, int compression, const ImageInfo&, const void*);
 }
