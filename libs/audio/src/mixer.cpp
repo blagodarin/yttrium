@@ -8,18 +8,11 @@
 #include <yttrium/audio/utils.h>
 #include "sound.h"
 
+#include <primal/dsp.hpp>
+
 #include <algorithm>
 #include <cassert>
 #include <cstring>
-
-namespace
-{
-	void addSaturateF32(void* dst, const void* src, size_t count) noexcept
-	{
-		for (size_t i = 0; i < count; ++i)
-			static_cast<float*>(dst)[i] = std::clamp(static_cast<float*>(dst)[i] + static_cast<const float*>(src)[i], -1.f, 1.f);
-	}
-}
 
 namespace Yt
 {
@@ -73,7 +66,7 @@ namespace Yt
 				if (!read(out, maxFrames, _conversionBuffer, _sound->_reader))
 					_sound.reset();
 				else if (out != buffer)
-					::addSaturateF32(buffer, out, maxFrames * _format.channels());
+					primal::addSaturate1D(buffer, out, maxFrames * _format.channels());
 			}
 		}
 		return maxFrames;

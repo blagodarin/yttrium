@@ -18,8 +18,6 @@ add_library(Y_audio STATIC
 	src/manager.h
 	src/mixer.cpp
 	src/mixer.h
-	src/processing.cpp
-	src/processing.h
 	src/reader.cpp
 	src/sound.h
 	src/utils.cpp

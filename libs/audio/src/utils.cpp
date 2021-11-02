@@ -6,8 +6,9 @@
 
 #include <yttrium/audio/format.h>
 #include <yttrium/storage/writer.h>
-#include "processing.h"
 #include "wav.h"
+
+#include <primal/dsp.hpp>
 
 #include <cstring>
 #include <limits>
@@ -36,7 +37,7 @@ namespace Yt
 		case AudioSample::i16:
 			if (src_sample == AudioSample::i16 && dst_channels == 2 && src_channels == 1)
 			{
-				duplicate_i16(dst, src, frames);
+				primal::duplicate1D(static_cast<int16_t*>(dst), static_cast<const int16_t*>(src), frames);
 				return true;
 			}
 			break;
@@ -47,12 +48,12 @@ namespace Yt
 			case AudioSample::i16:
 				if (dst_channels == src_channels)
 				{
-					convert_normalize_f32_i16(dst, src, frames * src_channels);
+					primal::normalize1D(static_cast<float*>(dst), static_cast<const int16_t*>(src), frames * src_channels);
 					return true;
 				}
 				else if (dst_channels == 2 && src_channels == 1)
 				{
-					convert_normalize_duplicate_f32_i16(dst, src, frames);
+					primal::normalizeDuplicate1D(static_cast<float*>(dst), static_cast<const int16_t*>(src), frames);
 					return true;
 				}
 				break;
@@ -60,7 +61,7 @@ namespace Yt
 			case AudioSample::f32:
 				if (dst_channels == 2 && src_channels == 1)
 				{
-					duplicate_f32(dst, src, frames);
+					primal::duplicate1D(static_cast<float*>(dst), static_cast<const float*>(src), frames);
 					return true;
 				}
 				break;
