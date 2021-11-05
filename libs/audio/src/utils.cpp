@@ -8,70 +8,10 @@
 #include <yttrium/storage/writer.h>
 #include "wav.h"
 
-#include <primal/dsp.hpp>
-
-#include <cstring>
 #include <limits>
 
 namespace Yt
 {
-	bool transform_audio(void* dst, const AudioFormat& dst_format, const void* src, const AudioFormat& src_format, size_t frames)
-	{
-		if (dst_format.frames_per_second() != src_format.frames_per_second())
-			return false;
-
-		const auto dst_sample = dst_format.sample_type();
-		const auto src_sample = src_format.sample_type();
-
-		const auto dst_channels = dst_format.channels();
-		const auto src_channels = src_format.channels();
-
-		if (dst_sample == src_sample && dst_channels == src_channels)
-		{
-			std::memcpy(dst, src, frames * src_format.bytes_per_frame());
-			return true;
-		}
-
-		switch (dst_sample)
-		{
-		case AudioSample::i16:
-			if (src_sample == AudioSample::i16 && dst_channels == 2 && src_channels == 1)
-			{
-				primal::duplicate1D(static_cast<int16_t*>(dst), static_cast<const int16_t*>(src), frames);
-				return true;
-			}
-			break;
-
-		case AudioSample::f32:
-			switch (src_sample)
-			{
-			case AudioSample::i16:
-				if (dst_channels == src_channels)
-				{
-					primal::normalize1D(static_cast<float*>(dst), static_cast<const int16_t*>(src), frames * src_channels);
-					return true;
-				}
-				else if (dst_channels == 2 && src_channels == 1)
-				{
-					primal::normalizeDuplicate1D(static_cast<float*>(dst), static_cast<const int16_t*>(src), frames);
-					return true;
-				}
-				break;
-
-			case AudioSample::f32:
-				if (dst_channels == 2 && src_channels == 1)
-				{
-					primal::duplicate1D(static_cast<float*>(dst), static_cast<const float*>(src), frames);
-					return true;
-				}
-				break;
-			}
-			break;
-		}
-
-		return false;
-	}
-
 	bool write_wav_header(Writer& writer, const AudioFormat& format, size_t samples)
 	{
 		constexpr size_t max_wav_data_size = std::numeric_limits<int32_t>::max()

@@ -12,8 +12,5 @@ namespace Yt
 	class Writer;
 
 	///
-	bool transform_audio(void* dst, const AudioFormat& dst_format, const void* src, const AudioFormat& src_format, size_t frames);
-
-	///
 	bool write_wav_header(Writer&, const AudioFormat&, size_t samples);
 }

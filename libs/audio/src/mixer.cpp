@@ -43,55 +43,50 @@ namespace Yt
 
 	size_t AudioMixer::onRead(float* buffer, size_t maxFrames) noexcept
 	{
+		std::memset(buffer, 0, maxFrames * _format.bytes_per_frame());
 		std::lock_guard lock{ _mutex };
-		if (!_music && !_sound)
-		{
-			std::memset(buffer, 0, maxFrames * _format.bytes_per_frame());
-		}
-		else
-		{
-			auto out = buffer;
-			if (_music)
-			{
-				if (!read(out, maxFrames, _conversionBuffer, *_music))
-					_music.reset();
-				else
-				{
-					_mixBuffer.reserve(maxFrames * _format.bytes_per_frame());
-					out = reinterpret_cast<float*>(_mixBuffer.data());
-				}
-			}
-			if (_sound)
-			{
-				if (!read(out, maxFrames, _conversionBuffer, _sound->_reader))
-					_sound.reset();
-				else if (out != buffer)
-					primal::addSaturate1D(buffer, out, maxFrames * _format.channels());
-			}
-		}
+		if (_music && !read(buffer, maxFrames, _buffer, *_music))
+			_music.reset();
+		if (_sound && !read(buffer, maxFrames, _buffer, _sound->_reader))
+			_sound.reset();
 		return maxFrames;
 	}
 
-	bool AudioMixer::read(void* out, size_t outFrames, primal::Buffer<std::byte>& inBuffer, AudioReader& reader)
+	bool AudioMixer::read(float* out, size_t outFrames, primal::Buffer<std::byte>& inBuffer, AudioReader& reader)
 	{
-		if (const auto inFormat = reader.format(); inFormat == _format)
+		const auto inFormat = reader.format();
+		inBuffer.reserve(outFrames * inFormat.bytes_per_frame());
+		const auto inFrames = reader.read_frames(inBuffer.data(), outFrames);
+		if (!inFrames)
+			return false;
+		switch (inFormat.sample_type())
 		{
-			const auto inFrames = reader.read_frames(out, outFrames);
-			if (!inFrames)
+		case Yt::AudioSample::i16:
+			switch (inFormat.channels())
+			{
+			case 1:
+				primal::addSamples2x1D(out, reinterpret_cast<const int16_t*>(inBuffer.data()), inFrames);
+				break;
+			case 2:
+				primal::addSamples1D(out, reinterpret_cast<const int16_t*>(inBuffer.data()), inFrames * 2);
+				break;
+			default:
 				return false;
-			if (inFrames < outFrames)
-				std::memset(static_cast<std::byte*>(out) + inFrames * _format.bytes_per_frame(), 0, (outFrames - inFrames) * _format.bytes_per_frame());
-		}
-		else
-		{
-			inBuffer.reserve(outFrames * inFormat.bytes_per_frame());
-			const auto inFrames = reader.read_frames(inBuffer.data(), outFrames);
-			if (!inFrames)
+			}
+			break;
+		case Yt::AudioSample::f32:
+			switch (inFormat.channels())
+			{
+			case 1:
+				primal::addSamples2x1D(out, reinterpret_cast<const float*>(inBuffer.data()), inFrames);
+				break;
+			case 2:
+				primal::addSamples1D(out, reinterpret_cast<const float*>(inBuffer.data()), inFrames * 2);
+				break;
+			default:
 				return false;
-			if (!transform_audio(out, _format, inBuffer.data(), inFormat, inFrames))
-				return false;
-			if (inFrames < outFrames)
-				std::memset(static_cast<std::byte*>(out) + inFrames * _format.bytes_per_frame(), 0, (outFrames - inFrames) * _format.bytes_per_frame());
+			}
+			break;
 		}
 		return true;
 	}

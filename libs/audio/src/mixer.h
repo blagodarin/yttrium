@@ -30,12 +30,11 @@ namespace Yt
 		size_t onRead(float* buffer, size_t maxFrames) noexcept override;
 
 	private:
-		bool read(void* out, size_t outFrames, primal::Buffer<std::byte>& inBuffer, AudioReader&);
+		bool read(float* out, size_t outFrames, primal::Buffer<std::byte>& inBuffer, AudioReader&);
 
 	private:
 		const AudioFormat _format;
-		primal::Buffer<std::byte> _mixBuffer;
-		primal::Buffer<std::byte> _conversionBuffer;
+		primal::Buffer<std::byte> _buffer;
 		std::mutex _mutex;
 		std::shared_ptr<AudioReader> _music;
 		std::shared_ptr<SoundImpl> _sound;
