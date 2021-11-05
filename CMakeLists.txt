@@ -2,7 +2,7 @@
 # Copyright (C) Sergei Blagodarin.
 # SPDX-License-Identifier: Apache-2.0
 
-cmake_minimum_required(VERSION 3.19)
+cmake_minimum_required(VERSION 3.21)
 
 project(Yttrium VERSION 0.0.1 LANGUAGES CXX)
 
@@ -10,7 +10,7 @@ include(CMakeDependentOption)
 include(FetchContent)
 include(GNUInstallDirs)
 
-if(NOT PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+if(PROJECT_IS_TOP_LEVEL)
 	set(CMAKE_FOLDER "Yttrium")
 	set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER ".cmake")
 	set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -29,8 +29,8 @@ cmake_dependent_option(YTTRIUM_COMPRESSION_ZLIB "Enable zlib compression support
 
 set(AULOS_AULOSPLAY ON)
 set(AULOS_STATIC_RUNTIME ON)
-FetchContent_Declare(Primal GIT_REPOSITORY https://github.com/blagodarin/primal.git GIT_TAG 0d1cb745bf673dbc140a422e6d51454a4fcf38f2)
-FetchContent_Declare(Aulos GIT_REPOSITORY https://github.com/blagodarin/aulos.git GIT_TAG 5ede4f216c453e8f89efefc096ba37f995c3a51f)
+FetchContent_Declare(Primal GIT_REPOSITORY https://github.com/blagodarin/primal.git GIT_TAG 47d74cf4427f79ab6db5a461f80cc5aa906f51a7)
+FetchContent_Declare(Aulos GIT_REPOSITORY https://github.com/blagodarin/aulos.git GIT_TAG 3336829acb1f782dc7d77eddfe58ac4b44efa5cb)
 FetchContent_MakeAvailable(Primal Aulos)
 
 primal_set_defaults()
