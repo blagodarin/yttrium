@@ -1,5 +1,5 @@
 [![Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
-[![AppVeyor](https://ci.appveyor.com/api/projects/status/v3pco3lbvp2y4r9b/branch/master?svg=true)](https://ci.appveyor.com/project/blagodarin/yttrium)
+[![Windows](https://github.com/blagodarin/yttrium/actions/workflows/windows.yml/badge.svg)](https://github.com/blagodarin/yttrium/actions/workflows/windows.yml)
 [![Travis CI](https://travis-ci.com/blagodarin/yttrium.svg?branch=master)](https://travis-ci.com/github/blagodarin/yttrium)
 [![Codecov](https://codecov.io/gh/blagodarin/yttrium/branch/master/graph/badge.svg)](https://codecov.io/gh/blagodarin/yttrium)
 
