@@ -1,0 +1,80 @@
+name: Linux
+on:
+  push:
+    paths-ignore:
+      - 'docs/**'
+      - 'LICENSE'
+      - 'README.md'
+jobs:
+  ci:
+    name: Linux
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - renderer: opengl
+            cxx: g++-10
+            config: Release
+          - renderer: opengl
+            cxx: g++-10
+            config: Debug
+          - renderer: opengl
+            cxx: clang++-12
+            config: Release
+          - renderer: opengl
+            cxx: clang++-12
+            config: Debug
+          - renderer: none
+            cxx: g++-10
+            config: Debug
+            mode: coverage
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install libasound2-dev libvorbis-dev ninja-build
+          if [ "${{ matrix.renderer }}" == "opengl" ]; then
+            sudo apt-get install libgl-dev
+          else
+            sudo apt-get install libxcb-image0-dev libxcb-xkb-dev libxkbcommon-x11-dev
+          fi
+      - name: Run CMake
+        env:
+          CXX: ${{ matrix.cxx }}
+        run: |
+          if [ "${{ matrix.mode }}" == "coverage" ]; then
+            export CXXFLAGS="--coverage"
+            export LDFLAGS="--coverage"
+          else
+            export CXXFLAGS="-fsanitize=address -fsanitize=undefined -fno-sanitize=nonnull-attribute"
+            export LDFLAGS="-fsanitize=address -fsanitize=undefined"
+          fi
+          cmake -S . -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=${{ matrix.config }} \
+            -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}/install" \
+            -DYTTRIUM_AUDIO_AULOS=ON \
+            -DYTTRIUM_AUDIO_OGGVORBIS=ON \
+            -DYTTRIUM_AUDIO_WAV=ON \
+            -DYTTRIUM_IMAGE_BMP=ON \
+            -DYTTRIUM_IMAGE_DDS=ON \
+            -DYTTRIUM_IMAGE_ICO=ON \
+            -DYTTRIUM_IMAGE_JPEG=ON \
+            -DYTTRIUM_IMAGE_PNG=ON \
+            -DYTTRIUM_IMAGE_TGA=ON \
+            -DYTTRIUM_RENDERER=${{ matrix.renderer }} \
+            -DYTTRIUM_TESTS=ON
+      - name: Build
+        run: |
+          cmake --build build
+          cmake --build build --target install
+      - name: Run tests
+        run: |
+          cd build
+          ctest --verbose
+      - name: Upload coverage reports
+        if: matrix.mode == 'coverage'
+        run: |
+          pip install --user codecov
+          codecov --gcov-root "${{ github.workspace }}/build" --gcov-exec gcov-10 --gcov-args "-s `pwd`"
