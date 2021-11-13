@@ -8,7 +8,7 @@
 #include <yttrium/base/numeric.h>
 #include "../../../base/src/windows/error.h"
 
-#include <primal/utf8.hpp>
+#include <seir_base/utf8.hpp>
 
 #include <array>
 #include <cassert>
@@ -210,7 +210,7 @@ namespace Yt
 			if (const auto callbacks = find_callbacks(hwnd))
 			{
 				std::array<char, 4> buffer;
-				if (const auto bytes = primal::writeUtf8(buffer, static_cast<char32_t>(wparam)))
+				if (const auto bytes = seir::writeUtf8(buffer, static_cast<char32_t>(wparam)))
 					if (const auto c = static_cast<unsigned char>(buffer[0]); c >= 0x20 && c != 0x7f)
 						callbacks->on_text({ buffer.data(), bytes });
 			}

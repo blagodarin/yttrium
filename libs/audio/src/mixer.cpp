@@ -8,7 +8,7 @@
 #include <yttrium/audio/utils.h>
 #include "sound.h"
 
-#include <primal/dsp.hpp>
+#include <seir_audio/processing.hpp>
 
 #include <algorithm>
 #include <cassert>
@@ -52,7 +52,7 @@ namespace Yt
 		return maxFrames;
 	}
 
-	bool AudioMixer::read(float* out, size_t outFrames, primal::Buffer<std::byte>& inBuffer, AudioReader& reader)
+	bool AudioMixer::read(float* out, size_t outFrames, seir::Buffer<std::byte>& inBuffer, AudioReader& reader)
 	{
 		const auto inFormat = reader.format();
 		inBuffer.reserve(outFrames * inFormat.bytes_per_frame());
@@ -65,10 +65,10 @@ namespace Yt
 			switch (inFormat.channels())
 			{
 			case 1:
-				primal::addSamples2x1D(out, reinterpret_cast<const int16_t*>(inBuffer.data()), inFrames);
+				seir::addSamples2x1D(out, reinterpret_cast<const int16_t*>(inBuffer.data()), inFrames);
 				break;
 			case 2:
-				primal::addSamples1D(out, reinterpret_cast<const int16_t*>(inBuffer.data()), inFrames * 2);
+				seir::addSamples1D(out, reinterpret_cast<const int16_t*>(inBuffer.data()), inFrames * 2);
 				break;
 			default:
 				return false;
@@ -78,10 +78,10 @@ namespace Yt
 			switch (inFormat.channels())
 			{
 			case 1:
-				primal::addSamples2x1D(out, reinterpret_cast<const float*>(inBuffer.data()), inFrames);
+				seir::addSamples2x1D(out, reinterpret_cast<const float*>(inBuffer.data()), inFrames);
 				break;
 			case 2:
-				primal::addSamples1D(out, reinterpret_cast<const float*>(inBuffer.data()), inFrames * 2);
+				seir::addSamples1D(out, reinterpret_cast<const float*>(inBuffer.data()), inFrames * 2);
 				break;
 			default:
 				return false;

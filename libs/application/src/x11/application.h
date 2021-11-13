@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <primal/pointer.hpp>
+#include <seir_base/pointer.hpp>
 
 #include <type_traits>
 
@@ -26,8 +26,8 @@ namespace Yt
 		int screen() const noexcept { return _screen; }
 
 	private:
-		primal::CPtr<::Display, ::XCloseDisplay> _display;
+		seir::CPtr<::Display, ::XCloseDisplay> _display;
 		int _screen = 0;
-		primal::CPtr<std::remove_pointer_t<XIM>, ::XCloseIM> _input_method;
+		seir::CPtr<std::remove_pointer_t<XIM>, ::XCloseIM> _input_method;
 	};
 }

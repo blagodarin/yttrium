@@ -2,7 +2,7 @@
 # Copyright (C) Sergei Blagodarin.
 # SPDX-License-Identifier: Apache-2.0
 
-primal_set_folder(libs)
+seir_folder(libs)
 source_group("src" REGULAR_EXPRESSION ".*\\.(h|cpp)$")
 source_group("src/posix" REGULAR_EXPRESSION "src/posix/")
 source_group("src/windows" REGULAR_EXPRESSION "src/windows/")
@@ -27,7 +27,7 @@ add_library(Y_base STATIC
 	src/virtual_memory.h
 	)
 target_include_directories(Y_base PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-target_link_libraries(Y_base PRIVATE primal fmt::fmt Threads::Threads)
+target_link_libraries(Y_base PRIVATE Seir::base fmt::fmt Threads::Threads)
 set_target_properties(Y_base PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 if(WIN32)
 	target_compile_definitions(Y_base PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
@@ -43,5 +43,5 @@ else()
 		src/posix/virtual_memory.cpp
 		)
 endif()
-primal_install(Y_base EXPORT YttriumTargets)
+seir_install(Y_base EXPORT YttriumTargets)
 install(DIRECTORY include/yttrium DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})

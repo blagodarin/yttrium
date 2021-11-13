@@ -6,8 +6,8 @@
 
 #include <yttrium/audio/format.h>
 
-#include <aulosplay/player.hpp>
-#include <primal/buffer.hpp>
+#include <seir_audio/player.hpp>
+#include <seir_base/buffer.hpp>
 
 #include <mutex>
 
@@ -17,7 +17,7 @@ namespace Yt
 	class Sound;
 	class SoundImpl;
 
-	class AudioMixer : public aulosplay::Source
+	class AudioMixer : public seir::AudioSource
 	{
 	public:
 		explicit AudioMixer(const AudioFormat&);
@@ -30,11 +30,11 @@ namespace Yt
 		size_t onRead(float* buffer, size_t maxFrames) noexcept override;
 
 	private:
-		bool read(float* out, size_t outFrames, primal::Buffer<std::byte>& inBuffer, AudioReader&);
+		bool read(float* out, size_t outFrames, seir::Buffer<std::byte>& inBuffer, AudioReader&);
 
 	private:
 		const AudioFormat _format;
-		primal::Buffer<std::byte> _buffer;
+		seir::Buffer<std::byte> _buffer;
 		std::mutex _mutex;
 		std::shared_ptr<AudioReader> _music;
 		std::shared_ptr<SoundImpl> _sound;

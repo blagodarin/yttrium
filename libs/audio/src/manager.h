@@ -6,7 +6,7 @@
 
 #include <yttrium/audio/manager.h>
 
-#include <aulosplay/player.hpp>
+#include <seir_audio/player.hpp>
 
 namespace Yt
 {
@@ -14,7 +14,7 @@ namespace Yt
 
 	class AudioManagerImpl final
 		: public AudioManager
-		, private aulosplay::PlayerCallbacks
+		, private seir::AudioCallbacks
 	{
 	public:
 		explicit AudioManagerImpl();
@@ -25,13 +25,13 @@ namespace Yt
 		void play_sound(const std::shared_ptr<Sound>&) override;
 
 	private:
-		void onPlaybackError(aulosplay::PlaybackError) override;
+		void onPlaybackError(seir::AudioError) override;
 		void onPlaybackError(std::string&&) override;
 		void onPlaybackStarted() override {}
 		void onPlaybackStopped() override {}
 
 	private:
 		const std::shared_ptr<AudioMixer> _mixer;
-		std::unique_ptr<aulosplay::Player> _player;
+		std::unique_ptr<seir::AudioPlayer> _player;
 	};
 }

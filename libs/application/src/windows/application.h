@@ -6,7 +6,7 @@
 
 #include <yttrium/application/event.h>
 
-#include <primal/pointer.hpp>
+#include <seir_base/pointer.hpp>
 
 #include <string_view>
 #include <unordered_map>
@@ -33,7 +33,7 @@ namespace Yt
 		static void free(HWND) noexcept;
 	};
 
-	using NativeWindow = primal::Pointer<std::remove_pointer_t<HWND>, HWndDeleter>;
+	using NativeWindow = seir::Pointer<std::remove_pointer_t<HWND>, HWndDeleter>;
 
 	class NativeApplication
 	{

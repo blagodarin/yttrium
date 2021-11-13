@@ -10,7 +10,7 @@
 #include <yttrium/storage/writer.h>
 #include "yp_format.h"
 
-#include <primal/buffer.hpp>
+#include <seir_base/buffer.hpp>
 
 #include <cstring>
 #include <limits>
@@ -80,7 +80,7 @@ namespace Yt
 			return _data->_finished;
 
 		const auto strippedIndexSize = _data->_entries.size() * sizeof(YpBlockEntry);
-		primal::Buffer<std::byte> indexBuffer{ strippedIndexSize };
+		seir::Buffer<std::byte> indexBuffer{ strippedIndexSize };
 		auto indexEntry = reinterpret_cast<YpBlockEntry*>(indexBuffer.data());
 
 		Buffer nameBuffer;
@@ -98,7 +98,7 @@ namespace Yt
 		if (!_data->_writer.write(header))
 			return false;
 
-		primal::Buffer<uint8_t> compressedBuffer;
+		seir::Buffer<uint8_t> compressedBuffer;
 		const auto writeBlock = [this, &compressedBuffer](YpBlockEntry& block, const void* data, size_t size, int compressionLevel) {
 			if (size > std::numeric_limits<uint32_t>::max())
 				return false;
@@ -120,7 +120,7 @@ namespace Yt
 			return _data->_writer.write_all(data, block._uncompressedSize);
 		};
 
-		primal::Buffer<uint8_t> uncompressedBuffer;
+		seir::Buffer<uint8_t> uncompressedBuffer;
 		for (const auto& entry : _data->_entries)
 		{
 			if (!writeName(entry._name))

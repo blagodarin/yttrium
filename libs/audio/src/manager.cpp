@@ -12,7 +12,7 @@ namespace Yt
 {
 	AudioManagerImpl::AudioManagerImpl()
 		: _mixer{ std::make_shared<AudioMixer>(AudioFormat{ AudioSample::f32, 2, 44'100 }) }
-		, _player{ aulosplay::Player::create(*this, 44'100) }
+		, _player{ seir::AudioPlayer::create(*this, 44'100) }
 	{
 		_player->play(_mixer);
 	}
@@ -37,11 +37,11 @@ namespace Yt
 		_mixer->playSound(sound);
 	}
 
-	void AudioManagerImpl::onPlaybackError(aulosplay::PlaybackError error)
+	void AudioManagerImpl::onPlaybackError(seir::AudioError error)
 	{
 		switch (error)
 		{
-		case aulosplay::PlaybackError::NoDevice: Logger::write("(AudioManager) No audio device found"); break;
+		case seir::AudioError::NoDevice: Logger::write("(AudioManager) No audio device found"); break;
 		}
 	}
 

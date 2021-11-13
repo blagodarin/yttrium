@@ -2,7 +2,7 @@
 # Copyright (C) Sergei Blagodarin.
 # SPDX-License-Identifier: Apache-2.0
 
-primal_set_folder(libs)
+seir_folder(libs)
 source_group("src" REGULAR_EXPRESSION ".*\\.(h|cpp)$")
 source_group("src/windows" REGULAR_EXPRESSION "/src/windows/")
 source_group("src/x11" REGULAR_EXPRESSION "/src/x11/")
@@ -26,7 +26,7 @@ target_compile_definitions(Y_application PUBLIC
 	YTTRIUM_RENDERER_VULKAN=$<BOOL:${YTTRIUM_RENDERER_VULKAN}>
 	)
 target_include_directories(Y_application PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-target_link_libraries(Y_application PUBLIC Y_base PRIVATE Y_geometry Y_image primal)
+target_link_libraries(Y_application PUBLIC Y_base PRIVATE Y_geometry Y_image Seir::base)
 set_target_properties(Y_application PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 if(YTTRIUM_RENDERER_OPENGL)
 	target_sources(Y_application PRIVATE
@@ -46,9 +46,9 @@ if(WIN32)
 			src/windows/wgl.cpp
 			src/windows/wgl.h
 			)
-		primal_download("https://www.khronos.org/registry/OpenGL/api/GL/wglext.h" NAME GL/wglext.h)
-		primal_download("https://www.khronos.org/registry/EGL/api/KHR/khrplatform.h" NAME KHR/khrplatform.h)
-		target_include_directories(Y_application SYSTEM PRIVATE ${PRIMAL_DOWNLOAD_DIR})
+		seir_download("https://www.khronos.org/registry/OpenGL/api/GL/wglext.h" NAME GL/wglext.h)
+		seir_download("https://www.khronos.org/registry/EGL/api/KHR/khrplatform.h" NAME KHR/khrplatform.h)
+		target_include_directories(Y_application SYSTEM PRIVATE ${SEIR_DOWNLOAD_DIR})
 	endif()
 else()
 	if(YTTRIUM_RENDERER_OPENGL)
@@ -82,5 +82,5 @@ else()
 		endif()
 	endif()
 endif()
-primal_install(Y_application EXPORT YttriumTargets)
+seir_install(Y_application EXPORT YttriumTargets)
 install(DIRECTORY include/yttrium DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})

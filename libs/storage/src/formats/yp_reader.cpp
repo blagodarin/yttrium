@@ -59,7 +59,7 @@ namespace Yt
 		{
 			if (!_decompressor || header._indexBlock._compressedSize == 0 || header._indexBlock._compressedSize > header._indexBlock._uncompressedSize)
 				throw BadPackage{ "Invalid Yttrium package" };
-			primal::Buffer<uint8_t> compressedIndexBuffer{ header._indexBlock._compressedSize };
+			seir::Buffer<uint8_t> compressedIndexBuffer{ header._indexBlock._compressedSize };
 			if (!_source->read_at(indexOffset, compressedIndexBuffer.data(), header._indexBlock._compressedSize)
 				|| !_decompressor->decompress(_indexBuffer.data(), header._indexBlock._uncompressedSize, compressedIndexBuffer.data(), header._indexBlock._compressedSize))
 				throw BadPackage{ "Invalid Yttrium package" };
@@ -93,7 +93,7 @@ namespace Yt
 			return Source::from(_source, entry._offset, entry._uncompressedSize);
 		if (!_decompressor || entry._compressedSize == 0 || entry._uncompressedSize == 0)
 			return {};
-		primal::Buffer<uint8_t> compressedBuffer{ entry._compressedSize };
+		seir::Buffer<uint8_t> compressedBuffer{ entry._compressedSize };
 		Buffer uncompressedBuffer{ entry._uncompressedSize };
 		if (!_source->read_at(entry._offset, compressedBuffer.data(), entry._compressedSize)
 			|| !_decompressor->decompress(uncompressedBuffer.data(), entry._uncompressedSize, compressedBuffer.data(), entry._compressedSize))

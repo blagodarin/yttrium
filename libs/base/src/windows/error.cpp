@@ -7,7 +7,7 @@
 #include <yttrium/base/exceptions.h>
 #include <yttrium/base/logger.h>
 
-#include <primal/pointer.hpp>
+#include <seir_base/pointer.hpp>
 
 #include <array>
 
@@ -19,7 +19,7 @@ namespace
 {
 	auto windows_error_description(unsigned long code)
 	{
-		primal::CPtr<char, ::LocalFree> buffer;
+		seir::CPtr<char, ::LocalFree> buffer;
 		::FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 			nullptr, code, MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US), reinterpret_cast<char*>(buffer.out()), 0, nullptr);
 		if (buffer)

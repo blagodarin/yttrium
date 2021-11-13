@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <primal/endian.hpp>
+#include <seir_base/endian.hpp>
 
 namespace Yt
 {
@@ -20,8 +20,8 @@ namespace Yt
 	{
 		enum : uint32_t
 		{
-			RIFF = primal::makeCC('R', 'I', 'F', 'F'),
-			WAVE = primal::makeCC('W', 'A', 'V', 'E'),
+			RIFF = seir::makeCC('R', 'I', 'F', 'F'),
+			WAVE = seir::makeCC('W', 'A', 'V', 'E'),
 		};
 
 		uint32_t riff_fourcc;
@@ -33,8 +33,8 @@ namespace Yt
 	{
 		enum : uint32_t
 		{
-			fmt = primal::makeCC('f', 'm', 't', ' '),
-			data = primal::makeCC('d', 'a', 't', 'a'),
+			fmt = seir::makeCC('f', 'm', 't', ' '),
+			data = seir::makeCC('d', 'a', 't', 'a'),
 		};
 
 		uint32_t name_fourcc;

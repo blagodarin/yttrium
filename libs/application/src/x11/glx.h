@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <primal/pointer.hpp>
+#include <seir_base/pointer.hpp>
 
 #include <GL/glx.h>
 #ifdef None
@@ -38,7 +38,7 @@ namespace Yt
 	private:
 		::Display* const _display;
 		const int _screen;
-		primal::CPtr<XVisualInfo, ::XFree> _visual_info;
+		seir::CPtr<XVisualInfo, ::XFree> _visual_info;
 		GLXContext _context = nullptr;
 		Extensions _extensions;
 	};

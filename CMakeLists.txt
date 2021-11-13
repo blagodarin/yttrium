@@ -11,9 +11,7 @@ include(FetchContent)
 include(GNUInstallDirs)
 
 if(PROJECT_IS_TOP_LEVEL)
-	set(CMAKE_FOLDER "Yttrium")
-	set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER ".cmake")
-	set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+	set(CMAKE_FOLDER ".subprojects")
 endif()
 
 option(YTTRIUM_AUDIO_AULOS "Enable Aulos audio support" OFF)
@@ -27,13 +25,12 @@ option(YTTRIUM_IMAGE_PNG "Enable PNG image support (write only)" OFF)
 option(YTTRIUM_IMAGE_TGA "Enable TGA image support" OFF)
 cmake_dependent_option(YTTRIUM_COMPRESSION_ZLIB "Enable zlib compression support" OFF "NOT YTTRIUM_IMAGE_PNG" ON)
 
-set(AULOS_AULOSPLAY ON)
-set(AULOS_STATIC_RUNTIME ON)
-FetchContent_Declare(Primal GIT_REPOSITORY https://github.com/blagodarin/primal.git GIT_TAG 47d74cf4427f79ab6db5a461f80cc5aa906f51a7)
-FetchContent_Declare(Aulos GIT_REPOSITORY https://github.com/blagodarin/aulos.git GIT_TAG 3336829acb1f782dc7d77eddfe58ac4b44efa5cb)
-FetchContent_MakeAvailable(Primal Aulos)
+set(SEIR_AUDIO ON)
+set(SEIR_STATIC_RUNTIME ON)
+FetchContent_Declare(Seir GIT_REPOSITORY https://github.com/blagodarin/seir.git GIT_TAG 80e8c8461647399398aaa821c5b7f2d2e227ca3c)
+FetchContent_MakeAvailable(Seir)
 
-primal_set_defaults()
+seir_set_defaults()
 
 if(WIN32)
 	set(CMAKE_DEBUG_POSTFIX "d")
@@ -51,28 +48,35 @@ if(NOT WIN32)
 endif()
 
 # fmt
-primal_provide_fmt(fmt_ROOT STATIC_RUNTIME ON)
+seir_provide_fmt(fmt_ROOT STATIC_RUNTIME ON)
 find_package(fmt REQUIRED)
 
 # Freetype
 if(WIN32)
-	primal_provide_freetype(Freetype_ROOT STATIC_RUNTIME ON)
+	seir_provide_freetype(Freetype_ROOT STATIC_RUNTIME ON)
 endif()
 find_package(Freetype REQUIRED)
 
 # JPEG
 if(YTTRIUM_IMAGE_JPEG)
 	if(WIN32)
-		primal_provide_jpeg(JPEG_ROOT STATIC_RUNTIME ON)
+		seir_provide_jpeg(JPEG_ROOT STATIC_RUNTIME ON)
 	endif()
 	find_package(JPEG REQUIRED)
+endif()
+
+# Aulos
+if(YTTRIUM_AUDIO_AULOS)
+	set(AULOS_STATIC_RUNTIME ON)
+	FetchContent_Declare(Aulos GIT_REPOSITORY https://github.com/blagodarin/aulos.git GIT_TAG 3336829acb1f782dc7d77eddfe58ac4b44efa5cb)
+	FetchContent_MakeAvailable(Aulos)
 endif()
 
 # Vorbis
 if(YTTRIUM_AUDIO_OGGVORBIS)
 	if(WIN32)
-		primal_provide_ogg(Ogg_ROOT STATIC_RUNTIME ON)
-		primal_provide_vorbis(Vorbis_ROOT STATIC_RUNTIME ON)
+		seir_provide_ogg(Ogg_ROOT STATIC_RUNTIME ON)
+		seir_provide_vorbis(Vorbis_ROOT STATIC_RUNTIME ON)
 		find_package(Vorbis REQUIRED)
 	else()
 		pkg_check_modules(vorbisfile REQUIRED IMPORTED_TARGET vorbisfile)
@@ -83,7 +87,7 @@ endif()
 # ZLIB
 if(YTTRIUM_COMPRESSION_ZLIB)
 	if(WIN32)
-		primal_provide_zlib(ZLIB_ROOT STATIC_RUNTIME ON)
+		seir_provide_zlib(ZLIB_ROOT STATIC_RUNTIME ON)
 	endif()
 	find_package(ZLIB REQUIRED)
 endif()
@@ -236,7 +240,7 @@ add_subdirectory(tools/pack)
 add_subdirectory(tools/ytr)
 
 if(YTTRIUM_TESTS)
-	primal_provide_doctest(doctest_ROOT STATIC_RUNTIME ON)
+	seir_provide_doctest(doctest_ROOT STATIC_RUNTIME ON)
 	find_package(doctest REQUIRED)
 	enable_testing()
 	add_subdirectory(libs/application/tests)

@@ -61,7 +61,7 @@ namespace Yt
 
 		WindowBackendCallbacks& _callbacks;
 		NativeApplication _application;
-		primal::Pointer<std::remove_pointer_t<HICON>, HIconDeleter> _icon;
+		seir::Pointer<std::remove_pointer_t<HICON>, HIconDeleter> _icon;
 		NativeWindow _hwnd = _application.create_window(*this);
 		const WindowDC _hdc{ _hwnd };
 #if YTTRIUM_RENDERER_OPENGL

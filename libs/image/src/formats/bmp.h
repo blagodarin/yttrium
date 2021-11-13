@@ -4,13 +4,13 @@
 
 #pragma once
 
-#include <primal/endian.hpp>
+#include <seir_base/endian.hpp>
 
 namespace Yt
 {
 	enum class BmpFileType : uint16_t
 	{
-		Bm = primal::makeCC('B', 'M'),
+		Bm = seir::makeCC('B', 'M'),
 	};
 
 	enum class BmpCompression : uint32_t

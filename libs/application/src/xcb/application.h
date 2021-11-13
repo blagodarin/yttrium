@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <primal/pointer.hpp>
+#include <seir_base/pointer.hpp>
 
 #include <xcb/xcb.h>
 
@@ -19,7 +19,7 @@ namespace Yt
 		xcb_screen_t* screen() const noexcept { return _screen; }
 
 	private:
-		primal::CPtr<xcb_connection_t, ::xcb_disconnect> _connection;
+		seir::CPtr<xcb_connection_t, ::xcb_disconnect> _connection;
 		xcb_screen_t* _screen = nullptr;
 	};
 }

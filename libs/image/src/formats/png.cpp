@@ -8,8 +8,8 @@
 #include <yttrium/storage/writer.h>
 #include "../formats.h"
 
-#include <primal/buffer.hpp>
-#include <primal/endian.hpp>
+#include <seir_base/buffer.hpp>
+#include <seir_base/endian.hpp>
 
 #include <array>
 #include <cstring>
@@ -17,13 +17,13 @@
 
 namespace
 {
-	constexpr auto PngSignature = primal::makeCC('\x89', 'P', 'N', 'G', '\r', '\n', '\x1a', '\n');
+	constexpr auto PngSignature = seir::makeCC('\x89', 'P', 'N', 'G', '\r', '\n', '\x1a', '\n');
 
 	enum class PngChunkType : uint32_t
 	{
-		IDAT = primal::makeCC('I', 'D', 'A', 'T'),
-		IEND = primal::makeCC('I', 'E', 'N', 'D'),
-		IHDR = primal::makeCC('I', 'H', 'D', 'R'),
+		IDAT = seir::makeCC('I', 'D', 'A', 'T'),
+		IEND = seir::makeCC('I', 'E', 'N', 'D'),
+		IHDR = seir::makeCC('I', 'H', 'D', 'R'),
 	};
 
 	enum class PngColorType : uint8_t
@@ -207,14 +207,14 @@ namespace Yt
 		ImageInfo pngInfo{ info.width(), info.height(), stride, uncompressedPixelFormat, ImageOrientation::XRightYDown };
 
 		const auto uncompressedSize = pngInfo.frame_size();
-		primal::Buffer<uint8_t> uncompressedBuffer{ uncompressedSize };
+		seir::Buffer<uint8_t> uncompressedBuffer{ uncompressedSize };
 		if (!Image::transform(info, data, pngInfo, uncompressedBuffer.data() + 1))
 			return false;
 
 		for (size_t i = 0; i < uncompressedSize; i += stride)
 			uncompressedBuffer.data()[i] = to_underlying(PngStandardFilterType::None);
 
-		primal::Buffer<uint8_t> compressedBuffer;
+		seir::Buffer<uint8_t> compressedBuffer;
 		size_t compressedSize = 0;
 		{
 			const auto compressor = Compressor::zlib();
@@ -228,24 +228,24 @@ namespace Yt
 
 		PngHeader header;
 		header.signature = PngSignature;
-		header.ihdr.length = primal::bigEndian(uint32_t{ sizeof header.ihdr.data });
+		header.ihdr.length = seir::bigEndian(uint32_t{ sizeof header.ihdr.data });
 		header.ihdr.type = PngChunkType::IHDR;
-		header.ihdr.data.width = primal::bigEndian(static_cast<uint32_t>(info.width()));
-		header.ihdr.data.height = primal::bigEndian(static_cast<uint32_t>(info.height()));
+		header.ihdr.data.width = seir::bigEndian(static_cast<uint32_t>(info.width()));
+		header.ihdr.data.height = seir::bigEndian(static_cast<uint32_t>(info.height()));
 		header.ihdr.data.bitDepth = 8;
 		header.ihdr.data.colorType = pngColorType;
 		header.ihdr.data.compressionMethod = PngCompressionMethod::Zlib;
 		header.ihdr.data.filterMethod = PngFilterMethod::Standard;
 		header.ihdr.data.interlaceMethod = PngInterlaceMethod::None;
-		header.ihdr.crc = primal::bigEndian(Crc32{}.process(&header.ihdr.type, sizeof header.ihdr.type).process(&header.ihdr.data, sizeof header.ihdr.data).value());
-		header.idat.length = primal::bigEndian(static_cast<uint32_t>(compressedSize));
+		header.ihdr.crc = seir::bigEndian(Crc32{}.process(&header.ihdr.type, sizeof header.ihdr.type).process(&header.ihdr.data, sizeof header.ihdr.data).value());
+		header.idat.length = seir::bigEndian(static_cast<uint32_t>(compressedSize));
 		header.idat.type = PngChunkType::IDAT;
 
 		PngFooter footer;
-		footer.idat.crc = primal::bigEndian(Crc32{}.process(&header.idat.type, sizeof header.idat.type).process(compressedBuffer.data(), compressedSize).value());
+		footer.idat.crc = seir::bigEndian(Crc32{}.process(&header.idat.type, sizeof header.idat.type).process(compressedBuffer.data(), compressedSize).value());
 		footer.iend.length = 0;
 		footer.iend.type = PngChunkType::IEND;
-		footer.iend.crc = primal::bigEndian(Crc32{}.process(&footer.iend.type, sizeof footer.iend.type).value());
+		footer.iend.crc = seir::bigEndian(Crc32{}.process(&footer.iend.type, sizeof footer.iend.type).value());
 
 		return writer.try_reserve(sizeof header + compressedSize + sizeof footer)
 			&& writer.write(header)

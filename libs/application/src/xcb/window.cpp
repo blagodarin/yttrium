@@ -81,7 +81,7 @@ namespace Yt
 
 			const auto cookie = ::xcb_xkb_select_events_aux_checked(_connection, XCB_XKB_ID_USE_CORE_KBD,
 				selected_events, 0, selected_events, selected_map_parts, selected_map_parts, nullptr);
-			primal::CPtr<xcb_generic_error_t, ::free> error{ ::xcb_request_check(_connection, cookie) };
+			seir::CPtr<xcb_generic_error_t, ::free> error{ ::xcb_request_check(_connection, cookie) };
 			if (error)
 				throw std::runtime_error{ "Unable to select XKB events" };
 
@@ -172,9 +172,9 @@ namespace Yt
 		xcb_connection_t* const _connection;
 		uint8_t _base_event = 0;
 		int32_t _keyboard_id = -1;
-		primal::CPtr<xkb_context, ::xkb_context_unref> _context;
-		primal::CPtr<xkb_keymap, ::xkb_keymap_unref> _keymap;
-		primal::CPtr<xkb_state, ::xkb_state_unref> _state;
+		seir::CPtr<xkb_context, ::xkb_context_unref> _context;
+		seir::CPtr<xkb_keymap, ::xkb_keymap_unref> _keymap;
+		seir::CPtr<xkb_state, ::xkb_state_unref> _state;
 		std::string _keycode_text_buffer;
 	};
 
@@ -224,7 +224,7 @@ namespace Yt
 	{
 		if (_window == XCB_WINDOW_NONE)
 			return false;
-		const primal::CPtr<xcb_query_pointer_reply_t, ::free> reply{ ::xcb_query_pointer_reply(_application.connection(), ::xcb_query_pointer(_application.connection(), _window), nullptr) };
+		const seir::CPtr<xcb_query_pointer_reply_t, ::free> reply{ ::xcb_query_pointer_reply(_application.connection(), ::xcb_query_pointer(_application.connection(), _window), nullptr) };
 		if (!reply)
 			return false;
 		cursor = { reply->win_x, reply->win_y };

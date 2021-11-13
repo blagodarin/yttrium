@@ -9,7 +9,7 @@
 #include <yttrium/gui/font.h>
 #include <yttrium/gui/style.h>
 
-#include <primal/utf8.hpp>
+#include <seir_base/utf8.hpp>
 
 #include <cassert>
 #include <chrono>
@@ -45,7 +45,7 @@ namespace Yt
 				if (_cursor > text.size())
 					_cursor = text.size();
 				else if (_cursor < text.size())
-					while (_cursor > 0 && primal::isUtf8Continuation(text[_cursor]))
+					while (_cursor > 0 && seir::isUtf8Continuation(text[_cursor]))
 						--_cursor;
 				if (_selectionOffset > _cursor)
 					_selectionOffset = _cursor;
@@ -211,7 +211,7 @@ namespace Yt
 				auto offset = _cursor;
 				do
 					--offset;
-				while (offset > 0 && primal::isUtf8Continuation(text[offset]));
+				while (offset > 0 && seir::isUtf8Continuation(text[offset]));
 				return _cursor - offset;
 			}
 
@@ -221,7 +221,7 @@ namespace Yt
 				auto offset = _cursor;
 				do
 					++offset;
-				while (offset < text.size() && primal::isUtf8Continuation(text[offset]));
+				while (offset < text.size() && seir::isUtf8Continuation(text[offset]));
 				return offset - _cursor;
 			}
 		};

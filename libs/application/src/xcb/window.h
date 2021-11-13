@@ -36,7 +36,7 @@ namespace Yt
 		void swap_buffers();
 
 	private:
-		using P_Atom = primal::CPtr<xcb_intern_atom_reply_t, ::free>;
+		using P_Atom = seir::CPtr<xcb_intern_atom_reply_t, ::free>;
 
 		P_Atom make_atom(std::string_view);
 
@@ -44,7 +44,7 @@ namespace Yt
 		class EmptyCursor;
 		class Keyboard;
 
-		using P_Event = primal::CPtr<xcb_generic_event_t, ::free>;
+		using P_Event = seir::CPtr<xcb_generic_event_t, ::free>;
 
 		WindowBackendCallbacks& _callbacks;
 		NativeApplication _application;

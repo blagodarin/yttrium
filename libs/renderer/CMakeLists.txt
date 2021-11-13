@@ -2,7 +2,7 @@
 # Copyright (C) Sergei Blagodarin.
 # SPDX-License-Identifier: Apache-2.0
 
-primal_set_folder(libs)
+seir_folder(libs)
 source_group("src" REGULAR_EXPRESSION ".*\\.(h|cpp)$")
 source_group("src/backend/null" REGULAR_EXPRESSION "/src/backend/null/")
 source_group("src/backend/opengl" REGULAR_EXPRESSION "/src/backend/opengl/")
@@ -45,7 +45,7 @@ add_library(Y_renderer STATIC
 	src/viewport.h
 	)
 target_include_directories(Y_renderer PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-target_link_libraries(Y_renderer PUBLIC Y_geometry Y_image PRIVATE Y_application Y_ion Y_storage primal fmt::fmt Threads::Threads)
+target_link_libraries(Y_renderer PUBLIC Y_geometry Y_image PRIVATE Y_application Y_ion Y_storage Seir::base fmt::fmt Threads::Threads)
 set_target_properties(Y_renderer PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 if(YTTRIUM_RENDERER_OPENGL)
 	target_sources(Y_renderer PRIVATE
@@ -69,8 +69,8 @@ if(YTTRIUM_RENDERER_OPENGL)
 		)
 	target_link_libraries(Y_renderer PRIVATE OpenGL::GL)
 	if(WIN32)
-		primal_download("https://www.khronos.org/registry/OpenGL/api/GL/glext.h" NAME GL/glext.h)
-		target_include_directories(Y_renderer SYSTEM PRIVATE ${PRIMAL_DOWNLOAD_DIR})
+		seir_download("https://www.khronos.org/registry/OpenGL/api/GL/glext.h" NAME GL/glext.h)
+		target_include_directories(Y_renderer SYSTEM PRIVATE ${SEIR_DOWNLOAD_DIR})
 	endif()
 	if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 		set_property(SOURCE src/backend/opengl/gl.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-useless-cast)
@@ -126,5 +126,5 @@ else()
 		target_compile_definitions(Y_renderer PRIVATE VK_USE_PLATFORM_XCB_KHR)
 	endif()
 endif()
-primal_install(Y_renderer EXPORT YttriumTargets)
+seir_install(Y_renderer EXPORT YttriumTargets)
 install(DIRECTORY include/yttrium DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})

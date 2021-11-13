@@ -6,7 +6,7 @@
 
 #include "../../../../base/src/windows/error.h"
 
-#include <primal/pointer.hpp>
+#include <seir_base/pointer.hpp>
 
 #include <shlobj.h>
 #include <versionhelpers.h>
@@ -15,7 +15,7 @@ namespace
 {
 	std::filesystem::path known_folder_path(const KNOWNFOLDERID& id)
 	{
-		primal::CPtr<wchar_t, ::CoTaskMemFree> path;
+		seir::CPtr<wchar_t, ::CoTaskMemFree> path;
 		if (const auto hr = ::SHGetKnownFolderPath(id, KF_FLAG_CREATE, nullptr, path.out()); FAILED(hr))
 		{
 			Yt::log_error("SHGetKnownFolderPath", hr);

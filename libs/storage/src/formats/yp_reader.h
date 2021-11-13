@@ -6,8 +6,8 @@
 
 #include <yttrium/storage/package.h>
 
-#include <primal/buffer.hpp>
-#include <primal/rigid_vector.hpp>
+#include <seir_base/buffer.hpp>
+#include <seir_base/rigid_vector.hpp>
 
 #include <vector>
 
@@ -28,9 +28,9 @@ namespace Yt
 		struct Entry;
 
 		const std::shared_ptr<const Source> _source;
-		primal::RigidVector<Entry> _entries;
-		primal::RigidVector<std::string_view> _names;
-		primal::Buffer<uint8_t> _indexBuffer; // TODO: Store only metadata part of the index.
+		seir::RigidVector<Entry> _entries;
+		seir::RigidVector<std::string_view> _names;
+		seir::Buffer<uint8_t> _indexBuffer; // TODO: Store only metadata part of the index.
 		std::unique_ptr<Decompressor> _decompressor;
 	};
 }

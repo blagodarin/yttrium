@@ -9,7 +9,7 @@
 #include <yttrium/storage/reader.h>
 #include <yttrium/storage/source.h>
 
-#include <primal/endian.hpp>
+#include <seir_base/endian.hpp>
 
 #include <algorithm>
 
@@ -30,16 +30,16 @@ namespace Yt
 				return false;
 			switch (signature.ab)
 			{
-			case primal::makeCC('B', 'M'):
+			case seir::makeCC('B', 'M'):
 				format = ImageFormat::Bmp;
 				break;
-			case primal::makeCC('D', 'D'):
+			case seir::makeCC('D', 'D'):
 				format = ImageFormat::Dds;
 				break;
-			case primal::makeCC('\xff', '\xd8'): // SOI marker.
+			case seir::makeCC('\xff', '\xd8'): // SOI marker.
 				format = ImageFormat::Jpeg;
 				break;
-			case primal::makeCC('\x89', 'P'):
+			case seir::makeCC('\x89', 'P'):
 				format = ImageFormat::Png;
 				break;
 			default:

@@ -4,7 +4,7 @@
 
 #include <yttrium/main.h>
 
-#include <primal/buffer.hpp>
+#include <seir_base/buffer.hpp>
 
 #include <windows.h>
 
@@ -12,12 +12,12 @@ namespace
 {
 	int call_ymain()
 	{
-		primal::Buffer<char> buffer;
-		primal::Buffer<char*> argv;
+		seir::Buffer<char> buffer;
+		seir::Buffer<char*> argv;
 		int argc = 0;
 		{
-			const primal::CPtr<LPWSTR, ::LocalFree> argvW{ ::CommandLineToArgvW(::GetCommandLineW(), &argc) };
-			primal::Buffer<int> sizes{ static_cast<size_t>(argc) };
+			const seir::CPtr<LPWSTR, ::LocalFree> argvW{ ::CommandLineToArgvW(::GetCommandLineW(), &argc) };
+			seir::Buffer<int> sizes{ static_cast<size_t>(argc) };
 			size_t bufferSize = 0;
 			for (int i = 0; i < argc; ++i)
 			{

@@ -2,7 +2,7 @@
 # Copyright (C) Sergei Blagodarin.
 # SPDX-License-Identifier: Apache-2.0
 
-primal_set_folder(libs)
+seir_folder(libs)
 source_group("src" REGULAR_EXPRESSION ".*\\.(h|cpp)$")
 source_group("include" REGULAR_EXPRESSION "/include/")
 source_group("src/formats" REGULAR_EXPRESSION "/src/formats/")
@@ -24,7 +24,7 @@ target_compile_definitions(Y_image PUBLIC
 	YTTRIUM_IMAGE_TGA=$<BOOL:${YTTRIUM_IMAGE_TGA}>
 	)
 target_include_directories(Y_image PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-target_link_libraries(Y_image PUBLIC Y_base PRIVATE Y_storage primal)
+target_link_libraries(Y_image PUBLIC Y_base PRIVATE Y_storage Seir::base)
 set_target_properties(Y_image PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 if(YTTRIUM_IMAGE_BMP)
 	target_sources(Y_image PRIVATE src/formats/bmp.cpp src/formats/bmp.h)
@@ -53,5 +53,5 @@ endif()
 if(YTTRIUM_IMAGE_TGA)
 	target_sources(Y_image PRIVATE src/formats/tga.cpp)
 endif()
-primal_install(Y_image EXPORT YttriumTargets)
+seir_install(Y_image EXPORT YttriumTargets)
 install(DIRECTORY include/yttrium DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
