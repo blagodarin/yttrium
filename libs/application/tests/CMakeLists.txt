@@ -2,11 +2,10 @@
 # Copyright (C) Sergei Blagodarin.
 # SPDX-License-Identifier: Apache-2.0
 
-seir_folder(tests)
 source_group("src" REGULAR_EXPRESSION ".*\\.(h|cpp)$")
 add_executable(test_application
 	src/key.cpp
 	)
 target_link_libraries(test_application PRIVATE Y_application doctest::doctest_with_main)
-set_target_properties(test_application PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+seir_target(test_application FOLDER tests STATIC_RUNTIME ON)
 add_test(NAME application COMMAND test_application)

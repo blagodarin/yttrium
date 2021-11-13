@@ -2,7 +2,6 @@
 # Copyright (C) Sergei Blagodarin.
 # SPDX-License-Identifier: Apache-2.0
 
-seir_folder(tests)
 source_group("src" REGULAR_EXPRESSION ".*\\.(h|cpp)$")
 add_executable(test_geometry
 	src/margins.cpp
@@ -12,5 +11,5 @@ add_executable(test_geometry
 	src/vector.cpp
 	)
 target_link_libraries(test_geometry PRIVATE Y_geometry doctest::doctest_with_main)
-set_target_properties(test_geometry PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+seir_target(test_geometry FOLDER tests STATIC_RUNTIME ON)
 add_test(NAME geometry COMMAND test_geometry)

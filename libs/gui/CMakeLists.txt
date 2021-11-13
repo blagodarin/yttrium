@@ -2,7 +2,6 @@
 # Copyright (C) Sergei Blagodarin.
 # SPDX-License-Identifier: Apache-2.0
 
-seir_folder(libs)
 source_group("src" REGULAR_EXPRESSION ".*\\.(h|cpp)$")
 source_group("include" REGULAR_EXPRESSION "/include/yttrium/gui/")
 add_library(Y_gui STATIC
@@ -21,6 +20,5 @@ add_library(Y_gui STATIC
 	)
 target_include_directories(Y_gui PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 target_link_libraries(Y_gui PUBLIC Y_geometry Y_image PRIVATE Y_application Y_renderer Y_storage Seir::base Freetype::Freetype)
-set_target_properties(Y_gui PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-seir_install(Y_gui EXPORT YttriumTargets)
-install(DIRECTORY include/yttrium DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+seir_target(Y_gui FOLDER libs STATIC_RUNTIME ON)
+seir_install(Y_gui EXPORT YttriumTargets INCLUDE_DIRECTORY include/yttrium)

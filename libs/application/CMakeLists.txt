@@ -2,7 +2,6 @@
 # Copyright (C) Sergei Blagodarin.
 # SPDX-License-Identifier: Apache-2.0
 
-seir_folder(libs)
 source_group("src" REGULAR_EXPRESSION ".*\\.(h|cpp)$")
 source_group("src/windows" REGULAR_EXPRESSION "/src/windows/")
 source_group("src/x11" REGULAR_EXPRESSION "/src/x11/")
@@ -27,7 +26,6 @@ target_compile_definitions(Y_application PUBLIC
 	)
 target_include_directories(Y_application PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 target_link_libraries(Y_application PUBLIC Y_base PRIVATE Y_geometry Y_image Seir::base)
-set_target_properties(Y_application PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 if(YTTRIUM_RENDERER_OPENGL)
 	target_sources(Y_application PRIVATE
 		src/opengl.h
@@ -82,5 +80,5 @@ else()
 		endif()
 	endif()
 endif()
-seir_install(Y_application EXPORT YttriumTargets)
-install(DIRECTORY include/yttrium DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+seir_target(Y_application FOLDER libs STATIC_RUNTIME ON)
+seir_install(Y_application EXPORT YttriumTargets INCLUDE_DIRECTORY include/yttrium)

@@ -2,7 +2,6 @@
 # Copyright (C) Sergei Blagodarin.
 # SPDX-License-Identifier: Apache-2.0
 
-seir_folder(libs)
 source_group("src" REGULAR_EXPRESSION ".*\\.(h|cpp)$")
 source_group("include" REGULAR_EXPRESSION "/include/")
 add_library(Y_geometry STATIC
@@ -20,6 +19,5 @@ add_library(Y_geometry STATIC
 	src/vector.cpp
 	)
 target_include_directories(Y_geometry PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-set_target_properties(Y_geometry PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-seir_install(Y_geometry EXPORT YttriumTargets)
-install(DIRECTORY include/yttrium DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+seir_target(Y_geometry FOLDER libs STATIC_RUNTIME ON)
+seir_install(Y_geometry EXPORT YttriumTargets INCLUDE_DIRECTORY include/yttrium)

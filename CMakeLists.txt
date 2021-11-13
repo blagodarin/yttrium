@@ -12,6 +12,8 @@ include(GNUInstallDirs)
 
 if(PROJECT_IS_TOP_LEVEL)
 	set(CMAKE_FOLDER ".subprojects")
+else()
+	set(CMAKE_FOLDER "Yttrium")
 endif()
 
 option(YTTRIUM_AUDIO_AULOS "Enable Aulos audio support" OFF)
@@ -27,10 +29,10 @@ cmake_dependent_option(YTTRIUM_COMPRESSION_ZLIB "Enable zlib compression support
 
 set(SEIR_AUDIO ON)
 set(SEIR_STATIC_RUNTIME ON)
-FetchContent_Declare(Seir GIT_REPOSITORY https://github.com/blagodarin/seir.git GIT_TAG 80e8c8461647399398aaa821c5b7f2d2e227ca3c)
+FetchContent_Declare(Seir GIT_REPOSITORY https://github.com/blagodarin/seir.git GIT_TAG d8f4cce9f1b5c37e2c32aabead5566a834dc81e2)
 FetchContent_MakeAvailable(Seir)
 
-seir_set_defaults()
+seir_defaults()
 
 if(WIN32)
 	set(CMAKE_DEBUG_POSTFIX "d")
@@ -68,7 +70,7 @@ endif()
 # Aulos
 if(YTTRIUM_AUDIO_AULOS)
 	set(AULOS_STATIC_RUNTIME ON)
-	FetchContent_Declare(Aulos GIT_REPOSITORY https://github.com/blagodarin/aulos.git GIT_TAG 3336829acb1f782dc7d77eddfe58ac4b44efa5cb)
+	FetchContent_Declare(Aulos GIT_REPOSITORY https://github.com/blagodarin/aulos.git GIT_TAG ef05badf4f8152e606a2fd8e315af5bddd486c97)
 	FetchContent_MakeAvailable(Aulos)
 endif()
 

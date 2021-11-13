@@ -2,7 +2,6 @@
 # Copyright (C) Sergei Blagodarin.
 # SPDX-License-Identifier: Apache-2.0
 
-seir_folder(libs)
 source_group("src" REGULAR_EXPRESSION ".*\\.(h|cpp)$")
 source_group("src/backend/null" REGULAR_EXPRESSION "/src/backend/null/")
 source_group("src/backend/opengl" REGULAR_EXPRESSION "/src/backend/opengl/")
@@ -46,7 +45,6 @@ add_library(Y_renderer STATIC
 	)
 target_include_directories(Y_renderer PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 target_link_libraries(Y_renderer PUBLIC Y_geometry Y_image PRIVATE Y_application Y_ion Y_storage Seir::base fmt::fmt Threads::Threads)
-set_target_properties(Y_renderer PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 if(YTTRIUM_RENDERER_OPENGL)
 	target_sources(Y_renderer PRIVATE
 		src/backend/opengl/api.h
@@ -126,5 +124,5 @@ else()
 		target_compile_definitions(Y_renderer PRIVATE VK_USE_PLATFORM_XCB_KHR)
 	endif()
 endif()
-seir_install(Y_renderer EXPORT YttriumTargets)
-install(DIRECTORY include/yttrium DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+seir_target(Y_renderer FOLDER libs STATIC_RUNTIME ON)
+seir_install(Y_renderer EXPORT YttriumTargets INCLUDE_DIRECTORY include/yttrium)

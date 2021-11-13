@@ -2,7 +2,6 @@
 # Copyright (C) Sergei Blagodarin.
 # SPDX-License-Identifier: Apache-2.0
 
-seir_folder(libs)
 source_group("src" REGULAR_EXPRESSION ".*\\.(h|cpp)$")
 source_group("include" REGULAR_EXPRESSION "/include/")
 add_library(Y_ion STATIC
@@ -13,6 +12,5 @@ add_library(Y_ion STATIC
 	)
 target_include_directories(Y_ion PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 target_link_libraries(Y_ion PRIVATE Y_base Y_storage fmt::fmt)
-set_target_properties(Y_ion PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-seir_install(Y_ion EXPORT YttriumTargets)
-install(DIRECTORY include/yttrium DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+seir_target(Y_ion FOLDER libs STATIC_RUNTIME ON)
+seir_install(Y_ion EXPORT YttriumTargets INCLUDE_DIRECTORY include/yttrium)

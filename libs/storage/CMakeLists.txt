@@ -2,7 +2,6 @@
 # Copyright (C) Sergei Blagodarin.
 # SPDX-License-Identifier: Apache-2.0
 
-seir_folder(libs)
 source_group("src" REGULAR_EXPRESSION ".*\\.(h|cpp)$")
 source_group("src/compression" REGULAR_EXPRESSION "/src/compression/")
 source_group("src/formats" REGULAR_EXPRESSION "/src/formats/")
@@ -36,7 +35,6 @@ add_library(Y_storage STATIC
 target_compile_definitions(Y_storage PUBLIC YTTRIUM_COMPRESSION_ZLIB=$<BOOL:${YTTRIUM_COMPRESSION_ZLIB}>)
 target_include_directories(Y_storage PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 target_link_libraries(Y_storage PRIVATE Y_base Seir::base)
-set_target_properties(Y_storage PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 	set_property(SOURCE src/writer.cpp APPEND PROPERTY COMPILE_OPTIONS -Wno-tautological-type-limit-compare)
 endif()
@@ -64,5 +62,5 @@ else()
 		)
 	set_property(SOURCE src/platform/posix/file.cpp APPEND PROPERTY COMPILE_DEFINITIONS _FILE_OFFSET_BITS=64)
 endif()
-seir_install(Y_storage EXPORT YttriumTargets)
-install(DIRECTORY include/yttrium DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+seir_target(Y_storage FOLDER libs STATIC_RUNTIME ON)
+seir_install(Y_storage EXPORT YttriumTargets INCLUDE_DIRECTORY include/yttrium)

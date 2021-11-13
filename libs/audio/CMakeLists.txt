@@ -2,7 +2,6 @@
 # Copyright (C) Sergei Blagodarin.
 # SPDX-License-Identifier: Apache-2.0
 
-seir_folder(libs)
 source_group("src" REGULAR_EXPRESSION ".*\\.(h|cpp)$")
 source_group("src/formats" REGULAR_EXPRESSION "/src/formats/")
 source_group("include" REGULAR_EXPRESSION "/include/")
@@ -30,7 +29,6 @@ target_compile_definitions(Y_audio PUBLIC
 	)
 target_include_directories(Y_audio PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 target_link_libraries(Y_audio PRIVATE Y_base Y_storage Seir::audio)
-set_target_properties(Y_audio PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 if(YTTRIUM_AUDIO_AULOS)
 	target_link_libraries(Y_audio PRIVATE aulos)
 	target_sources(Y_audio PRIVATE src/formats/aulos.cpp src/formats/aulos.h)
@@ -42,5 +40,5 @@ endif()
 if(YTTRIUM_AUDIO_WAV)
 	target_sources(Y_audio PRIVATE src/formats/wav.cpp src/formats/wav.h)
 endif()
-seir_install(Y_audio EXPORT YttriumTargets)
-install(DIRECTORY include/yttrium DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+seir_target(Y_audio FOLDER libs STATIC_RUNTIME ON)
+seir_install(Y_audio EXPORT YttriumTargets INCLUDE_DIRECTORY include/yttrium)
