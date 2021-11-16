@@ -6,6 +6,6 @@ source_group("src" REGULAR_EXPRESSION ".*\\.(h|cpp)$")
 add_executable(yembed
 	src/main.cpp
 	)
-target_link_libraries(yembed PRIVATE Y_main)
+target_link_libraries(yembed PRIVATE Seir::main)
 seir_target(yembed FOLDER tools STATIC_RUNTIME ON)
 seir_install(yembed)

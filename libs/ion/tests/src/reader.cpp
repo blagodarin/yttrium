@@ -3,9 +3,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <yttrium/base/exceptions.h>
-#include <yttrium/base/numeric.h>
 #include <yttrium/ion/reader.h>
 #include <yttrium/storage/source.h>
+
+#include <seir_base/int_utils.hpp>
 
 #include <sstream>
 
@@ -24,7 +25,7 @@ namespace Yt
 
 	inline std::ostream& operator<<(std::ostream& stream, const IonToken& token)
 	{
-		return stream << "{" << token.line() << "," << token.column() << ",IonToken::Type(" << to_underlying(token.type()) << "),R\"(" << token.text() << ")\"}";
+		return stream << "{" << token.line() << "," << token.column() << ",IonToken::Type(" << seir::toUnderlying(token.type()) << "),R\"(" << token.text() << ")\"}";
 	}
 }
 
@@ -69,7 +70,7 @@ TEST_CASE("ion.reader.token.iostream")
 {
 	std::ostringstream stream;
 	stream << IonToken{ 1, 2, IonToken::Type::End, "test" };
-	CHECK(stream.str() == "{1,2,IonToken::Type(" + std::to_string(to_underlying(IonToken::Type::End)) + "),R\"(test)\"}");
+	CHECK(stream.str() == "{1,2,IonToken::Type(" + std::to_string(seir::toUnderlying(IonToken::Type::End)) + "),R\"(test)\"}");
 }
 
 TEST_CASE("ion.reader.token.to_name")

@@ -5,7 +5,6 @@
 #include "renderer.h"
 
 #include <yttrium/base/logger.h>
-#include <yttrium/base/numeric.h>
 #include <yttrium/geometry/matrix.h>
 #include <yttrium/geometry/rect.h>
 #include "../../2d.h"
@@ -13,6 +12,8 @@
 #include "mesh.h"
 #include "program.h"
 #include "texture.h"
+
+#include <seir_base/int_utils.hpp>
 
 #include <cassert>
 
@@ -157,7 +158,7 @@ namespace Yt
 		};
 
 		if (image.info().pixel_format() == PixelFormat::Bgra32)
-			if (const auto alignment = power_of_2_alignment(image.info().stride() | 8); alignment == 4 || alignment == 8)
+			if (const auto alignment = seir::powerOf2Alignment(image.info().stride() | 8); alignment == 4 || alignment == 8)
 				return create(image.info(), image.data(), alignment);
 
 		const ImageInfo transformed_info{ image.info().width(), image.info().height(), PixelFormat::Bgra32, image.info().orientation() };
@@ -166,7 +167,7 @@ namespace Yt
 			return {};
 
 		// TODO: Count "slow" textures.
-		return create(transformed_info, buffer.data(), power_of_2_alignment(transformed_info.stride() | 8));
+		return create(transformed_info, buffer.data(), seir::powerOf2Alignment(transformed_info.stride() | 8));
 	}
 
 	size_t GlRenderer::draw_mesh(const Mesh& mesh)

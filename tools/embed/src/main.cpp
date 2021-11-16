@@ -2,7 +2,7 @@
 // Copyright (C) Sergei Blagodarin.
 // SPDX-License-Identifier: Apache-2.0
 
-#include <yttrium/main.h>
+#include <seir_main/u8main.hpp>
 
 #include <array>
 #include <cstdio>
@@ -30,7 +30,7 @@ namespace
 	};
 }
 
-int ymain(int argc, char** argv)
+int u8main(int argc, char** argv)
 {
 	if (argc != 4)
 		return usage();

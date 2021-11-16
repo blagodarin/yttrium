@@ -5,7 +5,6 @@
 #include "mixer.h"
 
 #include <yttrium/audio/reader.h>
-#include <yttrium/audio/utils.h>
 #include "sound.h"
 
 #include <seir_audio/processing.hpp>

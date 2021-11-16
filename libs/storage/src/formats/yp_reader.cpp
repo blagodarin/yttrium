@@ -5,7 +5,6 @@
 #include "yp_reader.h"
 
 #include <yttrium/base/buffer.h>
-#include <yttrium/base/numeric.h>
 #include <yttrium/storage/decompressor.h>
 #include <yttrium/storage/source.h>
 #include "../package.h"

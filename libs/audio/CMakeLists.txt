@@ -10,7 +10,6 @@ add_library(Y_audio STATIC
 	include/yttrium/audio/manager.h
 	include/yttrium/audio/reader.h
 	include/yttrium/audio/sound.h
-	include/yttrium/audio/utils.h
 	src/decoder.cpp
 	src/decoder.h
 	src/manager.cpp
@@ -19,7 +18,6 @@ add_library(Y_audio STATIC
 	src/mixer.h
 	src/reader.cpp
 	src/sound.h
-	src/utils.cpp
 	src/wav.h
 	)
 target_compile_definitions(Y_audio PUBLIC

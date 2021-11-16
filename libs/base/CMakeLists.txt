@@ -13,7 +13,6 @@ add_library(Y_base STATIC
 	include/yttrium/base/exceptions.h
 	include/yttrium/base/flags.h
 	include/yttrium/base/logger.h
-	include/yttrium/base/numeric.h
 	include/yttrium/base/string.h
 	src/buffer.cpp
 	src/buffer_memory.cpp

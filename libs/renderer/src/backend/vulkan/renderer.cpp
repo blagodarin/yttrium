@@ -4,7 +4,6 @@
 
 #include "renderer.h"
 
-#include <yttrium/base/numeric.h>
 #include <yttrium/geometry/matrix.h>
 #include <yttrium/geometry/rect.h>
 #include "../../model/mesh_data.h"
@@ -14,6 +13,8 @@
 #include "program.h"
 #include "swapchain.h"
 #include "texture.h"
+
+#include <seir_base/int_utils.hpp>
 
 #include <array>
 
@@ -110,7 +111,7 @@ namespace Yt
 			return std::make_unique<VulkanTexture2D>(*this, _context, info, has_mipmaps, VK_FORMAT_B8G8R8A8_UNORM, data);
 		};
 
-		if (image.info().pixel_format() == PixelFormat::Bgra32 && power_of_2_alignment(image.info().stride()) >= 4)
+		if (image.info().pixel_format() == PixelFormat::Bgra32 && seir::powerOf2Alignment(image.info().stride()) >= 4)
 			return create(image.info(), image.data());
 
 		const ImageInfo transformed_info{ image.info().width(), image.info().height(), PixelFormat::Bgra32, image.info().orientation() };

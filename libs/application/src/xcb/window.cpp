@@ -4,10 +4,11 @@
 
 #include "window.h"
 
-#include <yttrium/base/numeric.h>
 #include <yttrium/image/image.h>
 #include "../key_codes.h"
 #include "../window_callbacks.h"
+
+#include <seir_base/int_utils.hpp>
 
 #include <algorithm>
 #include <cstring>
@@ -105,7 +106,7 @@ namespace Yt
 				_keycode_text_buffer.resize(size);
 			::xkb_state_key_get_utf8(_state.get(), keycode, _keycode_text_buffer.data(), size + 1);
 			const auto begin = _keycode_text_buffer.begin();
-			const auto end = std::remove_if(begin, begin + static_cast<std::string::difference_type>(size), [](char c) { return to_unsigned(c) < 32 || c == 127; });
+			const auto end = std::remove_if(begin, begin + static_cast<std::string::difference_type>(size), [](char c) { return seir::toUnsigned(c) < 32 || c == 127; });
 			return { _keycode_text_buffer.data(), static_cast<size_t>(end - begin) };
 		}
 
@@ -146,7 +147,7 @@ namespace Yt
 				case XCB_XKB_STATE_NOTIFY:
 					::xkb_state_update_mask(_state.get(),
 						e->state_notify.baseMods, e->state_notify.latchedMods, e->state_notify.lockedMods,
-						to_unsigned(e->state_notify.baseGroup), to_unsigned(e->state_notify.latchedGroup), e->state_notify.lockedGroup);
+						seir::toUnsigned(e->state_notify.baseGroup), seir::toUnsigned(e->state_notify.latchedGroup), e->state_notify.lockedGroup);
 					break;
 				}
 			}

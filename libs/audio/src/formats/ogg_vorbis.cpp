@@ -5,7 +5,8 @@
 #include "ogg_vorbis.h"
 
 #include <yttrium/base/exceptions.h>
-#include <yttrium/base/numeric.h>
+
+#include <seir_base/int_utils.hpp>
 
 #include <algorithm>
 #include <cstring>
@@ -22,8 +23,8 @@ namespace
 		auto& reader = *static_cast<Yt::Reader*>(datasource);
 		switch (whence)
 		{
-		case SEEK_SET: return offset >= 0 && reader.seek(Yt::to_unsigned(offset)) ? 0 : -1;
-		case SEEK_CUR: return offset >= 0 && reader.skip(Yt::to_unsigned(offset)) ? 0 : -1;
+		case SEEK_SET: return offset >= 0 && reader.seek(seir::toUnsigned(offset)) ? 0 : -1;
+		case SEEK_CUR: return offset >= 0 && reader.skip(seir::toUnsigned(offset)) ? 0 : -1;
 		case SEEK_END: return offset == 0 && reader.seek(reader.size()) ? 0 : -1;
 		default: return -1;
 		}
@@ -64,8 +65,8 @@ namespace Yt
 		if (total_frames < 0)
 			throw DataError("Bad Ogg Vorbis file");
 
-		_format = AudioFormat{ AudioSample::i16, to_unsigned(info->channels), to_unsigned(info->rate) };
-		_total_frames = to_unsigned(total_frames);
+		_format = AudioFormat{ AudioSample::i16, seir::toUnsigned(info->channels), seir::toUnsigned(info->rate) };
+		_total_frames = seir::toUnsigned(total_frames);
 	}
 
 	OggVorbisDecoder::~OggVorbisDecoder()
@@ -80,11 +81,11 @@ namespace Yt
 		size_t bytes_read = 0;
 		for (int bitstream = 0; bytes_read <= bytes_to_read;)
 		{
-			const auto size = static_cast<int>(std::min<size_t>(bytes_to_read - bytes_read, to_unsigned(std::numeric_limits<int>::max())));
+			const auto size = static_cast<int>(std::min<size_t>(bytes_to_read - bytes_read, seir::toUnsigned(std::numeric_limits<int>::max())));
 			const auto read = ::ov_read(&_ov_file, static_cast<char*>(buffer) + bytes_read, size, 0, 2, 1, &bitstream);
 			if (read <= 0)
 				break;
-			bytes_read += to_unsigned(read);
+			bytes_read += seir::toUnsigned(read);
 		}
 		const auto frames_read = bytes_read / bytes_per_frame;
 		_current_frame += frames_read;

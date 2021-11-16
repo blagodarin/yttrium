@@ -45,5 +45,4 @@ namespace Yt
 	};
 
 	constexpr bool operator==(const AudioFormat& a, const AudioFormat& b) noexcept { return a.sample_type() == b.sample_type() && a.channels() == b.channels() && a.frames_per_second() == b.frames_per_second(); }
-	constexpr bool operator!=(const AudioFormat& a, const AudioFormat& b) noexcept { return !(a == b); }
 }

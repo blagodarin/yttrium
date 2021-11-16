@@ -4,8 +4,9 @@
 
 #include "buffer_memory.h"
 
-#include <yttrium/base/numeric.h>
 #include "virtual_memory.h"
+
+#include <seir_base/int_utils.hpp>
 
 #include <cassert>
 #include <cstddef>
@@ -15,7 +16,7 @@ namespace
 {
 	size_t level_from_capacity(size_t capacity) noexcept
 	{
-		assert(Yt::is_power_of_2(capacity));
+		assert(seir::isPowerOf2(capacity));
 		size_t level = 0;
 		for (auto i = capacity; i > 1; i >>= 1)
 			++level;
@@ -99,13 +100,13 @@ namespace Yt
 	{
 		const auto granularity_mask = granularity() - 1;
 		auto capacity = (size + granularity_mask) & ~granularity_mask;
-		return capacity > MaxSmallBlockSize ? capacity : next_power_of_2(capacity);
+		return capacity > MaxSmallBlockSize ? capacity : seir::nextPowerOf2(capacity);
 	}
 
 	size_t BufferMemory::granularity() noexcept
 	{
 		static const auto page_size = vm_granularity();
-		assert(is_power_of_2(page_size));
+		assert(seir::isPowerOf2(page_size));
 		return page_size;
 	}
 }

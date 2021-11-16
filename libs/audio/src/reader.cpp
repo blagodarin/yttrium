@@ -4,8 +4,9 @@
 
 #include <yttrium/audio/reader.h>
 
-#include <yttrium/base/numeric.h>
 #include "decoder.h"
+
+#include <seir_base/int_utils.hpp>
 
 #include <algorithm>
 #include <cassert>
@@ -58,10 +59,10 @@ namespace Yt
 			to = end_time;
 		else if (to > end_time)
 			return false;
-		const auto end_frame = std::min(to_unsigned(to.count()) * frames_per_second / 1000, total_frames);
+		const auto end_frame = std::min(seir::toUnsigned(to.count()) * frames_per_second / 1000, total_frames);
 		if (end_frame < _decoder->current_frame())
 			return false;
-		_loop_frame = to_unsigned(from.count()) * frames_per_second / 1000;
+		_loop_frame = seir::toUnsigned(from.count()) * frames_per_second / 1000;
 		assert(_loop_frame < total_frames);
 		_end_frame = end_frame;
 		return true;

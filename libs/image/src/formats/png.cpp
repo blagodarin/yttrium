@@ -2,7 +2,6 @@
 // Copyright (C) Sergei Blagodarin.
 // SPDX-License-Identifier: Apache-2.0
 
-#include <yttrium/base/numeric.h>
 #include <yttrium/image/image.h>
 #include <yttrium/storage/compressor.h>
 #include <yttrium/storage/writer.h>
@@ -10,6 +9,7 @@
 
 #include <seir_base/buffer.hpp>
 #include <seir_base/endian.hpp>
+#include <seir_base/int_utils.hpp>
 
 #include <array>
 #include <cstring>
@@ -212,7 +212,7 @@ namespace Yt
 			return false;
 
 		for (size_t i = 0; i < uncompressedSize; i += stride)
-			uncompressedBuffer.data()[i] = to_underlying(PngStandardFilterType::None);
+			uncompressedBuffer.data()[i] = seir::toUnderlying(PngStandardFilterType::None);
 
 		seir::Buffer<uint8_t> compressedBuffer;
 		size_t compressedSize = 0;

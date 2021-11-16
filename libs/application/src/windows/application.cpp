@@ -5,9 +5,9 @@
 #include "application.h"
 
 #include <yttrium/geometry/size.h>
-#include <yttrium/base/numeric.h>
 #include "../../../base/src/windows/error.h"
 
+#include <seir_base/int_utils.hpp>
 #include <seir_base/utf8.hpp>
 
 #include <array>
@@ -62,19 +62,19 @@ namespace Yt
 		auto key_from_wparam = [](WPARAM vk) {
 			if (vk >= '0' && vk <= '9')
 			{
-				return static_cast<Key>(to_underlying(Key::_0) + vk - '0');
+				return static_cast<Key>(seir::toUnderlying(Key::_0) + vk - '0');
 			}
 			else if (vk >= 'A' && vk <= 'Z')
 			{
-				return static_cast<Key>(to_underlying(Key::A) + vk - 'A');
+				return static_cast<Key>(seir::toUnderlying(Key::A) + vk - 'A');
 			}
 			else if (vk >= VK_F1 && vk <= VK_F24)
 			{
-				return static_cast<Key>(to_underlying(Key::F1) + vk - VK_F1);
+				return static_cast<Key>(seir::toUnderlying(Key::F1) + vk - VK_F1);
 			}
 			else if (vk >= VK_NUMPAD0 && vk <= VK_NUMPAD9)
 			{
-				return static_cast<Key>(to_underlying(Key::Num0) + vk - VK_NUMPAD0);
+				return static_cast<Key>(seir::toUnderlying(Key::Num0) + vk - VK_NUMPAD0);
 			}
 			else
 				switch (vk)

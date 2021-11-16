@@ -8,7 +8,6 @@ add_executable(test_base
 	src/buffer_appender.cpp
 	src/flags.cpp
 	src/logger.cpp
-	src/numeric.cpp
 	src/string.cpp
 	)
 target_link_libraries(test_base PRIVATE Y_base doctest::doctest_with_main)

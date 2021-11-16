@@ -4,7 +4,7 @@
 
 #include "ring_log.h"
 
-#include <yttrium/base/numeric.h>
+#include <seir_base/int_utils.hpp>
 
 #include <algorithm>
 #include <cassert>
@@ -12,7 +12,7 @@
 
 namespace
 {
-	static_assert(Yt::is_power_of_2(Yt::RingLog::BufferSize));
+	static_assert(seir::isPowerOf2(Yt::RingLog::BufferSize));
 
 	// If BufferSize is a power of two, we can wrap offsets using masking.
 	constexpr auto OffsetMask = Yt::RingLog::BufferSize - 1;

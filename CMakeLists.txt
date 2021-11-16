@@ -26,23 +26,18 @@ option(YTTRIUM_IMAGE_JPEG "Enable JPEG image support (requires libjpeg)" OFF)
 option(YTTRIUM_IMAGE_PNG "Enable PNG image support (write only)" OFF)
 option(YTTRIUM_IMAGE_TGA "Enable TGA image support" OFF)
 cmake_dependent_option(YTTRIUM_COMPRESSION_ZLIB "Enable zlib compression support" OFF "NOT YTTRIUM_IMAGE_PNG" ON)
+if(PROJECT_IS_TOP_LEVEL)
+	option(YTTRIUM_TESTS "Build tests" OFF)
+endif()
 
 set(SEIR_AUDIO ON)
 set(SEIR_STATIC_RUNTIME ON)
-FetchContent_Declare(Seir GIT_REPOSITORY https://github.com/blagodarin/seir.git GIT_TAG d8f4cce9f1b5c37e2c32aabead5566a834dc81e2)
+FetchContent_Declare(Seir GIT_REPOSITORY https://github.com/blagodarin/seir.git GIT_TAG c4626ae4759a1c4d5a1b3e83b0d6a38f5b97b871)
 FetchContent_MakeAvailable(Seir)
 
 seir_defaults()
 
-if(WIN32)
-	set(CMAKE_DEBUG_POSTFIX "d")
-endif()
-
 include(cmake/utils.cmake)
-
-if(NOT YTTRIUM_SUBPROJECT)
-	option(YTTRIUM_TESTS "Build tests" OFF)
-endif()
 
 find_package(Threads REQUIRED)
 if(NOT WIN32)
@@ -94,15 +89,6 @@ if(YTTRIUM_COMPRESSION_ZLIB)
 	find_package(ZLIB REQUIRED)
 endif()
 
-get_target_architecture(_target_arch)
-if(_target_arch MATCHES "^amd64$")
-	set(Y_ARCH_AMD64 ON)
-endif()
-if(_target_arch MATCHES "^amd64|x86$")
-	set(Y_ARCH_X86 ON)
-endif()
-message(STATUS "Target architecture: ${_target_arch}")
-
 set(YTTRIUM_RENDERER "opengl" CACHE STRING "Renderer backend")
 set_property(CACHE YTTRIUM_RENDERER PROPERTY STRINGS "opengl" "vulkan" "none")
 if(YTTRIUM_RENDERER STREQUAL "opengl")
@@ -118,7 +104,7 @@ endif()
 message(STATUS "Renderer: ${YTTRIUM_RENDERER}")
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-	if(Y_ARCH_X86 AND NOT Y_ARCH_AMD64)
+	if(SEIR_ARCHITECTURE STREQUAL "x86")
 		add_compile_options(-msse2)
 	endif()
 
@@ -142,7 +128,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 endif()
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-	if(Y_ARCH_X86 AND NOT Y_ARCH_AMD64)
+	if(SEIR_ARCHITECTURE STREQUAL "x86")
 		add_compile_options(-msse2)
 	endif()
 
@@ -178,7 +164,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 endif()
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-	if(Y_ARCH_X86 AND NOT Y_ARCH_AMD64)
+	if(SEIR_ARCHITECTURE STREQUAL "x86")
 		add_compile_options(/arch:SSE2)
 	endif()
 	add_compile_definitions(_SILENCE_CXX20_U8PATH_DEPRECATION_WARNING)
@@ -222,8 +208,6 @@ append_options(CMAKE_MODULE_LINKER_FLAGS ${DYNAMIC_LINKER_FLAGS})
 append_options(CMAKE_RC_FLAGS ${RC_FLAGS})
 append_options(CMAKE_SHARED_LINKER_FLAGS ${DYNAMIC_LINKER_FLAGS})
 append_options(CMAKE_STATIC_LINKER_FLAGS ${STATIC_LINKER_FLAGS})
-
-add_subdirectory(libs/main)
 
 add_subdirectory(tools/embed)
 

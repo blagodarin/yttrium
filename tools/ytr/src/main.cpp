@@ -6,13 +6,14 @@
 #include <yttrium/base/logger.h>
 #include <yttrium/i18n/translation.h>
 #include <yttrium/ion/reader.h>
-#include <yttrium/main.h>
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/writer.h>
 
+#include <seir_main/u8main.hpp>
+
 #include <iostream>
 
-int ymain(int argc, char** argv)
+int u8main(int argc, char** argv)
 {
 	Yt::Logger logger;
 
