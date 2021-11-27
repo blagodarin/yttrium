@@ -168,7 +168,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 		add_compile_options(/arch:SSE2)
 	endif()
 	add_compile_definitions(_SILENCE_CXX20_U8PATH_DEPRECATION_WARNING)
-	list(APPEND RC_FLAGS /nologo)
+	set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS} /nologo")
 
 	# Warnings.
 	add_compile_options(/WX /Wall
@@ -202,12 +202,6 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 		/wd5220 # a non-static data member with a volatile qualified type no longer implies
 		)
 endif()
-
-append_options(CMAKE_EXE_LINKER_FLAGS ${DYNAMIC_LINKER_FLAGS})
-append_options(CMAKE_MODULE_LINKER_FLAGS ${DYNAMIC_LINKER_FLAGS})
-append_options(CMAKE_RC_FLAGS ${RC_FLAGS})
-append_options(CMAKE_SHARED_LINKER_FLAGS ${DYNAMIC_LINKER_FLAGS})
-append_options(CMAKE_STATIC_LINKER_FLAGS ${STATIC_LINKER_FLAGS})
 
 add_subdirectory(tools/embed)
 
