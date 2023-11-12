@@ -30,7 +30,7 @@ namespace Yt
 		const std::shared_ptr<const Source> _source;
 		seir::RigidVector<Entry> _entries;
 		seir::RigidVector<std::string_view> _names;
-		seir::Buffer<uint8_t> _indexBuffer; // TODO: Store only metadata part of the index.
+		seir::Buffer _indexBuffer; // TODO: Store only metadata part of the index.
 		std::unique_ptr<Decompressor> _decompressor;
 	};
 }

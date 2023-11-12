@@ -80,7 +80,7 @@ namespace Yt
 			return _data->_finished;
 
 		const auto strippedIndexSize = _data->_entries.size() * sizeof(YpBlockEntry);
-		seir::Buffer<std::byte> indexBuffer{ strippedIndexSize };
+		seir::Buffer indexBuffer{ strippedIndexSize };
 		auto indexEntry = reinterpret_cast<YpBlockEntry*>(indexBuffer.data());
 
 		Buffer nameBuffer;
@@ -98,7 +98,7 @@ namespace Yt
 		if (!_data->_writer.write(header))
 			return false;
 
-		seir::Buffer<uint8_t> compressedBuffer;
+		seir::Buffer compressedBuffer;
 		const auto writeBlock = [this, &compressedBuffer](YpBlockEntry& block, const void* data, size_t size, int compressionLevel) {
 			if (size > std::numeric_limits<uint32_t>::max())
 				return false;
@@ -106,7 +106,7 @@ namespace Yt
 			{
 				if (!_data->_compressor->prepare(compressionLevel))
 					return false;
-				compressedBuffer.reserve(_data->_compressor->maxCompressedSize(size), false);
+				compressedBuffer.reserve(_data->_compressor->maxCompressedSize(size), 0);
 				const auto compressedSize = _data->_compressor->compress(compressedBuffer.data(), compressedBuffer.capacity(), data, size);
 				if (compressedSize < size)
 				{
@@ -120,7 +120,7 @@ namespace Yt
 			return _data->_writer.write_all(data, block._uncompressedSize);
 		};
 
-		seir::Buffer<uint8_t> uncompressedBuffer;
+		seir::Buffer uncompressedBuffer;
 		for (const auto& entry : _data->_entries)
 		{
 			if (!writeName(entry._name))
@@ -136,7 +136,7 @@ namespace Yt
 		}
 
 		const auto totalIndexSize = strippedIndexSize + nameBuffer.size();
-		indexBuffer.reserve(totalIndexSize);
+		indexBuffer.reserve(totalIndexSize, 0);
 		std::memcpy(indexBuffer.data() + strippedIndexSize, nameBuffer.data(), nameBuffer.size());
 		if (!writeBlock(header._indexBlock, indexBuffer.data(), totalIndexSize, _data->_maxCompressionLevel))
 			return false;

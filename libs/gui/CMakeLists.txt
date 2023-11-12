@@ -19,6 +19,6 @@ add_library(Y_gui STATIC
 	src/style.cpp
 	)
 target_include_directories(Y_gui PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-target_link_libraries(Y_gui PUBLIC Y_geometry Y_image PRIVATE Y_application Y_renderer Y_storage Seir::base Freetype::Freetype)
+target_link_libraries(Y_gui PUBLIC Y_geometry Y_image PRIVATE Y_application Y_renderer Y_storage Seir::base Seir::data Freetype::Freetype)
 seir_target(Y_gui FOLDER libs STATIC_RUNTIME ON)
 seir_install(Y_gui EXPORT YttriumTargets INCLUDE_DIRECTORY include/yttrium)

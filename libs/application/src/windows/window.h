@@ -30,7 +30,7 @@ namespace Yt
 		WindowID id() const noexcept { return { _application.instance(), reinterpret_cast<intptr_t>(_hwnd.get()) }; }
 		bool process_events() { return _application.process_events(); }
 		bool set_cursor(const Point&);
-		void set_icon(const Image&);
+		void set_icon(const seir::Image&);
 		void set_title(const std::string&);
 		void show();
 		std::optional<Size> size() const { return _size; }

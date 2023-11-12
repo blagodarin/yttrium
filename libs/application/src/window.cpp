@@ -145,7 +145,7 @@ namespace Yt
 		return true;
 	}
 
-	void Window::set_icon(const Image& icon)
+	void Window::set_icon(const seir::Image& icon)
 	{
 		_private->_backend.set_icon(icon);
 	}

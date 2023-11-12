@@ -4,15 +4,14 @@
 
 #include <yttrium/base/exceptions.h>
 #include <yttrium/base/logger.h>
-#include <yttrium/base/string.h>
 #include <yttrium/ion/reader.h>
-#include <yttrium/storage/compressor.h>
-#include <yttrium/storage/package.h>
 #include <yttrium/storage/source.h>
-#include <yttrium/storage/writer.h>
-#include <yttrium/storage/yp_writer.h>
 
-#include <seir_main/u8main.hpp>
+#include <seir_data/archive.hpp>
+#include <seir_data/blob.hpp>
+#include <seir_data/compression.hpp>
+#include <seir_data/writer.hpp>
+#include <seir_u8main/u8main.hpp>
 
 #include <cstring>
 #include <iostream>
@@ -32,10 +31,10 @@ namespace
 	{
 		struct FileGroup
 		{
-			int32_t _compressionLevel = 0;
+			seir::CompressionLevel _compressionLevel = seir::CompressionLevel::None;
 			std::vector<std::string> _files;
 		};
-		Yt::YpWriter::Compression _compression = Yt::YpWriter::Compression::None;
+		seir::Compression _compression = seir::Compression::None;
 		std::vector<FileGroup> _groups;
 	};
 
@@ -49,7 +48,7 @@ namespace
 		if (token.is_name("compressor"))
 		{
 			check(token.next(ion).to_value() == "zlib", "Bad compression algorithm");
-			result._compression = Yt::YpWriter::Compression::Zlib;
+			result._compression = seir::Compression::Zlib;
 			token.next(ion);
 		}
 		while (token.type() != Yt::IonToken::Type::End)
@@ -60,7 +59,14 @@ namespace
 			if (token.type() == Yt::IonToken::Type::ObjectBegin)
 			{
 				token.next(ion).check_name("compression");
-				check(Yt::from_chars(token.next(ion).to_value(), group._compressionLevel), "Bad compression level");
+				if (const auto level = token.next(ion).to_value(); level == "minimum")
+					group._compressionLevel = seir::CompressionLevel::Minimum;
+				else if (level == "default")
+					group._compressionLevel = seir::CompressionLevel::Default;
+				else if (level == "maximum")
+					group._compressionLevel = seir::CompressionLevel::Maximum;
+				else
+					check(level == "none", "Bad compression level");
 				token.next(ion).check_object_end();
 				token.next(ion);
 			}
@@ -112,23 +118,36 @@ int u8main(int argc, char** argv)
 				return usage();
 			const auto index = readIndex(std::filesystem::u8path(argv[1]));
 			const auto packagePath = std::filesystem::u8path(argv[2]);
-			Yt::Writer fileWriter{ packagePath };
+			auto fileWriter = seir::Writer::create(argv[2]);
 			if (!fileWriter)
 			{
 				std::cerr << "ERROR: Unable to open " << packagePath << " for writing\n";
 				return 1;
 			}
-			auto packageWriter = std::make_unique<Yt::YpWriter>(std::move(fileWriter), index._compression);
+			auto packageWriter = seir::Archiver::create(std::move(fileWriter), index._compression);
+			bool failed = false;
+			std::cerr << "Writing " << packagePath << "...\n";
 			for (const auto& group : index._groups)
 				for (const auto& file : group._files)
-					packageWriter->add(file, group._compressionLevel);
-			if (!packageWriter->commit())
+					if (const auto blob = seir::Blob::from(file); blob)
+					{
+						std::cerr << " >> " << file << '\n';
+						packageWriter->add(file, *blob, group._compressionLevel);
+					}
+					else
+					{
+						std::cerr << " !! " << file << '\n';
+						failed = true;
+						break;
+					}
+			if (failed || !packageWriter->finish())
 			{
 				std::cerr << "ERROR: Unable to write " << packagePath << '\n';
 				packageWriter.reset();
 				std::filesystem::remove(packagePath);
 				return 1;
 			}
+			std::cerr << "Done!\n";
 		}
 	}
 	catch (const std::runtime_error& e)

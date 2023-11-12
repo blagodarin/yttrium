@@ -6,7 +6,7 @@
 
 #include "../decoder.h"
 
-namespace aulos
+namespace seir::synth
 {
 	class Renderer;
 }
@@ -23,6 +23,6 @@ namespace Yt
 		bool seek_frame(uint64_t) override;
 
 	private:
-		std::unique_ptr<aulos::Renderer> _renderer;
+		std::unique_ptr<seir::synth::Renderer> _renderer;
 	};
 }

@@ -207,20 +207,20 @@ namespace Yt
 		ImageInfo pngInfo{ info.width(), info.height(), stride, uncompressedPixelFormat, ImageOrientation::XRightYDown };
 
 		const auto uncompressedSize = pngInfo.frame_size();
-		seir::Buffer<uint8_t> uncompressedBuffer{ uncompressedSize };
+		seir::Buffer uncompressedBuffer{ uncompressedSize };
 		if (!Image::transform(info, data, pngInfo, uncompressedBuffer.data() + 1))
 			return false;
 
 		for (size_t i = 0; i < uncompressedSize; i += stride)
-			uncompressedBuffer.data()[i] = seir::toUnderlying(PngStandardFilterType::None);
+			uncompressedBuffer.data()[i] = std::byte{ seir::toUnderlying(PngStandardFilterType::None) };
 
-		seir::Buffer<uint8_t> compressedBuffer;
+		seir::Buffer compressedBuffer;
 		size_t compressedSize = 0;
 		{
 			const auto compressor = Compressor::zlib();
 			if (!compressor->prepare((compression + 5) / 11))
 				return false;
-			compressedBuffer.reserve(compressor->maxCompressedSize(uncompressedSize));
+			compressedBuffer.reserve(compressor->maxCompressedSize(uncompressedSize), 0);
 			compressedSize = compressor->compress(compressedBuffer.data(), compressedBuffer.capacity(), uncompressedBuffer.data(), uncompressedSize);
 			if (!compressedSize)
 				return false;

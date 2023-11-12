@@ -14,6 +14,7 @@
 #include <yttrium/storage/source.h>
 
 #include <seir_base/utf8.hpp>
+#include <seir_data/blob.hpp>
 
 #include <cassert>
 #include <cstring>
@@ -41,7 +42,7 @@ namespace Yt
 	struct FreeTypeWrapper
 	{
 		FT_Library _library = nullptr;
-		Buffer _faceBuffer;
+		seir::SharedPtr<seir::Blob> _faceBlob;
 		FT_Face _face = nullptr;
 
 		FreeTypeWrapper()
@@ -57,23 +58,24 @@ namespace Yt
 			FT_Done_FreeType(_library); // TODO: Handle error code.
 		}
 
-		void load(Buffer&& buffer)
+		void load(const seir::SharedPtr<seir::Blob>& blob)
 		{
 			assert(!_face);
-			if (buffer.size() > static_cast<size_t>(std::numeric_limits<FT_Long>::max())
-				|| FT_New_Memory_Face(_library, static_cast<const FT_Byte*>(buffer.data()), static_cast<FT_Long>(buffer.size()), 0, &_face))
+			assert(blob);
+			if (blob->size() > static_cast<size_t>(std::numeric_limits<FT_Long>::max())
+				|| FT_New_Memory_Face(_library, static_cast<const FT_Byte*>(blob->data()), static_cast<FT_Long>(blob->size()), 0, &_face))
 				throw DataError{ "Failed to load font" };
-			_faceBuffer = std::move(buffer);
+			_faceBlob = blob;
 		}
 	};
 
 	class FontImpl final : public Font
 	{
 	public:
-		FontImpl(const Source& source, RenderManager& renderManager, size_t size)
+		FontImpl(const seir::SharedPtr<seir::Blob>& blob, RenderManager& renderManager, size_t size)
 			: _size{ static_cast<int>(size) }
 		{
-			_freetype.load(source.to_buffer());
+			_freetype.load(blob);
 			_hasKerning = FT_HAS_KERNING(_freetype._face);
 			FT_Set_Pixel_Sizes(_freetype._face, 0, static_cast<FT_UInt>(size));
 			Image image{ { size * 32, size * 32, PixelFormat::Intensity8 } };
@@ -241,8 +243,8 @@ namespace Yt
 		std::shared_ptr<const Texture2D> _texture;
 	};
 
-	std::shared_ptr<const Font> Font::load(const Source& source, RenderManager& renderManager)
+	std::shared_ptr<const Font> Font::load(const seir::SharedPtr<seir::Blob>& blob, RenderManager& renderManager)
 	{
-		return std::make_shared<FontImpl>(source, renderManager, 64);
+		return blob ? std::make_shared<FontImpl>(blob, renderManager, 64) : nullptr;
 	}
 }

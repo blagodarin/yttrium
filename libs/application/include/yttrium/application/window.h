@@ -7,10 +7,14 @@
 #include <memory>
 #include <string>
 
+namespace seir
+{
+	class Image;
+}
+
 namespace Yt
 {
 	class Application;
-	class Image;
 	class Point;
 	class Size;
 
@@ -48,7 +52,7 @@ namespace Yt
 		bool set_cursor(const Point& cursor);
 
 		///
-		void set_icon(const Image&);
+		void set_icon(const seir::Image&);
 
 		///
 		void set_title(const std::string&);

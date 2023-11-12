@@ -9,7 +9,7 @@
 #include <yttrium/storage/source.h>
 #include <yttrium/storage/writer.h>
 
-#include <seir_main/u8main.hpp>
+#include <seir_u8main/u8main.hpp>
 
 #include <iostream>
 

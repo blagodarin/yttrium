@@ -9,6 +9,13 @@
 #include <string_view>
 #include <vector>
 
+namespace seir
+{
+	class Blob;
+	template <class>
+	class SharedPtr;
+}
+
 namespace Yt
 {
 	class RectF;
@@ -37,7 +44,7 @@ namespace Yt
 				: _cursorOffset{ cursorOffset }, _selectionBegin{ selectionOffset }, _selectionEnd{ selectionOffset + selectionSize } {}
 		};
 
-		static std::shared_ptr<const Font> load(const Source&, RenderManager&);
+		static std::shared_ptr<const Font> load(const seir::SharedPtr<seir::Blob>&, RenderManager&);
 
 		virtual ~Font() noexcept = default;
 		virtual void render(Renderer2D&, const RectF&, std::string_view) const = 0;

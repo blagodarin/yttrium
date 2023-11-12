@@ -48,7 +48,7 @@ namespace Yt
 			throw BadPackage{ "Invalid Yttrium package" };
 		}
 		const auto indexOffset = _source->size() - header._indexBlock._compressedSize;
-		_indexBuffer.reserve(header._indexBlock._uncompressedSize);
+		_indexBuffer.reserve(header._indexBlock._uncompressedSize, 0);
 		if (header._indexBlock._compressedSize == header._indexBlock._uncompressedSize)
 		{
 			if (!_source->read_at(indexOffset, _indexBuffer.data(), header._indexBlock._uncompressedSize))
@@ -58,26 +58,27 @@ namespace Yt
 		{
 			if (!_decompressor || header._indexBlock._compressedSize == 0 || header._indexBlock._compressedSize > header._indexBlock._uncompressedSize)
 				throw BadPackage{ "Invalid Yttrium package" };
-			seir::Buffer<uint8_t> compressedIndexBuffer{ header._indexBlock._compressedSize };
+			seir::Buffer compressedIndexBuffer{ header._indexBlock._compressedSize };
 			if (!_source->read_at(indexOffset, compressedIndexBuffer.data(), header._indexBlock._compressedSize)
 				|| !_decompressor->decompress(_indexBuffer.data(), header._indexBlock._uncompressedSize, compressedIndexBuffer.data(), header._indexBlock._compressedSize))
 				throw BadPackage{ "Invalid Yttrium package" };
 		}
 		std::span<const YpBlockEntry> entries{ reinterpret_cast<YpBlockEntry*>(_indexBuffer.data()), header._fileCount };
-		std::span<const uint8_t> metadata{ _indexBuffer.data() + header._fileCount * sizeof(YpBlockEntry), header._indexBlock._uncompressedSize - header._fileCount * sizeof(YpBlockEntry) };
+		std::span<const std::byte> metadata{ _indexBuffer.data() + header._fileCount * sizeof(YpBlockEntry), header._indexBlock._uncompressedSize - header._fileCount * sizeof(YpBlockEntry) };
 		_entries.reserve(entries.size());
 		_names.reserve(entries.size());
 		uint64_t offset = sizeof header;
 		for (const auto& entry : entries)
 		{
-			if (entry._compressedSize == 0 || entry._compressedSize > entry._uncompressedSize || entry._compressedSize > indexOffset - offset)
+			if (entry._compressedSize == 0 || entry._compressedSize > entry._uncompressedSize || entry._compressedSize > indexOffset - offset || metadata.empty())
 				throw BadPackage{ "Invalid Yttrium package" };
-			if (metadata.empty() || metadata[0] > metadata.size() - 1)
+			const auto length = std::to_integer<uint8_t>(metadata[0]);
+			if (length > metadata.size() - 1)
 				throw BadPackage{ "Invalid Yttrium package" };
 			_entries.emplace_back(offset, entry._compressedSize, entry._uncompressedSize);
-			_names.emplace_back(reinterpret_cast<const char*>(metadata.data() + 1), metadata[0]);
+			_names.emplace_back(reinterpret_cast<const char*>(metadata.data() + 1), length);
 			offset += entry._compressedSize;
-			metadata = metadata.subspan(1 + metadata[0]);
+			metadata = metadata.subspan(1 + length);
 		}
 	}
 
@@ -92,7 +93,7 @@ namespace Yt
 			return Source::from(_source, entry._offset, entry._uncompressedSize);
 		if (!_decompressor || entry._compressedSize == 0 || entry._uncompressedSize == 0)
 			return {};
-		seir::Buffer<uint8_t> compressedBuffer{ entry._compressedSize };
+		seir::Buffer compressedBuffer{ entry._compressedSize };
 		Buffer uncompressedBuffer{ entry._uncompressedSize };
 		if (!_source->read_at(entry._offset, compressedBuffer.data(), entry._compressedSize)
 			|| !_decompressor->decompress(uncompressedBuffer.data(), entry._uncompressedSize, compressedBuffer.data(), entry._compressedSize))

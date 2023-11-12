@@ -16,8 +16,8 @@ else()
 	set(CMAKE_FOLDER "Yttrium")
 endif()
 
-option(YTTRIUM_AUDIO_AULOS "Enable Aulos audio support" OFF)
 option(YTTRIUM_AUDIO_OGGVORBIS "Enable Ogg Vorbis audio support (requires libvorbisfile)" OFF)
+option(YTTRIUM_AUDIO_SEIRSYNTH "Enable Seir Synth audio support" OFF)
 option(YTTRIUM_AUDIO_WAV "Enable WAV audio support" OFF)
 option(YTTRIUM_IMAGE_BMP "Enable BMP image support" OFF)
 option(YTTRIUM_IMAGE_DDS "Enable DDS image support" OFF)
@@ -31,8 +31,20 @@ if(PROJECT_IS_TOP_LEVEL)
 endif()
 
 set(SEIR_AUDIO ON)
+set(SEIR_AUDIO_OGGVORBIS ${YTTRIUM_AUDIO_OGGVORBIS})
+set(SEIR_AUDIO_WAV ${YTTRIUM_AUDIO_WAV})
+set(SEIR_COMPRESSION_ZLIB ${YTTRIUM_COMPRESSION_ZLIB})
+set(SEIR_IMAGE ON)
+set(SEIR_IMAGE ON)
+set(SEIR_IMAGE_BMP ${YTTRIUM_IMAGE_BMP})
+set(SEIR_IMAGE_ICO ${YTTRIUM_IMAGE_ICO})
+set(SEIR_IMAGE_JPEG ${YTTRIUM_IMAGE_JPEG})
+set(SEIR_IMAGE_PNG ${YTTRIUM_IMAGE_PNG})
+set(SEIR_IMAGE_TGA ${YTTRIUM_IMAGE_TGA})
 set(SEIR_STATIC_RUNTIME ON)
-FetchContent_Declare(Seir GIT_REPOSITORY https://github.com/blagodarin/seir.git GIT_TAG c4626ae4759a1c4d5a1b3e83b0d6a38f5b97b871)
+set(SEIR_SYNTH ${YTTRIUM_AUDIO_SEIRSYNTH})
+set(SEIR_U8MAIN ON)
+FetchContent_Declare(Seir GIT_REPOSITORY https://github.com/blagodarin/seir.git GIT_TAG b65341cef24b168a04f67feb3d00431d7f735887)
 FetchContent_MakeAvailable(Seir)
 
 seir_defaults()
@@ -60,13 +72,6 @@ if(YTTRIUM_IMAGE_JPEG)
 		seir_provide_jpeg(JPEG_ROOT STATIC_RUNTIME ON)
 	endif()
 	find_package(JPEG REQUIRED)
-endif()
-
-# Aulos
-if(YTTRIUM_AUDIO_AULOS)
-	set(AULOS_STATIC_RUNTIME ON)
-	FetchContent_Declare(Aulos GIT_REPOSITORY https://github.com/blagodarin/aulos.git GIT_TAG ef05badf4f8152e606a2fd8e315af5bddd486c97)
-	FetchContent_MakeAvailable(Aulos)
 endif()
 
 # Vorbis
@@ -200,6 +205,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 		/wd5039 # pointer or reference to potentially throwing function passed to extern C function under -EHc. Undefined behavior may occur if this function throws an exception.
 		/wd5045 # Compiler will insert Spectre mitigation for memory load if /Qspectre switch specified
 		/wd5220 # a non-static data member with a volatile qualified type no longer implies
+		/wd5246 # the initialization of a subobject should be wrapped in braces
 		)
 endif()
 
@@ -212,7 +218,6 @@ add_subdirectory(libs/i18n)
 add_subdirectory(libs/image)
 add_subdirectory(libs/ion)
 add_subdirectory(libs/application)
-add_subdirectory(libs/audio)
 add_subdirectory(libs/renderer)
 add_subdirectory(libs/gui)
 

@@ -6,12 +6,14 @@
 
 #include <yttrium/application/key.h>
 #include <yttrium/base/exceptions.h>
-#include <yttrium/image/image.h>
 #include <yttrium/geometry/point.h>
 #include <yttrium/geometry/size.h>
 #include "../../../base/src/windows/error.h"
 #include "../../../image/src/formats/bmp.h"
 #include "../window_callbacks.h"
+
+#include <seir_image/image.hpp>
+#include <seir_image/utils.hpp>
 
 #include <cassert>
 #include <memory>
@@ -61,11 +63,11 @@ namespace Yt
 			&& ::SetCursorPos(gdi_cursor.x, gdi_cursor.y);
 	}
 
-	void WindowBackend::set_icon(const Image& image)
+	void WindowBackend::set_icon(const seir::Image& image)
 	{
-		const ImageInfo info{ image.info().width(), image.info().height(), PixelFormat::Bgra32, ImageOrientation::XRightYUp };
+		const seir::ImageInfo info{ image.info().width(), image.info().height(), seir::PixelFormat::Bgra32, seir::ImageAxes::XRightYUp };
 		const auto mask_size = (info.width() + 7) / 8 * info.height();
-		const auto buffer_size = sizeof(BmpInfoHeader) + info.frame_size() + mask_size;
+		const auto buffer_size = sizeof(BmpInfoHeader) + info.frameSize() + mask_size;
 		const auto buffer = std::make_unique<std::uint8_t[]>(buffer_size);
 		auto* header = reinterpret_cast<BmpInfoHeader*>(buffer.get());
 		header->header_size = sizeof *header;
@@ -74,12 +76,12 @@ namespace Yt
 		header->planes = 1;
 		header->bits_per_pixel = 32;
 		header->compression = BmpCompression::Rgb;
-		header->image_size = static_cast<std::uint32_t>(info.frame_size());
+		header->image_size = static_cast<std::uint32_t>(info.frameSize());
 		header->x_pixels_per_meter = 0;
 		header->y_pixels_per_meter = 0;
 		header->used_colors = 0;
 		header->required_colors = 0;
-		if (!Image::transform(image.info(), image.data(), info, buffer.get() + sizeof *header))
+		if (!seir::copyImage(image, info, buffer.get() + sizeof *header))
 			return;
 		std::memset(buffer.get() + sizeof *header + header->image_size, 0xff, mask_size);
 		decltype(_icon) icon{ ::CreateIconFromResourceEx(buffer.get(), static_cast<DWORD>(buffer_size), TRUE, 0x00030000, 0, 0, LR_DEFAULTCOLOR) };

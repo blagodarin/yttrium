@@ -21,19 +21,19 @@ add_library(Y_audio STATIC
 	src/wav.h
 	)
 target_compile_definitions(Y_audio PUBLIC
-	YTTRIUM_AUDIO_AULOS=$<BOOL:${YTTRIUM_AUDIO_AULOS}>
 	YTTRIUM_AUDIO_OGGVORBIS=$<BOOL:${YTTRIUM_AUDIO_OGGVORBIS}>
+	YTTRIUM_AUDIO_SEIRSYNTH=$<BOOL:${YTTRIUM_AUDIO_SEIRSYNTH}>
 	YTTRIUM_AUDIO_WAV=$<BOOL:${YTTRIUM_AUDIO_WAV}>
 	)
 target_include_directories(Y_audio PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 target_link_libraries(Y_audio PRIVATE Y_base Y_storage Seir::audio)
-if(YTTRIUM_AUDIO_AULOS)
-	target_link_libraries(Y_audio PRIVATE aulos)
-	target_sources(Y_audio PRIVATE src/formats/aulos.cpp src/formats/aulos.h)
-endif()
 if(YTTRIUM_AUDIO_OGGVORBIS)
 	target_link_libraries(Y_audio PRIVATE Vorbis::vorbisfile)
 	target_sources(Y_audio PRIVATE src/formats/ogg_vorbis.cpp src/formats/ogg_vorbis.h)
+endif()
+if(YTTRIUM_AUDIO_SEIRSYNTH)
+	target_link_libraries(Y_audio PRIVATE Seir::synth)
+	target_sources(Y_audio PRIVATE src/formats/aulos.cpp src/formats/aulos.h)
 endif()
 if(YTTRIUM_AUDIO_WAV)
 	target_sources(Y_audio PRIVATE src/formats/wav.cpp src/formats/wav.h)

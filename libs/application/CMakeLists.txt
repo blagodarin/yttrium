@@ -25,7 +25,7 @@ target_compile_definitions(Y_application PUBLIC
 	YTTRIUM_RENDERER_VULKAN=$<BOOL:${YTTRIUM_RENDERER_VULKAN}>
 	)
 target_include_directories(Y_application PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-target_link_libraries(Y_application PUBLIC Y_base PRIVATE Y_geometry Y_image Seir::base)
+target_link_libraries(Y_application PUBLIC Y_base PRIVATE Y_geometry Y_image Seir::base Seir::image)
 if(YTTRIUM_RENDERER_OPENGL)
 	target_sources(Y_application PRIVATE
 		src/opengl.h
