@@ -14,6 +14,8 @@
 #include "texture.h"
 
 #include <seir_base/int_utils.hpp>
+#include <seir_image/image.hpp>
+#include <seir_image/utils.hpp>
 
 #include <cassert>
 
@@ -145,9 +147,9 @@ namespace Yt
 		return result;
 	}
 
-	std::unique_ptr<Texture2D> GlRenderer::create_texture_2d(const Image& image, Flags<RenderManager::TextureFlag> flags)
+	std::unique_ptr<Texture2D> GlRenderer::create_texture_2d(const seir::ImageInfo& image_info, const void* image_data, Flags<RenderManager::TextureFlag> flags)
 	{
-		const auto create = [this, flags](const ImageInfo& info, const void* data, std::size_t alignment) -> std::unique_ptr<Texture2D> {
+		const auto create = [this, flags](const seir::ImageInfo& info, const void* data, std::size_t alignment) -> std::unique_ptr<Texture2D> {
 			GlTextureHandle texture{ _gl, GL_TEXTURE_2D };
 			_gl.PixelStorei(GL_PACK_ALIGNMENT, static_cast<GLint>(alignment));
 			texture.set_data(0, GL_RGBA8, static_cast<GLsizei>(info.width()), static_cast<GLsizei>(info.height()), GL_BGRA, GL_UNSIGNED_BYTE, data);
@@ -157,13 +159,13 @@ namespace Yt
 			return std::make_unique<GlTexture2D>(*this, info, has_mipmaps, std::move(texture));
 		};
 
-		if (image.info().pixel_format() == PixelFormat::Bgra32)
-			if (const auto alignment = seir::powerOf2Alignment(image.info().stride() | 8); alignment == 4 || alignment == 8)
-				return create(image.info(), image.data(), alignment);
+		if (image_info.pixelFormat() == seir::PixelFormat::Bgra32)
+			if (const auto alignment = seir::powerOf2Alignment(image_info.stride() | 8); alignment == 4 || alignment == 8)
+				return create(image_info, image_data, alignment);
 
-		const ImageInfo transformed_info{ image.info().width(), image.info().height(), PixelFormat::Bgra32, image.info().orientation() };
-		Buffer buffer{ transformed_info.frame_size() };
-		if (!Image::transform(image.info(), image.data(), transformed_info, buffer.data()))
+		const seir::ImageInfo transformed_info{ image_info.width(), image_info.height(), seir::PixelFormat::Bgra32, image_info.axes() };
+		Buffer buffer{ transformed_info.frameSize() };
+		if (!seir::copyImage(image_info, image_data, transformed_info, buffer.data()))
 			return {};
 
 		// TODO: Count "slow" textures.
@@ -207,10 +209,10 @@ namespace Yt
 		_2d_vao.unbind();
 	}
 
-	RectF GlRenderer::map_rect(const RectF& rect, ImageOrientation orientation) const
+	RectF GlRenderer::map_rect(const RectF& rect, seir::ImageAxes axes) const
 	{
-		const auto map_point = [orientation](const Vector2& point) -> Vector2 {
-			return { point.x, orientation == ImageOrientation::XRightYDown ? point.y : 1.f - point.y };
+		const auto map_point = [axes](const Vector2& point) -> Vector2 {
+			return { point.x, axes == seir::ImageAxes::XRightYDown ? point.y : 1.f - point.y };
 		};
 		return { map_point(rect.topLeft()), map_point(rect.bottomRight()) };
 	}
@@ -230,20 +232,24 @@ namespace Yt
 		_gl.Viewport(0, 0, size._width, size._height);
 	}
 
-	Image GlRenderer::take_screenshot(const Size& viewport_size) const
+	seir::Image GlRenderer::take_screenshot(const Size& viewport_size) const
 	{
 		GLint alignment = 0;
 		_gl.GetIntegerv(GL_UNPACK_ALIGNMENT, &alignment);
 
-		Image image{ { static_cast<std::size_t>(viewport_size._width), static_cast<std::size_t>(viewport_size._height), PixelFormat::Rgb24, static_cast<std::size_t>(alignment), ImageOrientation::XRightYUp } };
+		const auto width = static_cast<uint32_t>(viewport_size._width);
+		const auto height = static_cast<uint32_t>(viewport_size._height);
+		const auto stride = (width * 3 + alignment - 1) / alignment * alignment;
+		const seir::ImageInfo info{ width, height, stride, seir::PixelFormat::Rgb24, seir::ImageAxes::XRightYUp };
+		seir::Buffer buffer{ info.frameSize() };
 
 		GLint read_buffer = GL_BACK;
 		_gl.GetIntegerv(GL_READ_BUFFER, &read_buffer);
 		_gl.ReadBuffer(GL_FRONT);
-		_gl.ReadPixels(0, 0, viewport_size._width, viewport_size._height, GL_RGB, GL_UNSIGNED_BYTE, image.data());
+		_gl.ReadPixels(0, 0, viewport_size._width, viewport_size._height, GL_RGB, GL_UNSIGNED_BYTE, buffer.data());
 		_gl.ReadBuffer(static_cast<GLenum>(read_buffer));
 
-		return image;
+		return seir::Image{ info, std::move(buffer) };
 	}
 
 #ifndef NDEBUG

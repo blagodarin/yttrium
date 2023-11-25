@@ -7,9 +7,13 @@
 #include <functional>
 #include <memory>
 
-namespace Yt
+namespace seir
 {
 	class Image;
+}
+
+namespace Yt
+{
 	class RenderManager;
 	class RenderMetrics;
 	class RenderPass;
@@ -31,7 +35,7 @@ namespace Yt
 		RenderManager& render_manager();
 
 		///
-		Image take_screenshot();
+		seir::Image take_screenshot();
 
 	private:
 		const std::unique_ptr<struct ViewportData> _data;

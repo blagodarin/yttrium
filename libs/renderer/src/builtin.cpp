@@ -5,9 +5,10 @@
 #include "builtin.h"
 
 #include <yttrium/base/exceptions.h>
-#include <yttrium/image/image.h>
 #include <yttrium/renderer/program.h>
 #include "backend/backend.h"
+
+#include <seir_image/image.hpp>
 
 namespace
 {
@@ -17,7 +18,7 @@ namespace
 namespace Yt
 {
 	RenderBuiltin::RenderBuiltin(RenderBackend& backend)
-		: _white_texture{ backend.create_texture_2d({ { 1, 1, PixelFormat::Bgra32 }, &_white_texture_data }, RenderManager::TextureFlag::NoMipmaps) }
+		: _white_texture{ backend.create_texture_2d({ 1, 1, seir::PixelFormat::Bgra32 }, &_white_texture_data, RenderManager::TextureFlag::NoMipmaps) }
 		, _program_2d{ backend.create_builtin_program_2d() }
 	{
 		if (!_white_texture)

@@ -118,7 +118,7 @@ int u8main(int argc, char** argv)
 				return usage();
 			const auto index = readIndex(std::filesystem::u8path(argv[1]));
 			const auto packagePath = std::filesystem::u8path(argv[2]);
-			auto fileWriter = seir::Writer::create(argv[2]);
+			auto fileWriter = seir::Writer::create(packagePath);
 			if (!fileWriter)
 			{
 				std::cerr << "ERROR: Unable to open " << packagePath << " for writing\n";

@@ -6,8 +6,9 @@
 
 #include <yttrium/renderer/texture.h>
 
-#include <yttrium/image/image.h>
 #include <yttrium/geometry/size.h>
+
+#include <seir_image/image.hpp>
 
 namespace Yt
 {
@@ -17,17 +18,17 @@ namespace Yt
 	class BackendTexture2D : public Texture2D
 	{
 	public:
-		BackendTexture2D(RenderBackend&, const ImageInfo&, bool has_mipmaps);
+		BackendTexture2D(RenderBackend&, const seir::ImageInfo&, bool has_mipmaps);
 
 		Size size() const noexcept override { return _size; }
 
 		RectF full_rectangle() const;
-		ImageOrientation orientation() const noexcept { return _orientation; }
+		seir::ImageAxes orientation() const noexcept { return _orientation; }
 
 	protected:
 		RenderBackend& _backend;
 		const Size _size;
-		const ImageOrientation _orientation;
+		const seir::ImageAxes _orientation;
 		const bool _has_mipmaps;
 	};
 }

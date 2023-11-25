@@ -9,10 +9,10 @@
 
 namespace Yt
 {
-	BackendTexture2D::BackendTexture2D(RenderBackend& backend, const ImageInfo& info, bool has_mipmaps)
+	BackendTexture2D::BackendTexture2D(RenderBackend& backend, const seir::ImageInfo& info, bool has_mipmaps)
 		: _backend{ backend }
-		, _size{ info.width(), info.height() }
-		, _orientation{ info.orientation() }
+		, _size{ size_t{ info.width() }, size_t{ info.height() } }
+		, _orientation{ info.axes() }
 		, _has_mipmaps{ has_mipmaps }
 	{
 	}

@@ -14,7 +14,7 @@ namespace Yt
 	class GlTexture2D final : public BackendTexture2D
 	{
 	public:
-		GlTexture2D(RenderBackend&, const ImageInfo&, bool has_mipmaps, GlTextureHandle&&);
+		GlTexture2D(RenderBackend&, const seir::ImageInfo&, bool has_mipmaps, GlTextureHandle&&);
 
 		void bind(Flags<Texture2D::Filter>) const;
 

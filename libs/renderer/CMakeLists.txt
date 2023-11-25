@@ -18,7 +18,6 @@ add_library(Y_renderer STATIC
 	include/yttrium/renderer/modifiers.h
 	include/yttrium/renderer/pass.h
 	include/yttrium/renderer/program.h
-	include/yttrium/renderer/resource_loader.h
 	include/yttrium/renderer/texture.h
 	include/yttrium/renderer/viewport.h
 	src/2d.cpp
@@ -37,14 +36,13 @@ add_library(Y_renderer STATIC
 	src/pass.h
 	src/renderer.cpp
 	src/renderer.h
-	src/resource_loader.cpp
 	src/texture.cpp
 	src/texture.h
 	src/viewport.cpp
 	src/viewport.h
 	)
 target_include_directories(Y_renderer PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-target_link_libraries(Y_renderer PUBLIC Y_geometry Y_image PRIVATE Y_application Y_ion Y_storage Seir::base fmt::fmt Threads::Threads)
+target_link_libraries(Y_renderer PUBLIC Y_geometry Y_image PRIVATE Y_application Y_ion Y_storage Seir::base Seir::image fmt::fmt Threads::Threads)
 if(YTTRIUM_RENDERER_OPENGL)
 	target_sources(Y_renderer PRIVATE
 		src/backend/opengl/api.h

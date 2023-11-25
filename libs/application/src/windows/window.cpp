@@ -9,7 +9,6 @@
 #include <yttrium/geometry/point.h>
 #include <yttrium/geometry/size.h>
 #include "../../../base/src/windows/error.h"
-#include "../../../image/src/formats/bmp.h"
 #include "../window_callbacks.h"
 
 #include <seir_image/image.hpp>
@@ -67,23 +66,23 @@ namespace Yt
 	{
 		const seir::ImageInfo info{ image.info().width(), image.info().height(), seir::PixelFormat::Bgra32, seir::ImageAxes::XRightYUp };
 		const auto mask_size = (info.width() + 7) / 8 * info.height();
-		const auto buffer_size = sizeof(BmpInfoHeader) + info.frameSize() + mask_size;
+		const auto buffer_size = sizeof(BITMAPINFOHEADER) + info.frameSize() + mask_size;
 		const auto buffer = std::make_unique<std::uint8_t[]>(buffer_size);
-		auto* header = reinterpret_cast<BmpInfoHeader*>(buffer.get());
-		header->header_size = sizeof *header;
-		header->width = static_cast<std::int32_t>(info.width());
-		header->height = static_cast<std::int32_t>(info.height()) * 2;
-		header->planes = 1;
-		header->bits_per_pixel = 32;
-		header->compression = BmpCompression::Rgb;
-		header->image_size = static_cast<std::uint32_t>(info.frameSize());
-		header->x_pixels_per_meter = 0;
-		header->y_pixels_per_meter = 0;
-		header->used_colors = 0;
-		header->required_colors = 0;
+		auto* header = reinterpret_cast<BITMAPINFOHEADER*>(buffer.get());
+		header->biSize = sizeof *header;
+		header->biWidth = static_cast<LONG>(info.width());
+		header->biHeight = static_cast<LONG>(info.height()) * 2;
+		header->biPlanes = 1;
+		header->biBitCount = 32;
+		header->biCompression = BI_RGB;
+		header->biSizeImage = info.frameSize();
+		header->biXPelsPerMeter = 0;
+		header->biYPelsPerMeter = 0;
+		header->biClrUsed = 0;
+		header->biClrImportant = 0;
 		if (!seir::copyImage(image, info, buffer.get() + sizeof *header))
 			return;
-		std::memset(buffer.get() + sizeof *header + header->image_size, 0xff, mask_size);
+		std::memset(buffer.get() + sizeof *header + header->biSizeImage, 0xff, mask_size);
 		decltype(_icon) icon{ ::CreateIconFromResourceEx(buffer.get(), static_cast<DWORD>(buffer_size), TRUE, 0x00030000, 0, 0, LR_DEFAULTCOLOR) };
 		if (!icon)
 			return log_last_error("CreateIconFromResourceEx");

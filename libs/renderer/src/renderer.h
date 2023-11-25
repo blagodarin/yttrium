@@ -8,6 +8,11 @@
 
 #include <memory>
 
+namespace seir
+{
+	enum class ImageAxes;
+}
+
 namespace Yt
 {
 	enum class ImageOrientation;
@@ -23,13 +28,13 @@ namespace Yt
 		~RendererImpl() override;
 
 		std::unique_ptr<RenderProgram> create_program(const std::string& vertex_shader, const std::string& fragment_shader) override;
-		std::unique_ptr<Texture2D> create_texture_2d(const Image&, Flags<TextureFlag>) override;
+		std::unique_ptr<Texture2D> create_texture_2d(const seir::Image&, Flags<TextureFlag>) override;
 		std::unique_ptr<Mesh> load_mesh(const Source&, std::string_view source_name) override;
 
 	public:
-		RectF map_rect(const RectF&, ImageOrientation) const;
+		RectF map_rect(const RectF&, seir::ImageAxes) const;
 		void set_viewport_size(const Size&);
-		Image take_screenshot(const Size&) const;
+		seir::Image take_screenshot(const Size&) const;
 
 	public:
 		const std::unique_ptr<RenderBackend> _backend;

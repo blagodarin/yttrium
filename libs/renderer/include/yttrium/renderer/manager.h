@@ -9,9 +9,13 @@
 #include <memory>
 #include <string>
 
-namespace Yt
+namespace seir
 {
 	class Image;
+}
+
+namespace Yt
+{
 	class Mesh;
 	class RenderProgram;
 	class Source;
@@ -35,7 +39,7 @@ namespace Yt
 		virtual std::unique_ptr<RenderProgram> create_program(const std::string& vertex_shader, const std::string& fragment_shader) = 0;
 
 		///
-		virtual std::unique_ptr<Texture2D> create_texture_2d(const Image&, Flags<TextureFlag> = {}) = 0;
+		virtual std::unique_ptr<Texture2D> create_texture_2d(const seir::Image&, Flags<TextureFlag> = {}) = 0;
 
 		///
 		virtual std::unique_ptr<Mesh> load_mesh(const Source&, std::string_view source_name) = 0;

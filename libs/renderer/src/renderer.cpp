@@ -6,7 +6,6 @@
 
 #include <yttrium/geometry/matrix.h>
 #include <yttrium/geometry/rect.h>
-#include <yttrium/image/image.h>
 #include <yttrium/renderer/mesh.h>
 #include <yttrium/renderer/program.h>
 #include "model/formats/obj.h"
@@ -19,6 +18,8 @@
 #else
 #	include "backend/null/renderer.h"
 #endif
+
+#include <seir_image/image.hpp>
 
 #include <cassert>
 
@@ -46,9 +47,9 @@ namespace Yt
 		return _backend->create_program(vertex_shader, fragment_shader);
 	}
 
-	std::unique_ptr<Texture2D> RendererImpl::create_texture_2d(const Image& image, Flags<TextureFlag> flags)
+	std::unique_ptr<Texture2D> RendererImpl::create_texture_2d(const seir::Image& image, Flags<TextureFlag> flags)
 	{
-		return _backend->create_texture_2d(image, flags);
+		return _backend->create_texture_2d(image.info(), image.data(), flags);
 	}
 
 	std::unique_ptr<Mesh> RendererImpl::load_mesh(const Source& source, std::string_view source_name)
@@ -60,9 +61,9 @@ namespace Yt
 		return _backend->create_mesh(data);
 	}
 
-	RectF RendererImpl::map_rect(const RectF& rect, ImageOrientation orientation) const
+	RectF RendererImpl::map_rect(const RectF& rect, seir::ImageAxes axes) const
 	{
-		return _backend->map_rect(rect, orientation);
+		return _backend->map_rect(rect, axes);
 	}
 
 	void RendererImpl::set_viewport_size(const Size& size)
@@ -70,7 +71,7 @@ namespace Yt
 		_backend->set_viewport_size(size);
 	}
 
-	Image RendererImpl::take_screenshot(const Size& size) const
+	seir::Image RendererImpl::take_screenshot(const Size& size) const
 	{
 		return _backend->take_screenshot(size);
 	}

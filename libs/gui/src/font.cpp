@@ -6,7 +6,6 @@
 
 #include <yttrium/base/exceptions.h>
 #include <yttrium/geometry/rect.h>
-#include <yttrium/image/image.h>
 #include <yttrium/renderer/2d.h>
 #include <yttrium/renderer/manager.h>
 #include <yttrium/renderer/texture.h>
@@ -15,6 +14,7 @@
 
 #include <seir_base/utf8.hpp>
 #include <seir_data/blob.hpp>
+#include <seir_image/image.hpp>
 
 #include <cassert>
 #include <cstring>
@@ -72,13 +72,14 @@ namespace Yt
 	class FontImpl final : public Font
 	{
 	public:
-		FontImpl(const seir::SharedPtr<seir::Blob>& blob, RenderManager& renderManager, size_t size)
+		FontImpl(const seir::SharedPtr<seir::Blob>& blob, RenderManager& renderManager, uint32_t size)
 			: _size{ static_cast<int>(size) }
 		{
 			_freetype.load(blob);
 			_hasKerning = FT_HAS_KERNING(_freetype._face);
-			FT_Set_Pixel_Sizes(_freetype._face, 0, static_cast<FT_UInt>(size));
-			Image image{ { size * 32, size * 32, PixelFormat::Intensity8 } };
+			FT_Set_Pixel_Sizes(_freetype._face, 0, size);
+			const seir::ImageInfo imageInfo{ size * 32, size * 32, seir::PixelFormat::Intensity8 };
+			seir::Buffer buffer{ imageInfo.frameSize() };
 			size_t x_offset = 0;
 			size_t y_offset = 0;
 			size_t row_height = 0;
@@ -87,12 +88,12 @@ namespace Yt
 				{
 					if (stride < 0)
 						src += (height - 1) * static_cast<size_t>(-stride);
-					auto dst = static_cast<uint8_t*>(image.data()) + image.info().stride() * y_offset + x_offset;
+					auto dst = buffer.data() + imageInfo.stride() * y_offset + x_offset;
 					for (size_t y = 0; y < height; ++y)
 					{
 						std::memcpy(dst, src, width);
 						src += stride;
-						dst += image.info().stride();
+						dst += imageInfo.stride();
 					}
 					if (row_height < height)
 						row_height = height;
@@ -109,13 +110,13 @@ namespace Yt
 				if (FT_Load_Glyph(_freetype._face, id, FT_LOAD_RENDER))
 					continue; // TODO: Report error.
 				const auto glyph = _freetype._face->glyph;
-				if (x_offset + glyph->bitmap.width > image.info().width())
+				if (x_offset + glyph->bitmap.width > imageInfo.width())
 				{
 					x_offset = 0;
 					y_offset += row_height + 1;
 					row_height = 0;
 				}
-				if (y_offset + glyph->bitmap.rows > image.info().height())
+				if (y_offset + glyph->bitmap.rows > imageInfo.height())
 					break; // TODO: Report error.
 				auto& glyphInfo = _glyph[codepoint];
 				glyphInfo._id = id;
@@ -124,7 +125,7 @@ namespace Yt
 				glyphInfo._advance = static_cast<int>(glyph->advance.x >> 6);
 				copy_rect(glyph->bitmap.buffer, glyph->bitmap.width, glyph->bitmap.rows, glyph->bitmap.pitch);
 			}
-			_texture = renderManager.create_texture_2d(image);
+			_texture = renderManager.create_texture_2d({ imageInfo, std::move(buffer) });
 		}
 
 		void render(Renderer2D& renderer, const RectF& rect, std::string_view text) const override

@@ -5,7 +5,7 @@
 #include <yttrium/renderer/viewport.h>
 #include "viewport.h"
 
-#include <yttrium/image/image.h>
+#include <seir_image/image.hpp>
 
 namespace Yt
 {
@@ -42,7 +42,7 @@ namespace Yt
 		return _data->_renderer;
 	}
 
-	Image Viewport::take_screenshot()
+	seir::Image Viewport::take_screenshot()
 	{
 		return _data->_renderer.take_screenshot(_data->_window_size);
 	}

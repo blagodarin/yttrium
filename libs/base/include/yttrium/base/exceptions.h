@@ -41,12 +41,4 @@ namespace Yt
 		explicit MissingDataError(const std::string& message)
 			: std::runtime_error{ message } {}
 	};
-
-	/// Thrown by ResourceLoader if it is unable to find the specified resource.
-	class ResourceError : public MissingDataError
-	{
-	public:
-		explicit ResourceError(const std::string& message)
-			: MissingDataError{ message } {}
-	};
 }

@@ -15,6 +15,7 @@
 #include "texture.h"
 
 #include <seir_base/int_utils.hpp>
+#include <seir_image/image.hpp>
 
 #include <array>
 
@@ -104,23 +105,9 @@ namespace Yt
 		return std::make_unique<VulkanProgram>(*this);
 	}
 
-	std::unique_ptr<Texture2D> VulkanRenderer::create_texture_2d(const Image& image, Flags<RenderManager::TextureFlag> flags)
+	std::unique_ptr<Texture2D> VulkanRenderer::create_texture_2d(const seir::ImageInfo&, const void*, Flags<RenderManager::TextureFlag>)
 	{
-		const auto create = [this, flags](const ImageInfo& info, const void* data) -> std::unique_ptr<Texture2D> {
-			const auto has_mipmaps = !(flags & RenderManager::TextureFlag::NoMipmaps);
-			return std::make_unique<VulkanTexture2D>(*this, _context, info, has_mipmaps, VK_FORMAT_B8G8R8A8_UNORM, data);
-		};
-
-		if (image.info().pixel_format() == PixelFormat::Bgra32 && seir::powerOf2Alignment(image.info().stride()) >= 4)
-			return create(image.info(), image.data());
-
-		const ImageInfo transformed_info{ image.info().width(), image.info().height(), PixelFormat::Bgra32, image.info().orientation() };
-		Buffer buffer{ transformed_info.frame_size() };
-		if (!Image::transform(image.info(), image.data(), transformed_info, buffer.data()))
-			return {};
-
-		// TODO: Count "slow" textures.
-		return create(transformed_info, buffer.data());
+		return {};
 	}
 
 	size_t VulkanRenderer::draw_mesh(const Mesh& mesh)
@@ -152,9 +139,11 @@ namespace Yt
 	{
 	}
 
-	Image VulkanRenderer::take_screenshot(const Size& viewport_size) const
+	seir::Image VulkanRenderer::take_screenshot(const Size& viewport_size) const
 	{
-		return Image{ { static_cast<std::size_t>(viewport_size._width), static_cast<std::size_t>(viewport_size._height), PixelFormat::Rgb24, 4, ImageOrientation::XRightYDown } };
+		const seir::ImageInfo info{ width, height, seir::PixelFormat::Rgb24, seir::ImageAxes::XRightYDown };
+		seir::Buffer buffer{ info.frameSize() };
+		return seir::Image{ info, std::move(buffer) };
 	}
 
 	void VulkanRenderer::update_descriptors()
