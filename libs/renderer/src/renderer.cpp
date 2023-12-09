@@ -52,9 +52,9 @@ namespace Yt
 		return _backend->create_texture_2d(image.info(), image.data(), flags);
 	}
 
-	std::unique_ptr<Mesh> RendererImpl::load_mesh(const Source& source, std::string_view source_name)
+	std::unique_ptr<Mesh> RendererImpl::load_mesh(const seir::Blob& blob, std::string_view source_name)
 	{
-		const auto data = load_obj_mesh(source, source_name);
+		const auto data = load_obj_mesh(blob, source_name);
 		assert(!data._vertex_format.empty());
 		assert(data._vertex_data.size() > 0);
 		assert(!data._indices.empty());

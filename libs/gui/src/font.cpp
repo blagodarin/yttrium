@@ -9,8 +9,6 @@
 #include <yttrium/renderer/2d.h>
 #include <yttrium/renderer/manager.h>
 #include <yttrium/renderer/texture.h>
-#include <yttrium/storage/reader.h>
-#include <yttrium/storage/source.h>
 
 #include <seir_base/utf8.hpp>
 #include <seir_data/blob.hpp>

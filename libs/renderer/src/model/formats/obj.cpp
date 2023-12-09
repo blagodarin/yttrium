@@ -7,9 +7,9 @@
 #include <yttrium/base/buffer_appender.h>
 #include <yttrium/base/exceptions.h>
 #include <yttrium/geometry/vector.h>
-#include <yttrium/storage/reader.h>
-#include <yttrium/storage/source.h>
 #include "../mesh_data.h"
+
+#include <seir_data/reader.hpp>
 
 #include <optional>
 #include <regex>
@@ -188,14 +188,17 @@ namespace
 
 namespace Yt
 {
-	MeshData load_obj_mesh(const Source& source, std::string_view source_name)
+	MeshData load_obj_mesh(const seir::Blob& blob, std::string_view source_name)
 	{
 		MeshData result;
 		std::string line;
 		size_t line_number = 0;
 		ObjState state;
-		for (Reader reader{ source }; reader.read_line(line);)
+		for (seir::Reader reader{ blob };;)
 		{
+			line = reader.readLine();
+			if (line.empty())
+				break;
 			++line_number;
 			if (std::regex_match(line, _obj_empty_regex))
 				continue;

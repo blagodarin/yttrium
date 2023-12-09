@@ -5,7 +5,8 @@
 #pragma once
 
 #include <yttrium/geometry/vector.h>
-#include <yttrium/image/color.h>
+
+#include <seir_graphics/color.hpp>
 
 namespace Yt
 {
@@ -13,6 +14,6 @@ namespace Yt
 	{
 		Vector2 _position;
 		Vector2 _texture;
-		Bgra32 _color;
+		seir::Rgba32 _color;
 	};
 }

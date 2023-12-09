@@ -4,12 +4,16 @@
 
 #pragma once
 
-#include <yttrium/image/color.h>
 #include <yttrium/geometry/margins.h>
 
 #include <memory>
 #include <string_view>
 #include <vector>
+
+namespace seir
+{
+	class Rgba32;
+}
 
 namespace Yt
 {
@@ -31,7 +35,7 @@ namespace Yt
 		void addRect(const RectF&);
 		void draw(RenderPass&);
 		void rewriteBorderlessRect(size_t id, const RectF&);
-		void setColor(Bgra32);
+		void setColor(const seir::Rgba32&);
 		void setTexture(const std::shared_ptr<const Texture2D>&);
 		void setTextureRect(const RectF&, const MarginsF& = {});
 		SizeF viewportSize() const noexcept;

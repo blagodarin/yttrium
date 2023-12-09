@@ -35,7 +35,7 @@ namespace Yt
 		const ViewportData& _viewportData;
 		std::vector<Part> _parts;
 		Part* _currentPart = nullptr;
-		Bgra32 _color = Bgra32::white();
+		seir::Rgba32 _color = seir::Rgba32::white();
 		RectF _textureRect;
 		MarginsF _textureBorders;
 
@@ -53,7 +53,7 @@ namespace Yt
 			_textureRect = static_cast<const BackendTexture2D*>(_currentPart->_texture.get())->full_rectangle();
 		}
 
-		void addRect(const RectF& position, const RectF& texture, const MarginsF& borders, Bgra32 color)
+		void addRect(const RectF& position, const RectF& texture, const MarginsF& borders, const seir::Rgba32& color)
 		{
 			const auto textureSize = _currentPart->_texture->size();
 
@@ -257,7 +257,7 @@ namespace Yt
 			part._texture = _data->_viewportData._renderer_builtin._white_texture;
 		}
 		_data->_currentPart = &_data->_parts.front();
-		_data->_color = Bgra32::white();
+		_data->_color = seir::Rgba32::white();
 		_data->_textureRect = static_cast<const BackendTexture2D*>(_data->_currentPart->_texture.get())->full_rectangle();
 		_data->_textureBorders = {};
 	}
@@ -276,7 +276,7 @@ namespace Yt
 		vertices[3]._position = rect.bottomRight();
 	}
 
-	void Renderer2D::setColor(Bgra32 color)
+	void Renderer2D::setColor(const seir::Rgba32& color)
 	{
 		_data->_color = color;
 	}

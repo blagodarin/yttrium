@@ -6,6 +6,6 @@ source_group("src" REGULAR_EXPRESSION ".*\\.(h|cpp)$")
 add_executable(ypack
 	src/main.cpp
 	)
-target_link_libraries(ypack PRIVATE Y_base Y_ion Y_storage Seir::data Seir::u8main)
+target_link_libraries(ypack PRIVATE Seir::data Seir::serialization Seir::u8main)
 seir_target(ypack FOLDER tools STATIC_RUNTIME ON)
 seir_install(ypack)

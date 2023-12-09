@@ -11,6 +11,7 @@
 
 namespace seir
 {
+	class Blob;
 	class Image;
 }
 
@@ -18,7 +19,6 @@ namespace Yt
 {
 	class Mesh;
 	class RenderProgram;
-	class Source;
 	class Texture2D;
 
 	///
@@ -42,6 +42,6 @@ namespace Yt
 		virtual std::unique_ptr<Texture2D> create_texture_2d(const seir::Image&, Flags<TextureFlag> = {}) = 0;
 
 		///
-		virtual std::unique_ptr<Mesh> load_mesh(const Source&, std::string_view source_name) = 0;
+		virtual std::unique_ptr<Mesh> load_mesh(const seir::Blob&, std::string_view source_name) = 0;
 	};
 }

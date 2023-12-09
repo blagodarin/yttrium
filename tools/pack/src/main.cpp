@@ -2,15 +2,11 @@
 // Copyright (C) Sergei Blagodarin.
 // SPDX-License-Identifier: Apache-2.0
 
-#include <yttrium/base/exceptions.h>
-#include <yttrium/base/logger.h>
-#include <yttrium/ion/reader.h>
-#include <yttrium/storage/source.h>
-
 #include <seir_data/archive.hpp>
 #include <seir_data/blob.hpp>
 #include <seir_data/compression.hpp>
 #include <seir_data/writer.hpp>
+#include <seir_serialization/st_stream.hpp>
 #include <seir_u8main/u8main.hpp>
 
 #include <cstring>
@@ -24,7 +20,7 @@ namespace
 	void check(bool condition, Args&&... args)
 	{
 		if (!condition)
-			throw Yt::DataError{ std::forward<Args>(args)... };
+			throw std::runtime_error{ std::forward<Args>(args)... };
 	}
 
 	struct Index
@@ -38,28 +34,26 @@ namespace
 		std::vector<FileGroup> _groups;
 	};
 
-	Index readIndex(const std::filesystem::path& path)
+	Index readIndex(const std::string& path)
 	{
-		auto source = Yt::Source::from(path);
-		check(static_cast<bool>(source), "Bad index file");
+		const auto blob = seir::Blob::from(path);
+		check(static_cast<bool>(blob), "Bad index file");
 		Index result;
-		Yt::IonReader ion{ *source };
-		auto token = ion.read();
-		if (token.is_name("compressor"))
+		seir::StReader reader{ blob };
+		seir::StStream stream{ reader };
+		if (stream.tryName("compressor"))
 		{
-			check(token.next(ion).to_value() == "zlib", "Bad compression algorithm");
+			check(stream.value() == "zlib", "Bad compression algorithm");
 			result._compression = seir::Compression::Zlib;
-			token.next(ion);
 		}
-		while (token.type() != Yt::IonToken::Type::End)
+		while (!stream.tryEnd())
 		{
-			token.check_name("files");
-			token.next(ion);
+			stream.name("files");
 			auto& group = result._groups.emplace_back();
-			if (token.type() == Yt::IonToken::Type::ObjectBegin)
+			if (stream.tryBeginObject())
 			{
-				token.next(ion).check_name("compression");
-				if (const auto level = token.next(ion).to_value(); level == "minimum")
+				stream.name("compression");
+				if (const auto level = stream.value(); level == "minimum")
 					group._compressionLevel = seir::CompressionLevel::Minimum;
 				else if (level == "default")
 					group._compressionLevel = seir::CompressionLevel::Default;
@@ -67,17 +61,11 @@ namespace
 					group._compressionLevel = seir::CompressionLevel::Maximum;
 				else
 					check(level == "none", "Bad compression level");
-				token.next(ion).check_object_end();
-				token.next(ion);
+				stream.endObject();
 			}
-			token.check_list_begin();
-			token.next(ion);
-			while (token.type() != Yt::IonToken::Type::ListEnd)
-			{
-				group._files.emplace_back(std::string{ token.to_value() });
-				token.next(ion);
-			}
-			token.next(ion);
+			stream.beginList();
+			while (!stream.tryEndList())
+				group._files.emplace_back(std::string{ stream.value() });
 		}
 		return result;
 	}
@@ -94,7 +82,6 @@ namespace
 
 int u8main(int argc, char** argv)
 {
-	Yt::Logger logger;
 	if (argc < 2)
 		return usage();
 	try
@@ -103,12 +90,14 @@ int u8main(int argc, char** argv)
 		{
 			if (argc != 3)
 				return usage();
-			const auto indexPath = std::filesystem::u8path(argv[2]);
+
 			auto dataTimestamp = std::filesystem::file_time_type::min();
-			const auto index = readIndex(indexPath);
+			const auto index = readIndex(argv[2]);
 			for (const auto& group : index._groups)
 				for (const auto& file : group._files)
 					dataTimestamp = std::max(dataTimestamp, std::filesystem::last_write_time(std::filesystem::u8path(file)));
+
+			const auto indexPath = std::filesystem::u8path(argv[2]);
 			if (dataTimestamp > std::filesystem::last_write_time(indexPath))
 				std::filesystem::last_write_time(indexPath, dataTimestamp);
 		}
@@ -116,7 +105,7 @@ int u8main(int argc, char** argv)
 		{
 			if (argc != 3)
 				return usage();
-			const auto index = readIndex(std::filesystem::u8path(argv[1]));
+			const auto index = readIndex(argv[1]);
 			const auto packagePath = std::filesystem::u8path(argv[2]);
 			auto fileWriter = seir::Writer::create(packagePath);
 			if (!fileWriter)

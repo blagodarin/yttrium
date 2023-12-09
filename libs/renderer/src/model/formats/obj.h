@@ -6,10 +6,14 @@
 
 #include <string_view>
 
+namespace seir
+{
+	class Blob;
+}
+
 namespace Yt
 {
 	class MeshData;
-	class Source;
 
-	MeshData load_obj_mesh(const Source&, std::string_view source_name);
+	MeshData load_obj_mesh(const seir::Blob&, std::string_view source_name);
 }
