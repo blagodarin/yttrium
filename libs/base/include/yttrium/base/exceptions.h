@@ -24,21 +24,4 @@ namespace Yt
 		explicit DataError(const std::string& message)
 			: std::runtime_error{ message } {}
 	};
-
-	///
-	class IonError : public DataError
-	{
-	public:
-		///
-		explicit IonError(const std::string& message)
-			: DataError{ message } {}
-	};
-
-	/// Thrown when required data is missing.
-	class MissingDataError : public std::runtime_error
-	{
-	public:
-		explicit MissingDataError(const std::string& message)
-			: std::runtime_error{ message } {}
-	};
 }

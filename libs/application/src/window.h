@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <yttrium/geometry/point.h>
+#include <yttrium/geometry/size.h>
 #include "application.h"
 #include "window_backend.h"
 #include "window_callbacks.h"

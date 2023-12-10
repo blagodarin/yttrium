@@ -5,7 +5,6 @@
 #include "renderer.h"
 
 #include <yttrium/base/logger.h>
-#include <yttrium/geometry/matrix.h>
 #include <yttrium/geometry/rect.h>
 #include "../../2d.h"
 #include "../../model/mesh_data.h"
@@ -211,7 +210,7 @@ namespace Yt
 
 	RectF GlRenderer::map_rect(const RectF& rect, seir::ImageAxes axes) const
 	{
-		const auto map_point = [axes](const Vector2& point) -> Vector2 {
+		const auto map_point = [axes](const seir::Vec2& point) -> seir::Vec2 {
 			return { point.x, axes == seir::ImageAxes::XRightYDown ? point.y : 1.f - point.y };
 		};
 		return { map_point(rect.topLeft()), map_point(rect.bottomRight()) };

@@ -17,7 +17,7 @@ namespace Yt
 		_program.attach(_fragment_shader.get());
 	}
 
-	void GlProgram::set_uniform(const std::string& name, const Matrix4& value)
+	void GlProgram::set_uniform(const std::string& name, const seir::Mat4& value)
 	{
 		_program.set_uniform(name.c_str(), value);
 	}

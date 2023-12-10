@@ -26,7 +26,7 @@ namespace
 	{
 		const auto yPadding = (rect.height() - size._height) / 2;
 		const auto xPadding = std::max(yPadding, (rect.width() - size._width) / 2);
-		return { rect.topLeft() + Yt::Vector2{ xPadding, yPadding }, rect.bottomRight() - Yt::Vector2{ xPadding, yPadding } };
+		return { rect.topLeft() + seir::Vec2{ xPadding, yPadding }, rect.bottomRight() - seir::Vec2{ xPadding, yPadding } };
 	}
 }
 
@@ -36,7 +36,8 @@ namespace Yt
 		: _context{ *context._data }
 		, _renderer{ renderer }
 	{
-		_context._mouseCursor = Vector2{ _context._window.cursor() };
+		const auto cursor = _context._window.cursor();
+		_context._mouseCursor = { static_cast<float>(cursor._x), static_cast<float>(cursor._y) };
 		_context._mouseCursorTaken = false;
 		_context._mouseHoverTaken = false;
 		_context._mouseItemPresent = false;
@@ -133,7 +134,7 @@ namespace Yt
 		return clicked;
 	}
 
-	std::optional<Vector2> GuiFrame::addDragArea(std::string_view id, const RectF& rect, Key key)
+	std::optional<seir::Vec2> GuiFrame::addDragArea(std::string_view id, const RectF& rect, Key key)
 	{
 		assert(!id.empty());
 		if (_context._mouseItem == id)
@@ -164,7 +165,7 @@ namespace Yt
 		return {};
 	}
 
-	std::optional<Vector2> GuiFrame::addHoverArea(const RectF& rect) noexcept
+	std::optional<seir::Vec2> GuiFrame::addHoverArea(const RectF& rect) noexcept
 	{
 		return _context.takeMouseHover(rect);
 	}
@@ -309,7 +310,7 @@ namespace Yt
 				{
 					const auto selectionRight = std::min(textRect.left() + capture._selectionRange->second, textRect.right());
 					_renderer.setColor(_context._editStyle._selectionColor);
-					_renderer.addBorderlessRect({ { selectionLeft, textRect.top() }, Vector2{ selectionRight, textRect.bottom() } });
+					_renderer.addBorderlessRect({ { selectionLeft, textRect.top() }, seir::Vec2{ selectionRight, textRect.bottom() } });
 				}
 			}
 			_renderer.setColor(styleState->_textColor);
@@ -321,7 +322,7 @@ namespace Yt
 				{
 					_renderer.setTextureRect(_context._editStyle._font->textureRect(Font::Graphics::WhiteRect));
 					_renderer.setColor(_context._editStyle._cursorColor);
-					_renderer.addRect({ { cursorX, textRect.top() }, Vector2{ std::min(cursorX + 2, textRect.right()), textRect.bottom() } });
+					_renderer.addRect({ { cursorX, textRect.top() }, seir::Vec2{ std::min(cursorX + 2, textRect.right()), textRect.bottom() } });
 				}
 			}
 		}
@@ -334,7 +335,7 @@ namespace Yt
 			_context._focusExpected = true;
 	}
 
-	std::optional<Vector2> GuiFrame::takeMouseCursor() noexcept
+	std::optional<seir::Vec2> GuiFrame::takeMouseCursor() noexcept
 	{
 		return _context.takeMouseCursor(RectF{ _renderer.viewportSize() });
 	}

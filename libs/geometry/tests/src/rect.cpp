@@ -11,7 +11,6 @@ using Yt::Rect;
 using Yt::RectF;
 using Yt::Size;
 using Yt::SizeF;
-using Yt::Vector2;
 
 TEST_CASE("rect")
 {
@@ -277,7 +276,7 @@ TEST_CASE("rectf")
 		CHECK(r.height() == 0.f);
 	}
 	{
-		RectF r{ { 1, 2 }, Vector2{ 4, 7 } };
+		RectF r{ { 1, 2 }, seir::Vec2{ 4, 7 } };
 		CHECK(r.left() == 1.f);
 		CHECK(r.top() == 2.f);
 		CHECK(r.right() == 4.f);

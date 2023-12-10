@@ -5,10 +5,8 @@
 source_group("src" REGULAR_EXPRESSION ".*\\.(h|cpp)$")
 add_executable(test_geometry
 	src/margins.cpp
-	src/matrix.cpp
 	src/point.cpp
 	src/rect.cpp
-	src/vector.cpp
 	)
 target_link_libraries(test_geometry PRIVATE Y_geometry doctest::doctest_with_main)
 seir_target(test_geometry FOLDER tests STATIC_RUNTIME ON)

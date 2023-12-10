@@ -42,7 +42,7 @@ add_library(Y_renderer STATIC
 	src/viewport.h
 	)
 target_include_directories(Y_renderer PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
-target_link_libraries(Y_renderer PUBLIC Y_geometry PRIVATE Y_application Seir::base Seir::data Seir::graphics Seir::image fmt::fmt Threads::Threads)
+target_link_libraries(Y_renderer PUBLIC Y_geometry PRIVATE Y_application Seir::base Seir::data Seir::graphics Seir::image Seir::math fmt::fmt Threads::Threads)
 if(YTTRIUM_RENDERER_OPENGL)
 	target_sources(Y_renderer PRIVATE
 		src/backend/opengl/api.h

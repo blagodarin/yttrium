@@ -4,16 +4,15 @@
 
 #pragma once
 
-#include <yttrium/geometry/vector.h>
-
 #include <seir_graphics/color.hpp>
+#include <seir_math/vec.hpp>
 
 namespace Yt
 {
 	struct Vertex2D
 	{
-		Vector2 _position;
-		Vector2 _texture;
+		seir::Vec2 _position;
+		seir::Vec2 _texture;
 		seir::Rgba32 _color;
 	};
 }

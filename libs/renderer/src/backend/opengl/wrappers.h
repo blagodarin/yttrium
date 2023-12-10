@@ -6,10 +6,13 @@
 
 #include "gl.h"
 
+namespace seir
+{
+	class Mat4;
+}
+
 namespace Yt
 {
-	class Matrix4;
-
 	class GlBufferHandle
 	{
 	public:
@@ -46,7 +49,7 @@ namespace Yt
 		GLuint get() const { return _handle; }
 		std::string info_log() const;
 		bool link() const;
-		void set_uniform(const char*, const Matrix4&) const;
+		void set_uniform(const char*, const seir::Mat4&) const;
 
 		GlProgramHandle(const GlProgramHandle&) = delete;
 		GlProgramHandle& operator=(const GlProgramHandle&) = delete;

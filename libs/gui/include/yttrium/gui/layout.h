@@ -45,7 +45,7 @@ namespace Yt
 		void fromBottomCenter(float padding = 0) noexcept { fromPoint({ _size._width / 2, _size._height }, { 0, -1 }, Axis::Y, padding); }
 		void fromBottomLeft(Axis axis, float padding = 0) noexcept { fromPoint({ 0, _size._height }, { 1, -1 }, axis, padding); }
 		void fromBottomRight(Axis axis, float padding = 0) noexcept { fromPoint({ _size._width, _size._height }, { -1, -1 }, axis, padding); }
-		void fromPoint(const Vector2& point, const Vector2& direction, Axis axis, float padding = 0) noexcept;
+		void fromPoint(const seir::Vec2& point, const seir::Vec2& direction, Axis axis, float padding = 0) noexcept;
 		void fromTopCenter(float padding = 0) noexcept { fromPoint({ _size._width / 2, 0 }, { 0, 1 }, Axis::Y, padding); }
 		void fromTopLeft(Axis axis, float padding = 0) noexcept { fromPoint({ 0, 0 }, { 1, 1 }, axis, padding); }
 		void fromTopRight(Axis axis, float padding = 0) noexcept { fromPoint({ _size._width, 0 }, { -1, 1 }, axis, padding); }
@@ -59,10 +59,10 @@ namespace Yt
 		GuiFrame& _frame;
 		GuiLayout* const _previous;
 		float _scaling = 1;
-		Vector2 _offset{ 0, 0 };
+		seir::Vec2 _offset{ 0, 0 };
 		SizeF _size;
-		Vector2 _direction{ 1, 1 };
-		Vector2 _position{ 0, 0 };
+		seir::Vec2 _direction{ 1, 1 };
+		seir::Vec2 _position{ 0, 0 };
 		Axis _axis = Axis::X;
 		float _spacing = 0;
 		SizeF _defaultSize;

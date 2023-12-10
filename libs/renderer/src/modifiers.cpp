@@ -4,7 +4,6 @@
 
 #include <yttrium/renderer/modifiers.h>
 
-#include <yttrium/geometry/matrix.h>
 #include <yttrium/renderer/program.h>
 #include <yttrium/renderer/texture.h>
 #include "material.h"
@@ -12,7 +11,7 @@
 
 namespace Yt
 {
-	Push3D::Push3D(RenderPass& pass, const Matrix4& projection, const Matrix4& view)
+	Push3D::Push3D(RenderPass& pass, const seir::Mat4& projection, const seir::Mat4& view)
 		: RenderModifier{ pass }
 	{
 		static_cast<RenderPassImpl&>(_pass).push_projection_3d(projection, view);
@@ -42,7 +41,7 @@ namespace Yt
 	{
 	}
 
-	void PushMaterial::set_uniform(const std::string& name, const Matrix4& value)
+	void PushMaterial::set_uniform(const std::string& name, const seir::Mat4& value)
 	{
 		const_cast<MaterialImpl*>(static_cast<const MaterialImpl*>(_material))->program().set_uniform(name, value); // TODO: Remove 'const_cast'.
 	}
@@ -58,7 +57,7 @@ namespace Yt
 		static_cast<RenderPassImpl&>(_pass).pop_texture(_filter);
 	}
 
-	PushTransformation::PushTransformation(RenderPass& pass, const Matrix4& matrix)
+	PushTransformation::PushTransformation(RenderPass& pass, const seir::Mat4& matrix)
 		: RenderModifier{ pass }
 	{
 		static_cast<RenderPassImpl&>(_pass).push_transformation(matrix);

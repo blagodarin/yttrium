@@ -17,7 +17,6 @@
 namespace Yt
 {
 	class BackendTexture2D;
-	class Matrix4;
 	class Quad;
 	class RenderBackend;
 	class RenderBuiltin;
@@ -39,7 +38,7 @@ namespace Yt
 		~RenderPassData() noexcept;
 
 	private:
-		std::vector<std::pair<Matrix4, RenderMatrixType>> _matrix_stack;
+		std::vector<std::pair<seir::Mat4, RenderMatrixType>> _matrix_stack;
 		std::vector<std::pair<const Texture2D*, int>> _texture_stack{ { nullptr, 1 } };
 #ifndef NDEBUG
 		std::vector<const Texture2D*> _seen_textures; // For redundancy statistics.
@@ -58,9 +57,9 @@ namespace Yt
 		~RenderPassImpl() noexcept override;
 
 		void draw_mesh(const Mesh&) override;
-		Matrix4 full_matrix() const override;
-		Matrix4 model_matrix() const override;
-		Line3 pixel_ray(const Vector2&) const override;
+		seir::Mat4 full_matrix() const override;
+		seir::Mat4 model_matrix() const override;
+		seir::Line3 pixel_ray(const seir::Vec2&) const override;
 		RectF viewport_rect() const override;
 
 	public:
@@ -71,10 +70,10 @@ namespace Yt
 		void pop_texture(Flags<Texture2D::Filter>) noexcept;
 		void pop_transformation() noexcept;
 		void push_program(const RenderProgram*);
-		void push_projection_2d(const Matrix4&);
-		void push_projection_3d(const Matrix4& projection, const Matrix4& view);
+		void push_projection_2d(const seir::Mat4&);
+		void push_projection_3d(const seir::Mat4& projection, const seir::Mat4& view);
 		Flags<Texture2D::Filter> push_texture(const Texture2D*, Flags<Texture2D::Filter>);
-		void push_transformation(const Matrix4&);
+		void push_transformation(const seir::Mat4&);
 
 	private:
 		void update_state();

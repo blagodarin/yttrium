@@ -13,7 +13,6 @@ add_library(Y_base STATIC
 	include/yttrium/base/exceptions.h
 	include/yttrium/base/flags.h
 	include/yttrium/base/logger.h
-	include/yttrium/base/string.h
 	src/buffer.cpp
 	src/buffer_memory.cpp
 	src/buffer_memory.h
@@ -21,7 +20,6 @@ add_library(Y_base STATIC
 	src/main.cpp
 	src/ring_log.cpp
 	src/ring_log.h
-	src/string.cpp
 	src/virtual_memory.h
 	)
 target_include_directories(Y_base PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)

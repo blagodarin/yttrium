@@ -6,7 +6,6 @@
 
 #include <yttrium/base/buffer.h>
 #include <yttrium/geometry/margins.h>
-#include <yttrium/geometry/matrix.h>
 #include <yttrium/geometry/quad.h>
 #include <yttrium/geometry/rect.h>
 #include <yttrium/renderer/modifiers.h>
@@ -15,6 +14,8 @@
 #include "2d.h"
 #include "texture.h"
 #include "viewport.h"
+
+#include <seir_math/mat.hpp>
 
 #include <cassert>
 
@@ -238,7 +239,8 @@ namespace Yt
 	void Renderer2D::draw(RenderPass& pass)
 	{
 		PushProgram program{ pass, _data->_viewportData._renderer_builtin._program_2d.get() };
-		_data->_viewportData._renderer_builtin._program_2d->set_uniform("mvp", Matrix4::projection_2d(pass.viewport_rect().size()));
+		const auto viewport_size = pass.viewport_rect().size();
+		_data->_viewportData._renderer_builtin._program_2d->set_uniform("mvp", seir::Mat4::projection2D(viewport_size._width, viewport_size._height));
 		for (auto& part : _data->_parts)
 		{
 			if (part._vertices.size() > 0)
@@ -292,7 +294,7 @@ namespace Yt
 		if (rect.width() >= minimumSize._width && rect.height() >= minimumSize._height)
 		{
 			const SizeF textureSize{ _data->_currentPart->_texture->size() };
-			_data->_textureRect = _data->_viewportData._renderer.map_rect(rect / Vector2{ textureSize._width, textureSize._height }, static_cast<const BackendTexture2D*>(_data->_currentPart->_texture.get())->orientation());
+			_data->_textureRect = _data->_viewportData._renderer.map_rect(rect / seir::Vec2{ textureSize._width, textureSize._height }, static_cast<const BackendTexture2D*>(_data->_currentPart->_texture.get())->orientation());
 			_data->_textureBorders = {
 				borders._top / textureSize._height,
 				borders._right / textureSize._width,

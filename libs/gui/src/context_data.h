@@ -229,7 +229,7 @@ namespace Yt
 		Window& _window;
 		std::vector<uint16_t> _inputEvents;
 		std::vector<std::string> _textInputs;
-		Vector2 _mouseCursor{ 0, 0 };
+		seir::Vec2 _mouseCursor{ 0, 0 };
 		bool _mouseCursorTaken = false;
 		bool _mouseHoverTaken = false;
 		std::string _mouseItem;
@@ -300,7 +300,7 @@ namespace Yt
 
 		RectF layoutRect() noexcept;
 
-		std::optional<Vector2> takeMouseCursor(const RectF& rect) noexcept
+		std::optional<seir::Vec2> takeMouseCursor(const RectF& rect) noexcept
 		{
 			if (_mouseCursorTaken || !rect.contains(_mouseCursor))
 				return {};
@@ -309,7 +309,7 @@ namespace Yt
 			return _mouseCursor;
 		}
 
-		std::optional<Vector2> takeMouseHover(const RectF& rect) noexcept
+		std::optional<seir::Vec2> takeMouseHover(const RectF& rect) noexcept
 		{
 			if (_mouseHoverTaken || !rect.contains(_mouseCursor))
 				return {};

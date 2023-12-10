@@ -4,7 +4,7 @@
 
 #include "wrappers.h"
 
-#include <yttrium/geometry/matrix.h>
+#include <seir_math/mat.hpp>
 
 #include <cassert>
 #include <stdexcept>
@@ -103,7 +103,7 @@ namespace Yt
 		return GL_TRUE == link_status;
 	}
 
-	void GlProgramHandle::set_uniform(const char* name, const Matrix4& value) const
+	void GlProgramHandle::set_uniform(const char* name, const seir::Mat4& value) const
 	{
 		_gl.ProgramUniformMatrix4fvEXT(_handle, _gl.GetUniformLocation(_handle, name), 1, GL_FALSE, &value.x.x);
 	}

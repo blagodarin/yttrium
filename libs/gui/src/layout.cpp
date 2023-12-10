@@ -72,10 +72,10 @@ namespace Yt
 			_position.x = _direction.x > 0 ? x2 + _spacing : x1 - _spacing;
 		else
 			_position.y = _direction.y > 0 ? y2 + _spacing : y1 - _spacing;
-		return RectF{ { x1, y1 }, Vector2{ x2, y2 } } * _scaling + _offset;
+		return RectF{ { x1, y1 }, seir::Vec2{ x2, y2 } } * _scaling + _offset;
 	}
 
-	void GuiLayout::fromPoint(const Vector2& point, const Vector2& direction, Axis axis, float padding) noexcept
+	void GuiLayout::fromPoint(const seir::Vec2& point, const seir::Vec2& direction, Axis axis, float padding) noexcept
 	{
 		_direction = direction;
 		_position = point + padding * _direction;

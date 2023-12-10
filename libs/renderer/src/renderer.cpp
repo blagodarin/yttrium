@@ -4,7 +4,6 @@
 
 #include "renderer.h"
 
-#include <yttrium/geometry/matrix.h>
 #include <yttrium/geometry/rect.h>
 #include <yttrium/renderer/mesh.h>
 #include <yttrium/renderer/program.h>

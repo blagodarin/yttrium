@@ -6,10 +6,10 @@
 
 #include <yttrium/base/buffer_appender.h>
 #include <yttrium/base/exceptions.h>
-#include <yttrium/geometry/vector.h>
 #include "../mesh_data.h"
 
 #include <seir_data/reader.hpp>
+#include <seir_math/vec.hpp>
 
 #include <optional>
 #include <regex>
@@ -168,9 +168,9 @@ namespace
 
 	private:
 		FaceFormat _face_format = FaceFormat::unknown;
-		std::vector<Yt::Vector3> _vertices;
-		std::vector<Yt::Vector2> _texcoords;
-		std::vector<Yt::Vector3> _normals;
+		std::vector<seir::Vec3> _vertices;
+		std::vector<seir::Vec2> _texcoords;
+		std::vector<seir::Vec3> _normals;
 		std::vector<std::tuple<size_t, size_t, size_t>> _indices;
 	};
 

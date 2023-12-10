@@ -6,10 +6,13 @@
 
 #include <string>
 
+namespace seir
+{
+	class Mat4;
+}
+
 namespace Yt
 {
-	class Matrix4;
-
 	/// Rendering pipeline program.
 	class RenderProgram
 	{
@@ -17,6 +20,6 @@ namespace Yt
 		virtual ~RenderProgram() = default;
 
 		///
-		virtual void set_uniform(const std::string& name, const Matrix4&) = 0;
+		virtual void set_uniform(const std::string& name, const seir::Mat4&) = 0;
 	};
 }

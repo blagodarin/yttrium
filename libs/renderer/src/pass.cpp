@@ -4,16 +4,15 @@
 
 #include "pass.h"
 
-#include <yttrium/base/buffer_appender.h>
-#include <yttrium/base/string.h>
-#include <yttrium/geometry/line.h>
-#include <yttrium/geometry/matrix.h>
 #include <yttrium/geometry/quad.h>
 #include <yttrium/renderer/metrics.h>
 #include <yttrium/renderer/program.h>
 #include "backend/backend.h"
 #include "builtin.h"
 #include "texture.h"
+
+#include <seir_math/line.hpp>
+#include <seir_math/mat.hpp>
 
 #include <cassert>
 
@@ -24,7 +23,7 @@
 namespace
 {
 	// Makes Y point forward and Z point up.
-	const Yt::Matrix4 _3d_directions{
+	const seir::Mat4 _3d_directions{
 		1, 0, 0, 0,
 		0, 0, 1, 0,
 		0, -1, 0, 0,
@@ -63,7 +62,7 @@ namespace Yt
 		++_metrics._draw_calls;
 	}
 
-	Matrix4 RenderPassImpl::full_matrix() const
+	seir::Mat4 RenderPassImpl::full_matrix() const
 	{
 		const auto current_projection = std::find_if(_data._matrix_stack.rbegin(), _data._matrix_stack.rend(), [](const auto& m) { return m.second == RenderMatrixType::Projection; });
 		assert(current_projection != _data._matrix_stack.rend());
@@ -73,20 +72,20 @@ namespace Yt
 		return current_projection->first * current_view->first * model_matrix();
 	}
 
-	Matrix4 RenderPassImpl::model_matrix() const
+	seir::Mat4 RenderPassImpl::model_matrix() const
 	{
 		assert(!_data._matrix_stack.empty());
 		assert(_data._matrix_stack.back().second == RenderMatrixType::Model);
 		return _data._matrix_stack.back().first;
 	}
 
-	Line3 RenderPassImpl::pixel_ray(const Vector2& v) const
+	seir::Line3 RenderPassImpl::pixel_ray(const seir::Vec2& v) const
 	{
 		// Move each coordinate to the center of the pixel (by adding 0.5), then normalize from [0, D] to [-1, 1].
 		const auto xn = (2 * v.x + 1) / static_cast<float>(_viewport_size._width) - 1;
 		const auto yn = 1 - (2 * v.y + 1) / static_cast<float>(_viewport_size._height);
 		const auto m = inverse(full_matrix());
-		return { m * Vector3{ xn, yn, 0 }, m * Vector3{ xn, yn, 1 } };
+		return { m * seir::Vec3{ xn, yn, 0 }, m * seir::Vec3{ xn, yn, 1 } };
 	}
 
 	RectF RenderPassImpl::viewport_rect() const
@@ -160,18 +159,18 @@ namespace Yt
 		_reset_program = true;
 	}
 
-	void RenderPassImpl::push_projection_2d(const Matrix4& matrix)
+	void RenderPassImpl::push_projection_2d(const seir::Mat4& matrix)
 	{
 		_data._matrix_stack.emplace_back(matrix, RenderMatrixType::Projection);
-		_data._matrix_stack.emplace_back(Matrix4::identity(), RenderMatrixType::View);
-		_data._matrix_stack.emplace_back(Matrix4::identity(), RenderMatrixType::Model);
+		_data._matrix_stack.emplace_back(seir::Mat4::identity(), RenderMatrixType::View);
+		_data._matrix_stack.emplace_back(seir::Mat4::identity(), RenderMatrixType::Model);
 	}
 
-	void RenderPassImpl::push_projection_3d(const Matrix4& projection, const Matrix4& view)
+	void RenderPassImpl::push_projection_3d(const seir::Mat4& projection, const seir::Mat4& view)
 	{
 		_data._matrix_stack.emplace_back(projection, RenderMatrixType::Projection);
 		_data._matrix_stack.emplace_back(::_3d_directions * view, RenderMatrixType::View);
-		_data._matrix_stack.emplace_back(Matrix4::identity(), RenderMatrixType::Model);
+		_data._matrix_stack.emplace_back(seir::Mat4::identity(), RenderMatrixType::Model);
 	}
 
 	Flags<Texture2D::Filter> RenderPassImpl::push_texture(const Texture2D* texture, Flags<Texture2D::Filter> filter)
@@ -192,7 +191,7 @@ namespace Yt
 		return std::exchange(_current_texture_filter, filter);
 	}
 
-	void RenderPassImpl::push_transformation(const Matrix4& matrix)
+	void RenderPassImpl::push_transformation(const seir::Mat4& matrix)
 	{
 		assert(!_data._matrix_stack.empty());
 		assert(_data._matrix_stack.back().second == RenderMatrixType::Model);

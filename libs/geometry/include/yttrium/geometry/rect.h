@@ -4,7 +4,10 @@
 
 #pragma once
 
+#include <yttrium/geometry/point.h>
 #include <yttrium/geometry/size.h>
+
+#include <algorithm>
 
 namespace Yt
 {
@@ -143,9 +146,9 @@ namespace Yt
 		float _bottom = 0;
 
 		constexpr RectF() noexcept = default;
-		constexpr RectF(const Vector2& topLeft, const Vector2& bottomRight) noexcept
+		constexpr RectF(const seir::Vec2& topLeft, const seir::Vec2& bottomRight) noexcept
 			: _left{ topLeft.x }, _top{ topLeft.y }, _right{ bottomRight.x }, _bottom{ bottomRight.y } {}
-		constexpr RectF(const Vector2& topLeft, const SizeF& size) noexcept
+		constexpr RectF(const seir::Vec2& topLeft, const SizeF& size) noexcept
 			: _left{ topLeft.x }, _top{ topLeft.y }, _right{ _left + size._width }, _bottom{ _top + size._height } {}
 		constexpr explicit RectF(const SizeF& size) noexcept
 			: _right{ size._width }, _bottom{ size._height } {}
@@ -153,13 +156,13 @@ namespace Yt
 			: _left{ static_cast<float>(r.left()) }, _top{ static_cast<float>(r.top()) }, _right{ static_cast<float>(r.right()) }, _bottom{ static_cast<float>(r.bottom()) } {}
 
 		[[nodiscard]] constexpr float bottom() const noexcept { return _bottom; }
-		[[nodiscard]] constexpr Vector2 bottomCenter() const noexcept { return { (_left + _right) / 2, _bottom }; }
-		[[nodiscard]] constexpr Vector2 bottomLeft() const noexcept { return { _left, _bottom }; }
-		[[nodiscard]] constexpr Vector2 bottomRight() const noexcept { return { _right, _bottom }; }
-		[[nodiscard]] constexpr Vector2 center() const noexcept { return { (_left + _right) / 2, (_top + _bottom) / 2 }; }
-		[[nodiscard]] constexpr Vector2 centerLeft() const noexcept { return { _left, (_top + _bottom) / 2 }; }
-		[[nodiscard]] constexpr Vector2 centerRight() const noexcept { return { _right, (_top + _bottom) / 2 }; }
-		[[nodiscard]] constexpr bool contains(const Vector2& point) const noexcept { return _left <= point.x && point.x < _right && _top <= point.y && point.y < _bottom; }
+		[[nodiscard]] constexpr seir::Vec2 bottomCenter() const noexcept { return { (_left + _right) / 2, _bottom }; }
+		[[nodiscard]] constexpr seir::Vec2 bottomLeft() const noexcept { return { _left, _bottom }; }
+		[[nodiscard]] constexpr seir::Vec2 bottomRight() const noexcept { return { _right, _bottom }; }
+		[[nodiscard]] constexpr seir::Vec2 center() const noexcept { return { (_left + _right) / 2, (_top + _bottom) / 2 }; }
+		[[nodiscard]] constexpr seir::Vec2 centerLeft() const noexcept { return { _left, (_top + _bottom) / 2 }; }
+		[[nodiscard]] constexpr seir::Vec2 centerRight() const noexcept { return { _right, (_top + _bottom) / 2 }; }
+		[[nodiscard]] constexpr bool contains(const seir::Vec2& point) const noexcept { return _left <= point.x && point.x < _right && _top <= point.y && point.y < _bottom; }
 		[[nodiscard]] constexpr bool empty() const noexcept { return _left >= _right || _top >= _bottom; }
 		[[nodiscard]] constexpr float height() const noexcept { return _bottom - _top; }
 		[[nodiscard]] constexpr float left() const noexcept { return _left; }
@@ -169,13 +172,13 @@ namespace Yt
 		constexpr void setWidth(float value) noexcept { _right = _left + value; }
 		[[nodiscard]] constexpr SizeF size() const noexcept { return { _right - _left, _bottom - _top }; }
 		[[nodiscard]] constexpr float top() const noexcept { return _top; }
-		[[nodiscard]] constexpr Vector2 topCenter() const noexcept { return { (_left + _right) / 2, _top }; }
-		[[nodiscard]] constexpr Vector2 topLeft() const noexcept { return { _left, _top }; }
-		[[nodiscard]] constexpr Vector2 topRight() const noexcept { return { _right, _top }; }
+		[[nodiscard]] constexpr seir::Vec2 topCenter() const noexcept { return { (_left + _right) / 2, _top }; }
+		[[nodiscard]] constexpr seir::Vec2 topLeft() const noexcept { return { _left, _top }; }
+		[[nodiscard]] constexpr seir::Vec2 topRight() const noexcept { return { _right, _top }; }
 		[[nodiscard]] constexpr float width() const noexcept { return _right - _left; }
 
 		///
-		[[nodiscard]] Vector2 bound(const Vector2& point) const noexcept
+		[[nodiscard]] seir::Vec2 bound(const seir::Vec2& point) const noexcept
 		{
 			auto x = point.x;
 			if (x < _left)
@@ -194,14 +197,14 @@ namespace Yt
 	[[nodiscard]] constexpr bool operator==(const RectF& a, const RectF& b) noexcept { return a.left() == b.left() && a.top() == b.top() && a.right() == b.right() && a.bottom() == b.bottom(); }
 
 	[[nodiscard]] constexpr RectF operator+(const RectF& rect, float value) noexcept { return { rect.topLeft() + value, rect.bottomRight() + value }; }
-	[[nodiscard]] constexpr RectF operator+(const RectF& rect, const Vector2& value) noexcept { return { value + rect.topLeft(), value + rect.bottomRight() }; }
+	[[nodiscard]] constexpr RectF operator+(const RectF& rect, const seir::Vec2& value) noexcept { return { value + rect.topLeft(), value + rect.bottomRight() }; }
 
 	[[nodiscard]] constexpr RectF operator-(const RectF& rect, float value) noexcept { return { rect.topLeft() - value, rect.bottomRight() - value }; }
-	[[nodiscard]] constexpr RectF operator-(const RectF& rect, const Vector2& value) noexcept { return { rect.topLeft() - value, rect.bottomRight() - value }; }
+	[[nodiscard]] constexpr RectF operator-(const RectF& rect, const seir::Vec2& value) noexcept { return { rect.topLeft() - value, rect.bottomRight() - value }; }
 
 	[[nodiscard]] constexpr RectF operator*(const RectF& rect, float value) noexcept { return { rect.topLeft() * value, rect.bottomRight() * value }; }
-	[[nodiscard]] constexpr RectF operator*(const RectF& rect, const Vector2& value) noexcept { return { rect.topLeft() * value, rect.bottomRight() * value }; }
+	[[nodiscard]] constexpr RectF operator*(const RectF& rect, const seir::Vec2& value) noexcept { return { rect.topLeft() * value, rect.bottomRight() * value }; }
 
 	[[nodiscard]] constexpr RectF operator/(const RectF& rect, float value) noexcept { return { rect.topLeft() / value, rect.bottomRight() / value }; }
-	[[nodiscard]] constexpr RectF operator/(const RectF& rect, const Vector2& value) noexcept { return { rect.topLeft() / value, rect.bottomRight() / value }; }
+	[[nodiscard]] constexpr RectF operator/(const RectF& rect, const seir::Vec2& value) noexcept { return { rect.topLeft() / value, rect.bottomRight() / value }; }
 }

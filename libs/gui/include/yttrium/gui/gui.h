@@ -10,6 +10,11 @@
 #include <optional>
 #include <string_view>
 
+namespace seir
+{
+	class Vec2;
+}
+
 namespace Yt
 {
 	class Font;
@@ -22,7 +27,6 @@ namespace Yt
 	enum class Key;
 	class RectF;
 	class Renderer2D;
-	class Vector2;
 
 	enum class GuiAlignment
 	{
@@ -38,8 +42,8 @@ namespace Yt
 		~GuiFrame() noexcept;
 
 		bool addButton(std::string_view id, std::string_view text, const RectF& = {});
-		std::optional<Vector2> addDragArea(std::string_view id, const RectF&, Key);
-		std::optional<Vector2> addHoverArea(const RectF&) noexcept;
+		std::optional<seir::Vec2> addDragArea(std::string_view id, const RectF&, Key);
+		std::optional<seir::Vec2> addHoverArea(const RectF&) noexcept;
 		void addLabel(std::string_view text, GuiAlignment = GuiAlignment::Left, const RectF& = {});
 		bool addStringEdit(std::string_view id, std::string& text, const RectF& = {});
 		void putDefaultFocus() noexcept;
@@ -51,7 +55,7 @@ namespace Yt
 		bool takeAnyKeyPress() noexcept;
 		bool takeKeyPress(Key) noexcept;
 		std::optional<bool> takeKeyState(Key) noexcept;
-		std::optional<Vector2> takeMouseCursor() noexcept;
+		std::optional<seir::Vec2> takeMouseCursor() noexcept;
 
 	private:
 		GuiContextData& _context;

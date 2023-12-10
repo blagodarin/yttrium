@@ -9,10 +9,14 @@
 
 #include <string>
 
+namespace seir
+{
+	class Mat4;
+}
+
 namespace Yt
 {
 	class Material;
-	class Matrix4;
 	class RenderPass;
 	class RenderProgram;
 	class SizeF;
@@ -35,7 +39,7 @@ namespace Yt
 	{
 	public:
 		///
-		Push3D(RenderPass&, const Matrix4& projection, const Matrix4& view);
+		Push3D(RenderPass&, const seir::Mat4& projection, const seir::Mat4& view);
 
 		///
 		~Push3D() noexcept;
@@ -74,7 +78,7 @@ namespace Yt
 		PushMaterial(RenderPass&, const Material*);
 
 		///
-		void set_uniform(const std::string&, const Matrix4&);
+		void set_uniform(const std::string&, const seir::Mat4&);
 
 	private:
 		const Material* const _material;
@@ -88,7 +92,7 @@ namespace Yt
 	public:
 		/// Multiplies the current transformation matrix by the specified one,
 		/// pushes it to the transformation stack and applies the resulting transformation.
-		PushTransformation(RenderPass&, const Matrix4&);
+		PushTransformation(RenderPass&, const seir::Mat4&);
 
 		/// Pops a matrix from the transformation stack and applies the previous matrix.
 		~PushTransformation() noexcept;
