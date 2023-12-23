@@ -5,9 +5,6 @@
 #include <yttrium/renderer/2d.h>
 
 #include <yttrium/base/buffer.h>
-#include <yttrium/geometry/margins.h>
-#include <yttrium/geometry/quad.h>
-#include <yttrium/geometry/rect.h>
 #include <yttrium/renderer/modifiers.h>
 #include <yttrium/renderer/program.h>
 #include <yttrium/renderer/viewport.h>
@@ -15,6 +12,9 @@
 #include "texture.h"
 #include "viewport.h"
 
+#include <seir_graphics/marginsf.hpp>
+#include <seir_graphics/quadf.hpp>
+#include <seir_graphics/rectf.hpp>
 #include <seir_math/mat.hpp>
 
 #include <cassert>
@@ -37,8 +37,8 @@ namespace Yt
 		std::vector<Part> _parts;
 		Part* _currentPart = nullptr;
 		seir::Rgba32 _color = seir::Rgba32::white();
-		RectF _textureRect;
-		MarginsF _textureBorders;
+		seir::RectF _textureRect;
+		seir::MarginsF _textureBorders;
 
 		struct Batch
 		{
@@ -54,7 +54,7 @@ namespace Yt
 			_textureRect = static_cast<const BackendTexture2D*>(_currentPart->_texture.get())->full_rectangle();
 		}
 
-		void addRect(const RectF& position, const RectF& texture, const MarginsF& borders, const seir::Rgba32& color)
+		void addRect(const seir::RectF& position, const seir::RectF& texture, const seir::MarginsF& borders, const seir::Rgba32& color)
 		{
 			const auto textureSize = _currentPart->_texture->size();
 
@@ -171,7 +171,7 @@ namespace Yt
 				else
 					_currentPart->_texture = texture;
 			}
-			_textureRect = _viewportData._renderer.map_rect({ { 0, 0 }, SizeF{ 1, 1 } }, static_cast<const BackendTexture2D*>(_currentPart->_texture.get())->orientation());
+			_textureRect = _viewportData._renderer.map_rect({ { 0, 0 }, seir::SizeF{ 1, 1 } }, static_cast<const BackendTexture2D*>(_currentPart->_texture.get())->orientation());
 			_textureBorders = {};
 		}
 
@@ -195,7 +195,7 @@ namespace Yt
 
 	Renderer2D::~Renderer2D() noexcept = default;
 
-	void Renderer2D::addQuad(const Quad& quad)
+	void Renderer2D::addQuad(const seir::QuadF& quad)
 	{
 		const auto batch = _data->prepareBatch(4, 4);
 
@@ -212,7 +212,7 @@ namespace Yt
 		batch._indices[3] = static_cast<uint16_t>(batch._baseIndex + 3);
 	}
 
-	size_t Renderer2D::addBorderlessRect(const RectF& rect)
+	size_t Renderer2D::addBorderlessRect(const seir::RectF& rect)
 	{
 		auto batch = _data->prepareBatch(4, 4);
 
@@ -231,7 +231,7 @@ namespace Yt
 		return (static_cast<size_t>(_data->_currentPart - _data->_parts.data()) << 16) + batch._baseIndex;
 	}
 
-	void Renderer2D::addRect(const RectF& rect)
+	void Renderer2D::addRect(const seir::RectF& rect)
 	{
 		_data->addRect(rect, _data->_textureRect, _data->_textureBorders, _data->_color);
 	}
@@ -264,7 +264,7 @@ namespace Yt
 		_data->_textureBorders = {};
 	}
 
-	void Renderer2D::rewriteBorderlessRect(size_t id, const RectF& rect)
+	void Renderer2D::rewriteBorderlessRect(size_t id, const seir::RectF& rect)
 	{
 		const auto partIndex = id >> 16;
 		assert(partIndex <= static_cast<size_t>(_data->_currentPart - _data->_parts.data()));
@@ -288,13 +288,13 @@ namespace Yt
 		_data->setTexture(texture ? texture : _data->_viewportData._renderer_builtin._white_texture);
 	}
 
-	void Renderer2D::setTextureRect(const RectF& rect, const MarginsF& borders)
+	void Renderer2D::setTextureRect(const seir::RectF& rect, const seir::MarginsF& borders)
 	{
-		const auto minimumSize = SizeF{ borders._left + 1 + borders._right, borders._top + 1 + borders._bottom };
+		const auto minimumSize = seir::SizeF{ borders._left + 1 + borders._right, borders._top + 1 + borders._bottom };
 		if (rect.width() >= minimumSize._width && rect.height() >= minimumSize._height)
 		{
-			const SizeF textureSize{ _data->_currentPart->_texture->size() };
-			_data->_textureRect = _data->_viewportData._renderer.map_rect(rect / seir::Vec2{ textureSize._width, textureSize._height }, static_cast<const BackendTexture2D*>(_data->_currentPart->_texture.get())->orientation());
+			const seir::SizeF textureSize{ _data->_currentPart->_texture->size() };
+			_data->_textureRect = _data->_viewportData._renderer.map_rect(rect / textureSize, static_cast<const BackendTexture2D*>(_data->_currentPart->_texture.get())->orientation());
 			_data->_textureBorders = {
 				borders._top / textureSize._height,
 				borders._right / textureSize._width,
@@ -304,8 +304,8 @@ namespace Yt
 		}
 	}
 
-	SizeF Renderer2D::viewportSize() const noexcept
+	seir::SizeF Renderer2D::viewportSize() const noexcept
 	{
-		return SizeF{ _data->_viewportData._window_size };
+		return seir::SizeF{ _data->_viewportData._window_size };
 	}
 }

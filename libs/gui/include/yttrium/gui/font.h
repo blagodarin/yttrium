@@ -12,16 +12,15 @@
 namespace seir
 {
 	class Blob;
+	class RectF;
 	template <class>
 	class SharedPtr;
 }
 
 namespace Yt
 {
-	class RectF;
 	class RenderManager;
 	class Renderer2D;
-	class Source;
 	class Texture2D;
 
 	class Font
@@ -47,9 +46,9 @@ namespace Yt
 		static std::shared_ptr<const Font> load(const seir::SharedPtr<seir::Blob>&, RenderManager&);
 
 		virtual ~Font() noexcept = default;
-		virtual void render(Renderer2D&, const RectF&, std::string_view) const = 0;
+		virtual void render(Renderer2D&, const seir::RectF&, std::string_view) const = 0;
 		virtual float textWidth(std::string_view, float fontSize, TextCapture* = nullptr) const = 0;
 		virtual std::shared_ptr<const Texture2D> texture() const noexcept = 0;
-		virtual RectF textureRect(Graphics) const noexcept = 0;
+		virtual seir::RectF textureRect(Graphics) const noexcept = 0;
 	};
 }

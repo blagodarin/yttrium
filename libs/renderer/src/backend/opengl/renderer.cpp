@@ -5,7 +5,6 @@
 #include "renderer.h"
 
 #include <yttrium/base/logger.h>
-#include <yttrium/geometry/rect.h>
 #include "../../2d.h"
 #include "../../model/mesh_data.h"
 #include "mesh.h"
@@ -13,6 +12,7 @@
 #include "texture.h"
 
 #include <seir_base/int_utils.hpp>
+#include <seir_graphics/rectf.hpp>
 #include <seir_image/image.hpp>
 #include <seir_image/utils.hpp>
 
@@ -208,7 +208,7 @@ namespace Yt
 		_2d_vao.unbind();
 	}
 
-	RectF GlRenderer::map_rect(const RectF& rect, seir::ImageAxes axes) const
+	seir::RectF GlRenderer::map_rect(const seir::RectF& rect, seir::ImageAxes axes) const
 	{
 		const auto map_point = [axes](const seir::Vec2& point) -> seir::Vec2 {
 			return { point.x, axes == seir::ImageAxes::XRightYDown ? point.y : 1.f - point.y };
@@ -226,12 +226,12 @@ namespace Yt
 		static_cast<const GlTexture2D&>(texture).bind(filter);
 	}
 
-	void GlRenderer::set_viewport_size(const Size& size)
+	void GlRenderer::set_viewport_size(const seir::Size& size)
 	{
 		_gl.Viewport(0, 0, size._width, size._height);
 	}
 
-	seir::Image GlRenderer::take_screenshot(const Size& viewport_size) const
+	seir::Image GlRenderer::take_screenshot(const seir::Size& viewport_size) const
 	{
 		GLint alignment = 0;
 		_gl.GetIntegerv(GL_UNPACK_ALIGNMENT, &alignment);

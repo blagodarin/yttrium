@@ -4,8 +4,9 @@
 
 #include "texture.h"
 
-#include <yttrium/geometry/rect.h>
 #include "backend/backend.h"
+
+#include <seir_graphics/rectf.hpp>
 
 namespace Yt
 {
@@ -17,8 +18,8 @@ namespace Yt
 	{
 	}
 
-	RectF BackendTexture2D::full_rectangle() const
+	seir::RectF BackendTexture2D::full_rectangle() const
 	{
-		return _backend.map_rect({ {}, SizeF(_size) }, _orientation);
+		return _backend.map_rect({ {}, seir::SizeF{ _size } }, _orientation);
 	}
 }

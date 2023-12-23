@@ -4,10 +4,13 @@
 
 #pragma once
 
-namespace Yt
+namespace seir
 {
 	class Size;
+}
 
+namespace Yt
+{
 	/// 2D texture.
 	class Texture2D
 	{
@@ -44,6 +47,6 @@ namespace Yt
 		virtual ~Texture2D() = default;
 
 		///
-		virtual Size size() const noexcept = 0;
+		virtual seir::Size size() const noexcept = 0;
 	};
 }

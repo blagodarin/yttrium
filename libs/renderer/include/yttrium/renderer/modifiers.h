@@ -19,7 +19,6 @@ namespace Yt
 	class Material;
 	class RenderPass;
 	class RenderProgram;
-	class SizeF;
 
 	/// Base class for RenderPass modifiers.
 	class RenderModifier

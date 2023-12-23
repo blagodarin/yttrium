@@ -10,13 +10,13 @@
 namespace seir
 {
 	class Image;
+	class Point;
+	class Size;
 }
 
 namespace Yt
 {
 	class Application;
-	class Point;
-	class Size;
 
 	struct WindowID
 	{
@@ -40,7 +40,7 @@ namespace Yt
 		void close();
 
 		///
-		Point cursor() const;
+		seir::Point cursor() const;
 
 		///
 		WindowID id() const noexcept;
@@ -49,7 +49,7 @@ namespace Yt
 		void lock_cursor(bool lock);
 
 		///
-		bool set_cursor(const Point& cursor);
+		bool set_cursor(const seir::Point& cursor);
 
 		///
 		void set_icon(const seir::Image&);
@@ -61,7 +61,7 @@ namespace Yt
 		void show();
 
 		///
-		Size size() const;
+		seir::Size size() const;
 
 		///
 		void swap_buffers();

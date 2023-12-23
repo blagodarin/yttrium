@@ -13,10 +13,13 @@
 
 #include <windows.h>
 
-namespace Yt
+namespace seir
 {
 	class Size;
+}
 
+namespace Yt
+{
 	class NativeWindowCallbacks
 	{
 	public:
@@ -24,7 +27,7 @@ namespace Yt
 		virtual void on_close() = 0;
 		virtual void on_focus(bool) = 0;
 		virtual void on_key(Key, bool pressed, bool autorepeat, Flags<KeyEvent::Modifier>) = 0;
-		virtual void on_resize(const Size&) = 0;
+		virtual void on_resize(const seir::Size&) = 0;
 		virtual void on_text(std::string_view) = 0;
 	};
 

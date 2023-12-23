@@ -11,13 +11,13 @@ namespace seir
 {
 	class Line3;
 	class Mat4;
+	class RectF;
 	class Vec2;
 }
 
 namespace Yt
 {
 	class Mesh;
-	class RectF;
 
 	///
 	class RenderPass
@@ -38,6 +38,6 @@ namespace Yt
 		virtual seir::Line3 pixel_ray(const seir::Vec2&) const = 0;
 
 		///
-		virtual RectF viewport_rect() const = 0;
+		virtual seir::RectF viewport_rect() const = 0;
 	};
 }

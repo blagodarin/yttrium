@@ -5,12 +5,13 @@
 #pragma once
 
 #include <yttrium/application/window.h>
-#include <yttrium/geometry/size.h>
 #include "application.h"
 
 #if YTTRIUM_RENDERER_OPENGL
 #	include "wgl.h"
 #endif
+
+#include <seir_graphics/size.hpp>
 
 #include <optional>
 #include <string>
@@ -26,21 +27,21 @@ namespace Yt
 		explicit WindowBackend(WindowBackendCallbacks&);
 
 		void close();
-		bool get_cursor(Point&);
+		bool get_cursor(seir::Point&);
 		WindowID id() const noexcept { return { _application.instance(), reinterpret_cast<intptr_t>(_hwnd.get()) }; }
 		bool process_events() { return _application.process_events(); }
-		bool set_cursor(const Point&);
+		bool set_cursor(const seir::Point&);
 		void set_icon(const seir::Image&);
 		void set_title(const std::string&);
 		void show();
-		std::optional<Size> size() const { return _size; }
+		std::optional<seir::Size> size() const { return _size; }
 		void swap_buffers();
 
 	private:
 		void on_close() override;
 		void on_focus(bool) override;
 		void on_key(Key, bool pressed, bool autorepeat, Flags<KeyEvent::Modifier>) override;
-		void on_resize(const Size&) override;
+		void on_resize(const seir::Size&) override;
 		void on_text(std::string_view) override;
 
 	private:
@@ -67,6 +68,6 @@ namespace Yt
 #if YTTRIUM_RENDERER_OPENGL
 		const WglContext _wgl{ _hdc };
 #endif
-		Size _size;
+		seir::Size _size;
 	};
 }

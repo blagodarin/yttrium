@@ -11,14 +11,14 @@
 namespace seir
 {
 	enum class ImageAxes;
+	class RectF;
+	class Size;
 }
 
 namespace Yt
 {
 	enum class ImageOrientation;
-	class RectF;
 	class RenderBackend;
-	class Size;
 	struct WindowID;
 
 	class RendererImpl final : public RenderManager
@@ -32,9 +32,9 @@ namespace Yt
 		std::unique_ptr<Mesh> load_mesh(const seir::Blob&, std::string_view source_name) override;
 
 	public:
-		RectF map_rect(const RectF&, seir::ImageAxes) const;
-		void set_viewport_size(const Size&);
-		seir::Image take_screenshot(const Size&) const;
+		seir::RectF map_rect(const seir::RectF&, seir::ImageAxes) const;
+		void set_viewport_size(const seir::Size&);
+		seir::Image take_screenshot(const seir::Size&) const;
 
 	public:
 		const std::unique_ptr<RenderBackend> _backend;

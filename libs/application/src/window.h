@@ -4,11 +4,12 @@
 
 #pragma once
 
-#include <yttrium/geometry/point.h>
-#include <yttrium/geometry/size.h>
 #include "application.h"
 #include "window_backend.h"
 #include "window_callbacks.h"
+
+#include <seir_graphics/point.hpp>
+#include <seir_graphics/size.hpp>
 
 namespace Yt
 {
@@ -27,7 +28,7 @@ namespace Yt
 	private:
 		void on_focus_event(bool is_focused) override;
 		void on_key_event(Key, bool pressed, bool autorepeat, Flags<KeyEvent::Modifier>) override;
-		void on_resize_event(const Size&) override;
+		void on_resize_event(const seir::Size&) override;
 		void on_text_input(std::string_view) override;
 
 	private:
@@ -40,9 +41,9 @@ namespace Yt
 		EventCallbacks* _callbacks = nullptr;
 		WindowBackend _backend{ *this };
 		bool _is_active = false;
-		Point _cursor;
+		seir::Point _cursor;
 		bool _is_cursor_locked = false;
-		Size _size;
+		seir::Size _size;
 
 		friend Window;
 	};

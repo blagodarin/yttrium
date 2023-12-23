@@ -4,13 +4,13 @@
 
 #include "pass.h"
 
-#include <yttrium/geometry/quad.h>
 #include <yttrium/renderer/metrics.h>
 #include <yttrium/renderer/program.h>
 #include "backend/backend.h"
 #include "builtin.h"
 #include "texture.h"
 
+#include <seir_graphics/rectf.hpp>
 #include <seir_math/line.hpp>
 #include <seir_math/mat.hpp>
 
@@ -37,7 +37,7 @@ namespace Yt
 
 	RenderPassData::~RenderPassData() noexcept = default;
 
-	RenderPassImpl::RenderPassImpl(RenderBackend& backend, RenderBuiltin& builtin, RenderPassData& data, const Size& viewport_size, RenderMetrics& metrics)
+	RenderPassImpl::RenderPassImpl(RenderBackend& backend, RenderBuiltin& builtin, RenderPassData& data, const seir::Size& viewport_size, RenderMetrics& metrics)
 		: _backend{ backend }
 		, _builtin{ builtin }
 		, _data{ data }
@@ -88,9 +88,9 @@ namespace Yt
 		return { m * seir::Vec3{ xn, yn, 0 }, m * seir::Vec3{ xn, yn, 1 } };
 	}
 
-	RectF RenderPassImpl::viewport_rect() const
+	seir::RectF RenderPassImpl::viewport_rect() const
 	{
-		return RectF{ _viewport_size };
+		return seir::RectF{ _viewport_size };
 	}
 
 	void RenderPassImpl::pop_program() noexcept

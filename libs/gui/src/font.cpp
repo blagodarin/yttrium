@@ -5,13 +5,13 @@
 #include <yttrium/gui/font.h>
 
 #include <yttrium/base/exceptions.h>
-#include <yttrium/geometry/rect.h>
 #include <yttrium/renderer/2d.h>
 #include <yttrium/renderer/manager.h>
 #include <yttrium/renderer/texture.h>
 
 #include <seir_base/utf8.hpp>
 #include <seir_data/blob.hpp>
+#include <seir_graphics/rectf.hpp>
 #include <seir_image/image.hpp>
 
 #include <cassert>
@@ -32,7 +32,7 @@ namespace
 		{ 0x00, 0x00, 0x00, 0x00 },
 		{ 0x00, 0x00, 0x00, 0x00 },
 	};
-	constexpr Yt::RectF builtinWhiteRect{ {}, Yt::SizeF{ 1, 1 } };
+	constexpr seir::RectF builtinWhiteRect{ {}, seir::SizeF{ 1, 1 } };
 }
 
 namespace Yt
@@ -118,7 +118,7 @@ namespace Yt
 					break; // TODO: Report error.
 				auto& glyphInfo = _glyph[codepoint];
 				glyphInfo._id = id;
-				glyphInfo._rect = { { static_cast<int>(x_offset), static_cast<int>(y_offset) }, Size{ static_cast<int>(glyph->bitmap.width), static_cast<int>(glyph->bitmap.rows) } };
+				glyphInfo._rect = { { static_cast<int>(x_offset), static_cast<int>(y_offset) }, seir::Size{ static_cast<int>(glyph->bitmap.width), static_cast<int>(glyph->bitmap.rows) } };
 				glyphInfo._offset = { glyph->bitmap_left, baseline - glyph->bitmap_top };
 				glyphInfo._advance = static_cast<int>(glyph->advance.x >> 6);
 				copy_rect(glyph->bitmap.buffer, glyph->bitmap.width, glyph->bitmap.rows, glyph->bitmap.pitch);
@@ -126,7 +126,7 @@ namespace Yt
 			_texture = renderManager.create_texture_2d({ imageInfo, std::move(buffer) });
 		}
 
-		void render(Renderer2D& renderer, const RectF& rect, std::string_view text) const override
+		void render(Renderer2D& renderer, const seir::RectF& rect, std::string_view text) const override
 		{
 			const auto scale = rect.height() / static_cast<float>(_size);
 			int x = 0;
@@ -146,8 +146,8 @@ namespace Yt
 				const auto left = rect.left() + static_cast<float>(x + current->second._offset._x) * scale;
 				if (left >= rect.right())
 					break;
-				RectF positionRect{ { left, rect.top() + static_cast<float>(current->second._offset._y) * scale }, SizeF{ current->second._rect.size() } * scale };
-				RectF glyphRect{ current->second._rect };
+				seir::RectF positionRect{ { left, rect.top() + static_cast<float>(current->second._offset._y) * scale }, seir::SizeF{ current->second._rect.size() } * scale };
+				seir::RectF glyphRect{ current->second._rect };
 				bool clipped = false;
 				if (positionRect.right() > rect.right())
 				{
@@ -217,7 +217,7 @@ namespace Yt
 			return _texture;
 		}
 
-		RectF textureRect(Graphics graphics) const noexcept override
+		seir::RectF textureRect(Graphics graphics) const noexcept override
 		{
 			switch (graphics)
 			{
@@ -230,8 +230,8 @@ namespace Yt
 		struct Glyph
 		{
 			FT_UInt _id = 0;
-			Rect _rect;
-			Point _offset;
+			seir::Rect _rect;
+			seir::Point _offset;
 			int _advance = 0;
 		};
 

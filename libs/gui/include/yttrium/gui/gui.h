@@ -6,14 +6,11 @@
 
 #include <yttrium/gui/layout.h>
 
+#include <seir_graphics/rectf.hpp>
+
 #include <memory>
 #include <optional>
 #include <string_view>
-
-namespace seir
-{
-	class Vec2;
-}
 
 namespace Yt
 {
@@ -25,7 +22,6 @@ namespace Yt
 	struct GuiLabelStyle;
 	class GuiLayout;
 	enum class Key;
-	class RectF;
 	class Renderer2D;
 
 	enum class GuiAlignment
@@ -41,11 +37,11 @@ namespace Yt
 		explicit GuiFrame(GuiContext&, Renderer2D&);
 		~GuiFrame() noexcept;
 
-		bool addButton(std::string_view id, std::string_view text, const RectF& = {});
-		std::optional<seir::Vec2> addDragArea(std::string_view id, const RectF&, Key);
-		std::optional<seir::Vec2> addHoverArea(const RectF&) noexcept;
-		void addLabel(std::string_view text, GuiAlignment = GuiAlignment::Left, const RectF& = {});
-		bool addStringEdit(std::string_view id, std::string& text, const RectF& = {});
+		bool addButton(std::string_view id, std::string_view text, const seir::RectF& = {});
+		std::optional<seir::Vec2> addDragArea(std::string_view id, const seir::RectF&, Key);
+		std::optional<seir::Vec2> addHoverArea(const seir::RectF&) noexcept;
+		void addLabel(std::string_view text, GuiAlignment = GuiAlignment::Left, const seir::RectF& = {});
+		bool addStringEdit(std::string_view id, std::string& text, const seir::RectF& = {});
 		void putDefaultFocus() noexcept;
 		Renderer2D& renderer() noexcept { return _renderer; }
 		void selectBlankTexture();

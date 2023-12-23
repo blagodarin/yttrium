@@ -4,11 +4,11 @@
 
 #include "application.h"
 
-#include <yttrium/geometry/size.h>
 #include "../../../base/src/windows/error.h"
 
 #include <seir_base/int_utils.hpp>
 #include <seir_base/utf8.hpp>
+#include <seir_graphics/size.hpp>
 
 #include <array>
 #include <cassert>

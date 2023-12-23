@@ -5,11 +5,11 @@
 #include <yttrium/application/application.h>
 #include <yttrium/application/event.h>
 #include <yttrium/application/window.h>
-#include <yttrium/geometry/rect.h>
 #include <yttrium/gui/font.h>
 #include <yttrium/gui/style.h>
 
 #include <seir_base/utf8.hpp>
+#include <seir_graphics/rectf.hpp>
 
 #include <cassert>
 #include <chrono>
@@ -241,7 +241,7 @@ namespace Yt
 		GuiLabelStyle _labelStyle;
 		std::shared_ptr<const Font> _defaultFont;
 		std::shared_ptr<const Texture2D> _blankTexture;
-		RectF _blankTextureRect;
+		seir::RectF _blankTextureRect;
 		GuiLayout* _layout = nullptr;
 		std::array<uint8_t, 256> _keyStates{};
 		bool _focusExpected = false;
@@ -298,9 +298,9 @@ namespace Yt
 			}
 		}
 
-		RectF layoutRect() noexcept;
+		seir::RectF layoutRect() noexcept;
 
-		std::optional<seir::Vec2> takeMouseCursor(const RectF& rect) noexcept
+		std::optional<seir::Vec2> takeMouseCursor(const seir::RectF& rect) noexcept
 		{
 			if (_mouseCursorTaken || !rect.contains(_mouseCursor))
 				return {};
@@ -309,7 +309,7 @@ namespace Yt
 			return _mouseCursor;
 		}
 
-		std::optional<seir::Vec2> takeMouseHover(const RectF& rect) noexcept
+		std::optional<seir::Vec2> takeMouseHover(const seir::RectF& rect) noexcept
 		{
 			if (_mouseHoverTaken || !rect.contains(_mouseCursor))
 				return {};

@@ -16,13 +16,13 @@
 
 namespace
 {
-	constexpr Yt::RectF relativeHeightInRect(const Yt::RectF& rect, float relativeHeight) noexcept
+	constexpr seir::RectF relativeHeightInRect(const seir::RectF& rect, float relativeHeight) noexcept
 	{
 		const auto padding = rect.height() * (1 - relativeHeight) / 2;
 		return { rect.topLeft() + padding, rect.bottomRight() - padding };
 	}
 
-	constexpr Yt::RectF sizeInRect(const Yt::RectF& rect, const Yt::SizeF& size) noexcept
+	constexpr seir::RectF sizeInRect(const seir::RectF& rect, const seir::SizeF& size) noexcept
 	{
 		const auto yPadding = (rect.height() - size._height) / 2;
 		const auto xPadding = std::max(yPadding, (rect.width() - size._width) / 2);
@@ -69,11 +69,11 @@ namespace Yt
 			keyState &= static_cast<uint8_t>(~GuiContextData::kKeyStateTaken);
 	}
 
-	bool GuiFrame::addButton(std::string_view id, std::string_view text, const RectF& rect)
+	bool GuiFrame::addButton(std::string_view id, std::string_view text, const seir::RectF& rect)
 	{
 		assert(!id.empty());
-		const auto widgetRect = rect.null() ? _context.layoutRect() : rect;
-		if (widgetRect.empty())
+		const auto widgetRect = rect.isNull() ? _context.layoutRect() : rect;
+		if (widgetRect.isEmpty())
 			return false;
 		bool clicked = false;
 		const auto* styleState = &_context._buttonStyle._normal;
@@ -134,7 +134,7 @@ namespace Yt
 		return clicked;
 	}
 
-	std::optional<seir::Vec2> GuiFrame::addDragArea(std::string_view id, const RectF& rect, Key key)
+	std::optional<seir::Vec2> GuiFrame::addDragArea(std::string_view id, const seir::RectF& rect, Key key)
 	{
 		assert(!id.empty());
 		if (_context._mouseItem == id)
@@ -165,16 +165,16 @@ namespace Yt
 		return {};
 	}
 
-	std::optional<seir::Vec2> GuiFrame::addHoverArea(const RectF& rect) noexcept
+	std::optional<seir::Vec2> GuiFrame::addHoverArea(const seir::RectF& rect) noexcept
 	{
 		return _context.takeMouseHover(rect);
 	}
 
-	void GuiFrame::addLabel(std::string_view text, GuiAlignment alignment, const RectF& rect)
+	void GuiFrame::addLabel(std::string_view text, GuiAlignment alignment, const seir::RectF& rect)
 	{
 		if (!_context._labelStyle._font)
 			return;
-		auto textRect = rect.null() ? _context.layoutRect() : rect;
+		auto textRect = rect.isNull() ? _context.layoutRect() : rect;
 		if (textRect.top() >= textRect.bottom())
 			return;
 		const auto verticalPadding = textRect.height() * (1 - _context._buttonStyle._fontSize) / 2;
@@ -203,11 +203,11 @@ namespace Yt
 		_context._labelStyle._font->render(_renderer, textRect, text);
 	}
 
-	bool GuiFrame::addStringEdit(std::string_view id, std::string& text, const RectF& rect)
+	bool GuiFrame::addStringEdit(std::string_view id, std::string& text, const seir::RectF& rect)
 	{
 		assert(!id.empty());
-		const auto widgetRect = rect.null() ? _context.layoutRect() : rect;
-		if (widgetRect.empty())
+		const auto widgetRect = rect.isNull() ? _context.layoutRect() : rect;
+		if (widgetRect.isEmpty())
 			return false;
 		bool entered = false;
 		const auto* styleState = &_context._editStyle._normal;
@@ -337,7 +337,7 @@ namespace Yt
 
 	std::optional<seir::Vec2> GuiFrame::takeMouseCursor() noexcept
 	{
-		return _context.takeMouseCursor(RectF{ _renderer.viewportSize() });
+		return _context.takeMouseCursor(seir::RectF{ _renderer.viewportSize() });
 	}
 
 	bool GuiFrame::takeAnyKeyPress() noexcept

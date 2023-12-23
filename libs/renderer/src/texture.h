@@ -6,13 +6,16 @@
 
 #include <yttrium/renderer/texture.h>
 
-#include <yttrium/geometry/size.h>
-
+#include <seir_graphics/size.hpp>
 #include <seir_image/image.hpp>
+
+namespace seir
+{
+	class RectF;
+}
 
 namespace Yt
 {
-	class RectF;
 	class RenderBackend;
 
 	class BackendTexture2D : public Texture2D
@@ -20,14 +23,14 @@ namespace Yt
 	public:
 		BackendTexture2D(RenderBackend&, const seir::ImageInfo&, bool has_mipmaps);
 
-		Size size() const noexcept override { return _size; }
+		seir::Size size() const noexcept override { return _size; }
 
-		RectF full_rectangle() const;
+		seir::RectF full_rectangle() const;
 		seir::ImageAxes orientation() const noexcept { return _orientation; }
 
 	protected:
 		RenderBackend& _backend;
-		const Size _size;
+		const seir::Size _size;
 		const seir::ImageAxes _orientation;
 		const bool _has_mipmaps;
 	};

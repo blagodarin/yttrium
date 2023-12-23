@@ -6,11 +6,11 @@
 
 #include <yttrium/application/key.h>
 #include <yttrium/base/exceptions.h>
-#include <yttrium/geometry/point.h>
-#include <yttrium/geometry/size.h>
 #include "../../../base/src/windows/error.h"
 #include "../window_callbacks.h"
 
+#include <seir_graphics/point.hpp>
+#include <seir_graphics/size.hpp>
 #include <seir_image/image.hpp>
 #include <seir_image/utils.hpp>
 
@@ -45,7 +45,7 @@ namespace Yt
 		::SendMessageW(_hwnd, WM_CLOSE, 0, 0);
 	}
 
-	bool WindowBackend::get_cursor(Point& cursor)
+	bool WindowBackend::get_cursor(seir::Point& cursor)
 	{
 		POINT gdi_cursor;
 		if (!::GetCursorPos(&gdi_cursor)
@@ -55,7 +55,7 @@ namespace Yt
 		return true;
 	}
 
-	bool WindowBackend::set_cursor(const Point& cursor)
+	bool WindowBackend::set_cursor(const seir::Point& cursor)
 	{
 		POINT gdi_cursor{ cursor._x, cursor._y };
 		return ::ClientToScreen(_hwnd, &gdi_cursor)
@@ -131,7 +131,7 @@ namespace Yt
 		_callbacks.on_key_event(key, pressed, autorepeat, modifiers);
 	}
 
-	void WindowBackend::on_resize(const Size& size)
+	void WindowBackend::on_resize(const seir::Size& size)
 	{
 		_size = size;
 		_callbacks.on_resize_event(_size);

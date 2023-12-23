@@ -4,7 +4,6 @@
 
 #include "renderer.h"
 
-#include <yttrium/geometry/rect.h>
 #include <yttrium/renderer/mesh.h>
 #include <yttrium/renderer/program.h>
 #include "model/formats/obj.h"
@@ -18,6 +17,7 @@
 #	include "backend/null/renderer.h"
 #endif
 
+#include <seir_graphics/rectf.hpp>
 #include <seir_image/image.hpp>
 
 #include <cassert>
@@ -60,17 +60,17 @@ namespace Yt
 		return _backend->create_mesh(data);
 	}
 
-	RectF RendererImpl::map_rect(const RectF& rect, seir::ImageAxes axes) const
+	seir::RectF RendererImpl::map_rect(const seir::RectF& rect, seir::ImageAxes axes) const
 	{
 		return _backend->map_rect(rect, axes);
 	}
 
-	void RendererImpl::set_viewport_size(const Size& size)
+	void RendererImpl::set_viewport_size(const seir::Size& size)
 	{
 		_backend->set_viewport_size(size);
 	}
 
-	seir::Image RendererImpl::take_screenshot(const Size& size) const
+	seir::Image RendererImpl::take_screenshot(const seir::Size& size) const
 	{
 		return _backend->take_screenshot(size);
 	}

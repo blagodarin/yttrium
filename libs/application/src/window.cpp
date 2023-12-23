@@ -6,7 +6,8 @@
 #include "window.h"
 
 #include <yttrium/application/application.h>
-#include <yttrium/geometry/rect.h>
+
+#include <seir_graphics/rect.hpp>
 
 #include <cassert>
 
@@ -46,7 +47,7 @@ namespace Yt
 		if (!_is_active)
 			return;
 
-		Point cursor = Rect{ _size }.center();
+		auto cursor = seir::Rect{ _size }.center();
 		_backend.get_cursor(cursor);
 
 		// cppcheck-suppress variableScope
@@ -55,7 +56,7 @@ namespace Yt
 		const auto dy = cursor._y - _cursor._y;
 
 		if (!_is_cursor_locked)
-			_cursor = Rect{ _size }.bound(cursor);
+			_cursor = seir::Rect{ _size }.bound(cursor);
 		else
 			_backend.set_cursor(_cursor);
 
@@ -75,14 +76,14 @@ namespace Yt
 		_callbacks->onWindowKeyEvent(_window, event);
 	}
 
-	void WindowPrivate::on_resize_event(const Size& size)
+	void WindowPrivate::on_resize_event(const seir::Size& size)
 	{
 		_size = size;
 		if (!_is_cursor_locked)
 		{
-			auto cursor = Rect(_size).center();
+			auto cursor = seir::Rect(_size).center();
 			_backend.get_cursor(cursor);
-			_cursor = Rect(_size).bound(cursor);
+			_cursor = seir::Rect(_size).bound(cursor);
 		}
 		else
 			lock_cursor(true);
@@ -98,7 +99,7 @@ namespace Yt
 		_is_cursor_locked = lock;
 		if (_is_cursor_locked && _is_active)
 		{
-			_cursor = Rect(_size).center();
+			_cursor = seir::Rect(_size).center();
 			_backend.set_cursor(_cursor);
 		}
 	}
@@ -122,7 +123,7 @@ namespace Yt
 		_private->_backend.close();
 	}
 
-	Point Window::cursor() const
+	seir::Point Window::cursor() const
 	{
 		return _private->_cursor;
 	}
@@ -137,9 +138,9 @@ namespace Yt
 		_private->lock_cursor(lock);
 	}
 
-	bool Window::set_cursor(const Point& cursor)
+	bool Window::set_cursor(const seir::Point& cursor)
 	{
-		if (_private->_is_cursor_locked || !Rect{ _private->_size }.contains(cursor) || !_private->_backend.set_cursor(cursor))
+		if (_private->_is_cursor_locked || !seir::Rect{ _private->_size }.contains(cursor) || !_private->_backend.set_cursor(cursor))
 			return false;
 		_private->_cursor = cursor;
 		return true;
@@ -161,7 +162,7 @@ namespace Yt
 		_private->set_active(true);
 	}
 
-	Size Window::size() const
+	seir::Size Window::size() const
 	{
 		return _private->_size;
 	}

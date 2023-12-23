@@ -15,9 +15,9 @@ namespace Yt
 	{
 	}
 
-	RectF GuiContextData::layoutRect() noexcept // NOLINT(readability-make-member-function-const)
+	seir::RectF GuiContextData::layoutRect() noexcept // NOLINT(readability-make-member-function-const)
 	{
-		return _layout ? _layout->add() : RectF{};
+		return _layout ? _layout->add() : seir::RectF{};
 	}
 
 	void GuiContextData::onWindowMouseMove([[maybe_unused]] const Window& window, int, int)

@@ -8,9 +8,9 @@
 
 #include <yttrium/base/buffer.h>
 #include <yttrium/base/flags.h>
-#include <yttrium/geometry/margins.h>
-#include <yttrium/geometry/rect.h>
 #include <yttrium/renderer/texture.h>
+
+#include <seir_graphics/sizef.hpp>
 
 #include <string>
 
@@ -53,14 +53,14 @@ namespace Yt
 	class RenderPassImpl : public RenderPass
 	{
 	public:
-		RenderPassImpl(RenderBackend&, RenderBuiltin&, RenderPassData&, const Size& viewport_size, RenderMetrics&);
+		RenderPassImpl(RenderBackend&, RenderBuiltin&, RenderPassData&, const seir::Size& viewport_size, RenderMetrics&);
 		~RenderPassImpl() noexcept override;
 
 		void draw_mesh(const Mesh&) override;
 		seir::Mat4 full_matrix() const override;
 		seir::Mat4 model_matrix() const override;
 		seir::Line3 pixel_ray(const seir::Vec2&) const override;
-		RectF viewport_rect() const override;
+		seir::RectF viewport_rect() const override;
 
 	public:
 		RenderBuiltin& builtin() const noexcept { return _builtin; }
@@ -82,7 +82,7 @@ namespace Yt
 		RenderBackend& _backend;
 		RenderBuiltin& _builtin;
 		RenderPassData& _data;
-		const SizeF _viewport_size;
+		const seir::SizeF _viewport_size;
 		RenderMetrics& _metrics;
 
 		const Texture2D* _current_texture = nullptr;

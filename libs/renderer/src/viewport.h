@@ -13,7 +13,7 @@ namespace Yt
 	struct ViewportData
 	{
 		Window& _window;
-		Size _window_size;
+		seir::Size _window_size;
 		RendererImpl _renderer{ _window.id() };
 		RenderBuiltin _renderer_builtin{ *_renderer._backend };
 		RenderPassData _render_pass_data;
