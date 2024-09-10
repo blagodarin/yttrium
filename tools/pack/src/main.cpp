@@ -41,18 +41,18 @@ namespace
 		Index result;
 		seir::StReader reader{ blob };
 		seir::StStream stream{ reader };
-		if (stream.tryName("compressor"))
+		if (stream.tryKey("compressor"))
 		{
 			check(stream.value() == "zlib", "Bad compression algorithm");
 			result._compression = seir::Compression::Zlib;
 		}
 		while (!stream.tryEnd())
 		{
-			stream.name("files");
+			stream.key("files");
 			auto& group = result._groups.emplace_back();
 			if (stream.tryBeginObject())
 			{
-				stream.name("compression");
+				stream.key("compression");
 				if (const auto level = stream.value(); level == "minimum")
 					group._compressionLevel = seir::CompressionLevel::Minimum;
 				else if (level == "default")

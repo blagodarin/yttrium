@@ -9,7 +9,6 @@ source_group("include" REGULAR_EXPRESSION "include/")
 add_library(Y_base STATIC
 	include/yttrium/base/buffer.h
 	include/yttrium/base/buffer_appender.h
-	include/yttrium/base/clock.h
 	include/yttrium/base/exceptions.h
 	include/yttrium/base/flags.h
 	include/yttrium/base/logger.h
